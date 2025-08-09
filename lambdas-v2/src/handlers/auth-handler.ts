@@ -275,11 +275,11 @@ export const handler = authHandler.withoutAuth(async (event: APIGatewayProxyEven
   const path = event.resource;
 
   // Route to appropriate handler based on method and path
-  if (method === 'POST' && path === '/auth/register') {
+  if (method === 'POST' && path.endsWith('/auth/register')) {
     return authHandler.register(event);
-  } else if (method === 'POST' && path === '/auth/login') {
+  } else if (method === 'POST' && path.endsWith('/auth/login')) {
     return authHandler.login(event);
-  } else if (method === 'POST' && path === '/auth/refresh') {
+  } else if (method === 'POST' && path.endsWith('/auth/refresh')) {
     return authHandler.refresh(event);
   } else {
     return {
