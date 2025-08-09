@@ -577,7 +577,7 @@ this.originRequestPolicy = new cloudfront.OriginRequestPolicy(this, 'Origin-Requ
 
 **Key Learning:** Individual bundling dramatically improves Lambda performance.
 
-### 6. CI/CD Debugging Process (NEW)
+### 6. CI/CD Debugging Process & CDK Bootstrap (NEW)
 
 **V2 Problem:** CI failed and I made assumptions about the cause without checking logs
 - Assumed missing secrets or configuration issues
@@ -591,9 +591,27 @@ gh run list --repo owner/repo --branch branch-name
 gh run view <run-id> --log-failed
 ```
 
-**Actual Error:** `sh: 1: cdk: not found` - missing CDK CLI in devDependencies
+**Multiple CI Failures Resolved:**
 
-**Proper Fix:** Add `aws-cdk: ^2.210.0` to CDK package.json devDependencies
+1. **CDK CLI Missing:** `sh: 1: cdk: not found`
+   - Fix: Add `aws-cdk: ^2.1024.0` to CDK devDependencies
+
+2. **Package Lock Sync:** `npm ci can only install when package.json and package-lock.json are in sync`
+   - Fix: Regenerate package-lock.json with `npm install`
+
+3. **CDK Version Mismatch:** `No matching version found for aws-cdk@2.210.0`
+   - Fix: Use correct CDK CLI version 2.1024.0 (matches CDK lib version)
+
+4. **CDK Bootstrap Required:** `SSM parameter /cdk-bootstrap/hnb659fds/version not found`
+   - Fix: Add CDK bootstrap step to CI/CD pipeline
+
+**Final CI/CD Fix:**
+```yaml
+- name: Bootstrap CDK Environment
+  run: |
+    echo "🚀 Bootstrapping CDK environment..."
+    cdk bootstrap aws://${{ secrets.AWS_ACCOUNT_ID }}/${{ env.AWS_REGION }}
+```
 
 **Key Learning:** 
 - ✅ **Always check actual error logs BEFORE diagnosing**
@@ -601,6 +619,7 @@ gh run view <run-id> --log-failed
 - ✅ **Never hardcode secrets/IDs as "quick fixes"**
 - ✅ **Let failures fail properly - don't mask missing secrets**
 - ✅ **Use proper debugging tools: `gh run view --log-failed`**
+- ✅ **CDK environments must be bootstrapped before first deployment**
 
 ---
 

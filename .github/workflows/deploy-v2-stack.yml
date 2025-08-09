@@ -116,6 +116,11 @@ jobs:
         working-directory: ./cdk-v2
         run: npm ci
         
+      - name: Bootstrap CDK Environment
+        run: |
+          echo "🚀 Bootstrapping CDK environment..."
+          cdk bootstrap aws://${{ secrets.AWS_ACCOUNT_ID }}/${{ env.AWS_REGION }}
+        
       - name: Deploy or Destroy Stack
         working-directory: ./cdk-v2
         env:
