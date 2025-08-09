@@ -410,7 +410,7 @@ aws cloudformation describe-stacks \
 
 ### CI/CD Pipeline
 
-The GitHub Actions workflow (`deploy-v2-stack.yml`) provides:
+The GitHub Actions workflow (`deploy-v2-stack.yml`) provides a streamlined 2-job approach:
 
 1. **Build & Test Job:**
    - Install dependencies
@@ -420,17 +420,14 @@ The GitHub Actions workflow (`deploy-v2-stack.yml`) provides:
    - CDK synth validation
 
 2. **Deploy Job:**
+   - Bootstrap CDK environment (if needed)
    - Deploy to AWS using CDK
-   - Output deployment URLs and resource IDs
+   - Output deployment results with key URLs
+   - Display health check endpoint for immediate testing
 
-3. **Integration Tests:**
-   - Health endpoint testing
-   - JWT token generation and testing
-   - Protected endpoint validation
-   - CloudFront distribution testing
-
-4. **Cleanup on Failure:**
-   - Automatically destroy failed dev deployments
+**Simplified Design:** Removed unnecessary integration tests and cleanup jobs since:
+- Integration tests were redundant after successful deployment
+- CloudFormation automatically handles rollback on deployment failures
 
 **Trigger deployment:**
 ```bash
