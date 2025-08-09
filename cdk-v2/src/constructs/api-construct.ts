@@ -110,8 +110,21 @@ export class ApiConstruct extends Construct {
 
     // Auth endpoints (no auth required)
     const auth = v1.addResource('auth');
-    auth.addMethod('POST', new apigateway.LambdaIntegration(props.functions.authFunction), {
-      operationName: 'AuthenticateUser'
+    
+    // Auth sub-routes
+    const authRegister = auth.addResource('register');
+    authRegister.addMethod('POST', new apigateway.LambdaIntegration(props.functions.authFunction), {
+      operationName: 'RegisterUser'
+    });
+    
+    const authLogin = auth.addResource('login');
+    authLogin.addMethod('POST', new apigateway.LambdaIntegration(props.functions.authFunction), {
+      operationName: 'LoginUser'
+    });
+    
+    const authRefresh = auth.addResource('refresh');
+    authRefresh.addMethod('POST', new apigateway.LambdaIntegration(props.functions.authFunction), {
+      operationName: 'RefreshToken'
     });
 
     // Protected endpoints (require TOKEN authorization)
@@ -132,6 +145,20 @@ export class ApiConstruct extends Construct {
     questions.addMethod('GET', new apigateway.LambdaIntegration(props.functions.questionFunction), {
       ...authOptions,
       operationName: 'GetQuestions'
+    });
+
+    // Questions random - GET /questions/random
+    const questionsRandom = questions.addResource('random');
+    questionsRandom.addMethod('GET', new apigateway.LambdaIntegration(props.functions.questionFunction), {
+      ...authOptions,
+      operationName: 'GetRandomQuestions'
+    });
+
+    // Questions stats - GET /questions/stats
+    const questionsStats = questions.addResource('stats');
+    questionsStats.addMethod('GET', new apigateway.LambdaIntegration(props.functions.questionFunction), {
+      ...authOptions,
+      operationName: 'GetQuestionStats'
     });
 
     // Sessions endpoint
@@ -160,6 +187,20 @@ export class ApiConstruct extends Construct {
       operationName: 'DeleteSession'
     });
 
+    // Session answers - POST /sessions/{sessionId}/answers
+    const sessionAnswers = sessionById.addResource('answers');
+    sessionAnswers.addMethod('POST', new apigateway.LambdaIntegration(props.functions.sessionFunction), {
+      ...authOptions,
+      operationName: 'SubmitAnswer'
+    });
+
+    // Session complete - POST /sessions/{sessionId}/complete
+    const sessionComplete = sessionById.addResource('complete');
+    sessionComplete.addMethod('POST', new apigateway.LambdaIntegration(props.functions.sessionFunction), {
+      ...authOptions,
+      operationName: 'CompleteSession'
+    });
+
     // Goals endpoint
     const goals = v1.addResource('goals');
     goals.addMethod('GET', new apigateway.LambdaIntegration(props.functions.goalFunction), {
@@ -184,6 +225,13 @@ export class ApiConstruct extends Construct {
     goalById.addMethod('DELETE', new apigateway.LambdaIntegration(props.functions.goalFunction), {
       ...authOptions,
       operationName: 'DeleteGoal'
+    });
+
+    // Goal milestones - POST /goals/{goalId}/milestones
+    const goalMilestones = goalById.addResource('milestones');
+    goalMilestones.addMethod('POST', new apigateway.LambdaIntegration(props.functions.goalFunction), {
+      ...authOptions,
+      operationName: 'AddMilestone'
     });
 
     // Analytics endpoint
