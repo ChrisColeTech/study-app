@@ -96,8 +96,9 @@ export class TokenAuthorizer {
     const restApiId = apiGatewayArnTmp[0] || '*';
     const stage = apiGatewayArnTmp[1] || '*';
     
-    // Create resource ARN pattern to allow/deny all methods and resources
-    const resourceArn = `arn:aws:execute-api:${arnParts[3]}:${arnParts[4]}:${restApiId}/${stage}/*/*`;
+    // Create more inclusive resource ARN pattern to handle sub-routes
+    // Use wildcard at the end to match all paths including path parameters
+    const resourceArn = `arn:aws:execute-api:${arnParts[3]}:${arnParts[4]}:${restApiId}/${stage}/*`;
 
     return {
       principalId,
