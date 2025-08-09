@@ -10,7 +10,7 @@ export class LambdaFactory {
       functionName: `study-app-${props.functionName}-${props.stage}`,
       runtime: lambda.Runtime.NODEJS_18_X,
       handler: props.handler,
-      code: lambda.Code.fromAsset('../lambdas/dist'),
+      code: lambda.Code.fromAsset('../lambdas-built'),
       memorySize: props.memorySize || 512,
       timeout: cdk.Duration.seconds(props.timeout || 30),
       environment: {
