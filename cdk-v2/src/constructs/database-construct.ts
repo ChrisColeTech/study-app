@@ -28,7 +28,16 @@ export class DatabaseConstruct extends Construct {
       pointInTimeRecovery: props.config.pointInTimeRecovery,
       encryption: props.config.encryption ? dynamodb.TableEncryption.AWS_MANAGED : undefined,
       removalPolicy: props.stage === 'prod' ? cdk.RemovalPolicy.RETAIN : cdk.RemovalPolicy.DESTROY,
-      // We'll add GSI after table creation to avoid TypeScript issues
+    });
+
+    // Add GSI for email-based user lookup
+    this.usersTable.addGlobalSecondaryIndex({
+      indexName: 'email-index',
+      partitionKey: {
+        name: 'email',
+        type: dynamodb.AttributeType.STRING
+      },
+      projectionType: dynamodb.ProjectionType.ALL
     });
 
     // Sessions Table - V2 with new logical ID
@@ -50,6 +59,16 @@ export class DatabaseConstruct extends Construct {
       timeToLiveAttribute: 'expiresAt'
     });
 
+    // Add GSI for user-based session queries
+    this.sessionsTable.addGlobalSecondaryIndex({
+      indexName: 'UserIdIndex',
+      partitionKey: {
+        name: 'userId',
+        type: dynamodb.AttributeType.STRING
+      },
+      projectionType: dynamodb.ProjectionType.ALL
+    });
+
     // Goals Table - V2 with new logical ID
     this.goalsTable = new dynamodb.Table(this, 'Goals-Table-V2', {
       tableName: `StudyAppV2-Goals-${props.stage}`,
@@ -65,7 +84,16 @@ export class DatabaseConstruct extends Construct {
       pointInTimeRecovery: props.config.pointInTimeRecovery,
       encryption: props.config.encryption ? dynamodb.TableEncryption.AWS_MANAGED : undefined,
       removalPolicy: props.stage === 'prod' ? cdk.RemovalPolicy.RETAIN : cdk.RemovalPolicy.DESTROY,
-      // GSI will be added after table creation
+    });
+
+    // Add GSI for user-based goal queries
+    this.goalsTable.addGlobalSecondaryIndex({
+      indexName: 'UserIdIndex',
+      partitionKey: {
+        name: 'userId',
+        type: dynamodb.AttributeType.STRING
+      },
+      projectionType: dynamodb.ProjectionType.ALL
     });
 
     // Analytics Table - V2 with new logical ID  
