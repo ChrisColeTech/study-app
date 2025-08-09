@@ -1,0 +1,134 @@
+{
+  "batch_metadata": {
+    "batch_number": 4,
+    "questions_answered": 25,
+    "completion_date": "2025-08-08"
+  },
+  "ai_answers": [
+    {
+      "question_number": 126,
+      "correct_answer": "B",
+      "explanation": "S3 Lifecycle policy to transition objects to S3 Glacier Deep Archive after 2 years meets the requirement that data from the most recent 2 years must be highly available and immediately retrievable, while providing the lowest cost for long-term storage."
+    },
+    {
+      "question_number": 127,
+      "correct_answer": "D",
+      "explanation": "EC2 instance store provides the maximum I/O performance for video processing, S3 provides highly durable storage for media content, and S3 Glacier offers the most cost-effective archival storage for inactive media."
+    },
+    {
+      "question_number": 128,
+      "correct_answer": "B",
+      "explanation": "Spot Instances in Amazon EKS managed node groups provide the lowest cost for stateless applications that can tolerate disruptions. EKS reduces operational overhead compared to managing EC2 Auto Scaling groups directly."
+    },
+    {
+      "question_number": 129,
+      "correct_answer": "A, E",
+      "explanation": "Migrating PostgreSQL to Amazon Aurora reduces operational overhead and provides high availability, while migrating the containerized web application to AWS Fargate eliminates infrastructure management and provides automatic scaling."
+    },
+    {
+      "question_number": 130,
+      "correct_answer": "B",
+      "explanation": "Target tracking policy automatically adjusts the Auto Scaling group capacity to maintain the target CPU utilization of 40%, providing the most efficient and responsive scaling behavior."
+    },
+    {
+      "question_number": 131,
+      "correct_answer": "D",
+      "explanation": "Origin Access Identity (OAI) is the standard way to restrict S3 access to only CloudFront, preventing direct access to S3 URLs while allowing CloudFront to serve the content."
+    },
+    {
+      "question_number": 132,
+      "correct_answer": "A",
+      "explanation": "Amazon CloudFront and S3 provide global distribution, cost-effectiveness, minimal infrastructure provisioning, and fastest response times for serving downloadable files worldwide."
+    },
+    {
+      "question_number": 133,
+      "correct_answer": "C",
+      "explanation": "Amazon RDS Custom for Oracle provides access to the underlying operating system while maintaining managed database benefits, and read replicas in another region provide disaster recovery with minimal operational overhead."
+    },
+    {
+      "question_number": 134,
+      "correct_answer": "C",
+      "explanation": "Using the existing S3 bucket with Cross-Region Replication and Amazon Athena minimizes operational overhead. Athena is the serverless SQL solution for analyzing S3 data without managing infrastructure."
+    },
+    {
+      "question_number": 135,
+      "correct_answer": "D",
+      "explanation": "AWS PrivateLink with a VPC endpoint created by the provider enables private connectivity that is restricted to the target service and can only be initiated from the company's VPC, meeting all security requirements."
+    },
+    {
+      "question_number": 136,
+      "correct_answer": "A, C",
+      "explanation": "AWS Database Migration Service (DMS) replication server enables ongoing replication between on-premises PostgreSQL and Aurora PostgreSQL, keeping databases synchronized during migration."
+    },
+    {
+      "question_number": 137,
+      "correct_answer": "B",
+      "explanation": "Configuring AWS account root user email addresses as distribution lists ensures all administrators receive notifications, providing redundancy and preventing missed notifications while limiting access to account administrators."
+    },
+    {
+      "question_number": 138,
+      "correct_answer": "B",
+      "explanation": "Amazon MQ with redundant RabbitMQ instances provides high availability for the messaging layer, Multi-AZ Auto Scaling groups for the application provide availability, and Amazon RDS Multi-AZ for PostgreSQL ensures database availability with minimal operational overhead."
+    },
+    {
+      "question_number": 139,
+      "correct_answer": "C",
+      "explanation": "S3 replication automatically copies files between buckets with minimal operational overhead, and S3 event notifications can trigger both Lambda functions and SageMaker Pipelines efficiently."
+    },
+    {
+      "question_number": 140,
+      "correct_answer": "A, C",
+      "explanation": "Spot Instances are ideal for the sporadic, interruptible data ingestion layer, while Compute Savings Plan provides the best cost optimization for predictable Fargate and Lambda usage across the front-end and API layers."
+    },
+    {
+      "question_number": 141,
+      "correct_answer": "A",
+      "explanation": "CloudFront can serve both static and dynamic content with the ALB as the origin, providing global edge locations for minimal latency to users worldwide while maintaining a single deployment region."
+    },
+    {
+      "question_number": 142,
+      "correct_answer": "C",
+      "explanation": "AWS Global Accelerator provides static IP addresses, routes traffic to the nearest edge location, and works with Network Load Balancer for UDP traffic. EC2 instances can run the modified Linux kernel application."
+    },
+    {
+      "question_number": 143,
+      "correct_answer": "D",
+      "explanation": "Amazon ECS provides the right balance of keeping existing code while enabling microservices architecture with minimal operational overhead. Application Load Balancer can route to different containerized services managed by different teams."
+    },
+    {
+      "question_number": 144,
+      "correct_answer": "B",
+      "explanation": "Aurora Replica offloads read-heavy reporting workloads from the primary database, reducing CPU and IO contention on the main ecommerce application while being more cost-effective than Redshift."
+    },
+    {
+      "question_number": 145,
+      "correct_answer": "D",
+      "explanation": "Migrating to Aurora MySQL provides better performance and availability, while using AMI in a launch template with Auto Scaling group enables automatic scaling during busy periods, providing the most cost-effective scalable solution."
+    },
+    {
+      "question_number": 146,
+      "correct_answer": "B",
+      "explanation": "Reserved Instances for baseline capacity provide cost savings for steady overnight usage, while Spot Instances handle additional capacity during peak business hours at significant cost reduction without affecting availability."
+    },
+    {
+      "question_number": 147,
+      "correct_answer": "B",
+      "explanation": "S3 with Lifecycle policies provides the most cost-effective solution for large log volumes. S3 is cheaper than CloudWatch Logs for storage, and Lifecycle policies automatically transition older logs to Glacier Deep Archive."
+    },
+    {
+      "question_number": 148,
+      "correct_answer": "D",
+      "explanation": "SQS queue as the on-failure destination provides a dead letter queue mechanism that captures failed messages for reprocessing, ensuring all notifications are eventually processed even after network connectivity issues."
+    },
+    {
+      "question_number": 149,
+      "correct_answer": "A",
+      "explanation": "Amazon SQS FIFO queue maintains message order and ensures exactly-once processing, which is required for this use case. Lambda function provides serverless processing with minimal operational overhead."
+    },
+    {
+      "question_number": 150,
+      "correct_answer": "A",
+      "explanation": "CloudWatch composite alarms allow combining multiple metrics (CPU utilization AND disk IOPS) into a single alarm, reducing false positives by only triggering when both conditions are met simultaneously."
+    }
+  ]
+}

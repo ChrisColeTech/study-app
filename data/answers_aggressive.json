@@ -1,0 +1,384 @@
+{
+  "metadata": {
+    "parsing_date": "2025-08-07T22:55:31.712229",
+    "source_file": "docs/exam-material/AWS SAA-03 Solution.txt",
+    "classification_file": "data/segment_analysis.json",
+    "target_segments": 24,
+    "extraction_attempts": 24,
+    "successful_extractions": 24,
+    "success_rate": 1.0,
+    "pattern_usage": {
+      "letter_flexible": 8,
+      "standalone_action": 1,
+      "line_extraction": 8,
+      "aws_service_based": 5,
+      "sentence_based": 2
+    },
+    "confidence_distribution": {
+      "high": 20,
+      "medium": 4,
+      "low": 0
+    }
+  },
+  "answers": [
+    {
+      "answer_number": 6,
+      "question_preview": "A company uses NFS to store large video files in on-premises network attached storage. Each video file ranges in size from 1 MB to 500 GB. The total storage is 70 TB and is no longer growing. The company decides to migrate the video files to Amazon S3. The company must migrate the video files as soon as possible while using the least possible network bandwidth. Which solution will meet these requi...",
+      "correct_answer": "The total storage is 70 T",
+      "answer_format": "letter_flexible",
+      "explanation": "B and is no longer growing. The company decides to migrate the video files to Amazon S3. The company must migrate the video files as soon as possible while using the least possible network bandwidth. Which solution will meet these requirements? B Create an AWS Snowball Edge job. Receive a Snowball Edge device on premises. Use the Snowball Edge client to transfer data to the device. Return the device so that AWS can import the data into Amazon S3 On a Snowball Edge device you can copy files with a speed of up to 100Gbps. 70TB will take around 5600 seconds, so very quickly, less than 2 hours. The downside is that it'll take between 4-6 working days to receive the device and then another 2-3 working days to send it back and for AWS to move the data onto S3 once it reaches them. Total time: 6-...",
+      "keywords": [
+        "S3"
+      ],
+      "raw_text": "6]A company uses NFS to store large video files in on-premises network attached storage. Each video file ranges in size from 1 MB to 500 GB. The total storage is 70 TB and is no longer growing. The company decides to migrate the video files to Amazon S3. The company must migrate the video files as soon as possible while using the least possible network bandwidth.\nWhich solution will meet these requirements?\n\n  B Create an AWS Snowball Edge job. Receive a Snowball Edge device on premises. Use the Snowball Edge client to transfer data to the device. Return the device so that AWS can import the data into Amazon S3\n\n On a Snowball Edge device you can copy files with a speed of up to 100Gbps. 70TB will take around 5600 seconds, so very quickly, less than 2 hours. The downside is that it'll take...",
+      "parsing_confidence": 0.8,
+      "aggressive_extraction": true
+    },
+    {
+      "answer_number": 219,
+      "question_preview": "A company’s application is having performance issues. The application is stateful and needs to complete in-memory tasks on Amazon EC2 instances. The company used AWS CloudFormation to deploy infrastructure and used the M5 EC2 instance family. As traffic increased, the application performance degraded. Users are reporting delays when the users attempt to access the application. Which solution will ...",
+      "correct_answer": "deploy infrastructure and used the M5 EC2 instance family.",
+      "answer_format": "standalone_action",
+      "explanation": "As traffic increased, the application performance degraded. Users are reporting delays when the users attempt to access the application. Which solution will resolve these issues in the MOST operationally efficient way?",
+      "keywords": [
+        "EC2"
+      ],
+      "raw_text": "219] A company’s application is having performance issues. The application is stateful and needs to complete in-memory tasks on Amazon EC2 instances. The company used AWS CloudFormation to deploy infrastructure and used the M5 EC2 instance family. As traffic increased, the application performance degraded. Users are reporting delays when the users attempt to access the application.\n\nWhich solution will resolve these issues in the MOST operationally efficient way?\n\n\n\n--------------------------------------------------------------------------------------------------",
+      "parsing_confidence": 0.81,
+      "aggressive_extraction": true
+    },
+    {
+      "answer_number": 247,
+      "question_preview": "A company has deployed a database in Amazon RDS for MySQL. Due to increased transactions, the database support team is reporting slow reads against the DB instance and recommends adding a read replica. Which combination of actions should a solutions architect take before implementing this change? (Choose two.)",
+      "correct_answer": "company has deployed a database in Amazon RDS for MySQL. Due to increased transactions, the database support team is reporting slow reads against the DB instance and recommends adding a read replica.",
+      "answer_format": "line_extraction",
+      "explanation": "Which combination of actions should a solutions architect take before implementing this change? (Choose two.)",
+      "keywords": [
+        "RDS"
+      ],
+      "raw_text": "247] A company has deployed a database in Amazon RDS for MySQL. Due to increased transactions, the database support team is reporting slow reads against the DB instance and recommends adding a read replica.\n\nWhich combination of actions should a solutions architect take before implementing this change? (Choose two.)\n\n\n\n-------------------------------------------------------------------------------------",
+      "parsing_confidence": 0.7100000000000002,
+      "aggressive_extraction": true
+    },
+    {
+      "answer_number": 311,
+      "question_preview": "A company is using AWS to design a web application that will process insurance quotes. Users will request quotes from the application. Quotes must be separated by quote type, must be responded to within 24 hours, and must not get lost. The solution must maximize operational efficiency and must minimize maintenance. Which solution meets these requirements?",
+      "correct_answer": "company is using AWS to design a web application that will process insurance quotes. Quotes must be separated by quote type, must be responded to within 24 hours, and must not get lost.",
+      "answer_format": "aws_service_based",
+      "explanation": "onded to within 24 hours, and must not get lost. The solution must maximize operational efficiency and must minimize maintenance. Which solution meets these requirements?",
+      "keywords": [],
+      "raw_text": "311] A company is using AWS to design a web application that will process insurance quotes. Users will request quotes from the application. Quotes must be separated by quote type, must be responded to within 24 hours, and must not get lost. The solution must maximize operational efficiency and must minimize maintenance.\n\nWhich solution meets these requirements?\n\n---------------------------------------------------------------------",
+      "parsing_confidence": 0.7,
+      "aggressive_extraction": true
+    },
+    {
+      "answer_number": 327,
+      "question_preview": "A solutions architect must secure a VPC network that hosts Amazon EC2 instances. The EC2 instances contain highly sensitive data and run in a private subnet. According to company policy, the EC2 instances that run in the VPC can access only approved third-party software repositories on the internet for software product updates that use the third party’s URL. Other internet traffic must be blocked....",
+      "correct_answer": "solutions architect must secure a VPC network that hosts Amazon EC2 instances. The EC2 instances contain highly sensitive data and run in a private subnet.",
+      "answer_format": "line_extraction",
+      "explanation": "According to company policy, the EC2 instances that run in the VPC can access only approved third-party software repositories on the internet for software product updates that use the third party’s URL. Other internet traffic must be blocked. Which solution meets these requirements?",
+      "keywords": [
+        "EC2",
+        "VPC"
+      ],
+      "raw_text": "327] A solutions architect must secure a VPC network that hosts Amazon EC2 instances. The EC2 instances contain highly sensitive data and run in a private subnet. According to company policy, the EC2 instances that run in the VPC can access only approved third-party software repositories on the internet for software product updates that use the third party’s URL. Other internet traffic must be blocked.\n\nWhich solution meets these requirements?\n\n\n-----------------------------------------------------------------------------------------------------",
+      "parsing_confidence": 0.7000000000000001,
+      "aggressive_extraction": true
+    },
+    {
+      "answer_number": 341,
+      "question_preview": "A company has an Amazon S3 data lake that is governed by AWS Lake Formation. The company wants to create a visualization in Amazon QuickSight by joining the data in the data lake with operational data that is stored in an Amazon Aurora MySQL database. The company wants to enforce column-level authorization so that the company’s marketing team can access only a subset of columns in the database. Wh...",
+      "correct_answer": "company has an Amazon S3 data lake that is governed by",
+      "answer_format": "aws_service_based",
+      "explanation": "AWS Lake Formation. The company wants to create a visualization in Amazon QuickSight by joining the data in the data lake with operational data that is stored in an Amazon Aurora MySQL database. The company wants to enforce column-level authorization so that the company’s marketing team can access only a subset of columns in the database. Which solution will meet these requirements with the LEAST operational overhead?",
+      "keywords": [
+        "S3"
+      ],
+      "raw_text": "341] A company has an Amazon S3 data lake that is governed by AWS Lake Formation. The company wants to create a visualization in Amazon QuickSight by joining the data in the data lake with operational data that is stored in an Amazon Aurora MySQL database. The company wants to enforce column-level authorization so that the company’s marketing team can access only a subset of columns in the database.\n\nWhich solution will meet these requirements with the LEAST operational overhead?\n\n\n\n------------------------------------------------------------------------------------------",
+      "parsing_confidence": 0.75,
+      "aggressive_extraction": true
+    },
+    {
+      "answer_number": 390,
+      "question_preview": "A company hosts a three-tier ecommerce application on a fleet of Amazon EC2 instances. The instances run in an Auto Scaling group behind an Application Load Balancer (ALB). All ecommerce data is stored in an Amazon RDS for MariaDB Multi-AZ DB instance. The company wants to optimize customer session management during transactions. The application must store session data durably. Which solutions wil...",
+      "correct_answer": "ll ecommerce data is stored in an",
+      "answer_format": "letter_flexible",
+      "explanation": "Amazon RDS for MariaDB Multi-AZ DB instance. The company wants to optimize customer session management during transactions. The application must store session data durably. Which solutions will meet these requirements? (Choose two.)",
+      "keywords": [
+        "RDS"
+      ],
+      "raw_text": "390] A company hosts a three-tier ecommerce application on a fleet of Amazon EC2 instances. The instances run in an Auto Scaling group behind an Application Load Balancer (ALB). All ecommerce data is stored in an Amazon RDS for MariaDB Multi-AZ DB instance.\n\nThe company wants to optimize customer session management during transactions. The application must store session data durably.\n\nWhich solutions will meet these requirements? (Choose two.)\n\n\n---------------------------------------------------------------------",
+      "parsing_confidence": 0.8,
+      "aggressive_extraction": true
+    },
+    {
+      "answer_number": 402,
+      "question_preview": "A company needs to ingest and handle large amounts of streaming data that its application generates. The application runs on Amazon EC2 instances and sends data to Amazon Kinesis Data Streams, which is configured with default settings. Every other day, the application consumes the data and writes the data to an Amazon S3 bucket for business intelligence (BI) processing. The company observes that A...",
+      "correct_answer": "I) processing. The company observes that Amazon S3 is not receiving all the data that the application sends to Kinesis",
+      "answer_format": "aws_service_based",
+      "explanation": "Data Streams. What should a solutions architect do to resolve this issue?",
+      "keywords": [
+        "S3",
+        "Kinesis"
+      ],
+      "raw_text": "402] A company needs to ingest and handle large amounts of streaming data that its application generates. The application runs on Amazon EC2 instances and sends data to Amazon Kinesis Data Streams, which is configured with default settings. Every other day, the application consumes the data and writes the data to an Amazon S3 bucket for business intelligence (BI) processing. The company observes that Amazon S3 is not receiving all the data that the application sends to Kinesis Data Streams.\n\nWhat should a solutions architect do to resolve this issue?\n\n\n---------------------------------------------------------------------------------------------",
+      "parsing_confidence": 0.7999999999999999,
+      "aggressive_extraction": true
+    },
+    {
+      "answer_number": 414,
+      "question_preview": "A company has a business system that generates hundreds of reports each day. The business system saves the reports to a network share in CSV format. The company needs to store this data in the AWS Cloud in near-real time for analysis. Which solution will meet these requirements with the LEAST administrative overhead?",
+      "correct_answer": "company has a business system that generates hundreds of reports each day. The business system saves the reports to a network share in CSV format.",
+      "answer_format": "line_extraction",
+      "explanation": "The company needs to store this data in the AWS Cloud in near-real time for analysis. Which solution will meet these requirements with the LEAST administrative overhead?",
+      "keywords": [],
+      "raw_text": "414] A company has a business system that generates hundreds of reports each day. The business system saves the reports to a network share in CSV format. The company needs to store this data in the AWS Cloud in near-real time for analysis.\n\nWhich solution will meet these requirements with the LEAST administrative overhead?\n\n\n\n---------------------------------------------------------------------------------------------",
+      "parsing_confidence": 0.6000000000000001,
+      "aggressive_extraction": true
+    },
+    {
+      "answer_number": 417,
+      "question_preview": "A company uses Amazon EC2 instances and AWS Lambda functions to run its application. The company has VPCs with public subnets and private subnets in its AWS account. The EC2 instances run in a private subnet in one of the VPCs. The Lambda functions need direct network access to the EC2 instances for the application to work. The application will run for at least 1 year. The company expects the numb...",
+      "correct_answer": "company uses Amazon EC2 instances and AWS Lambda functions to run its application. The EC2 instances run in a private subnet in one of the VPCs.",
+      "answer_format": "line_extraction",
+      "explanation": "in its AWS account. The EC2 instances run in a private subnet in one of the VPCs. The Lambda functions need direct network access to the EC2 instances for the application to work. The application will run for at least 1 year. The company expects the number of Lambda functions that the application uses to increase during that time. The company wants to maximize its savings on all application resources and to keep network latency between the services low. Which solution will meet these requirements?",
+      "keywords": [
+        "EC2",
+        "Lambda",
+        "VPC"
+      ],
+      "raw_text": "417] A company uses Amazon EC2 instances and AWS Lambda functions to run its application. The company has VPCs with public subnets and private subnets in its AWS account. The EC2 instances run in a private subnet in one of the VPCs. The Lambda functions need direct network access to the EC2 instances for the application to work.\n\nThe application will run for at least 1 year. The company expects the number of Lambda functions that the application uses to increase during that time. The company wants to maximize its savings on all application resources and to keep network latency between the services low.\n\nWhich solution will meet these requirements?\n\n\n--------------------------------------------------------------------------",
+      "parsing_confidence": 0.7800000000000001,
+      "aggressive_extraction": true
+    },
+    {
+      "answer_number": 434,
+      "question_preview": "A company hosts its application in the AWS Cloud. The application runs on Amazon EC2 instances behind an Elastic Load Balancer in an Auto Scaling group and with an Amazon DynamoDB table. The company wants to ensure the application can be made available in anotherAWS Region with minimal downtime. What should a solutions architect do to meet these requirements with the LEAST amount of downtime?",
+      "correct_answer": "company hosts its application in the AWS Cloud. The application runs on Amazon EC2 instances behind an Elastic Load Balancer in an Auto Scaling group and with an Amazon DynamoDB table.",
+      "answer_format": "line_extraction",
+      "explanation": "The company wants to ensure the application can be made available in anotherAWS Region with minimal downtime. What should a solutions architect do to meet these requirements with the LEAST amount of downtime?",
+      "keywords": [
+        "DynamoDB",
+        "EC2",
+        "Auto Scaling"
+      ],
+      "raw_text": "434] A company hosts its application in the AWS Cloud. The application runs on Amazon EC2 instances behind an Elastic Load Balancer in an Auto Scaling group and with an Amazon DynamoDB table. The company wants to ensure the application can be made available in anotherAWS Region with minimal downtime.\n\nWhat should a solutions architect do to meet these requirements with the LEAST amount of downtime?\n\n\n\n-----------------------------------------------------------------------------------",
+      "parsing_confidence": 0.7500000000000001,
+      "aggressive_extraction": true
+    },
+    {
+      "answer_number": 491,
+      "question_preview": "A solutions architect is designing an asynchronous application to process credit card data validation requests for a bank. The application must be secure and be able to process each request at least once. Which solution will meet these requirements MOST cost-effectively?",
+      "correct_answer": "solutions architect is designing an asynchronous application to process credit card data validation requests for a bank.",
+      "answer_format": "line_extraction",
+      "explanation": "The application must be secure and be able to process each request at least once. Which solution will meet these requirements MOST cost-effectively?",
+      "keywords": [],
+      "raw_text": "491] A solutions architect is designing an asynchronous application to process credit card data validation requests for a bank. The application must be secure and be able to process each request at least once.\n\nWhich solution will meet these requirements MOST cost-effectively?\n\n---------------------------------------------------------------------------------------------------------",
+      "parsing_confidence": 0.6000000000000001,
+      "aggressive_extraction": true
+    },
+    {
+      "answer_number": 494,
+      "question_preview": "D. The request to terminate the EC2 instance does not originate from the CIDR blocks 192.0.2.0/24 or 203.0.113.0/24.",
+      "correct_answer": "The request to terminate the",
+      "answer_format": "letter_flexible",
+      "explanation": "EC2 instance does not originate from the CIDR blocks 192.0.2.0/24 or 203.0.113.0/24.",
+      "keywords": [
+        "EC2"
+      ],
+      "raw_text": "494] D. The request to terminate the EC2 instance does not originate from the CIDR blocks 192.0.2.0/24 or 203.0.113.0/24.\n\n--------------------------------------------------------------------------------",
+      "parsing_confidence": 0.8,
+      "aggressive_extraction": true
+    },
+    {
+      "answer_number": 539,
+      "question_preview": "A company wants to use the AWS Cloud to improve its on-premises disaster recovery (DR) configuration. The company's core production business application uses Microsoft SQL Server Standard, which runs on a virtual machine (VM). The application has a recovery point objective (RPO) of 30 seconds or fewer and a recovery time objective (RTO) of 60 minutes. The DR solution needs to minimize costs wherev...",
+      "correct_answer": "R) configuration. The company's core production business application uses Microsoft SQL Server Standard, which runs on a virtual machine (VM).",
+      "answer_format": "sentence_based",
+      "explanation": "The application has a recovery point objective (RPO) of 30 seconds or fewer and a recovery time objective (RTO) of 60 minutes. The DR solution needs to minimize costs wherever possible. Which solution will meet these requirements?",
+      "keywords": [],
+      "raw_text": "539] A company wants to use the AWS Cloud to improve its on-premises disaster recovery (DR) configuration. The company's core production business application uses Microsoft SQL Server Standard, which runs on a virtual machine (VM). The application has a recovery point objective (RPO) of 30 seconds or fewer and a recovery time objective (RTO) of 60 minutes. The DR solution needs to minimize costs wherever possible.\n\nWhich solution will meet these requirements?\n\n---------------------------------------------------------------------------------------",
+      "parsing_confidence": 0.6799999999999999,
+      "aggressive_extraction": true
+    },
+    {
+      "answer_number": 543,
+      "question_preview": "A company runs Amazon EC2 instances in multiple AWS accounts that are individually bled. The company recently purchased a Savings Pian. Because of changes in the company’s business requirements, the company has decommissioned a large number of EC2 instances. The company wants to use its Savings Plan discounts on its other AWS accounts. Which combination of steps will meet these requirements? (Choo...",
+      "correct_answer": "2 instances in multiple AWS accounts that are individually bled. The company recently purchased a Savings Pian.",
+      "answer_format": "aws_service_based",
+      "explanation": "Because of changes in the company’s business requirements, the company has decommissioned a large number of EC2 instances. The company wants to use its Savings Plan discounts on its other AWS accounts. Which combination of steps will meet these requirements? (Choose two.)",
+      "keywords": [
+        "EC2"
+      ],
+      "raw_text": "543] A company runs Amazon EC2 instances in multiple AWS accounts that are individually bled. The company recently purchased a Savings Pian. Because of changes in the company’s business requirements, the company has decommissioned a large number of EC2 instances. The company wants to use its Savings Plan discounts on its other AWS accounts.\n\nWhich combination of steps will meet these requirements? (Choose two.)\n\n--------------------------------------------------------------------------",
+      "parsing_confidence": 0.7,
+      "aggressive_extraction": true
+    },
+    {
+      "answer_number": 569,
+      "question_preview": "An Amazon EventBridge rule targets a third-party API. The third-party API has not received any incoming traffic. A solutions architect needs to determine whether the rule conditions are being met and if the rule's target is being invoked. Which solution will meet these requirements? s",
+      "correct_answer": "PI has not received any incoming traffic.",
+      "answer_format": "sentence_based",
+      "explanation": "A solutions architect needs to determine whether the rule conditions are being met and if the rule's target is being invoked. Which solution will meet these requirements? s",
+      "keywords": [],
+      "raw_text": "569] An Amazon EventBridge rule targets a third-party API. The third-party API has not received any incoming traffic. A solutions architect needs to determine whether the rule conditions are being met and if the rule's target is being invoked.\n\nWhich solution will meet these requirements?\n\ns\n------------------------------------------------------------------------------",
+      "parsing_confidence": 0.6499999999999999,
+      "aggressive_extraction": true
+    },
+    {
+      "answer_number": 608,
+      "question_preview": "A company has an application that serves clients that are deployed in more than 20.000 retail storefront locations around the world. The application consists of backend web services that are exposed over HTTPS on port 443. The application is hosted on Amazon EC2 instances behind an Application Load Balancer (ALB). The retail locations communicate with the web application over the public internet. ...",
+      "correct_answer": "The retail locations communicate with the web application over the public internet.",
+      "answer_format": "letter_flexible",
+      "explanation": "The company allows each retail location to register the IP address that the retail location has been allocated by its local ISP. The company's security team recommends to increase the security of the application endpoint by restricting access to only the IP addresses registered by the retail locations. What should a solutions architect do to meet these requirements?",
+      "keywords": [],
+      "raw_text": "608] A company has an application that serves clients that are deployed in more than 20.000 retail storefront locations around the world. The application consists of backend web services that are exposed over HTTPS on port 443. The application is hosted on Amazon EC2 instances behind an Application Load Balancer (ALB). The retail locations communicate with the web application over the public internet. The company allows each retail location to register the IP address that the retail location has been allocated by its local ISP.\n\nThe company's security team recommends to increase the security of the application endpoint by restricting access to only the IP addresses registered by the retail locations.\n\nWhat should a solutions architect do to meet these requirements?\n\n-----------------------...",
+      "parsing_confidence": 0.8,
+      "aggressive_extraction": true
+    },
+    {
+      "answer_number": 638,
+      "question_preview": "A company collects and shares research data with the company's employees all over the world. The company wants to collect and store the data in an Amazon S3 bucket and process the data in the AWS Cloud. The company will share the data with the company's employees. The company needs a secure solution in the AWS Cloud that minimizes operational overhead. Which solution will meet these requirements?",
+      "correct_answer": "company collects and shares research data with the company's employees all over the world.",
+      "answer_format": "aws_service_based",
+      "explanation": "The company wants to collect and store the data in an Amazon S3 bucket and process the data in the AWS Cloud. The company will share the data with the company's employees. The company needs a secure solution in the AWS Cloud that minimizes operational overhead. Which solution will meet these requirements?",
+      "keywords": [
+        "S3"
+      ],
+      "raw_text": "638] A company collects and shares research data with the company's employees all over the world. The company wants to collect and store the data in an Amazon S3 bucket and process the data in the AWS Cloud. The company will share the data with the company's employees. The company needs a secure solution in the AWS Cloud that minimizes operational overhead.\n\nWhich solution will meet these requirements?\n\n\n\n\n-------------------------------------------------------------------------------------",
+      "parsing_confidence": 0.7,
+      "aggressive_extraction": true
+    },
+    {
+      "answer_number": 652,
+      "question_preview": "A company has a large data workload that runs for 6 hours each day. The company cannot lose any data while the process is running. A solutions architect is designing an Amazon EMR cluster con guration to support this critical data workload. Which solution will meet these requirements MOST cost-effectively? Answer: B) Configure a transient cluster with primary/core nodes on On-Demand Instances and ...",
+      "correct_answer": "onfigure a transient cluster with primary/core nodes on On",
+      "answer_format": "letter_flexible",
+      "explanation": "-Demand Instances and task nodes on Spot Instances. Transient clusters are cost-effective for short workloads. Spot Instances reduce costs for non-critical task nodes. Long-running clusters (Options A/D) are unnecessary for a 6-hour workload.",
+      "keywords": [],
+      "raw_text": "652] A company has a large data workload that runs for 6 hours each day. The company cannot lose any data while the process is running. A solutions\narchitect is designing an Amazon EMR cluster con guration to support this critical data workload.\nWhich solution will meet these requirements MOST cost-effectively?\n\nAnswer: B) Configure a transient cluster with primary/core nodes on On-Demand Instances and task nodes on Spot Instances.\nTransient clusters are cost-effective for short workloads. Spot Instances reduce costs for non-critical task nodes.\nLong-running clusters (Options A/D) are unnecessary for a 6-hour workload.\n----------------------------------------------------------------------",
+      "parsing_confidence": 0.8,
+      "aggressive_extraction": true
+    },
+    {
+      "answer_number": 656,
+      "question_preview": "A company runs a website that stores images of historical events. Website users need the ability to search and view images based on the year that the event in the image occurred. On average, users request each image only once or twice a year. The company wants a highly available solution to store and deliver the images to users. Which solution will meet these requirements MOST cost-effectively? An...",
+      "correct_answer": "Store images in S3 Standard-I",
+      "answer_format": "letter_flexible",
+      "explanation": "A and deliver via static website. Standard-IA is cost-effective for rarely accessed images. Static websites simplify delivery. EBS/EFS (Options A/B) are expensive and lack S3’s durability.",
+      "keywords": [
+        "EBS",
+        "S3"
+      ],
+      "raw_text": "656]A company runs a website that stores images of historical events. Website users need the ability to search and view images based on the year\nthat the event in the image occurred. On average, users request each image only once or twice a year. The company wants a highly available\nsolution to store and deliver the images to users.\nWhich solution will meet these requirements MOST cost-effectively?\n\nAnswer: D) Store images in S3 Standard-IA and deliver via static website.\nStandard-IA is cost-effective for rarely accessed images. Static websites simplify delivery.\nEBS/EFS (Options A/B) are expensive and lack S3’s durability.\n----------------------------------------------------------------------",
+      "parsing_confidence": 0.8500000000000001,
+      "aggressive_extraction": true
+    },
+    {
+      "answer_number": 660,
+      "question_preview": "A company hosts an application on Amazon EC2 On-Demand Instances in an Auto Scaling group. Application peak hours occur at the same time each day. Application users report slow application performance at the start of peak hours. The application performs normally 2-3 hours after peak hours begin. The company wants to ensure that the application works properly at the start of peak hours. Which solut...",
+      "correct_answer": "onfigure scheduled scaling to launch instances before peak hours.",
+      "answer_format": "letter_flexible",
+      "explanation": "Proactively scales instances to handle predictable traffic spikes. Dynamic scaling (Options B/C) reacts too slowly for known peaks.",
+      "keywords": [],
+      "raw_text": "660]A company hosts an application on Amazon EC2 On-Demand Instances in an Auto Scaling group. Application peak hours occur at the same time\neach day. Application users report slow application performance at the start of peak hours. The application performs normally 2-3 hours after\npeak hours begin. The company wants to ensure that the application works properly at the start of peak hours.\nWhich solution will meet these requirements?\n\nAnswer: D) Configure scheduled scaling to launch instances before peak hours.\nProactively scales instances to handle predictable traffic spikes.\nDynamic scaling (Options B/C) reacts too slowly for known peaks.\n----------------------------------------------------------------------",
+      "parsing_confidence": 0.8,
+      "aggressive_extraction": true
+    },
+    {
+      "answer_number": 662,
+      "question_preview": "A company uses AWS Cost Explorer to monitor its AWS costs. The company notices that Amazon Elastic Block Store (Amazon EBS) storage and snapshot costs increase every month. However, the company does not purchase additional EBS storage every month. The company wants to optimize monthly costs for its current storage usage. Which solution will meet these requirements with the LEAST operational overhe...",
+      "correct_answer": "elete nonessential snapshots + use",
+      "answer_format": "letter_flexible",
+      "explanation": "Data Lifecycle Manager. Automates snapshot retention per policy, reducing costs. Manual resizing (Options A/B) adds overhead.",
+      "keywords": [],
+      "raw_text": "662]A company uses AWS Cost Explorer to monitor its AWS costs. The company notices that Amazon Elastic Block Store (Amazon EBS) storage and\nsnapshot costs increase every month. However, the company does not purchase additional EBS storage every month. The company wants to\noptimize monthly costs for its current storage usage.\nWhich solution will meet these requirements with the LEAST operational overhead\n\nAnswer: D) Delete nonessential snapshots + use Data Lifecycle Manager.\nAutomates snapshot retention per policy, reducing costs.\nManual resizing (Options A/B) adds overhead.\n----------------------------------------------------------------------",
+      "parsing_confidence": 0.8300000000000001,
+      "aggressive_extraction": true
+    },
+    {
+      "answer_number": 663,
+      "question_preview": "A company is developing a new application on AWS. The application consists of an Amazon Elastic Container Service (Amazon ECS) cluster, an Amazon S3 bucket that contains assets for the application, and an Amazon RDS for MySQL database that contains the dataset for the application. The dataset contains sensitive information. The company wants to ensure that only the ECS cluster can access the data ...",
+      "correct_answer": "nswer: C) Restrict S3/RDS access via VPC endpoints + security groups. VPC endpoints keep traffic private. Security groups limit access to ECS subnets.",
+      "answer_format": "line_extraction",
+      "explanation": "KMS (Options A/B) doesn’t restrict network access.",
+      "keywords": [
+        "RDS",
+        "ECS",
+        "S3",
+        "VPC"
+      ],
+      "raw_text": "663]A company is developing a new application on AWS. The application consists of an Amazon Elastic Container Service (Amazon ECS) cluster, an\nAmazon S3 bucket that contains assets for the application, and an Amazon RDS for MySQL database that contains the dataset for the application.\nThe dataset contains sensitive information. The company wants to ensure that only the ECS cluster can access the data in the RDS for MySQL\ndatabase and the data in the S3 bucket.\nWhich solution will meet these requirements?\n\nAnswer: C) Restrict S3/RDS access via VPC endpoints + security groups.\nVPC endpoints keep traffic private. Security groups limit access to ECS subnets.\nKMS (Options A/B) doesn’t restrict network access.\n----------------------------------------------------------------------",
+      "parsing_confidence": 0.7500000000000001,
+      "aggressive_extraction": true
+    },
+    {
+      "answer_number": 676,
+      "question_preview": "A company's application uses Network Load Balancers, Auto Scaling groups, Amazon EC2 instances, and databases that are deployed in an Amazon VPC. The company wants to capture information about tra c to and from the network interfaces in near real time in its Amazon VPC. The company wants to send the information to Amazon OpenSearch Service for analysis. Which solution will meet these requirements?...",
+      "correct_answer": "company's application uses Network Load Balancers, Auto Scaling groups, Amazon EC2 instances, and databases that are deployed in an Amazon VPC.",
+      "answer_format": "line_extraction",
+      "explanation": "The company wants to capture information about tra c to and from the network interfaces in near real time in its Amazon VPC. The company wants to send the information to Amazon OpenSearch Service for analysis. Which solution will meet these requirements? Answer: B) Use VPC Flow Logs → CloudWatch → Kinesis Firehose → OpenSearch. Flow Logs capture traffic; Firehose streams to OpenSearch. CloudTrail (Options C/D) logs API calls, not network traffic.",
+      "keywords": [
+        "EC2",
+        "Auto Scaling",
+        "CloudWatch",
+        "VPC",
+        "Kinesis"
+      ],
+      "raw_text": "676]A company's application uses Network Load Balancers, Auto Scaling groups, Amazon EC2 instances, and databases that are deployed in an\nAmazon VPC. The company wants to capture information about tra c to and from the network interfaces in near real time in its Amazon VPC. The\ncompany wants to send the information to Amazon OpenSearch Service for analysis.\nWhich solution will meet these requirements?\n\nAnswer: B) Use VPC Flow Logs → CloudWatch → Kinesis Firehose → OpenSearch.\nFlow Logs capture traffic; Firehose streams to OpenSearch.\nCloudTrail (Options C/D) logs API calls, not network traffic.\n----------------------------------------------------------------------",
+      "parsing_confidence": 0.81,
+      "aggressive_extraction": true
+    }
+  ],
+  "parsing_report": {
+    "successful_segments": [
+      6,
+      219,
+      247,
+      311,
+      327,
+      341,
+      390,
+      402,
+      414,
+      417,
+      434,
+      491,
+      494,
+      539,
+      543,
+      569,
+      608,
+      638,
+      652,
+      656,
+      660,
+      662,
+      663,
+      676
+    ],
+    "failed_segments": [],
+    "pattern_effectiveness": {
+      "letter_flexible": {
+        "usage_count": 8,
+        "usage_percentage": 33.3
+      },
+      "standalone_action": {
+        "usage_count": 1,
+        "usage_percentage": 4.2
+      },
+      "line_extraction": {
+        "usage_count": 8,
+        "usage_percentage": 33.3
+      },
+      "aws_service_based": {
+        "usage_count": 5,
+        "usage_percentage": 20.8
+      },
+      "sentence_based": {
+        "usage_count": 2,
+        "usage_percentage": 8.3
+      }
+    }
+  }
+}

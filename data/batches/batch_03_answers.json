@@ -1,0 +1,134 @@
+{
+  "batch_metadata": {
+    "batch_number": 3,
+    "questions_answered": 25,
+    "completion_date": "2025-08-08"
+  },
+  "ai_answers": [
+    {
+      "question_number": 100,
+      "correct_answer": "C",
+      "explanation": "AWS KMS customer managed key provides secure encryption/decryption for certificates in near real time with minimal operational overhead. KMS integrates with EC2 IAM roles and provides highly available storage through S3 or other AWS services."
+    },
+    {
+      "question_number": 101,
+      "correct_answer": "A",
+      "explanation": "NAT gateways in public subnets provide internet access for private subnets. Creating one NAT gateway per AZ ensures high availability and proper routing for outbound traffic from private subnets."
+    },
+    {
+      "question_number": 102,
+      "correct_answer": "B, E",
+      "explanation": "AWS DataSync agent installed on-premises can efficiently transfer 200GB of NFS data. Creating a DataSync location configuration for the SFTP server enables automated, secure data transfer to AWS with minimal operational overhead."
+    },
+    {
+      "question_number": 103,
+      "correct_answer": "A",
+      "explanation": "AWS Glue job bookmarks track processed data and prevent reprocessing of the same files. This is the most efficient way to handle incremental data processing in ETL jobs."
+    },
+    {
+      "question_number": 104,
+      "correct_answer": "A, C",
+      "explanation": "AWS Shield Advanced provides comprehensive DDoS protection against large-scale attacks. CloudFront acts as a global edge service that can absorb and mitigate DDoS attacks before they reach origin servers, providing both static and dynamic content delivery."
+    },
+    {
+      "question_number": 105,
+      "correct_answer": "D",
+      "explanation": "Resource-based policy on the Lambda function with lambda:InvokeFunction action and events.amazonaws.com principal follows the principle of least privilege, allowing only EventBridge to invoke the function."
+    },
+    {
+      "question_number": 106,
+      "correct_answer": "D",
+      "explanation": "SSE-KMS with automatic rotation meets all requirements: encryption at rest, key usage logging through CloudTrail, and automated annual key rotation, providing the most operationally efficient solution."
+    },
+    {
+      "question_number": 107,
+      "correct_answer": "B",
+      "explanation": "API Gateway with Lambda provides a serverless REST API solution that can scale automatically for peak operating hours. Lambda can process location data and integrate with existing analytics platforms efficiently."
+    },
+    {
+      "question_number": 108,
+      "correct_answer": "D",
+      "explanation": "RDS event notifications can trigger SNS topics, which fan out to multiple target systems (SQS queues, Lambda functions, etc.). This provides a decoupled, scalable solution for sending data to multiple destinations when database changes occur."
+    },
+    {
+      "question_number": 109,
+      "correct_answer": "D",
+      "explanation": "S3 Object Lock with versioning and legal hold provides immutable object storage for an unspecified duration. Legal hold can be removed by specific users with s3:PutObjectLegalHold permission, meeting the flexible retention requirements."
+    },
+    {
+      "question_number": 110,
+      "correct_answer": "C, D",
+      "explanation": "Presigned URLs allow direct browser uploads to S3, reducing coupling and server load. S3 Event Notifications triggering Lambda for image resizing creates an efficient, decoupled architecture that improves website performance."
+    },
+    {
+      "question_number": 111,
+      "correct_answer": "D",
+      "explanation": "Amazon MQ with active/standby brokers across AZs provides high availability for messaging. Auto Scaling group for consumer EC2 instances with RDS Multi-AZ ensures the entire system is highly available with automatic scaling capabilities."
+    },
+    {
+      "question_number": 112,
+      "correct_answer": "A",
+      "explanation": "AWS Fargate on ECS provides serverless container hosting with automatic scaling and minimal operational overhead. It requires minimal code changes and handles infrastructure management automatically."
+    },
+    {
+      "question_number": 113,
+      "correct_answer": "C",
+      "explanation": "Snowball Edge Storage Optimized can handle 50TB of data transfer without network bandwidth constraints. Creating a custom transformation job with AWS Glue provides the least operational overhead for continuing the transformation process in the cloud."
+    },
+    {
+      "question_number": 114,
+      "correct_answer": "C",
+      "explanation": "Lambda automatically scales to handle varying concurrent users and processes photos efficiently. S3 provides scalable storage for photos, while DynamoDB remains optimal for metadata storage, creating a fully scalable serverless architecture."
+    },
+    {
+      "question_number": 115,
+      "correct_answer": "C",
+      "explanation": "Moving EC2 instances to private subnets and creating a VPC endpoint for S3 ensures traffic to S3 stays within AWS network infrastructure, meeting the private routing requirement while maintaining functionality."
+    },
+    {
+      "question_number": 116,
+      "correct_answer": "A, D",
+      "explanation": "S3 static website hosting eliminates maintenance overhead for static content updated quarterly. CloudFront provides HTTPS, enhanced security, global distribution, and high scalability with minimal operational overhead."
+    },
+    {
+      "question_number": 117,
+      "correct_answer": "A",
+      "explanation": "CloudWatch Logs subscription filters can directly stream logs to Amazon OpenSearch Service in near-real time with minimal operational overhead, eliminating the need for additional services or custom code."
+    },
+    {
+      "question_number": 118,
+      "correct_answer": "D",
+      "explanation": "Amazon S3 provides virtually unlimited scalability for 900TB of text documents at the lowest cost. It offers high availability, durability, and scales automatically to meet demand without pre-provisioning storage."
+    },
+    {
+      "question_number": 119,
+      "correct_answer": "B",
+      "explanation": "AWS Firewall Manager centrally manages AWS WAF rules across multiple accounts and regions, providing the least administrative effort for protecting API Gateway across multiple accounts from SQL injection and XSS attacks."
+    },
+    {
+      "question_number": 120,
+      "correct_answer": "B",
+      "explanation": "AWS Global Accelerator with endpoint groups in both regions provides optimal performance and availability by routing traffic to the closest healthy endpoints, improving DNS resolution performance globally."
+    },
+    {
+      "question_number": 121,
+      "correct_answer": "A",
+      "explanation": "Encrypting a copy of the latest snapshot and restoring it to replace the existing instance is the correct approach. You cannot encrypt an existing unencrypted RDS instance directly; you must restore from an encrypted snapshot."
+    },
+    {
+      "question_number": 122,
+      "correct_answer": "B",
+      "explanation": "AWS KMS provides a fully managed key management service that reduces operational burden by handling key creation, rotation, and access control automatically, making it ideal for scalable application encryption needs."
+    },
+    {
+      "question_number": 123,
+      "correct_answer": "D",
+      "explanation": "Application Load Balancer with ACM certificate handles SSL termination, offloading encryption/decryption from EC2 instances. This improves application performance by freeing up compute capacity on the web servers."
+    },
+    {
+      "question_number": 124,
+      "correct_answer": "A",
+      "explanation": "EC2 Spot Instances provide up to 90% cost savings for stateless, interruptible batch processing jobs. Since the job can be stopped and restarted without negative impact and runs for 60+ minutes, Spot Instances are ideal for cost-effective scaling."
+    }
+  ]
+}

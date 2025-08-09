@@ -1,0 +1,167 @@
+{
+  "metadata": {
+    "batch_number": 7,
+    "total_batches": 7,
+    "questions_in_batch": 5,
+    "question_range": "283-528",
+    "instructions": {
+      "task": "Answer each AWS SAA-C03 exam question with the correct letter choice(s)",
+      "format": "Provide correct_answer and explanation for each question",
+      "output_format": "JSON with ai_answers array",
+      "example_output": {
+        "ai_answers": [
+          {
+            "question_number": 36,
+            "correct_answer": "B",
+            "explanation": "Multi-Region KMS key provides least operational overhead for cross-region encryption."
+          }
+        ]
+      }
+    }
+  },
+  "questions": [
+    {
+      "question_number": 283,
+      "question_text": "A research company runs experiments that are powered by a simulation application and a visualization application. The simulation application\nruns on Linux and outputs intermediate data to an NFS share every 5 minutes. The visualization application is a Windows desktop application that\ndisplays the simulation output and requires an SMB \u0000le system.\nThe company maintains two synchronized \u0000le systems. This strategy is causing data duplication and ine\u0000cient resource usage. The company\nneeds to migrate the applications to AWS without making code changes to either application.\nWhich solution will meet these requirements?",
+      "options": [
+        [
+          "A",
+          "Migrate both applications to AWS Lambda. Create an Amazon S3 bucket to exchange data between the applications."
+        ],
+        [
+          "B",
+          "Migrate both applications to Amazon Elastic Container Service (Amazon ECS). Con\u0000gure Amazon FSx File Gateway for storage."
+        ],
+        [
+          "C",
+          "Migrate the simulation application to Linux Amazon EC2 instances. Migrate the visualization application to Windows EC2 instances."
+        ],
+        [
+          "D",
+          "Migrate the simulation application to Linux Amazon EC2 instances. Migrate the visualization application to Windows EC2 instances."
+        ]
+      ],
+      "question_type": "single_choice",
+      "expected_answers": 1,
+      "topic": "Monitoring & Management",
+      "aws_services": [
+        "RESOURCE",
+        "OUTPUT"
+      ]
+    },
+    {
+      "question_number": 315,
+      "question_text": "A company experienced a breach that affected several applications in its on-premises data center. The attacker took advantage of vulnerabilities\nin the custom applications that were running on the servers. The company is now migrating its applications to run on Amazon EC2 instances. The\ncompany wants to implement a solution that actively scans for vulnerabilities on the EC2 instances and sends a report that details the \u0000ndings.\nWhich solution will meet these requirements?",
+      "options": [
+        [
+          "A",
+          "Deploy AWS Shield to scan the EC2 instances for vulnerabilities. Create an AWS Lambda function to log any \u0000ndings to AWS CloudTrail."
+        ],
+        [
+          "B",
+          "Deploy Amazon Macie and AWS Lambda functions to scan the EC2 instances for vulnerabilities. Log any \u0000ndings to AWS CloudTrail."
+        ],
+        [
+          "C",
+          "Turn on Amazon GuardDuty. Deploy the GuardDuty agents to the EC2 instances. Con\u0000gure an AWS Lambda function to automate the"
+        ],
+        [
+          "D",
+          "Turn on Amazon Inspector. Deploy the Amazon Inspector agent to the EC2 instances. Con\u0000gure an AWS Lambda function to automate the"
+        ]
+      ],
+      "question_type": "single_choice",
+      "expected_answers": 1,
+      "topic": "Compute Services",
+      "aws_services": [
+        "EC2"
+      ]
+    },
+    {
+      "question_number": 366,
+      "question_text": "A company’s web application consists of an Amazon API Gateway API in front of an AWS Lambda function and an Amazon DynamoDB database.\nThe Lambda function handles the business logic, and the DynamoDB table hosts the data. The application uses Amazon Cognito user pools to\nidentify the individual users of the application. A solutions architect needs to update the application so that only users who have a subscription\ncan access premium content.\nWhich solution will meet this requirement with the LEAST operational overhead?",
+      "options": [
+        [
+          "A",
+          "Enable API caching and throttling on the API Gateway API."
+        ],
+        [
+          "B",
+          "Set up AWS WAF on the API Gateway API. Create a rule to \u0000lter users who have a subscription."
+        ],
+        [
+          "C",
+          "Apply \u0000ne-grained IAM permissions to the premium content in the DynamoDB table."
+        ],
+        [
+          "D",
+          "Implement API usage plans and API keys to limit the access of users who do not have a subscription."
+        ]
+      ],
+      "question_type": "single_choice",
+      "expected_answers": 1,
+      "topic": "Compute Services",
+      "aws_services": [
+        "LAMBDA",
+        "FUNCTION"
+      ]
+    },
+    {
+      "question_number": 429,
+      "question_text": "The following IAM policy is attached to an IAM group. This is the only policy applied to the group.\nWhat are the effective IAM permissions of this policy for group members?",
+      "options": [
+        [
+          "A",
+          "Group members are permitted any Amazon EC2 action within the us-east-1 Region. Statements after the Allow permission are not applied."
+        ],
+        [
+          "B",
+          "Group members are denied any Amazon EC2 permissions in the us-east-1 Region unless they are logged in with multi-factor authentication"
+        ],
+        [
+          "C",
+          "Group members are allowed the ec2:StopInstances and ec2:TerminateInstances permissions for all Regions when logged in with multi-"
+        ],
+        [
+          "D",
+          "Group members are allowed the ec2:StopInstances and ec2:TerminateInstances permissions for the us-east-1 Region only when logged in"
+        ]
+      ],
+      "question_type": "single_choice",
+      "expected_answers": 1,
+      "topic": "Security & Identity",
+      "aws_services": [
+        "IAM",
+        "POLICY"
+      ]
+    },
+    {
+      "question_number": 528,
+      "question_text": "A data analytics company wants to migrate its batch processing system to AWS. The company receives thousands of small data \u0000les periodically\nduring the day through FTP. An on-premises batch job processes the data \u0000les overnight. However, the batch job takes hours to \u0000nish running.\nThe company wants the AWS solution to process incoming data \u0000les as soon as possible with minimal changes to the FTP clients that send the\n\u0000les. The solution must delete the incoming data \u0000les after the \u0000les have been processed successfully. Processing for each \u0000le needs to take 3-8\nminutes.\nWhich solution will meet these requirements in the MOST operationally e\u0000cient way?",
+      "options": [
+        [
+          "A",
+          "Use an Amazon EC2 instance that runs an FTP server to store incoming \u0000les as objects in Amazon S3 Glacier Flexible Retrieval. Con\u0000gure a"
+        ],
+        [
+          "B",
+          "Use an Amazon EC2 instance that runs an FTP server to store incoming \u0000les on an Amazon Elastic Block Store (Amazon EBS) volume."
+        ],
+        [
+          "C",
+          "Use AWS Transfer Family to create an FTP server to store incoming \u0000les on an Amazon Elastic Block Store (Amazon EBS) volume."
+        ],
+        [
+          "D",
+          "Use AWS Transfer Family to create an FTP server to store incoming \u0000les in Amazon S3 Standard. Create an AWS Lambda function to"
+        ]
+      ],
+      "question_type": "single_choice",
+      "expected_answers": 1,
+      "topic": "Compute Services",
+      "aws_services": [
+        "BATCH"
+      ]
+    }
+  ]
+}

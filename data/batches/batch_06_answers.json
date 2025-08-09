@@ -1,0 +1,134 @@
+{
+  "batch_metadata": {
+    "batch_number": 6,
+    "questions_answered": 25,
+    "completion_date": "2025-08-08"
+  },
+  "ai_answers": [
+    {
+      "question_number": 176,
+      "correct_answer": "A",
+      "explanation": "VPC endpoint for DynamoDB ensures traffic stays within AWS network and provides secure access without needing internet gateway or NAT."
+    },
+    {
+      "question_number": 177,
+      "correct_answer": "B",
+      "explanation": "DynamoDB Accelerator (DAX) provides microsecond latency for read-intensive workloads without application reconfiguration and minimal operational overhead."
+    },
+    {
+      "question_number": 178,
+      "correct_answer": "A",
+      "explanation": "AWS Backup provides centralized backup management for both EC2 and RDS with cross-region capabilities and minimal operational overhead."
+    },
+    {
+      "question_number": 179,
+      "correct_answer": "A",
+      "explanation": "Create IAM role with Parameter Store read access and KMS decrypt permissions, then attach to EC2 instance for secure parameter retrieval."
+    },
+    {
+      "question_number": 180,
+      "correct_answer": "B, C",
+      "explanation": "AWS Shield Advanced protects against sophisticated DDoS attacks on NLB, while AWS WAF on API Gateway protects against web exploits like SQL injection."
+    },
+    {
+      "question_number": 181,
+      "correct_answer": "A",
+      "explanation": "Amazon SQS provides reliable, decoupled communication for microservices with built-in ordering guarantees and fault tolerance for sequential processing."
+    },
+    {
+      "question_number": 182,
+      "correct_answer": "B",
+      "explanation": "RDS MySQL with Multi-AZ provides synchronous replication to a standby instance in different AZ, ensuring every transaction is stored on two nodes."
+    },
+    {
+      "question_number": 183,
+      "correct_answer": "A",
+      "explanation": "Serverless architecture with S3, API Gateway, Lambda, and DynamoDB with auto-scaling minimizes server maintenance while providing rapid scaling."
+    },
+    {
+      "question_number": 184,
+      "correct_answer": "A",
+      "explanation": "Lambda functions must run in VPC with appropriate security groups to access resources in private subnets through Direct Connect."
+    },
+    {
+      "question_number": 185,
+      "correct_answer": "B",
+      "explanation": "Create IAM role with S3 permissions and specify as taskRoleArn in ECS task definition for secure access without hardcoded credentials."
+    },
+    {
+      "question_number": 191,
+      "correct_answer": "A",
+      "explanation": "Read replica offloads reporting queries from primary database, eliminating timeouts during order processing while maintaining data consistency."
+    },
+    {
+      "question_number": 192,
+      "correct_answer": "B, E",
+      "explanation": "Amazon Textract extracts medical information from documents, while S3 + Athena provides scalable storage and SQL querying capabilities."
+    },
+    {
+      "question_number": 193,
+      "correct_answer": "B",
+      "explanation": "ElastiCache for Redis provides in-memory caching to reduce database reads while maintaining high availability with cluster mode."
+    },
+    {
+      "question_number": 194,
+      "correct_answer": "A",
+      "explanation": "Deploy database across two AZs with replication and automatic failover configuration for high availability in same region."
+    },
+    {
+      "question_number": 195,
+      "correct_answer": "C",
+      "explanation": "SQS queue provides durable message storage and Auto Scaling processes messages reliably, preventing order loss during failures."
+    },
+    {
+      "question_number": 196,
+      "correct_answer": "D",
+      "explanation": "DynamoDB TTL automatically deletes old items based on timestamp attribute, minimizing cost and development effort for data lifecycle management."
+    },
+    {
+      "question_number": 197,
+      "correct_answer": "B, E",
+      "explanation": "Elastic Beanstalk supports .NET with minimal changes for high availability, while DMS migrates Oracle to RDS Oracle in Multi-AZ."
+    },
+    {
+      "question_number": 198,
+      "correct_answer": "D",
+      "explanation": "EKS with Fargate provides managed Kubernetes without infrastructure overhead, DocumentDB offers MongoDB compatibility with minimal operational overhead."
+    },
+    {
+      "question_number": 199,
+      "correct_answer": "B",
+      "explanation": "Amazon Transcribe provides speaker recognition and transcription, while Athena enables SQL queries on transcript files stored in S3."
+    },
+    {
+      "question_number": 200,
+      "correct_answer": "D",
+      "explanation": "Amazon Cognito user pool authorizer in API Gateway provides AWS managed authentication with least operational overhead."
+    },
+    {
+      "question_number": 207,
+      "correct_answer": "D",
+      "explanation": "SQS queue buffers writes to DynamoDB during high throughput periods, preventing data loss and providing better availability."
+    },
+    {
+      "question_number": 210,
+      "correct_answer": "C",
+      "explanation": "Two SQS queues decouple order collection and fulfillment processes, allowing independent scaling based on queue depth metrics."
+    },
+    {
+      "question_number": 224,
+      "correct_answer": "C, E",
+      "explanation": "Route 53 multivalue answer routing distributes traffic randomly, while launching instances across two AZs ensures fault tolerance."
+    },
+    {
+      "question_number": 235,
+      "correct_answer": "C",
+      "explanation": "AWS SCT converts Oracle schema to PostgreSQL, while DMS with memory-optimized instance handles high read/write workload during migration."
+    },
+    {
+      "question_number": 257,
+      "correct_answer": "A",
+      "explanation": "CloudWatch metric stream with Kinesis Data Firehose provides serverless, real-time data delivery to S3 without affecting EC2 launch speed."
+    }
+  ]
+}

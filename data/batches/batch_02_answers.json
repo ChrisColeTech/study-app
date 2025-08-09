@@ -1,0 +1,134 @@
+{
+  "batch_metadata": {
+    "batch_number": 2,
+    "questions_answered": 25,
+    "completion_date": "2025-08-08"
+  },
+  "ai_answers": [
+    {
+      "question_number": 75,
+      "correct_answer": "D",
+      "explanation": "SQS provides durable message queuing to decouple components and handle traffic spikes, while Auto Scaling ensures optimal resource utilization. This is the most operationally efficient solution for modernizing the multi-tiered application."
+    },
+    {
+      "question_number": 76,
+      "correct_answer": "B",
+      "explanation": "AWS DataSync over Direct Connect provides the most reliable data transfer for 10TB daily transfers. Direct Connect offers dedicated bandwidth and better security than public internet, while DataSync is optimized for large-scale data transfers to S3."
+    },
+    {
+      "question_number": 77,
+      "correct_answer": "C",
+      "explanation": "API Gateway provides managed API service, Kinesis Data Streams handles real-time ingestion, and Kinesis Data Firehose automatically transforms and delivers data to storage with minimal operational overhead - all fully managed services."
+    },
+    {
+      "question_number": 78,
+      "correct_answer": "B",
+      "explanation": "AWS Backup provides automated, policy-driven backup solution for DynamoDB with flexible retention policies. It's the most operationally efficient way to meet the 7-year retention requirement with centralized backup management."
+    },
+    {
+      "question_number": 79,
+      "correct_answer": "A",
+      "explanation": "On-demand capacity mode is ideal for unpredictable workloads with rapid scaling needs. It automatically scales up and down based on traffic patterns and is cost-effective when usage is sporadic, eliminating the need to provision capacity."
+    },
+    {
+      "question_number": 80,
+      "correct_answer": "B",
+      "explanation": "Modify the AMI's launchPermission to share with specific AWS account and update KMS key policy to allow the MSP Partner account to use the key. This provides secure, controlled access without making resources publicly available."
+    },
+    {
+      "question_number": 81,
+      "correct_answer": "B",
+      "explanation": "SQS provides durable message storage and loose coupling for job processing. Auto Scaling Groups automatically add/remove EC2 instances based on queue depth, ensuring scalability and fault tolerance for stateless processor applications."
+    },
+    {
+      "question_number": 82,
+      "correct_answer": "D",
+      "explanation": "EventBridge can detect ACM certificate expiration events and trigger SNS notifications. This is the most direct and efficient approach for monitoring certificate expiration with 30-day advance notice."
+    },
+    {
+      "question_number": 83,
+      "correct_answer": "C",
+      "explanation": "CloudFront with custom origin pointing to on-premises servers provides immediate global content distribution, caching static content closer to European users while keeping the backend in the US. This is the fastest solution to implement."
+    },
+    {
+      "question_number": 84,
+      "correct_answer": "B",
+      "explanation": "Reserved Instances for production (24/7 usage) provide significant cost savings. On-Demand for dev/test environments that run 8+ hours with automation to stop instances offers flexibility without long-term commitment."
+    },
+    {
+      "question_number": 85,
+      "correct_answer": "A",
+      "explanation": "S3 Object Lock with Versioning provides Write Once Read Many (WORM) functionality, preventing document modification or deletion. This meets regulatory compliance requirements for immutable document storage."
+    },
+    {
+      "question_number": 86,
+      "correct_answer": "A",
+      "explanation": "AWS Secrets Manager automatically rotates database credentials and provides secure access through IAM permissions. It's specifically designed for managing database credentials with automatic rotation capabilities."
+    },
+    {
+      "question_number": 87,
+      "correct_answer": "D",
+      "explanation": "SQS FIFO queue ensures reliable message delivery and ordering during database unavailability. A separate Lambda function can process queued messages when the database is available, preventing data loss during upgrades."
+    },
+    {
+      "question_number": 88,
+      "correct_answer": "A",
+      "explanation": "Requester Pays configuration means the European marketing firm pays for data transfer costs when accessing the S3 bucket, minimizing costs for the data owner while enabling data sharing."
+    },
+    {
+      "question_number": 89,
+      "correct_answer": "A",
+      "explanation": "S3 Versioning preserves document history, while MFA Delete adds extra security layer requiring multi-factor authentication for permanent deletion. This prevents accidental deletion while maintaining audit compliance."
+    },
+    {
+      "question_number": 90,
+      "correct_answer": "B",
+      "explanation": "Read replica separates read workloads from the primary database, allowing the script to run queries without impacting development team's database performance. This provides the least operational overhead."
+    },
+    {
+      "question_number": 91,
+      "correct_answer": "A",
+      "explanation": "S3 Gateway Endpoint allows EC2 instances in VPC to access S3 without internet traffic, keeping all communication within AWS network. This meets security requirements for no internet traversal."
+    },
+    {
+      "question_number": 92,
+      "correct_answer": "A, C",
+      "explanation": "VPC Gateway Endpoint enables secure S3 access from VPC without internet routing. Bucket policy restricts access to only the VPC, ensuring secure, controlled access to sensitive data."
+    },
+    {
+      "question_number": 93,
+      "correct_answer": "B",
+      "explanation": "Aurora MySQL with Multi-AZ replicas handles read traffic efficiently. Database cloning creates staging environment instantly from production without impacting performance, allowing continuous development work."
+    },
+    {
+      "question_number": 94,
+      "correct_answer": "C",
+      "explanation": "S3 event notification to SQS with Lambda function provides serverless, event-driven processing with minimal operational overhead. Lambda scales automatically based on file upload volume, making it cost-effective for variable workloads."
+    },
+    {
+      "question_number": 95,
+      "correct_answer": "D",
+      "explanation": "Read replicas with same compute/storage resources as source database ensure consistent performance for read operations. This effectively separates read and write traffic, optimizing application performance quickly."
+    },
+    {
+      "question_number": 96,
+      "correct_answer": "C",
+      "explanation": "The policy allows EC2 termination in us-east-1 region only when the user's source IP is 10.100.100.254. The condition restricts access based on source IP address for enhanced security."
+    },
+    {
+      "question_number": 97,
+      "correct_answer": "D",
+      "explanation": "Amazon FSx for Windows File Server provides fully managed Windows-based file storage with native Active Directory integration. It supports SMB protocol required for SharePoint and offers high availability across multiple AZs."
+    },
+    {
+      "question_number": 98,
+      "correct_answer": "C",
+      "explanation": "Increase SQS visibility timeout to prevent message reprocessing while Lambda function executes. This prevents duplicate processing and multiple email notifications by ensuring messages aren't visible to other consumers during processing."
+    },
+    {
+      "question_number": 99,
+      "correct_answer": "D",
+      "explanation": "Amazon FSx for Lustre provides fully managed Lustre file system optimized for high-performance computing workloads. It natively supports Lustre clients and offers the fully managed solution required."
+    }
+  ]
+}

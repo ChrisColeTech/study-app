@@ -1,0 +1,162 @@
+name: Deploy Frontend
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+    paths:
+      - 'frontend/**'
+      - '.github/workflows/deploy-frontend.yml'
+  workflow_dispatch:
+    inputs:
+      stage:
+        description: 'Deployment stage'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - dev
+          - staging
+          - prod
+
+env:
+  NODE_VERSION: '20'
+  AWS_REGION: 'us-east-1'
+
+jobs:
+  # Determine deployment stage
+  determine-stage:
+    runs-on: ubuntu-latest
+    outputs:
+      stage: ${{ steps.stage.outputs.stage }}
+    steps:
+      - name: Determine stage
+        id: stage
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "stage=${{ github.event.inputs.stage }}" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+            echo "stage=prod" >> $GITHUB_OUTPUT
+          else
+            echo "stage=dev" >> $GITHUB_OUTPUT
+          fi
+
+  # Build and deploy frontend
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    needs: determine-stage
+    environment: ${{ needs.determine-stage.outputs.stage }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: 'frontend/app/package-lock.json'
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Get API Gateway URL
+        id: api-url
+        run: |
+          STACK_NAME="StudyAppStack-${{ needs.determine-stage.outputs.stage }}"
+          API_URL=$(aws cloudformation describe-stacks \
+            --stack-name $STACK_NAME \
+            --query 'Stacks[0].Outputs[?OutputKey==`ApiUrl`].OutputValue' \
+            --output text)
+          echo "api-url=$API_URL" >> $GITHUB_OUTPUT
+
+      - name: Install frontend dependencies
+        run: |
+          cd frontend/app
+          npm ci
+
+      - name: Create environment file
+        run: |
+          cd frontend/app
+          cat > .env.production << EOF
+          VITE_APP_TITLE="Multi-Exam Certification Study Platform"
+          VITE_APP_VERSION="1.0.0"
+          VITE_APP_DESCRIPTION="Comprehensive certification study platform"
+          VITE_ENABLE_MULTI_EXAM=true
+          VITE_ENABLE_CROSS_PROVIDER=true
+          VITE_ENABLE_ANALYTICS=true
+          VITE_API_BASE_URL=${{ steps.api-url.outputs.api-url }}api/v1
+          VITE_DEFAULT_PROVIDER=aws
+          VITE_MAX_CROSS_PROVIDER_QUESTIONS=50
+          EOF
+
+      - name: Build frontend
+        run: |
+          cd frontend/app
+          npm run build
+        env:
+          NODE_ENV: production
+
+      - name: Run tests
+        run: |
+          cd frontend/app
+          npm test -- --run
+        continue-on-error: true
+
+      - name: Deploy to S3
+        run: |
+          STAGE=${{ needs.determine-stage.outputs.stage }}
+          BUCKET_NAME="study-app-frontend-$STAGE-${{ secrets.AWS_ACCOUNT_ID }}"
+          
+          # Sync build files to S3
+          aws s3 sync frontend/app/dist/ s3://$BUCKET_NAME/ --delete
+          
+          # Set cache headers for static assets
+          aws s3 cp s3://$BUCKET_NAME/assets/ s3://$BUCKET_NAME/assets/ \
+            --recursive \
+            --metadata-directive REPLACE \
+            --cache-control "public, max-age=31536000, immutable"
+          
+          # Set cache headers for HTML files
+          aws s3 cp s3://$BUCKET_NAME/index.html s3://$BUCKET_NAME/index.html \
+            --metadata-directive REPLACE \
+            --cache-control "public, max-age=0, must-revalidate"
+
+      - name: Invalidate CloudFront
+        run: |
+          STACK_NAME="StudyAppStack-${{ needs.determine-stage.outputs.stage }}"
+          DISTRIBUTION_ID=$(aws cloudformation describe-stack-resources \
+            --stack-name $STACK_NAME \
+            --logical-resource-id FrontendDistribution \
+            --query 'StackResources[0].PhysicalResourceId' \
+            --output text)
+          
+          aws cloudfront create-invalidation \
+            --distribution-id $DISTRIBUTION_ID \
+            --paths "/*"
+
+      - name: Get CloudFront URL
+        id: cloudfront-url
+        run: |
+          STACK_NAME="StudyAppStack-${{ needs.determine-stage.outputs.stage }}"
+          CLOUDFRONT_URL=$(aws cloudformation describe-stacks \
+            --stack-name $STACK_NAME \
+            --query 'Stacks[0].Outputs[?OutputKey==`CloudFrontUrl`].OutputValue' \
+            --output text)
+          echo "cloudfront-url=$CLOUDFRONT_URL" >> $GITHUB_OUTPUT
+
+      - name: Deployment Summary
+        run: |
+          echo "## Frontend Deployment Summary 🚀" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Stage:** ${{ needs.determine-stage.outputs.stage }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Frontend URL:** ${{ steps.cloudfront-url.outputs.cloudfront-url }}" >> $GITHUB_STEP_SUMMARY
+          echo "**API URL:** ${{ steps.api-url.outputs.api-url }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Application Ready! 🎉" >> $GITHUB_STEP_SUMMARY
+          echo "Visit the frontend URL above to access the study application." >> $GITHUB_STEP_SUMMARY

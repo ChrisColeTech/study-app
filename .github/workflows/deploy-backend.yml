@@ -1,0 +1,286 @@
+name: Deploy Backend Infrastructure
+
+on:
+  push:
+    branches:
+      - main
+      - master
+      - develop
+    paths:
+      - 'cdk/**'
+      - 'lambdas/**'
+      - '.github/workflows/deploy-backend.yml'
+  workflow_dispatch:
+    inputs:
+      stage:
+        description: 'Deployment stage'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - dev
+          - staging
+          - prod
+      destroy:
+        description: 'Destroy infrastructure instead of deploy'
+        required: false
+        default: false
+        type: boolean
+
+env:
+  NODE_VERSION: '20'
+  AWS_REGION: 'us-east-2'
+
+jobs:
+  # Determine deployment stage
+  determine-stage:
+    runs-on: ubuntu-latest
+    outputs:
+      stage: ${{ steps.stage.outputs.stage }}
+    steps:
+      - name: Determine stage
+        id: stage
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "stage=${{ github.event.inputs.stage }}" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+            echo "stage=prod" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.ref }}" == "refs/heads/master" ]]; then
+            echo "stage=dev" >> $GITHUB_OUTPUT
+          else
+            echo "stage=dev" >> $GITHUB_OUTPUT
+          fi
+
+  # Build and test shared Lambda code
+  build-lambdas:
+    runs-on: ubuntu-latest
+    needs: determine-stage
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: 'lambdas/package-lock.json'
+
+      - name: Install lambda dependencies
+        run: |
+          cd lambdas
+          npm ci
+
+      - name: Build lambda functions
+        run: |
+          cd lambdas
+          npm run build
+
+      - name: Run tests
+        run: |
+          cd lambdas
+          npm test
+        continue-on-error: true
+
+      - name: Upload Lambda artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: lambda-build
+          path: |
+            lambdas/
+          retention-days: 1
+
+  # Deploy infrastructure
+  deploy-infrastructure:
+    runs-on: ubuntu-latest
+    needs: [determine-stage, build-lambdas]
+    environment: ${{ needs.determine-stage.outputs.stage }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download Lambda artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: lambda-build
+          path: lambdas/
+
+      - name: Copy Lambda bundle to expected location
+        run: |
+          if [ -d "lambdas/lambdas-built" ]; then
+            cp -r lambdas/lambdas-built .
+          else
+            echo "lambdas-built directory not found, creating from lambdas dist and node_modules"
+            mkdir -p lambdas-built
+            cp -r lambdas/dist/* lambdas-built/ 2>/dev/null || true
+            cp lambdas/package.json lambdas-built/ 2>/dev/null || true
+            cp -r lambdas/node_modules lambdas-built/ 2>/dev/null || true
+          fi
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: 'cdk/package-lock.json'
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Install CDK dependencies
+        run: |
+          cd cdk
+          npm ci
+
+      - name: Build CDK
+        run: |
+          cd cdk
+          npm run build
+
+      - name: CDK Bootstrap (if needed)
+        run: |
+          cd cdk
+          npm run bootstrap
+        env:
+          STAGE: ${{ needs.determine-stage.outputs.stage }}
+          AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+
+      - name: Synthesize CDK
+        run: |
+          cd cdk
+          STAGE=${{ needs.determine-stage.outputs.stage }} npm run synth
+        env:
+          STAGE: ${{ needs.determine-stage.outputs.stage }}
+          AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+
+      - name: Deploy CDK Stack
+        if: ${{ github.event.inputs.destroy != 'true' }}
+        run: |
+          cd cdk
+          STAGE=${{ needs.determine-stage.outputs.stage }} npm run deploy -- --require-approval never
+        env:
+          STAGE: ${{ needs.determine-stage.outputs.stage }}
+          AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+
+      - name: Destroy CDK Stack
+        if: ${{ github.event.inputs.destroy == 'true' }}
+        run: |
+          cd cdk
+          STAGE=${{ needs.determine-stage.outputs.stage }} npm run destroy -- --force
+        env:
+          STAGE: ${{ needs.determine-stage.outputs.stage }}
+          AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+
+      - name: Upload CDK outputs
+        if: ${{ github.event.inputs.destroy != 'true' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: cdk-outputs-${{ needs.determine-stage.outputs.stage }}
+          path: cdk/cdk.out/
+          retention-days: 7
+
+  # Setup JWT Secret (only for new deployments)
+  setup-secrets:
+    runs-on: ubuntu-latest
+    needs: [determine-stage, deploy-infrastructure]
+    if: ${{ github.event.inputs.destroy != 'true' }}
+    environment: ${{ needs.determine-stage.outputs.stage }}
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Create JWT Secret
+        run: |
+          SECRET_NAME="study-app-jwt-secret-${{ needs.determine-stage.outputs.stage }}"
+          
+          # Check if secret already exists
+          if aws secretsmanager describe-secret --secret-id $SECRET_NAME 2>/dev/null; then
+            echo "JWT secret already exists"
+          else
+            # Generate a random JWT secret
+            JWT_SECRET=$(openssl rand -base64 64)
+            
+            # Create the secret
+            aws secretsmanager create-secret \
+              --name $SECRET_NAME \
+              --description "JWT secret for Study App ${{ needs.determine-stage.outputs.stage }} environment" \
+              --secret-string "{\"jwt_secret\":\"$JWT_SECRET\"}"
+            
+            echo "JWT secret created successfully"
+          fi
+
+  # Upload sample data (dev/staging only)
+  upload-sample-data:
+    runs-on: ubuntu-latest
+    needs: [determine-stage, deploy-infrastructure]
+    if: ${{ github.event.inputs.destroy != 'true' && needs.determine-stage.outputs.stage != 'prod' }}
+    environment: ${{ needs.determine-stage.outputs.stage }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Upload sample question data
+        run: |
+          STAGE=${{ needs.determine-stage.outputs.stage }}
+          BUCKET_NAME="study-app-data-$STAGE-${{ secrets.AWS_ACCOUNT_ID }}"
+          
+          # Upload AWS sample questions if they exist
+          if [ -f "data/study_data_final.json" ]; then
+            aws s3 cp data/study_data_final.json s3://$BUCKET_NAME/providers/aws/saa-c03/questions.json
+            echo "Uploaded AWS SAA-C03 sample questions"
+          fi
+          
+          # Create provider metadata
+          echo '{
+            "providers": [
+              {
+                "id": "aws",
+                "name": "Amazon Web Services",
+                "description": "AWS Certification Exams",
+                "exams": [
+                  {
+                    "code": "saa-c03",
+                    "name": "AWS Certified Solutions Architect - Associate",
+                    "description": "Validate technical skills and expertise for designing and implementing solutions on AWS"
+                  }
+                ]
+              }
+            ]
+          }' | aws s3 cp - s3://$BUCKET_NAME/providers/metadata.json
+          
+          echo "Sample data uploaded successfully"
+
+  # Deployment summary
+  deployment-summary:
+    runs-on: ubuntu-latest
+    needs: [determine-stage, deploy-infrastructure, setup-secrets, upload-sample-data]
+    if: always() && ${{ github.event.inputs.destroy != 'true' }}
+    steps:
+      - name: Deployment Summary
+        run: |
+          echo "## Deployment Summary 🚀" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Stage:** ${{ needs.determine-stage.outputs.stage }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Region:** ${{ env.AWS_REGION }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Stack Name:** StudyAppStack-${{ needs.determine-stage.outputs.stage }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Next Steps:" >> $GITHUB_STEP_SUMMARY
+          echo "1. API Gateway URL will be available in AWS Console" >> $GITHUB_STEP_SUMMARY
+          echo "2. Upload question data to S3 data bucket" >> $GITHUB_STEP_SUMMARY
+          echo "3. Test API endpoints with authentication" >> $GITHUB_STEP_SUMMARY
+          echo "4. Deploy frontend to S3 frontend bucket" >> $GITHUB_STEP_SUMMARY

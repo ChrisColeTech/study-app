@@ -1,0 +1,10 @@
+{
+  "questions": [
+    {
+      "id": "test-1",
+      "questionText": "Test question",
+      "options": [],
+      "correctAnswers": []
+    }
+  ]
+}

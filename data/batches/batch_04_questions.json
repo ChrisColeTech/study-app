@@ -1,0 +1,756 @@
+{
+  "metadata": {
+    "batch_number": 4,
+    "total_batches": 7,
+    "questions_in_batch": 25,
+    "question_range": "126-150",
+    "instructions": {
+      "task": "Answer each AWS SAA-C03 exam question with the correct letter choice(s)",
+      "format": "Provide correct_answer and explanation for each question",
+      "output_format": "JSON with ai_answers array",
+      "example_output": {
+        "ai_answers": [
+          {
+            "question_number": 36,
+            "correct_answer": "B",
+            "explanation": "Multi-Region KMS key provides least operational overhead for cross-region encryption."
+          }
+        ]
+      }
+    }
+  },
+  "questions": [
+    {
+      "question_number": 126,
+      "question_text": "A solutions architect needs to implement a solution to reduce a company's storage costs. All the company's data is in the Amazon S3 Standard\nstorage class. The company must keep all data for at least 25 years. Data from the most recent 2 years must be highly available and immediately\nretrievable.\nWhich solution will meet these requirements?",
+      "options": [
+        [
+          "A",
+          "Set up an S3 Lifecycle policy to transition objects to S3 Glacier Deep Archive immediately."
+        ],
+        [
+          "B",
+          "Set up an S3 Lifecycle policy to transition objects to S3 Glacier Deep Archive after 2 years."
+        ],
+        [
+          "C",
+          "Use S3 Intelligent-Tiering. Activate the archiving option to ensure that data is archived in S3 Glacier Deep Archive."
+        ],
+        [
+          "D",
+          "Set up an S3 Lifecycle policy to transition objects to S3 One Zone-Infrequent Access (S3 One Zone-IA) immediately and to S3 Glacier Deep"
+        ]
+      ],
+      "question_type": "single_choice",
+      "expected_answers": 1,
+      "topic": "Storage Services",
+      "aws_services": [
+        "S3",
+        "STORAGE CLASS"
+      ]
+    },
+    {
+      "question_number": 127,
+      "question_text": "A media company is evaluating the possibility of moving its systems to the AWS Cloud. The company needs at least 10 TB of storage with the\nmaximum possible I/O performance for video processing, 300 TB of very durable storage for storing media content, and 900 TB of storage to meet\nrequirements for archival media that is not in use anymore.\nWhich set of services should a solutions architect recommend to meet these requirements?",
+      "options": [
+        [
+          "A",
+          "Amazon EBS for maximum performance, Amazon S3 for durable data storage, and Amazon S3 Glacier for archival storage"
+        ],
+        [
+          "B",
+          "Amazon EBS for maximum performance, Amazon EFS for durable data storage, and Amazon S3 Glacier for archival storage"
+        ],
+        [
+          "C",
+          "Amazon EC2 instance store for maximum performance, Amazon EFS for durable data storage, and Amazon S3 for archival storage"
+        ],
+        [
+          "D",
+          "Amazon EC2 instance store for maximum performance, Amazon S3 for durable data storage, and Amazon S3 Glacier for archival storage"
+        ]
+      ],
+      "question_type": "single_choice",
+      "expected_answers": 1,
+      "topic": "Monitoring & Management",
+      "aws_services": [
+        "GENERAL"
+      ]
+    },
+    {
+      "question_number": 128,
+      "question_text": "A company wants to run applications in containers in the AWS Cloud. These applications are stateless and can tolerate disruptions within the\nunderlying infrastructure. The company needs a solution that minimizes cost and operational overhead.\nWhat should a solutions architect do to meet these requirements?",
+      "options": [
+        [
+          "A",
+          "Use Spot Instances in an Amazon EC2 Auto Scaling group to run the application containers."
+        ],
+        [
+          "B",
+          "Use Spot Instances in an Amazon Elastic Kubernetes Service (Amazon EKS) managed node group."
+        ],
+        [
+          "C",
+          "Use On-Demand Instances in an Amazon EC2 Auto Scaling group to run the application containers."
+        ],
+        [
+          "D",
+          "Use On-Demand Instances in an Amazon Elastic Kubernetes Service (Amazon EKS) managed node group."
+        ]
+      ],
+      "question_type": "single_choice",
+      "expected_answers": 1,
+      "topic": "Monitoring & Management",
+      "aws_services": [
+        "COST"
+      ]
+    },
+    {
+      "question_number": 129,
+      "question_text": "A company is running a multi-tier web application on premises. The web application is containerized and runs on a number of Linux hosts\nconnected to a PostgreSQL database that contains user records. The operational overhead of maintaining the infrastructure and capacity planning\nis limiting the company's growth. A solutions architect must improve the application's infrastructure.\nWhich combination of actions should the solutions architect take to accomplish this? (Choose two.)",
+      "options": [
+        [
+          "A",
+          "Migrate the PostgreSQL database to Amazon Aurora."
+        ],
+        [
+          "B",
+          "Migrate the web application to be hosted on Amazon EC2 instances."
+        ],
+        [
+          "C",
+          "Set up an Amazon CloudFront distribution for the web application content."
+        ],
+        [
+          "D",
+          "Set up Amazon ElastiCache between the web application and the PostgreSQL database."
+        ],
+        [
+          "E",
+          "Migrate the web application to be hosted on AWS Fargate with Amazon Elastic Container Service (Amazon ECS)."
+        ]
+      ],
+      "question_type": "multiple_choice_2",
+      "expected_answers": 2,
+      "topic": "Databases",
+      "aws_services": [
+        "POSTGRESQL"
+      ]
+    },
+    {
+      "question_number": 130,
+      "question_text": "An application runs on Amazon EC2 instances across multiple Availability Zonas. The instances run in an Amazon EC2 Auto Scaling group behind\nan Application Load Balancer. The application performs best when the CPU utilization of the EC2 instances is at or near 40%.\nWhat should a solutions architect do to maintain the desired performance across all instances in the group?",
+      "options": [
+        [
+          "A",
+          "Use a simple scaling policy to dynamically scale the Auto Scaling group."
+        ],
+        [
+          "B",
+          "Use a target tracking policy to dynamically scale the Auto Scaling group."
+        ],
+        [
+          "C",
+          "Use an AWS Lambda function ta update the desired Auto Scaling group capacity."
+        ],
+        [
+          "D",
+          "Use scheduled scaling actions to scale up and scale down the Auto Scaling group."
+        ]
+      ],
+      "question_type": "single_choice",
+      "expected_answers": 1,
+      "topic": "Compute Services",
+      "aws_services": [
+        "EC2",
+        "AUTO SCALING",
+        "SCALING GROUP",
+        "LOAD BALANCER",
+        "APPLICATION LOAD BALANCER"
+      ]
+    },
+    {
+      "question_number": 131,
+      "question_text": "A company is developing a \u0000le-sharing application that will use an Amazon S3 bucket for storage. The company wants to serve all the \u0000les\nthrough an Amazon CloudFront distribution. The company does not want the \u0000les to be accessible through direct navigation to the S3 URL.\nWhat should a solutions architect do to meet these requirements?",
+      "options": [
+        [
+          "A",
+          "Write individual policies for each S3 bucket to grant read permission for only CloudFront access."
+        ],
+        [
+          "B",
+          "Create an IAM user. Grant the user read permission to objects in the S3 bucket. Assign the user to CloudFront."
+        ],
+        [
+          "C",
+          "Write an S3 bucket policy that assigns the CloudFront distribution ID as the Principal and assigns the target S3 bucket as the Amazon"
+        ],
+        [
+          "D",
+          "Create an origin access identity (OAI). Assign the OAI to the CloudFront distribution. Con\u0000gure the S3 bucket permissions so that only the"
+        ]
+      ],
+      "question_type": "single_choice",
+      "expected_answers": 1,
+      "topic": "Storage Services",
+      "aws_services": [
+        "S3",
+        "BUCKET"
+      ]
+    },
+    {
+      "question_number": 132,
+      "question_text": "A company’s website provides users with downloadable historical performance reports. The website needs a solution that will scale to meet the\ncompany’s website demands globally. The solution should be cost-effective, limit the provisioning of infrastructure resources, and provide the\nfastest possible response time.\nWhich combination should a solutions architect recommend to meet these requirements?",
+      "options": [
+        [
+          "A",
+          "Amazon CloudFront and Amazon S3"
+        ],
+        [
+          "B",
+          "AWS Lambda and Amazon DynamoDB"
+        ],
+        [
+          "C",
+          "Application Load Balancer with Amazon EC2 Auto Scaling"
+        ],
+        [
+          "D",
+          "Amazon Route 53 with internal Application Load Balancers"
+        ]
+      ],
+      "question_type": "single_choice",
+      "expected_answers": 1,
+      "topic": "Monitoring & Management",
+      "aws_services": [
+        "COST"
+      ]
+    },
+    {
+      "question_number": 133,
+      "question_text": "A company runs an Oracle database on premises. As part of the company’s migration to AWS, the company wants to upgrade the database to the\nmost recent available version. The company also wants to set up disaster recovery (DR) for the database. The company needs to minimize the\noperational overhead for normal operations and DR setup. The company also needs to maintain access to the database's underlying operating\nsystem.\nWhich solution will meet these requirements?",
+      "options": [
+        [
+          "A",
+          "Migrate the Oracle database to an Amazon EC2 instance. Set up database replication to a different AWS Region."
+        ],
+        [
+          "B",
+          "Migrate the Oracle database to Amazon RDS for Oracle. Activate Cross-Region automated backups to replicate the snapshots to another"
+        ],
+        [
+          "C",
+          "Migrate the Oracle database to Amazon RDS Custom for Oracle. Create a read replica for the database in another AWS Region."
+        ],
+        [
+          "D",
+          "Migrate the Oracle database to Amazon RDS for Oracle. Create a standby database in another Availability Zone."
+        ]
+      ],
+      "question_type": "single_choice",
+      "expected_answers": 1,
+      "topic": "Databases",
+      "aws_services": [
+        "ORACLE"
+      ]
+    },
+    {
+      "question_number": 134,
+      "question_text": "A company wants to move its application to a serverless solution. The serverless solution needs to analyze existing and new data by using SL.\nThe company stores the data in an Amazon S3 bucket. The data requires encryption and must be replicated to a different AWS Region.\nWhich solution will meet these requirements with the LEAST operational overhead?",
+      "options": [
+        [
+          "A",
+          "Create a new S3 bucket. Load the data into the new S3 bucket. Use S3 Cross-Region Replication (CRR) to replicate encrypted objects to an"
+        ],
+        [
+          "B",
+          "Create a new S3 bucket. Load the data into the new S3 bucket. Use S3 Cross-Region Replication (CRR) to replicate encrypted objects to an"
+        ],
+        [
+          "C",
+          "Load the data into the existing S3 bucket. Use S3 Cross-Region Replication (CRR) to replicate encrypted objects to an S3 bucket in another"
+        ],
+        [
+          "D",
+          "Load the data into the existing S3 bucket. Use S3 Cross-Region Replication (CRR) to replicate encrypted objects to an S3 bucket in another"
+        ]
+      ],
+      "question_type": "single_choice",
+      "expected_answers": 1,
+      "topic": "Storage Services",
+      "aws_services": [
+        "S3",
+        "BUCKET"
+      ]
+    },
+    {
+      "question_number": 135,
+      "question_text": "A company runs workloads on AWS. The company needs to connect to a service from an external provider. The service is hosted in the provider's\nVPC. According to the company’s security team, the connectivity must be private and must be restricted to the target service. The connection\nmust be initiated only from the company’s VPC.\nWhich solution will mast these requirements?",
+      "options": [
+        [
+          "A",
+          "Create a VPC peering connection between the company's VPC and the provider's VPC. Update the route table to connect to the target"
+        ],
+        [
+          "B",
+          "Ask the provider to create a virtual private gateway in its VPC. Use AWS PrivateLink to connect to the target service."
+        ],
+        [
+          "C",
+          "Create a NAT gateway in a public subnet of the company’s VPUpdate the route table to connect to the target service."
+        ],
+        [
+          "D",
+          "Ask the provider to create a VPC endpoint for the target service. Use AWS PrivateLink to connect to the target service."
+        ]
+      ],
+      "question_type": "single_choice",
+      "expected_answers": 1,
+      "topic": "Networking & Content Delivery",
+      "aws_services": [
+        "VPC"
+      ]
+    },
+    {
+      "question_number": 136,
+      "question_text": "A company is migrating its on-premises PostgreSQL database to Amazon Aurora PostgreSQL. The on-premises database must remain online and\naccessible during the migration. The Aurora database must remain synchronized with the on-premises database.\nWhich combination of actions must a solutions architect take to meet these requirements? (Choose two.)",
+      "options": [
+        [
+          "A",
+          "Create an ongoing replication task."
+        ],
+        [
+          "B",
+          "Create a database backup of the on-premises database."
+        ],
+        [
+          "C",
+          "Create an AWS Database Migration Service (AWS DMS) replication server."
+        ],
+        [
+          "D",
+          "Convert the database schema by using the AWS Schema Conversion Tool (AWS SCT)."
+        ],
+        [
+          "E",
+          "Create an Amazon EventBridge (Amazon CloudWatch Events) rule to monitor the database synchronization."
+        ]
+      ],
+      "question_type": "multiple_choice_2",
+      "expected_answers": 2,
+      "topic": "Databases",
+      "aws_services": [
+        "POSTGRESQL",
+        "AURORA"
+      ]
+    },
+    {
+      "question_number": 137,
+      "question_text": "A company uses AWS Organizations to create dedicated AWS accounts for each business unit to manage each business unit's account\nindependently upon request. The root email recipient missed a noti\u0000cation that was sent to the root user email address of one account. The\ncompany wants to ensure that all future noti\u0000cations are not missed. Future noti\u0000cations must be limited to account administrators.\nWhich solution will meet these requirements?",
+      "options": [
+        [
+          "A",
+          "Con\u0000gure the company’s email server to forward noti\u0000cation email messages that are sent to the AWS account root user email address to"
+        ],
+        [
+          "B",
+          "Con\u0000gure all AWS account root user email addresses as distribution lists that go to a few administrators who can respond to alerts."
+        ],
+        [
+          "C",
+          "Con\u0000gure all AWS account root user email messages to be sent to one administrator who is responsible for monitoring alerts and"
+        ],
+        [
+          "D",
+          "Con\u0000gure all existing AWS accounts and all newly created accounts to use the same root user email address. Con\u0000gure AWS account"
+        ]
+      ],
+      "question_type": "single_choice",
+      "expected_answers": 1,
+      "topic": "Security & Identity",
+      "aws_services": [
+        "USER"
+      ]
+    },
+    {
+      "question_number": 138,
+      "question_text": "A company runs its ecommerce application on AWS. Every new order is published as a massage in a RabbitMQ queue that runs on an Amazon EC2\ninstance in a single Availability Zone. These messages are processed by a different application that runs on a separate EC2 instance. This\napplication stores the details in a PostgreSQL database on another EC2 instance. All the EC2 instances are in the same Availability Zone.\nThe company needs to redesign its architecture to provide the highest availability with the least operational overhead.\nWhat should a solutions architect do to meet these requirements?",
+      "options": [
+        [
+          "A",
+          "Migrate the queue to a redundant pair (active/standby) of RabbitMQ instances on Amazon MQ. Create a Multi-AZ Auto Scaling group for"
+        ],
+        [
+          "B",
+          "Migrate the queue to a redundant pair (active/standby) of RabbitMQ instances on Amazon MQ. Create a Multi-AZ Auto Scaling group for"
+        ],
+        [
+          "C",
+          "Create a Multi-AZ Auto Scaling group for EC2 instances that host the RabbitMQ queue. Create another Multi-AZ Auto Scaling group for EC2"
+        ],
+        [
+          "D",
+          "Create a Multi-AZ Auto Scaling group for EC2 instances that host the RabbitMQ queue. Create another Multi-AZ Auto Scaling group for EC2"
+        ]
+      ],
+      "question_type": "single_choice",
+      "expected_answers": 1,
+      "topic": "Compute Services",
+      "aws_services": [
+        "EC2",
+        "INSTANCE"
+      ]
+    },
+    {
+      "question_number": 139,
+      "question_text": "A reporting team receives \u0000les each day in an Amazon S3 bucket. The reporting team manually reviews and copies the \u0000les from this initial S3\nbucket to an analysis S3 bucket each day at the same time to use with Amazon QuickSight. Additional teams are starting to send more \u0000les in\nlarger sizes to the initial S3 bucket.\nThe reporting team wants to move the \u0000les automatically analysis S3 bucket as the \u0000les enter the initial S3 bucket. The reporting team also wants\nto use AWS Lambda functions to run pattern-matching code on the copied data. In addition, the reporting team wants to send the data \u0000les to a\npipeline in Amazon SageMaker Pipelines.\nWhat should a solutions architect do to meet these requirements with the LEAST operational overhead?",
+      "options": [
+        [
+          "A",
+          "Create a Lambda function to copy the \u0000les to the analysis S3 bucket. Create an S3 event noti\u0000cation for the analysis S3 bucket. Con\u0000gure"
+        ],
+        [
+          "B",
+          "Create a Lambda function to copy the \u0000les to the analysis S3 bucket. Con\u0000gure the analysis S3 bucket to send event noti\u0000cations to"
+        ],
+        [
+          "C",
+          "Con\u0000gure S3 replication between the S3 buckets. Create an S3 event noti\u0000cation for the analysis S3 bucket. Con\u0000gure Lambda and"
+        ],
+        [
+          "D",
+          "Con\u0000gure S3 replication between the S3 buckets. Con\u0000gure the analysis S3 bucket to send event noti\u0000cations to Amazon EventBridge"
+        ]
+      ],
+      "question_type": "single_choice",
+      "expected_answers": 1,
+      "topic": "Storage Services",
+      "aws_services": [
+        "S3",
+        "BUCKET"
+      ]
+    },
+    {
+      "question_number": 140,
+      "question_text": "A solutions architect needs to help a company optimize the cost of running an application on AWS. The application will use Amazon EC2\ninstances, AWS Fargate, and AWS Lambda for compute within the architecture.\nThe EC2 instances will run the data ingestion layer of the application. EC2 usage will be sporadic and unpredictable. Workloads that run on EC2\ninstances can be interrupted at any time. The application front end will run on Fargate, and Lambda will serve the API layer. The front-end\nutilization and API layer utilization will be predictable over the course of the next year.\nWhich combination of purchasing options will provide the MOST cost-effective solution for hosting this application? (Choose two.)",
+      "options": [
+        [
+          "A",
+          "Use Spot Instances for the data ingestion layer"
+        ],
+        [
+          "B",
+          "Use On-Demand Instances for the data ingestion layer"
+        ],
+        [
+          "C",
+          "Purchase a 1-year Compute Savings Plan for the front end and API layer."
+        ],
+        [
+          "D",
+          "Purchase 1-year All Upfront Reserved instances for the data ingestion layer."
+        ],
+        [
+          "E",
+          "Purchase a 1-year EC2 instance Savings Plan for the front end and API layer."
+        ]
+      ],
+      "question_type": "multiple_choice_2",
+      "expected_answers": 2,
+      "topic": "Compute Services",
+      "aws_services": [
+        "EC2",
+        "LAMBDA"
+      ]
+    },
+    {
+      "question_number": 141,
+      "question_text": "A company runs a web-based portal that provides users with global breaking news, local alerts, and weather updates. The portal delivers each\nuser a personalized view by using mixture of static and dynamic content. Content is served over HTTPS through an API server running on an\nAmazon EC2 instance behind an Application Load Balancer (ALB). The company wants the portal to provide this content to its users across the\nworld as quickly as possible.\nHow should a solutions architect design the application to ensure the LEAST amount of latency for all users?",
+      "options": [
+        [
+          "A",
+          "Deploy the application stack in a single AWS Region. Use Amazon CloudFront to serve all static and dynamic content by specifying the ALB"
+        ],
+        [
+          "B",
+          "Deploy the application stack in two AWS Regions. Use an Amazon Route 53 latency routing policy to serve all content from the ALB in the"
+        ],
+        [
+          "C",
+          "Deploy the application stack in a single AWS Region. Use Amazon CloudFront to serve the static content. Serve the dynamic content"
+        ],
+        [
+          "D",
+          "Deploy the application stack in two AWS Regions. Use an Amazon Route 53 geolocation routing policy to serve all content from the ALB in"
+        ]
+      ],
+      "question_type": "single_choice",
+      "expected_answers": 1,
+      "topic": "Compute Services",
+      "aws_services": [
+        "EC2",
+        "INSTANCE",
+        "LOAD BALANCER",
+        "APPLICATION LOAD BALANCER",
+        "ALB"
+      ]
+    },
+    {
+      "question_number": 142,
+      "question_text": "A gaming company is designing a highly available architecture. The application runs on a modi\u0000ed Linux kernel and supports only UDP-based\ntra\u0000c. The company needs the front-end tier to provide the best possible user experience. That tier must have low latency, route tra\u0000c to the\nnearest edge location, and provide static IP addresses for entry into the application endpoints.\nWhat should a solutions architect do to meet these requirements?",
+      "options": [
+        [
+          "A",
+          "Con\u0000gure Amazon Route 53 to forward requests to an Application Load Balancer. Use AWS Lambda for the application in AWS Application"
+        ],
+        [
+          "B",
+          "Con\u0000gure Amazon CloudFront to forward requests to a Network Load Balancer. Use AWS Lambda for the application in an AWS Application"
+        ],
+        [
+          "C",
+          "Con\u0000gure AWS Global Accelerator to forward requests to a Network Load Balancer. Use Amazon EC2 instances for the application in an"
+        ],
+        [
+          "D",
+          "Con\u0000gure Amazon API Gateway to forward requests to an Application Load Balancer. Use Amazon EC2 instances for the application in an"
+        ]
+      ],
+      "question_type": "single_choice",
+      "expected_answers": 1,
+      "topic": "Networking & Content Delivery",
+      "aws_services": [
+        "EDGE LOCATION"
+      ]
+    },
+    {
+      "question_number": 143,
+      "question_text": "A company wants to migrate its existing on-premises monolithic application to AWS. The company wants to keep as much of the front-end code\nand the backend code as possible. However, the company wants to break the application into smaller applications. A different team will manage\neach application. The company needs a highly scalable solution that minimizes operational overhead.\nWhich solution will meet these requirements?",
+      "options": [
+        [
+          "A",
+          "Host the application on AWS Lambda. Integrate the application with Amazon API Gateway."
+        ],
+        [
+          "B",
+          "Host the application with AWS Amplify. Connect the application to an Amazon API Gateway API that is integrated with AWS Lambda."
+        ],
+        [
+          "C",
+          "Host the application on Amazon EC2 instances. Set up an Application Load Balancer with EC2 instances in an Auto Scaling group as"
+        ],
+        [
+          "D",
+          "Host the application on Amazon Elastic Container Service (Amazon ECS). Set up an Application Load Balancer with Amazon ECS as the"
+        ]
+      ],
+      "question_type": "single_choice",
+      "expected_answers": 1,
+      "topic": "Monitoring & Management",
+      "aws_services": [
+        "GENERAL"
+      ]
+    },
+    {
+      "question_number": 144,
+      "question_text": "A company recently started using Amazon Aurora as the data store for its global ecommerce application. When large reports are run, developers\nreport that the ecommerce application is performing poorly. After reviewing metrics in Amazon CloudWatch, a solutions architect \u0000nds that the\nReadIOPS and CPUUtilizalion metrics are spiking when monthly reports run.\nWhat is the MOST cost-effective solution?",
+      "options": [
+        [
+          "A",
+          "Migrate the monthly reporting to Amazon Redshift."
+        ],
+        [
+          "B",
+          "Migrate the monthly reporting to an Aurora Replica."
+        ],
+        [
+          "C",
+          "Migrate the Aurora database to a larger instance class."
+        ],
+        [
+          "D",
+          "Increase the Provisioned IOPS on the Aurora instance."
+        ]
+      ],
+      "question_type": "single_choice",
+      "expected_answers": 1,
+      "topic": "Monitoring & Management",
+      "aws_services": [
+        "CLOUDWATCH",
+        "COST"
+      ]
+    },
+    {
+      "question_number": 145,
+      "question_text": "A company hosts a website analytics application on a single Amazon EC2 On-Demand Instance. The analytics software is written in PHP and uses\na MySQL database. The analytics software, the web server that provides PHP, and the database server are all hosted on the EC2 instance. The\napplication is showing signs of performance degradation during busy times and is presenting 5xx errors. The company needs to make the\napplication scale seamlessly.\nWhich solution will meet these requirements MOST cost-effectively?",
+      "options": [
+        [
+          "A",
+          "Migrate the database to an Amazon RDS for MySQL DB instance. Create an AMI of the web application. Use the AMI to launch a second"
+        ],
+        [
+          "B",
+          "Migrate the database to an Amazon RDS for MySQL DB instance. Create an AMI of the web application. Use the AMI to launch a second"
+        ],
+        [
+          "C",
+          "Migrate the database to an Amazon Aurora MySQL DB instance. Create an AWS Lambda function to stop the EC2 instance and change the"
+        ],
+        [
+          "D",
+          "Migrate the database to an Amazon Aurora MySQL DB instance. Create an AMI of the web application. Apply the AMI to a launch template."
+        ]
+      ],
+      "question_type": "single_choice",
+      "expected_answers": 1,
+      "topic": "Compute Services",
+      "aws_services": [
+        "EC2",
+        "INSTANCE"
+      ]
+    },
+    {
+      "question_number": 146,
+      "question_text": "A company runs a stateless web application in production on a group of Amazon EC2 On-Demand Instances behind an Application Load Balancer.\nThe application experiences heavy usage during an 8-hour period each business day. Application usage is moderate and steady overnight.\nApplication usage is low during weekends.\nThe company wants to minimize its EC2 costs without affecting the availability of the application.\nWhich solution will meet these requirements?",
+      "options": [
+        [
+          "A",
+          "Use Spot Instances for the entire workload."
+        ],
+        [
+          "B",
+          "Use Reserved Instances for the baseline level of usage. Use Spot instances for any additional capacity that the application needs."
+        ],
+        [
+          "C",
+          "Use On-Demand Instances for the baseline level of usage. Use Spot Instances for any additional capacity that the application needs."
+        ],
+        [
+          "D",
+          "Use Dedicated Instances for the baseline level of usage. Use On-Demand Instances for any additional capacity that the application needs."
+        ]
+      ],
+      "question_type": "single_choice",
+      "expected_answers": 1,
+      "topic": "Compute Services",
+      "aws_services": [
+        "EC2",
+        "LOAD BALANCER",
+        "APPLICATION LOAD BALANCER"
+      ]
+    },
+    {
+      "question_number": 147,
+      "question_text": "A company needs to retain application log \u0000les for a critical application for 10 years. The application team regularly accesses logs from the past\nmonth for troubleshooting, but logs older than 1 month are rarely accessed. The application generates more than 10 TB of logs per month.\nWhich storage option meets these requirements MOST cost-effectively?",
+      "options": [
+        [
+          "A",
+          "Store the logs in Amazon S3. Use AWS Backup to move logs more than 1 month old to S3 Glacier Deep Archive."
+        ],
+        [
+          "B",
+          "Store the logs in Amazon S3. Use S3 Lifecycle policies to move logs more than 1 month old to S3 Glacier Deep Archive."
+        ],
+        [
+          "C",
+          "Store the logs in Amazon CloudWatch Logs. Use AWS Backup to move logs more than 1 month old to S3 Glacier Deep Archive."
+        ],
+        [
+          "D",
+          "Store the logs in Amazon CloudWatch Logs. Use Amazon S3 Lifecycle policies to move logs more than 1 month old to S3 Glacier Deep"
+        ]
+      ],
+      "question_type": "single_choice",
+      "expected_answers": 1,
+      "topic": "Monitoring & Management",
+      "aws_services": [
+        "COST"
+      ]
+    },
+    {
+      "question_number": 148,
+      "question_text": "A company has a data ingestion work\u0000ow that includes the following components:\nAn Amazon Simple Noti\u0000cation Service (Amazon SNS) topic that receives noti\u0000cations about new data deliveries\nAn AWS Lambda function that processes and stores the data\nThe ingestion work\u0000ow occasionally fails because of network connectivity issues. When failure occurs, the corresponding data is not ingested\nunless the company manually reruns the job.\nWhat should a solutions architect do to ensure that all noti\u0000cations are eventually processed?",
+      "options": [
+        [
+          "A",
+          "Con\u0000gure the Lambda function for deployment across multiple Availability Zones."
+        ],
+        [
+          "B",
+          "Modify the Lambda function's con\u0000guration to increase the CPU and memory allocations for the function."
+        ],
+        [
+          "C",
+          "Con\u0000gure the SNS topic’s retry strategy to increase both the number of retries and the wait time between retries."
+        ],
+        [
+          "D",
+          "Con\u0000gure an Amazon Simple Queue Service (Amazon SQS) queue as the on-failure destination. Modify the Lambda function to process"
+        ]
+      ],
+      "question_type": "single_choice",
+      "expected_answers": 1,
+      "topic": "Compute Services",
+      "aws_services": [
+        "LAMBDA",
+        "FUNCTION"
+      ]
+    },
+    {
+      "question_number": 149,
+      "question_text": "A company has a service that produces event data. The company wants to use AWS to process the event data as it is received. The data is written\nin a speci\u0000c order that must be maintained throughout processing. The company wants to implement a solution that minimizes operational\noverhead.\nHow should a solutions architect accomplish this?",
+      "options": [
+        [
+          "A",
+          "Create an Amazon Simple Queue Service (Amazon SQS) FIFO queue to hold messages. Set up an AWS Lambda function to process"
+        ],
+        [
+          "B",
+          "Create an Amazon Simple Noti\u0000cation Service (Amazon SNS) topic to deliver noti\u0000cations containing payloads to process. Con\u0000gure an"
+        ],
+        [
+          "C",
+          "Create an Amazon Simple Queue Service (Amazon SQS) standard queue to hold messages. Set up an AWS Lambda function to process"
+        ],
+        [
+          "D",
+          "Create an Amazon Simple Noti\u0000cation Service (Amazon SNS) topic to deliver noti\u0000cations containing payloads to process. Con\u0000gure an"
+        ]
+      ],
+      "question_type": "single_choice",
+      "expected_answers": 1,
+      "topic": "Monitoring & Management",
+      "aws_services": [
+        "GENERAL"
+      ]
+    },
+    {
+      "question_number": 150,
+      "question_text": "A company is migrating an application from on-premises servers to Amazon EC2 instances. As part of the migration design requirements, a\nsolutions architect must implement infrastructure metric alarms. The company does not need to take action if CPU utilization increases to more\nthan 50% for a short burst of time. However, if the CPU utilization increases to more than 50% and read IOPS on the disk are high at the same time,\nthe company needs to act as soon as possible. The solutions architect also must reduce false alarms.\nWhat should the solutions architect do to meet these requirements?",
+      "options": [
+        [
+          "A",
+          "Create Amazon CloudWatch composite alarms where possible."
+        ],
+        [
+          "B",
+          "Create Amazon CloudWatch dashboards to visualize the metrics and react to issues quickly."
+        ],
+        [
+          "C",
+          "Create Amazon CloudWatch Synthetics canaries to monitor the application and raise an alarm."
+        ],
+        [
+          "D",
+          "Create single Amazon CloudWatch metric alarms with multiple metric thresholds where possible."
+        ]
+      ],
+      "question_type": "single_choice",
+      "expected_answers": 1,
+      "topic": "Storage Services",
+      "aws_services": [
+        "IOPS"
+      ]
+    }
+  ]
+}

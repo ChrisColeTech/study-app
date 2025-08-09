@@ -1,0 +1,42 @@
+{
+  "name": "study-app-cdk",
+  "version": "1.0.0",
+  "description": "AWS CDK infrastructure for Multi-Exam Certification Study Platform",
+  "main": "lib/app.js",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "test": "jest",
+    "cdk": "cdk",
+    "deploy": "npx cdk deploy",
+    "destroy": "npx cdk destroy",
+    "diff": "npx cdk diff",
+    "synth": "npx cdk synth",
+    "bootstrap": "npx cdk bootstrap"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.0",
+    "@types/node": "^20.0.0",
+    "aws-cdk": "2.160.0",
+    "jest": "^29.5.0",
+    "ts-jest": "^29.1.0",
+    "typescript": "~5.0.0"
+  },
+  "dependencies": {
+    "aws-cdk-lib": "2.160.0",
+    "constructs": "^10.4.2",
+    "@aws-sdk/client-dynamodb": "^3.0.0",
+    "@aws-sdk/client-s3": "^3.0.0",
+    "@aws-sdk/lib-dynamodb": "^3.0.0"
+  },
+  "keywords": [
+    "aws-cdk",
+    "serverless",
+    "study-app",
+    "lambda",
+    "dynamodb",
+    "s3"
+  ],
+  "author": "",
+  "license": "MIT"
+}

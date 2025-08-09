@@ -1,0 +1,134 @@
+{
+  "batch_metadata": {
+    "batch_number": 1,
+    "questions_answered": 25,
+    "completion_date": "2025-08-08"
+  },
+  "ai_answers": [
+    {
+      "question_number": 36,
+      "correct_answer": "B",
+      "explanation": "Multi-Region KMS key allows the same key to encrypt/decrypt data in multiple regions with least operational overhead, eliminating the need to manage separate keys or cross-region key access."
+    },
+    {
+      "question_number": 51,
+      "correct_answer": "B, D",
+      "explanation": "Amazon SES can format HTML emails and send to multiple recipients. EventBridge scheduled events can trigger Lambda functions to query APIs and process data on a schedule, providing the automated morning report functionality."
+    },
+    {
+      "question_number": 52,
+      "correct_answer": "C",
+      "explanation": "Amazon EFS provides a scalable, highly available file system that supports standard file system structure, can handle large files, and scales automatically with minimal operational overhead compared to managing containers or EBS volumes."
+    },
+    {
+      "question_number": 53,
+      "correct_answer": "C",
+      "explanation": "S3 Object Lock in compliance mode prevents deletion even by root users for the entire retention period. Lifecycle policy transitions to Glacier Deep Archive after 1 year for cost optimization while maintaining maximum resiliency."
+    },
+    {
+      "question_number": 54,
+      "correct_answer": "C",
+      "explanation": "Amazon FSx for Windows File Server with Multi-AZ configuration provides highly available, durable Windows-compatible file shares that preserve existing user access patterns and eliminate the need for manual synchronization."
+    },
+    {
+      "question_number": 55,
+      "correct_answer": "C",
+      "explanation": "Security groups that allow inbound traffic from the private subnet security group attached to RDS databases will restrict access to only EC2 instances in private subnets, meeting the requirement for database access control."
+    },
+    {
+      "question_number": 56,
+      "correct_answer": "B",
+      "explanation": "Route 53 DNS records pointing to the Regional API Gateway endpoint with the company's domain name, combined with importing the public certificate to ACM, provides HTTPS access using the custom domain."
+    },
+    {
+      "question_number": 57,
+      "correct_answer": "B",
+      "explanation": "Amazon Rekognition provides pre-built content moderation capabilities for images with minimal development effort. Human review for low-confidence predictions ensures accuracy while leveraging AWS managed services."
+    },
+    {
+      "question_number": 58,
+      "correct_answer": "C",
+      "explanation": "Amazon ECS on AWS Fargate provides serverless containers where AWS manages the underlying infrastructure, allowing the company to focus on applications without provisioning or managing servers."
+    },
+    {
+      "question_number": 59,
+      "correct_answer": "D",
+      "explanation": "Kinesis Data Streams collects real-time streaming data, and Kinesis Data Firehose efficiently delivers it to S3 data lakes for analysis. This combination handles high-volume clickstream data with automatic scaling."
+    },
+    {
+      "question_number": 60,
+      "correct_answer": "C",
+      "explanation": "ALB listener rules can redirect HTTP traffic to HTTPS, automatically converting all requests to use secure connections. This is the standard AWS approach for enforcing HTTPS on web applications."
+    },
+    {
+      "question_number": 61,
+      "correct_answer": "C",
+      "explanation": "AWS Secrets Manager with automatic rotation eliminates hardcoded credentials and handles rotation with minimal operational overhead. The required IAM permissions allow applications to retrieve secrets securely."
+    },
+    {
+      "question_number": 62,
+      "correct_answer": "D",
+      "explanation": "Importing external CA certificates into ACM and using EventBridge to trigger rotation workflows before expiration provides automated certificate management for third-party certificates on ALBs."
+    },
+    {
+      "question_number": 63,
+      "correct_answer": "A",
+      "explanation": "S3 with Lambda triggered by PUT events provides the most cost-effective solution for PDF to JPG conversion. S3 offers cost-effective storage and Lambda provides serverless processing that scales automatically."
+    },
+    {
+      "question_number": 64,
+      "correct_answer": "D",
+      "explanation": "FSx for Windows File Server on AWS with FSx File Gateway on-premises provides hybrid access with minimum latency, preserves existing file access patterns, and requires minimal operational changes."
+    },
+    {
+      "question_number": 65,
+      "correct_answer": "C",
+      "explanation": "Amazon Textract extracts text from PDF and JPEG files, while Comprehend Medical specifically identifies PHI in healthcare documents with pre-trained models, providing the least operational overhead."
+    },
+    {
+      "question_number": 66,
+      "correct_answer": "C",
+      "explanation": "S3 Standard-IA after 30 days provides immediate accessibility while reducing costs for infrequently accessed files. It maintains high availability and durability required for critical business data."
+    },
+    {
+      "question_number": 67,
+      "correct_answer": "D",
+      "explanation": "Increasing the visibility timeout prevents multiple consumers from processing the same message simultaneously, eliminating duplicate records in RDS while maintaining the existing queue structure."
+    },
+    {
+      "question_number": 68,
+      "correct_answer": "A",
+      "explanation": "AWS Direct Connect provides consistent low latency and high availability, while VPN backup is cost-effective for failover scenarios, meeting the requirement for minimized costs with acceptable slower backup traffic."
+    },
+    {
+      "question_number": 69,
+      "correct_answer": "B",
+      "explanation": "Multi-AZ Auto Scaling group provides EC2 high availability, Multi-AZ database configuration ensures database resilience, and RDS Proxy improves connection management with minimal operational effort."
+    },
+    {
+      "question_number": 70,
+      "correct_answer": "C",
+      "explanation": "Application Load Balancer supports HTTP health checks and can detect application-level errors, while Network Load Balancer only supports TCP-level health checks. This provides better application monitoring without custom scripts."
+    },
+    {
+      "question_number": 71,
+      "correct_answer": "B",
+      "explanation": "DynamoDB point-in-time recovery can restore data to any point within the last 35 days, meeting the 15-minute RPO requirement. Recovery typically completes within the 1-hour RTO requirement."
+    },
+    {
+      "question_number": 72,
+      "correct_answer": "D",
+      "explanation": "S3 VPC Gateway Endpoint allows private communication between VPC and S3 without internet gateway charges, significantly reducing data transfer costs for same-region S3 access."
+    },
+    {
+      "question_number": 73,
+      "correct_answer": "C, D",
+      "explanation": "Bastion host security group should allow inbound access from the company's external IP range. Application instances should allow SSH access only from the bastion host's private IP for secure access control."
+    },
+    {
+      "question_number": 74,
+      "correct_answer": "A, C",
+      "explanation": "Web tier needs inbound HTTPS (port 443) from internet (0.0.0.0/0) for public access. Database tier needs inbound access on SQL Server port 1433 only from the web tier security group for secure database communication."
+    }
+  ]
+}

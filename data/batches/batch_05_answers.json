@@ -1,0 +1,134 @@
+{
+  "batch_metadata": {
+    "batch_number": 5,
+    "questions_answered": 25,
+    "completion_date": "2025-08-08"
+  },
+  "ai_answers": [
+    {
+      "question_number": 151,
+      "correct_answer": "A, C",
+      "explanation": "AWS Control Tower provides data residency guardrails and can deny internet access. AWS Organizations with SCPs can prevent VPCs from gaining internet access and restrict access to specific regions. Both provide centralized compliance controls."
+    },
+    {
+      "question_number": 152,
+      "correct_answer": "D",
+      "explanation": "Using Lambda functions with EventBridge scheduled events to start/stop the RDS instance during the 12-hour usage window is the most cost-effective solution. This eliminates charges during the 12 hours when the application isn't being used."
+    },
+    {
+      "question_number": 153,
+      "correct_answer": "D",
+      "explanation": "S3 Lifecycle policies automatically transition objects from S3 Standard to S3 Standard-IA after 90 days based on the access pattern. This is the most cost-effective automated solution for infrequently accessed files over 128KB."
+    },
+    {
+      "question_number": 154,
+      "correct_answer": "B",
+      "explanation": "S3 Object Lock in compliance mode with a 365-day retention period ensures files cannot be deleted or modified for exactly 1 year. Compliance mode provides stronger protection than governance mode as it cannot be bypassed even by root users."
+    },
+    {
+      "question_number": 155,
+      "correct_answer": "C",
+      "explanation": "Amazon CloudFront is the correct solution for caching and delivering confidential media files globally. It provides edge locations worldwide for fast content delivery and supports private content distribution with signed URLs/cookies for confidential files."
+    },
+    {
+      "question_number": 156,
+      "correct_answer": "A, E",
+      "explanation": "Amazon Athena provides serverless querying for one-time analysis with minimal operational overhead. AWS Lake Formation with Glue crawlers automates data ingestion and cataloging from multiple sources into a data lake with the least operational complexity."
+    },
+    {
+      "question_number": 157,
+      "correct_answer": "D, E",
+      "explanation": "CloudWatch Logs export captures audit logs indefinitely for compliance. AWS Backup provides centralized backup management with 5-year retention policies, offering more flexibility than Aurora's native automated backups which have limited retention periods."
+    },
+    {
+      "question_number": 158,
+      "correct_answer": "A",
+      "explanation": "Amazon CloudFront is optimized for both real-time streaming and on-demand content delivery globally. It provides low-latency edge locations worldwide and supports various streaming protocols for live and on-demand video content."
+    },
+    {
+      "question_number": 159,
+      "correct_answer": "A, C",
+      "explanation": "API Gateway usage plans with API keys control access to genuine users. AWS WAF rules can identify and block malicious requests from botnets based on IP addresses, request patterns, and rate limiting before they reach the Lambda function."
+    },
+    {
+      "question_number": 160,
+      "correct_answer": "C",
+      "explanation": "S3 Standard provides millisecond access times and is cost-effective for 300MB of data over 30 days. S3 Glacier has longer retrieval times, and databases like RDS or OpenSearch are unnecessary and more expensive for simple JSON storage."
+    },
+    {
+      "question_number": 161,
+      "correct_answer": "B",
+      "explanation": "AWS Lambda with S3 trigger provides serverless, highly available, and automatically scalable processing. Lambda scales automatically to handle thousands of daily executions with minimal operational overhead compared to managing EC2 instances or containers."
+    },
+    {
+      "question_number": 162,
+      "correct_answer": "A",
+      "explanation": "Amazon FSx for Lustre is specifically designed for HPC workloads on Linux, providing high-performance parallel file system capabilities. Its tight integration with S3 allows seamless data movement between high-performance computing and long-term storage."
+    },
+    {
+      "question_number": 163,
+      "correct_answer": "B",
+      "explanation": "Amazon ECS with Fargate provides fully managed container orchestration without server management. ECR handles container image storage, while Fargate automatically scales and manages the underlying infrastructure with minimal operational overhead."
+    },
+    {
+      "question_number": 164,
+      "correct_answer": "C",
+      "explanation": "Amazon SQS with dead-letter queue is designed for exactly this use case. It handles message retention up to 14 days, provides reliable message delivery, and isolates failed messages without affecting processing of remaining messages."
+    },
+    {
+      "question_number": 165,
+      "correct_answer": "D",
+      "explanation": "CloudFront with Origin Access Identity (OAI) restricts S3 access to only CloudFront. Associating AWS WAF with the CloudFront distribution ensures all traffic is inspected before reaching the origin, meeting the security requirement."
+    },
+    {
+      "question_number": 166,
+      "correct_answer": "D",
+      "explanation": "Amazon CloudFront with S3 as origin is the most efficient solution for serving millions of views globally. CloudFront's edge locations provide low latency access worldwide and reduce load on the S3 bucket through caching."
+    },
+    {
+      "question_number": 167,
+      "correct_answer": "C",
+      "explanation": "Reserved Instances provide cost savings for baseline capacity that runs continuously. Spot Instances handle additional capacity cost-effectively, as they can handle interruptions better than the baseline processing that must be continuous."
+    },
+    {
+      "question_number": 168,
+      "correct_answer": "D",
+      "explanation": "Service Control Policies (SCPs) in AWS Organizations provide centralized permission management across all accounts. Creating an SCP at the root OU ensures consistent access restrictions across the entire organization from a single point of management."
+    },
+    {
+      "question_number": 169,
+      "correct_answer": "C",
+      "explanation": "AWS Shield Advanced provides enhanced DDoS protection specifically for applications behind load balancers. It offers 24/7 access to the DDoS Response Team and financial protection against DDoS-related charges."
+    },
+    {
+      "question_number": 170,
+      "correct_answer": "C",
+      "explanation": "AWS WAF on the Application Load Balancer can implement geo-blocking rules to restrict access to specific countries. WAF provides geographic match conditions to allow or block requests based on the country of origin."
+    },
+    {
+      "question_number": 171,
+      "correct_answer": "B",
+      "explanation": "API Gateway with Lambda provides automatic scaling and elasticity. Lambda scales automatically based on demand, making it perfect for seasonal traffic spikes. This serverless approach requires minimal management and scales instantly."
+    },
+    {
+      "question_number": 172,
+      "correct_answer": "C",
+      "explanation": "CloudFront field-level encryption provides an additional layer of security by encrypting sensitive form data at the edge before it reaches the origin. This ensures sensitive information is protected throughout the entire application stack."
+    },
+    {
+      "question_number": 173,
+      "correct_answer": "B",
+      "explanation": "Amazon CloudFront distribution in front of S3 bucket is the most cost-effective solution for global content delivery. It caches content at edge locations worldwide, reducing load on the origin and improving user experience globally."
+    },
+    {
+      "question_number": 174,
+      "correct_answer": "B",
+      "explanation": "Modifying the Auto Scaling group to use three instances across two Availability Zones provides high availability within the same region. This ensures the application continues running even if one AZ fails, without requiring application modifications."
+    },
+    {
+      "question_number": 175,
+      "correct_answer": "B",
+      "explanation": "Amazon RDS Proxy manages database connections and connection pooling, reducing the number of open connections to the database. This prevents timeout errors during traffic surges with minimal changes to the Lambda function code."
+    }
+  ]
+}

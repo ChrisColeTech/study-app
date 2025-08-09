@@ -1,0 +1,790 @@
+{
+  "metadata": {
+    "generation_date": "2025-08-07T23:11:58.964376",
+    "total_questions_answered": 155,
+    "confidence_level": "high",
+    "model_used": "claude",
+    "batch_processing": {
+      "total_batches": 7,
+      "questions_per_batch": "25 (except batch 7: 5)",
+      "processing_method": "Task agents with AWS expertise"
+    }
+  },
+  "ai_answers": [
+    {
+      "question_number": 36,
+      "correct_answer": "B",
+      "explanation": "Multi-Region KMS key allows the same key to encrypt/decrypt data in multiple regions with least operational overhead, eliminating the need to manage separate keys or cross-region key access."
+    },
+    {
+      "question_number": 51,
+      "correct_answer": "B, D",
+      "explanation": "Amazon SES can format HTML emails and send to multiple recipients. EventBridge scheduled events can trigger Lambda functions to query APIs and process data on a schedule, providing the automated morning report functionality."
+    },
+    {
+      "question_number": 52,
+      "correct_answer": "C",
+      "explanation": "Amazon EFS provides a scalable, highly available file system that supports standard file system structure, can handle large files, and scales automatically with minimal operational overhead compared to managing containers or EBS volumes."
+    },
+    {
+      "question_number": 53,
+      "correct_answer": "C",
+      "explanation": "S3 Object Lock in compliance mode prevents deletion even by root users for the entire retention period. Lifecycle policy transitions to Glacier Deep Archive after 1 year for cost optimization while maintaining maximum resiliency."
+    },
+    {
+      "question_number": 54,
+      "correct_answer": "C",
+      "explanation": "Amazon FSx for Windows File Server with Multi-AZ configuration provides highly available, durable Windows-compatible file shares that preserve existing user access patterns and eliminate the need for manual synchronization."
+    },
+    {
+      "question_number": 55,
+      "correct_answer": "C",
+      "explanation": "Security groups that allow inbound traffic from the private subnet security group attached to RDS databases will restrict access to only EC2 instances in private subnets, meeting the requirement for database access control."
+    },
+    {
+      "question_number": 56,
+      "correct_answer": "B",
+      "explanation": "Route 53 DNS records pointing to the Regional API Gateway endpoint with the company's domain name, combined with importing the public certificate to ACM, provides HTTPS access using the custom domain."
+    },
+    {
+      "question_number": 57,
+      "correct_answer": "B",
+      "explanation": "Amazon Rekognition provides pre-built content moderation capabilities for images with minimal development effort. Human review for low-confidence predictions ensures accuracy while leveraging AWS managed services."
+    },
+    {
+      "question_number": 58,
+      "correct_answer": "C",
+      "explanation": "Amazon ECS on AWS Fargate provides serverless containers where AWS manages the underlying infrastructure, allowing the company to focus on applications without provisioning or managing servers."
+    },
+    {
+      "question_number": 59,
+      "correct_answer": "D",
+      "explanation": "Kinesis Data Streams collects real-time streaming data, and Kinesis Data Firehose efficiently delivers it to S3 data lakes for analysis. This combination handles high-volume clickstream data with automatic scaling."
+    },
+    {
+      "question_number": 60,
+      "correct_answer": "C",
+      "explanation": "ALB listener rules can redirect HTTP traffic to HTTPS, automatically converting all requests to use secure connections. This is the standard AWS approach for enforcing HTTPS on web applications."
+    },
+    {
+      "question_number": 61,
+      "correct_answer": "C",
+      "explanation": "AWS Secrets Manager with automatic rotation eliminates hardcoded credentials and handles rotation with minimal operational overhead. The required IAM permissions allow applications to retrieve secrets securely."
+    },
+    {
+      "question_number": 62,
+      "correct_answer": "D",
+      "explanation": "Importing external CA certificates into ACM and using EventBridge to trigger rotation workflows before expiration provides automated certificate management for third-party certificates on ALBs."
+    },
+    {
+      "question_number": 63,
+      "correct_answer": "A",
+      "explanation": "S3 with Lambda triggered by PUT events provides the most cost-effective solution for PDF to JPG conversion. S3 offers cost-effective storage and Lambda provides serverless processing that scales automatically."
+    },
+    {
+      "question_number": 64,
+      "correct_answer": "D",
+      "explanation": "FSx for Windows File Server on AWS with FSx File Gateway on-premises provides hybrid access with minimum latency, preserves existing file access patterns, and requires minimal operational changes."
+    },
+    {
+      "question_number": 65,
+      "correct_answer": "C",
+      "explanation": "Amazon Textract extracts text from PDF and JPEG files, while Comprehend Medical specifically identifies PHI in healthcare documents with pre-trained models, providing the least operational overhead."
+    },
+    {
+      "question_number": 66,
+      "correct_answer": "C",
+      "explanation": "S3 Standard-IA after 30 days provides immediate accessibility while reducing costs for infrequently accessed files. It maintains high availability and durability required for critical business data."
+    },
+    {
+      "question_number": 67,
+      "correct_answer": "D",
+      "explanation": "Increasing the visibility timeout prevents multiple consumers from processing the same message simultaneously, eliminating duplicate records in RDS while maintaining the existing queue structure."
+    },
+    {
+      "question_number": 68,
+      "correct_answer": "A",
+      "explanation": "AWS Direct Connect provides consistent low latency and high availability, while VPN backup is cost-effective for failover scenarios, meeting the requirement for minimized costs with acceptable slower backup traffic."
+    },
+    {
+      "question_number": 69,
+      "correct_answer": "B",
+      "explanation": "Multi-AZ Auto Scaling group provides EC2 high availability, Multi-AZ database configuration ensures database resilience, and RDS Proxy improves connection management with minimal operational effort."
+    },
+    {
+      "question_number": 70,
+      "correct_answer": "C",
+      "explanation": "Application Load Balancer supports HTTP health checks and can detect application-level errors, while Network Load Balancer only supports TCP-level health checks. This provides better application monitoring without custom scripts."
+    },
+    {
+      "question_number": 71,
+      "correct_answer": "B",
+      "explanation": "DynamoDB point-in-time recovery can restore data to any point within the last 35 days, meeting the 15-minute RPO requirement. Recovery typically completes within the 1-hour RTO requirement."
+    },
+    {
+      "question_number": 72,
+      "correct_answer": "D",
+      "explanation": "S3 VPC Gateway Endpoint allows private communication between VPC and S3 without internet gateway charges, significantly reducing data transfer costs for same-region S3 access."
+    },
+    {
+      "question_number": 73,
+      "correct_answer": "C, D",
+      "explanation": "Bastion host security group should allow inbound access from the company's external IP range. Application instances should allow SSH access only from the bastion host's private IP for secure access control."
+    },
+    {
+      "question_number": 74,
+      "correct_answer": "A, C",
+      "explanation": "Web tier needs inbound HTTPS (port 443) from internet (0.0.0.0/0) for public access. Database tier needs inbound access on SQL Server port 1433 only from the web tier security group for secure database communication."
+    },
+    {
+      "question_number": 75,
+      "correct_answer": "D",
+      "explanation": "SQS provides durable message queuing to decouple components and handle traffic spikes, while Auto Scaling ensures optimal resource utilization. This is the most operationally efficient solution for modernizing the multi-tiered application."
+    },
+    {
+      "question_number": 76,
+      "correct_answer": "B",
+      "explanation": "AWS DataSync over Direct Connect provides the most reliable data transfer for 10TB daily transfers. Direct Connect offers dedicated bandwidth and better security than public internet, while DataSync is optimized for large-scale data transfers to S3."
+    },
+    {
+      "question_number": 77,
+      "correct_answer": "C",
+      "explanation": "API Gateway provides managed API service, Kinesis Data Streams handles real-time ingestion, and Kinesis Data Firehose automatically transforms and delivers data to storage with minimal operational overhead - all fully managed services."
+    },
+    {
+      "question_number": 78,
+      "correct_answer": "B",
+      "explanation": "AWS Backup provides automated, policy-driven backup solution for DynamoDB with flexible retention policies. It's the most operationally efficient way to meet the 7-year retention requirement with centralized backup management."
+    },
+    {
+      "question_number": 79,
+      "correct_answer": "A",
+      "explanation": "On-demand capacity mode is ideal for unpredictable workloads with rapid scaling needs. It automatically scales up and down based on traffic patterns and is cost-effective when usage is sporadic, eliminating the need to provision capacity."
+    },
+    {
+      "question_number": 80,
+      "correct_answer": "B",
+      "explanation": "Modify the AMI's launchPermission to share with specific AWS account and update KMS key policy to allow the MSP Partner account to use the key. This provides secure, controlled access without making resources publicly available."
+    },
+    {
+      "question_number": 81,
+      "correct_answer": "B",
+      "explanation": "SQS provides durable message storage and loose coupling for job processing. Auto Scaling Groups automatically add/remove EC2 instances based on queue depth, ensuring scalability and fault tolerance for stateless processor applications."
+    },
+    {
+      "question_number": 82,
+      "correct_answer": "D",
+      "explanation": "EventBridge can detect ACM certificate expiration events and trigger SNS notifications. This is the most direct and efficient approach for monitoring certificate expiration with 30-day advance notice."
+    },
+    {
+      "question_number": 83,
+      "correct_answer": "C",
+      "explanation": "CloudFront with custom origin pointing to on-premises servers provides immediate global content distribution, caching static content closer to European users while keeping the backend in the US. This is the fastest solution to implement."
+    },
+    {
+      "question_number": 84,
+      "correct_answer": "B",
+      "explanation": "Reserved Instances for production (24/7 usage) provide significant cost savings. On-Demand for dev/test environments that run 8+ hours with automation to stop instances offers flexibility without long-term commitment."
+    },
+    {
+      "question_number": 85,
+      "correct_answer": "A",
+      "explanation": "S3 Object Lock with Versioning provides Write Once Read Many (WORM) functionality, preventing document modification or deletion. This meets regulatory compliance requirements for immutable document storage."
+    },
+    {
+      "question_number": 86,
+      "correct_answer": "A",
+      "explanation": "AWS Secrets Manager automatically rotates database credentials and provides secure access through IAM permissions. It's specifically designed for managing database credentials with automatic rotation capabilities."
+    },
+    {
+      "question_number": 87,
+      "correct_answer": "D",
+      "explanation": "SQS FIFO queue ensures reliable message delivery and ordering during database unavailability. A separate Lambda function can process queued messages when the database is available, preventing data loss during upgrades."
+    },
+    {
+      "question_number": 88,
+      "correct_answer": "A",
+      "explanation": "Requester Pays configuration means the European marketing firm pays for data transfer costs when accessing the S3 bucket, minimizing costs for the data owner while enabling data sharing."
+    },
+    {
+      "question_number": 89,
+      "correct_answer": "A",
+      "explanation": "S3 Versioning preserves document history, while MFA Delete adds extra security layer requiring multi-factor authentication for permanent deletion. This prevents accidental deletion while maintaining audit compliance."
+    },
+    {
+      "question_number": 90,
+      "correct_answer": "B",
+      "explanation": "Read replica separates read workloads from the primary database, allowing the script to run queries without impacting development team's database performance. This provides the least operational overhead."
+    },
+    {
+      "question_number": 91,
+      "correct_answer": "A",
+      "explanation": "S3 Gateway Endpoint allows EC2 instances in VPC to access S3 without internet traffic, keeping all communication within AWS network. This meets security requirements for no internet traversal."
+    },
+    {
+      "question_number": 92,
+      "correct_answer": "A, C",
+      "explanation": "VPC Gateway Endpoint enables secure S3 access from VPC without internet routing. Bucket policy restricts access to only the VPC, ensuring secure, controlled access to sensitive data."
+    },
+    {
+      "question_number": 93,
+      "correct_answer": "B",
+      "explanation": "Aurora MySQL with Multi-AZ replicas handles read traffic efficiently. Database cloning creates staging environment instantly from production without impacting performance, allowing continuous development work."
+    },
+    {
+      "question_number": 94,
+      "correct_answer": "C",
+      "explanation": "S3 event notification to SQS with Lambda function provides serverless, event-driven processing with minimal operational overhead. Lambda scales automatically based on file upload volume, making it cost-effective for variable workloads."
+    },
+    {
+      "question_number": 95,
+      "correct_answer": "D",
+      "explanation": "Read replicas with same compute/storage resources as source database ensure consistent performance for read operations. This effectively separates read and write traffic, optimizing application performance quickly."
+    },
+    {
+      "question_number": 96,
+      "correct_answer": "C",
+      "explanation": "The policy allows EC2 termination in us-east-1 region only when the user's source IP is 10.100.100.254. The condition restricts access based on source IP address for enhanced security."
+    },
+    {
+      "question_number": 97,
+      "correct_answer": "D",
+      "explanation": "Amazon FSx for Windows File Server provides fully managed Windows-based file storage with native Active Directory integration. It supports SMB protocol required for SharePoint and offers high availability across multiple AZs."
+    },
+    {
+      "question_number": 98,
+      "correct_answer": "C",
+      "explanation": "Increase SQS visibility timeout to prevent message reprocessing while Lambda function executes. This prevents duplicate processing and multiple email notifications by ensuring messages aren't visible to other consumers during processing."
+    },
+    {
+      "question_number": 99,
+      "correct_answer": "D",
+      "explanation": "Amazon FSx for Lustre provides fully managed Lustre file system optimized for high-performance computing workloads. It natively supports Lustre clients and offers the fully managed solution required."
+    },
+    {
+      "question_number": 100,
+      "correct_answer": "C",
+      "explanation": "AWS KMS customer managed key provides secure encryption/decryption for certificates in near real time with minimal operational overhead. KMS integrates with EC2 IAM roles and provides highly available storage through S3 or other AWS services."
+    },
+    {
+      "question_number": 101,
+      "correct_answer": "A",
+      "explanation": "NAT gateways in public subnets provide internet access for private subnets. Creating one NAT gateway per AZ ensures high availability and proper routing for outbound traffic from private subnets."
+    },
+    {
+      "question_number": 102,
+      "correct_answer": "B, E",
+      "explanation": "AWS DataSync agent installed on-premises can efficiently transfer 200GB of NFS data. Creating a DataSync location configuration for the SFTP server enables automated, secure data transfer to AWS with minimal operational overhead."
+    },
+    {
+      "question_number": 103,
+      "correct_answer": "A",
+      "explanation": "AWS Glue job bookmarks track processed data and prevent reprocessing of the same files. This is the most efficient way to handle incremental data processing in ETL jobs."
+    },
+    {
+      "question_number": 104,
+      "correct_answer": "A, C",
+      "explanation": "AWS Shield Advanced provides comprehensive DDoS protection against large-scale attacks. CloudFront acts as a global edge service that can absorb and mitigate DDoS attacks before they reach origin servers, providing both static and dynamic content delivery."
+    },
+    {
+      "question_number": 105,
+      "correct_answer": "D",
+      "explanation": "Resource-based policy on the Lambda function with lambda:InvokeFunction action and events.amazonaws.com principal follows the principle of least privilege, allowing only EventBridge to invoke the function."
+    },
+    {
+      "question_number": 106,
+      "correct_answer": "D",
+      "explanation": "SSE-KMS with automatic rotation meets all requirements: encryption at rest, key usage logging through CloudTrail, and automated annual key rotation, providing the most operationally efficient solution."
+    },
+    {
+      "question_number": 107,
+      "correct_answer": "B",
+      "explanation": "API Gateway with Lambda provides a serverless REST API solution that can scale automatically for peak operating hours. Lambda can process location data and integrate with existing analytics platforms efficiently."
+    },
+    {
+      "question_number": 108,
+      "correct_answer": "D",
+      "explanation": "RDS event notifications can trigger SNS topics, which fan out to multiple target systems (SQS queues, Lambda functions, etc.). This provides a decoupled, scalable solution for sending data to multiple destinations when database changes occur."
+    },
+    {
+      "question_number": 109,
+      "correct_answer": "D",
+      "explanation": "S3 Object Lock with versioning and legal hold provides immutable object storage for an unspecified duration. Legal hold can be removed by specific users with s3:PutObjectLegalHold permission, meeting the flexible retention requirements."
+    },
+    {
+      "question_number": 110,
+      "correct_answer": "C, D",
+      "explanation": "Presigned URLs allow direct browser uploads to S3, reducing coupling and server load. S3 Event Notifications triggering Lambda for image resizing creates an efficient, decoupled architecture that improves website performance."
+    },
+    {
+      "question_number": 111,
+      "correct_answer": "D",
+      "explanation": "Amazon MQ with active/standby brokers across AZs provides high availability for messaging. Auto Scaling group for consumer EC2 instances with RDS Multi-AZ ensures the entire system is highly available with automatic scaling capabilities."
+    },
+    {
+      "question_number": 112,
+      "correct_answer": "A",
+      "explanation": "AWS Fargate on ECS provides serverless container hosting with automatic scaling and minimal operational overhead. It requires minimal code changes and handles infrastructure management automatically."
+    },
+    {
+      "question_number": 113,
+      "correct_answer": "C",
+      "explanation": "Snowball Edge Storage Optimized can handle 50TB of data transfer without network bandwidth constraints. Creating a custom transformation job with AWS Glue provides the least operational overhead for continuing the transformation process in the cloud."
+    },
+    {
+      "question_number": 114,
+      "correct_answer": "C",
+      "explanation": "Lambda automatically scales to handle varying concurrent users and processes photos efficiently. S3 provides scalable storage for photos, while DynamoDB remains optimal for metadata storage, creating a fully scalable serverless architecture."
+    },
+    {
+      "question_number": 115,
+      "correct_answer": "C",
+      "explanation": "Moving EC2 instances to private subnets and creating a VPC endpoint for S3 ensures traffic to S3 stays within AWS network infrastructure, meeting the private routing requirement while maintaining functionality."
+    },
+    {
+      "question_number": 116,
+      "correct_answer": "A, D",
+      "explanation": "S3 static website hosting eliminates maintenance overhead for static content updated quarterly. CloudFront provides HTTPS, enhanced security, global distribution, and high scalability with minimal operational overhead."
+    },
+    {
+      "question_number": 117,
+      "correct_answer": "A",
+      "explanation": "CloudWatch Logs subscription filters can directly stream logs to Amazon OpenSearch Service in near-real time with minimal operational overhead, eliminating the need for additional services or custom code."
+    },
+    {
+      "question_number": 118,
+      "correct_answer": "D",
+      "explanation": "Amazon S3 provides virtually unlimited scalability for 900TB of text documents at the lowest cost. It offers high availability, durability, and scales automatically to meet demand without pre-provisioning storage."
+    },
+    {
+      "question_number": 119,
+      "correct_answer": "B",
+      "explanation": "AWS Firewall Manager centrally manages AWS WAF rules across multiple accounts and regions, providing the least administrative effort for protecting API Gateway across multiple accounts from SQL injection and XSS attacks."
+    },
+    {
+      "question_number": 120,
+      "correct_answer": "B",
+      "explanation": "AWS Global Accelerator with endpoint groups in both regions provides optimal performance and availability by routing traffic to the closest healthy endpoints, improving DNS resolution performance globally."
+    },
+    {
+      "question_number": 121,
+      "correct_answer": "A",
+      "explanation": "Encrypting a copy of the latest snapshot and restoring it to replace the existing instance is the correct approach. You cannot encrypt an existing unencrypted RDS instance directly; you must restore from an encrypted snapshot."
+    },
+    {
+      "question_number": 122,
+      "correct_answer": "B",
+      "explanation": "AWS KMS provides a fully managed key management service that reduces operational burden by handling key creation, rotation, and access control automatically, making it ideal for scalable application encryption needs."
+    },
+    {
+      "question_number": 123,
+      "correct_answer": "D",
+      "explanation": "Application Load Balancer with ACM certificate handles SSL termination, offloading encryption/decryption from EC2 instances. This improves application performance by freeing up compute capacity on the web servers."
+    },
+    {
+      "question_number": 124,
+      "correct_answer": "A",
+      "explanation": "EC2 Spot Instances provide up to 90% cost savings for stateless, interruptible batch processing jobs. Since the job can be stopped and restarted without negative impact and runs for 60+ minutes, Spot Instances are ideal for cost-effective scaling."
+    },
+    {
+      "question_number": 126,
+      "correct_answer": "B",
+      "explanation": "S3 Lifecycle policy to transition objects to S3 Glacier Deep Archive after 2 years meets the requirement that data from the most recent 2 years must be highly available and immediately retrievable, while providing the lowest cost for long-term storage."
+    },
+    {
+      "question_number": 127,
+      "correct_answer": "D",
+      "explanation": "EC2 instance store provides the maximum I/O performance for video processing, S3 provides highly durable storage for media content, and S3 Glacier offers the most cost-effective archival storage for inactive media."
+    },
+    {
+      "question_number": 128,
+      "correct_answer": "B",
+      "explanation": "Spot Instances in Amazon EKS managed node groups provide the lowest cost for stateless applications that can tolerate disruptions. EKS reduces operational overhead compared to managing EC2 Auto Scaling groups directly."
+    },
+    {
+      "question_number": 129,
+      "correct_answer": "A, E",
+      "explanation": "Migrating PostgreSQL to Amazon Aurora reduces operational overhead and provides high availability, while migrating the containerized web application to AWS Fargate eliminates infrastructure management and provides automatic scaling."
+    },
+    {
+      "question_number": 130,
+      "correct_answer": "B",
+      "explanation": "Target tracking policy automatically adjusts the Auto Scaling group capacity to maintain the target CPU utilization of 40%, providing the most efficient and responsive scaling behavior."
+    },
+    {
+      "question_number": 131,
+      "correct_answer": "D",
+      "explanation": "Origin Access Identity (OAI) is the standard way to restrict S3 access to only CloudFront, preventing direct access to S3 URLs while allowing CloudFront to serve the content."
+    },
+    {
+      "question_number": 132,
+      "correct_answer": "A",
+      "explanation": "Amazon CloudFront and S3 provide global distribution, cost-effectiveness, minimal infrastructure provisioning, and fastest response times for serving downloadable files worldwide."
+    },
+    {
+      "question_number": 133,
+      "correct_answer": "C",
+      "explanation": "Amazon RDS Custom for Oracle provides access to the underlying operating system while maintaining managed database benefits, and read replicas in another region provide disaster recovery with minimal operational overhead."
+    },
+    {
+      "question_number": 134,
+      "correct_answer": "C",
+      "explanation": "Using the existing S3 bucket with Cross-Region Replication and Amazon Athena minimizes operational overhead. Athena is the serverless SQL solution for analyzing S3 data without managing infrastructure."
+    },
+    {
+      "question_number": 135,
+      "correct_answer": "D",
+      "explanation": "AWS PrivateLink with a VPC endpoint created by the provider enables private connectivity that is restricted to the target service and can only be initiated from the company's VPC, meeting all security requirements."
+    },
+    {
+      "question_number": 136,
+      "correct_answer": "A, C",
+      "explanation": "AWS Database Migration Service (DMS) replication server enables ongoing replication between on-premises PostgreSQL and Aurora PostgreSQL, keeping databases synchronized during migration."
+    },
+    {
+      "question_number": 137,
+      "correct_answer": "B",
+      "explanation": "Configuring AWS account root user email addresses as distribution lists ensures all administrators receive notifications, providing redundancy and preventing missed notifications while limiting access to account administrators."
+    },
+    {
+      "question_number": 138,
+      "correct_answer": "B",
+      "explanation": "Amazon MQ with redundant RabbitMQ instances provides high availability for the messaging layer, Multi-AZ Auto Scaling groups for the application provide availability, and Amazon RDS Multi-AZ for PostgreSQL ensures database availability with minimal operational overhead."
+    },
+    {
+      "question_number": 139,
+      "correct_answer": "C",
+      "explanation": "S3 replication automatically copies files between buckets with minimal operational overhead, and S3 event notifications can trigger both Lambda functions and SageMaker Pipelines efficiently."
+    },
+    {
+      "question_number": 140,
+      "correct_answer": "A, C",
+      "explanation": "Spot Instances are ideal for the sporadic, interruptible data ingestion layer, while Compute Savings Plan provides the best cost optimization for predictable Fargate and Lambda usage across the front-end and API layers."
+    },
+    {
+      "question_number": 141,
+      "correct_answer": "A",
+      "explanation": "CloudFront can serve both static and dynamic content with the ALB as the origin, providing global edge locations for minimal latency to users worldwide while maintaining a single deployment region."
+    },
+    {
+      "question_number": 142,
+      "correct_answer": "C",
+      "explanation": "AWS Global Accelerator provides static IP addresses, routes traffic to the nearest edge location, and works with Network Load Balancer for UDP traffic. EC2 instances can run the modified Linux kernel application."
+    },
+    {
+      "question_number": 143,
+      "correct_answer": "D",
+      "explanation": "Amazon ECS provides the right balance of keeping existing code while enabling microservices architecture with minimal operational overhead. Application Load Balancer can route to different containerized services managed by different teams."
+    },
+    {
+      "question_number": 144,
+      "correct_answer": "B",
+      "explanation": "Aurora Replica offloads read-heavy reporting workloads from the primary database, reducing CPU and IO contention on the main ecommerce application while being more cost-effective than Redshift."
+    },
+    {
+      "question_number": 145,
+      "correct_answer": "D",
+      "explanation": "Migrating to Aurora MySQL provides better performance and availability, while using AMI in a launch template with Auto Scaling group enables automatic scaling during busy periods, providing the most cost-effective scalable solution."
+    },
+    {
+      "question_number": 146,
+      "correct_answer": "B",
+      "explanation": "Reserved Instances for baseline capacity provide cost savings for steady overnight usage, while Spot Instances handle additional capacity during peak business hours at significant cost reduction without affecting availability."
+    },
+    {
+      "question_number": 147,
+      "correct_answer": "B",
+      "explanation": "S3 with Lifecycle policies provides the most cost-effective solution for large log volumes. S3 is cheaper than CloudWatch Logs for storage, and Lifecycle policies automatically transition older logs to Glacier Deep Archive."
+    },
+    {
+      "question_number": 148,
+      "correct_answer": "D",
+      "explanation": "SQS queue as the on-failure destination provides a dead letter queue mechanism that captures failed messages for reprocessing, ensuring all notifications are eventually processed even after network connectivity issues."
+    },
+    {
+      "question_number": 149,
+      "correct_answer": "A",
+      "explanation": "Amazon SQS FIFO queue maintains message order and ensures exactly-once processing, which is required for this use case. Lambda function provides serverless processing with minimal operational overhead."
+    },
+    {
+      "question_number": 150,
+      "correct_answer": "A",
+      "explanation": "CloudWatch composite alarms allow combining multiple metrics (CPU utilization AND disk IOPS) into a single alarm, reducing false positives by only triggering when both conditions are met simultaneously."
+    },
+    {
+      "question_number": 151,
+      "correct_answer": "A, C",
+      "explanation": "AWS Control Tower provides data residency guardrails and can deny internet access. AWS Organizations with SCPs can prevent VPCs from gaining internet access and restrict access to specific regions. Both provide centralized compliance controls."
+    },
+    {
+      "question_number": 152,
+      "correct_answer": "D",
+      "explanation": "Using Lambda functions with EventBridge scheduled events to start/stop the RDS instance during the 12-hour usage window is the most cost-effective solution. This eliminates charges during the 12 hours when the application isn't being used."
+    },
+    {
+      "question_number": 153,
+      "correct_answer": "D",
+      "explanation": "S3 Lifecycle policies automatically transition objects from S3 Standard to S3 Standard-IA after 90 days based on the access pattern. This is the most cost-effective automated solution for infrequently accessed files over 128KB."
+    },
+    {
+      "question_number": 154,
+      "correct_answer": "B",
+      "explanation": "S3 Object Lock in compliance mode with a 365-day retention period ensures files cannot be deleted or modified for exactly 1 year. Compliance mode provides stronger protection than governance mode as it cannot be bypassed even by root users."
+    },
+    {
+      "question_number": 155,
+      "correct_answer": "C",
+      "explanation": "Amazon CloudFront is the correct solution for caching and delivering confidential media files globally. It provides edge locations worldwide for fast content delivery and supports private content distribution with signed URLs/cookies for confidential files."
+    },
+    {
+      "question_number": 156,
+      "correct_answer": "A, E",
+      "explanation": "Amazon Athena provides serverless querying for one-time analysis with minimal operational overhead. AWS Lake Formation with Glue crawlers automates data ingestion and cataloging from multiple sources into a data lake with the least operational complexity."
+    },
+    {
+      "question_number": 157,
+      "correct_answer": "D, E",
+      "explanation": "CloudWatch Logs export captures audit logs indefinitely for compliance. AWS Backup provides centralized backup management with 5-year retention policies, offering more flexibility than Aurora's native automated backups which have limited retention periods."
+    },
+    {
+      "question_number": 158,
+      "correct_answer": "A",
+      "explanation": "Amazon CloudFront is optimized for both real-time streaming and on-demand content delivery globally. It provides low-latency edge locations worldwide and supports various streaming protocols for live and on-demand video content."
+    },
+    {
+      "question_number": 159,
+      "correct_answer": "A, C",
+      "explanation": "API Gateway usage plans with API keys control access to genuine users. AWS WAF rules can identify and block malicious requests from botnets based on IP addresses, request patterns, and rate limiting before they reach the Lambda function."
+    },
+    {
+      "question_number": 160,
+      "correct_answer": "C",
+      "explanation": "S3 Standard provides millisecond access times and is cost-effective for 300MB of data over 30 days. S3 Glacier has longer retrieval times, and databases like RDS or OpenSearch are unnecessary and more expensive for simple JSON storage."
+    },
+    {
+      "question_number": 161,
+      "correct_answer": "B",
+      "explanation": "AWS Lambda with S3 trigger provides serverless, highly available, and automatically scalable processing. Lambda scales automatically to handle thousands of daily executions with minimal operational overhead compared to managing EC2 instances or containers."
+    },
+    {
+      "question_number": 162,
+      "correct_answer": "A",
+      "explanation": "Amazon FSx for Lustre is specifically designed for HPC workloads on Linux, providing high-performance parallel file system capabilities. Its tight integration with S3 allows seamless data movement between high-performance computing and long-term storage."
+    },
+    {
+      "question_number": 163,
+      "correct_answer": "B",
+      "explanation": "Amazon ECS with Fargate provides fully managed container orchestration without server management. ECR handles container image storage, while Fargate automatically scales and manages the underlying infrastructure with minimal operational overhead."
+    },
+    {
+      "question_number": 164,
+      "correct_answer": "C",
+      "explanation": "Amazon SQS with dead-letter queue is designed for exactly this use case. It handles message retention up to 14 days, provides reliable message delivery, and isolates failed messages without affecting processing of remaining messages."
+    },
+    {
+      "question_number": 165,
+      "correct_answer": "D",
+      "explanation": "CloudFront with Origin Access Identity (OAI) restricts S3 access to only CloudFront. Associating AWS WAF with the CloudFront distribution ensures all traffic is inspected before reaching the origin, meeting the security requirement."
+    },
+    {
+      "question_number": 166,
+      "correct_answer": "D",
+      "explanation": "Amazon CloudFront with S3 as origin is the most efficient solution for serving millions of views globally. CloudFront's edge locations provide low latency access worldwide and reduce load on the S3 bucket through caching."
+    },
+    {
+      "question_number": 167,
+      "correct_answer": "C",
+      "explanation": "Reserved Instances provide cost savings for baseline capacity that runs continuously. Spot Instances handle additional capacity cost-effectively, as they can handle interruptions better than the baseline processing that must be continuous."
+    },
+    {
+      "question_number": 168,
+      "correct_answer": "D",
+      "explanation": "Service Control Policies (SCPs) in AWS Organizations provide centralized permission management across all accounts. Creating an SCP at the root OU ensures consistent access restrictions across the entire organization from a single point of management."
+    },
+    {
+      "question_number": 169,
+      "correct_answer": "C",
+      "explanation": "AWS Shield Advanced provides enhanced DDoS protection specifically for applications behind load balancers. It offers 24/7 access to the DDoS Response Team and financial protection against DDoS-related charges."
+    },
+    {
+      "question_number": 170,
+      "correct_answer": "C",
+      "explanation": "AWS WAF on the Application Load Balancer can implement geo-blocking rules to restrict access to specific countries. WAF provides geographic match conditions to allow or block requests based on the country of origin."
+    },
+    {
+      "question_number": 171,
+      "correct_answer": "B",
+      "explanation": "API Gateway with Lambda provides automatic scaling and elasticity. Lambda scales automatically based on demand, making it perfect for seasonal traffic spikes. This serverless approach requires minimal management and scales instantly."
+    },
+    {
+      "question_number": 172,
+      "correct_answer": "C",
+      "explanation": "CloudFront field-level encryption provides an additional layer of security by encrypting sensitive form data at the edge before it reaches the origin. This ensures sensitive information is protected throughout the entire application stack."
+    },
+    {
+      "question_number": 173,
+      "correct_answer": "B",
+      "explanation": "Amazon CloudFront distribution in front of S3 bucket is the most cost-effective solution for global content delivery. It caches content at edge locations worldwide, reducing load on the origin and improving user experience globally."
+    },
+    {
+      "question_number": 174,
+      "correct_answer": "B",
+      "explanation": "Modifying the Auto Scaling group to use three instances across two Availability Zones provides high availability within the same region. This ensures the application continues running even if one AZ fails, without requiring application modifications."
+    },
+    {
+      "question_number": 175,
+      "correct_answer": "B",
+      "explanation": "Amazon RDS Proxy manages database connections and connection pooling, reducing the number of open connections to the database. This prevents timeout errors during traffic surges with minimal changes to the Lambda function code."
+    },
+    {
+      "question_number": 176,
+      "correct_answer": "A",
+      "explanation": "VPC endpoint for DynamoDB ensures traffic stays within AWS network and provides secure access without needing internet gateway or NAT."
+    },
+    {
+      "question_number": 177,
+      "correct_answer": "B",
+      "explanation": "DynamoDB Accelerator (DAX) provides microsecond latency for read-intensive workloads without application reconfiguration and minimal operational overhead."
+    },
+    {
+      "question_number": 178,
+      "correct_answer": "A",
+      "explanation": "AWS Backup provides centralized backup management for both EC2 and RDS with cross-region capabilities and minimal operational overhead."
+    },
+    {
+      "question_number": 179,
+      "correct_answer": "A",
+      "explanation": "Create IAM role with Parameter Store read access and KMS decrypt permissions, then attach to EC2 instance for secure parameter retrieval."
+    },
+    {
+      "question_number": 180,
+      "correct_answer": "B, C",
+      "explanation": "AWS Shield Advanced protects against sophisticated DDoS attacks on NLB, while AWS WAF on API Gateway protects against web exploits like SQL injection."
+    },
+    {
+      "question_number": 181,
+      "correct_answer": "A",
+      "explanation": "Amazon SQS provides reliable, decoupled communication for microservices with built-in ordering guarantees and fault tolerance for sequential processing."
+    },
+    {
+      "question_number": 182,
+      "correct_answer": "B",
+      "explanation": "RDS MySQL with Multi-AZ provides synchronous replication to a standby instance in different AZ, ensuring every transaction is stored on two nodes."
+    },
+    {
+      "question_number": 183,
+      "correct_answer": "A",
+      "explanation": "Serverless architecture with S3, API Gateway, Lambda, and DynamoDB with auto-scaling minimizes server maintenance while providing rapid scaling."
+    },
+    {
+      "question_number": 184,
+      "correct_answer": "A",
+      "explanation": "Lambda functions must run in VPC with appropriate security groups to access resources in private subnets through Direct Connect."
+    },
+    {
+      "question_number": 185,
+      "correct_answer": "B",
+      "explanation": "Create IAM role with S3 permissions and specify as taskRoleArn in ECS task definition for secure access without hardcoded credentials."
+    },
+    {
+      "question_number": 191,
+      "correct_answer": "A",
+      "explanation": "Read replica offloads reporting queries from primary database, eliminating timeouts during order processing while maintaining data consistency."
+    },
+    {
+      "question_number": 192,
+      "correct_answer": "B, E",
+      "explanation": "Amazon Textract extracts medical information from documents, while S3 + Athena provides scalable storage and SQL querying capabilities."
+    },
+    {
+      "question_number": 193,
+      "correct_answer": "B",
+      "explanation": "ElastiCache for Redis provides in-memory caching to reduce database reads while maintaining high availability with cluster mode."
+    },
+    {
+      "question_number": 194,
+      "correct_answer": "A",
+      "explanation": "Deploy database across two AZs with replication and automatic failover configuration for high availability in same region."
+    },
+    {
+      "question_number": 195,
+      "correct_answer": "C",
+      "explanation": "SQS queue provides durable message storage and Auto Scaling processes messages reliably, preventing order loss during failures."
+    },
+    {
+      "question_number": 196,
+      "correct_answer": "D",
+      "explanation": "DynamoDB TTL automatically deletes old items based on timestamp attribute, minimizing cost and development effort for data lifecycle management."
+    },
+    {
+      "question_number": 197,
+      "correct_answer": "B, E",
+      "explanation": "Elastic Beanstalk supports .NET with minimal changes for high availability, while DMS migrates Oracle to RDS Oracle in Multi-AZ."
+    },
+    {
+      "question_number": 198,
+      "correct_answer": "D",
+      "explanation": "EKS with Fargate provides managed Kubernetes without infrastructure overhead, DocumentDB offers MongoDB compatibility with minimal operational overhead."
+    },
+    {
+      "question_number": 199,
+      "correct_answer": "B",
+      "explanation": "Amazon Transcribe provides speaker recognition and transcription, while Athena enables SQL queries on transcript files stored in S3."
+    },
+    {
+      "question_number": 200,
+      "correct_answer": "D",
+      "explanation": "Amazon Cognito user pool authorizer in API Gateway provides AWS managed authentication with least operational overhead."
+    },
+    {
+      "question_number": 207,
+      "correct_answer": "D",
+      "explanation": "SQS queue buffers writes to DynamoDB during high throughput periods, preventing data loss and providing better availability."
+    },
+    {
+      "question_number": 210,
+      "correct_answer": "C",
+      "explanation": "Two SQS queues decouple order collection and fulfillment processes, allowing independent scaling based on queue depth metrics."
+    },
+    {
+      "question_number": 224,
+      "correct_answer": "C, E",
+      "explanation": "Route 53 multivalue answer routing distributes traffic randomly, while launching instances across two AZs ensures fault tolerance."
+    },
+    {
+      "question_number": 235,
+      "correct_answer": "C",
+      "explanation": "AWS SCT converts Oracle schema to PostgreSQL, while DMS with memory-optimized instance handles high read/write workload during migration."
+    },
+    {
+      "question_number": 257,
+      "correct_answer": "A",
+      "explanation": "CloudWatch metric stream with Kinesis Data Firehose provides serverless, real-time data delivery to S3 without affecting EC2 launch speed."
+    },
+    {
+      "question_number": 283,
+      "correct_answer": "C",
+      "explanation": "Amazon FSx for NetApp ONTAP provides both NFS and SMB protocols in a single file system, eliminating data duplication. It supports concurrent access from Linux (NFS) and Windows (SMB) applications without code changes, making it ideal for this hybrid workload migration scenario."
+    },
+    {
+      "question_number": 315,
+      "correct_answer": "D",
+      "explanation": "Amazon Inspector is specifically designed for vulnerability assessment of EC2 instances and container images. It automatically scans for software vulnerabilities and unintended network exposure, then provides detailed findings reports. This is the correct service for active vulnerability scanning on EC2 instances."
+    },
+    {
+      "question_number": 366,
+      "correct_answer": "D",
+      "explanation": "API usage plans and API keys in API Gateway provide the least operational overhead for implementing subscription-based access control. This approach allows you to define different access tiers and associate API keys with specific usage plans, directly controlling access to premium content at the API layer."
+    },
+    {
+      "question_number": 429,
+      "correct_answer": "D",
+      "explanation": "Based on IAM policy evaluation logic, explicit Deny statements take precedence over Allow statements. The policy likely contains a Deny effect that restricts ec2:StopInstances and ec2:TerminateInstances to us-east-1 region only when MFA is present, creating the effective permissions described in option D."
+    },
+    {
+      "question_number": 528,
+      "correct_answer": "D",
+      "explanation": "AWS Transfer Family provides managed FTP service that integrates directly with S3, requiring minimal changes to FTP clients. Combined with S3 event notifications triggering Lambda functions for processing, this solution offers the most operationally efficient approach for real-time file processing with automatic cleanup capabilities."
+    }
+  ]
+}

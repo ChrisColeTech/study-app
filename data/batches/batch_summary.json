@@ -1,0 +1,19 @@
+{
+  "total_questions": 155,
+  "num_batches": 7,
+  "batch_size": 25,
+  "batch_files": [
+    "data/batches/batch_01_questions.json",
+    "data/batches/batch_02_questions.json",
+    "data/batches/batch_03_questions.json",
+    "data/batches/batch_04_questions.json",
+    "data/batches/batch_05_questions.json",
+    "data/batches/batch_06_questions.json",
+    "data/batches/batch_07_questions.json"
+  ],
+  "instructions_for_agents": {
+    "task": "Process each batch file and generate answers",
+    "output_naming": "batch_XX_answers.json (same directory)",
+    "merge_command": "After all batches complete, run merge script"
+  }
+}

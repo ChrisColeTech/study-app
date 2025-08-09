@@ -1,0 +1,747 @@
+{
+  "metadata": {
+    "batch_number": 2,
+    "total_batches": 7,
+    "questions_in_batch": 25,
+    "question_range": "75-99",
+    "instructions": {
+      "task": "Answer each AWS SAA-C03 exam question with the correct letter choice(s)",
+      "format": "Provide correct_answer and explanation for each question",
+      "output_format": "JSON with ai_answers array",
+      "example_output": {
+        "ai_answers": [
+          {
+            "question_number": 36,
+            "correct_answer": "B",
+            "explanation": "Multi-Region KMS key provides least operational overhead for cross-region encryption."
+          }
+        ]
+      }
+    }
+  },
+  "questions": [
+    {
+      "question_number": 75,
+      "question_text": "A company wants to move a multi-tiered application from on premises to the AWS Cloud to improve the application's performance. The application\nconsists of application tiers that communicate with each other by way of RESTful services. Transactions are dropped when one tier becomes\noverloaded. A solutions architect must design a solution that resolves these issues and modernizes the application.\nWhich solution meets these requirements and is the MOST operationally e\u0000cient?",
+      "options": [
+        [
+          "A",
+          "Use Amazon API Gateway and direct transactions to the AWS Lambda functions as the application layer. Use Amazon Simple Queue Service"
+        ],
+        [
+          "B",
+          "Use Amazon CloudWatch metrics to analyze the application performance history to determine the servers' peak utilization during the"
+        ],
+        [
+          "C",
+          "Use Amazon Simple Noti\u0000cation Service (Amazon SNS) to handle the messaging between application servers running on Amazon EC2 in an"
+        ],
+        [
+          "D",
+          "Use Amazon Simple Queue Service (Amazon SQS) to handle the messaging between application servers running on Amazon EC2 in an Auto"
+        ]
+      ],
+      "question_type": "single_choice",
+      "expected_answers": 1,
+      "topic": "Monitoring & Management",
+      "aws_services": [
+        "GENERAL"
+      ]
+    },
+    {
+      "question_number": 76,
+      "question_text": "A company receives 10 TB of instrumentation data each day from several machines located at a single factory. The data consists of JSON \u0000les\nstored on a storage area network (SAN) in an on-premises data center located within the factory. The company wants to send this data to Amazon\nS3 where it can be accessed by several additional systems that provide critical near-real-time analytics. A secure transfer is important because\nthe data is considered sensitive.\nWhich solution offers the MOST reliable data transfer?",
+      "options": [
+        [
+          "A",
+          "AWS DataSync over public internet"
+        ],
+        [
+          "B",
+          "AWS DataSync over AWS Direct Connect"
+        ],
+        [
+          "C",
+          "AWS Database Migration Service (AWS DMS) over public internet"
+        ],
+        [
+          "D",
+          "AWS Database Migration Service (AWS DMS) over AWS Direct Connect"
+        ]
+      ],
+      "question_type": "single_choice",
+      "expected_answers": 1,
+      "topic": "Storage Services",
+      "aws_services": [
+        "S3"
+      ]
+    },
+    {
+      "question_number": 77,
+      "question_text": "A company needs to con\u0000gure a real-time data ingestion architecture for its application. The company needs an API, a process that transforms\ndata as the data is streamed, and a storage solution for the data.\nWhich solution will meet these requirements with the LEAST operational overhead?",
+      "options": [
+        [
+          "A",
+          "Deploy an Amazon EC2 instance to host an API that sends data to an Amazon Kinesis data stream. Create an Amazon Kinesis Data"
+        ],
+        [
+          "B",
+          "Deploy an Amazon EC2 instance to host an API that sends data to AWS Glue. Stop source/destination checking on the EC2 instance. Use"
+        ],
+        [
+          "C",
+          "Con\u0000gure an Amazon API Gateway API to send data to an Amazon Kinesis data stream. Create an Amazon Kinesis Data Firehose delivery"
+        ],
+        [
+          "D",
+          "Con\u0000gure an Amazon API Gateway API to send data to AWS Glue. Use AWS Lambda functions to transform the data. Use AWS Glue to send"
+        ]
+      ],
+      "question_type": "single_choice",
+      "expected_answers": 1,
+      "topic": "Monitoring & Management",
+      "aws_services": [
+        "GENERAL"
+      ]
+    },
+    {
+      "question_number": 78,
+      "question_text": "A company needs to keep user transaction data in an Amazon DynamoDB table. The company must retain the data for 7 years.\nWhat is the MOST operationally e\u0000cient solution that meets these requirements?",
+      "options": [
+        [
+          "A",
+          "Use DynamoDB point-in-time recovery to back up the table continuously."
+        ],
+        [
+          "B",
+          "Use AWS Backup to create backup schedules and retention policies for the table."
+        ],
+        [
+          "C",
+          "Create an on-demand backup of the table by using the DynamoDB console. Store the backup in an Amazon S3 bucket. Set an S3 Lifecycle"
+        ],
+        [
+          "D",
+          "Create an Amazon EventBridge (Amazon CloudWatch Events) rule to invoke an AWS Lambda function. Con\u0000gure the Lambda function to"
+        ]
+      ],
+      "question_type": "single_choice",
+      "expected_answers": 1,
+      "topic": "Databases",
+      "aws_services": [
+        "DYNAMODB",
+        "TABLE"
+      ]
+    },
+    {
+      "question_number": 79,
+      "question_text": "A company is planning to use an Amazon DynamoDB table for data storage. The company is concerned about cost optimization. The table will not\nbe used on most mornings. In the evenings, the read and write tra\u0000c will often be unpredictable. When tra\u0000c spikes occur, they will happen very\nquickly.\nWhat should a solutions architect recommend?",
+      "options": [
+        [
+          "A",
+          "Create a DynamoDB table in on-demand capacity mode."
+        ],
+        [
+          "B",
+          "Create a DynamoDB table with a global secondary index."
+        ],
+        [
+          "C",
+          "Create a DynamoDB table with provisioned capacity and auto scaling."
+        ],
+        [
+          "D",
+          "Create a DynamoDB table in provisioned capacity mode, and con\u0000gure it as a global table."
+        ]
+      ],
+      "question_type": "single_choice",
+      "expected_answers": 1,
+      "topic": "Monitoring & Management",
+      "aws_services": [
+        "OPTIMIZATION",
+        "COST"
+      ]
+    },
+    {
+      "question_number": 80,
+      "question_text": "A company recently signed a contract with an AWS Managed Service Provider (MSP) Partner for help with an application migration initiative. A\nsolutions architect needs ta share an Amazon Machine Image (AMI) from an existing AWS account with the MSP Partner's AWS account. The AMI\nis backed by Amazon Elastic Block Store (Amazon EBS) and uses an AWS Key Management Service (AWS KMS) customer managed key to encrypt\nEBS volume snapshots.\nWhat is the MOST secure way for the solutions architect to share the AMI with the MSP Partner's AWS account?",
+      "options": [
+        [
+          "A",
+          "Make the encrypted AMI and snapshots publicly available. Modify the key policy to allow the MSP Partner's AWS account to use the key."
+        ],
+        [
+          "B",
+          "Modify the launchPermission property of the AMI. Share the AMI with the MSP Partner's AWS account only. Modify the key policy to allow"
+        ],
+        [
+          "C",
+          "Modify the launchPermission property of the AMI. Share the AMI with the MSP Partner's AWS account only. Modify the key policy to trust a"
+        ],
+        [
+          "D",
+          "Export the AMI from the source account to an Amazon S3 bucket in the MSP Partner's AWS account, Encrypt the S3 bucket with a new KMS"
+        ]
+      ],
+      "question_type": "single_choice",
+      "expected_answers": 1,
+      "topic": "Security & Identity",
+      "aws_services": [
+        "KMS",
+        "KEY MANAGEMENT",
+        "ENCRYPT",
+        "CUSTOMER MANAGED KEY"
+      ]
+    },
+    {
+      "question_number": 81,
+      "question_text": "A solutions architect is designing the cloud architecture for a new application being deployed on AWS. The process should run in parallel while\nadding and removing application nodes as needed based on the number of jobs to be processed. The processor application is stateless. The\nsolutions architect must ensure that the application is loosely coupled and the job items are durably stored.\nWhich design should the solutions architect use?",
+      "options": [
+        [
+          "A",
+          "Create an Amazon SNS topic to send the jobs that need to be processed. Create an Amazon Machine Image (AMI) that consists of the"
+        ],
+        [
+          "B",
+          "Create an Amazon SQS queue to hold the jobs that need to be processed. Create an Amazon Machine Image (AMI) that consists of the"
+        ],
+        [
+          "C",
+          "Create an Amazon SQS queue to hold the jobs that need to be processed. Create an Amazon Machine Image (AMI) that consists of the"
+        ],
+        [
+          "D",
+          "Create an Amazon SNS topic to send the jobs that need to be processed. Create an Amazon Machine Image (AMI) that consists of the"
+        ]
+      ],
+      "question_type": "single_choice",
+      "expected_answers": 1,
+      "topic": "Monitoring & Management",
+      "aws_services": [
+        "GENERAL"
+      ]
+    },
+    {
+      "question_number": 82,
+      "question_text": "A company hosts its web applications in the AWS Cloud. The company con\u0000gures Elastic Load Balancers to use certi\u0000cates that are imported into\nAWS Certi\u0000cate Manager (ACM). The company's security team must be noti\u0000ed 30 days before the expiration of each certi\u0000cate.\nWhat should a solutions architect recommend to meet this requirement?",
+      "options": [
+        [
+          "A",
+          "Add a rule in ACM to publish a custom message to an Amazon Simple Noti\u0000cation Service (Amazon SNS) topic every day, beginning 30"
+        ],
+        [
+          "B",
+          "Create an AWS Con\u0000g rule that checks for certi\u0000cates that will expire within 30 days. Con\u0000gure Amazon EventBridge (Amazon CloudWatch"
+        ],
+        [
+          "C",
+          "Use AWS Trusted Advisor to check for certi\u0000cates that will expire within 30 days. Create an Amazon CloudWatch alarm that is based on"
+        ],
+        [
+          "D",
+          "Create an Amazon EventBridge (Amazon CloudWatch Events) rule to detect any certi\u0000cates that will expire within 30 days. Con\u0000gure the"
+        ]
+      ],
+      "question_type": "single_choice",
+      "expected_answers": 1,
+      "topic": "Monitoring & Management",
+      "aws_services": [
+        "GENERAL"
+      ]
+    },
+    {
+      "question_number": 83,
+      "question_text": "A company's dynamic website is hosted using on-premises servers in the United States. The company is launching its product in Europe, and it\nwants to optimize site loading times for new European users. The site's backend must remain in the United States. The product is being launched\nin a few days, and an immediate solution is needed.\nWhat should the solutions architect recommend?",
+      "options": [
+        [
+          "A",
+          "Launch an Amazon EC2 instance in us-east-1 and migrate the site to it."
+        ],
+        [
+          "B",
+          "Move the website to Amazon S3. Use Cross-Region Replication between Regions."
+        ],
+        [
+          "C",
+          "Use Amazon CloudFront with a custom origin pointing to the on-premises servers."
+        ],
+        [
+          "D",
+          "Use an Amazon Route 53 geoproximity routing policy pointing to on-premises servers."
+        ]
+      ],
+      "question_type": "single_choice",
+      "expected_answers": 1,
+      "topic": "Monitoring & Management",
+      "aws_services": [
+        "GENERAL"
+      ]
+    },
+    {
+      "question_number": 84,
+      "question_text": "A company wants to reduce the cost of its existing three-tier web architecture. The web, application, and database servers are running on Amazon\nEC2 instances for the development, test, and production environments. The EC2 instances average 30% CPU utilization during peak hours and 10%\nCPU utilization during non-peak hours.\nThe production EC2 instances run 24 hours a day. The development and test EC2 instances run for at least 8 hours each day. The company plans\nto implement automation to stop the development and test EC2 instances when they are not in use.\nWhich EC2 instance purchasing solution will meet the company's requirements MOST cost-effectively?",
+      "options": [
+        [
+          "A",
+          "Use Spot Instances for the production EC2 instances. Use Reserved Instances for the development and test EC2 instances."
+        ],
+        [
+          "B",
+          "Use Reserved Instances for the production EC2 instances. Use On-Demand Instances for the development and test EC2 instances."
+        ],
+        [
+          "C",
+          "Use Spot blocks for the production EC2 instances. Use Reserved Instances for the development and test EC2 instances."
+        ],
+        [
+          "D",
+          "Use On-Demand Instances for the production EC2 instances. Use Spot blocks for the development and test EC2 instances."
+        ]
+      ],
+      "question_type": "single_choice",
+      "expected_answers": 1,
+      "topic": "Compute Services",
+      "aws_services": [
+        "EC2",
+        "INSTANCE"
+      ]
+    },
+    {
+      "question_number": 85,
+      "question_text": "A company has a production web application in which users upload documents through a web interface or a mobile app. According to a new\nregulatory requirement. new documents cannot be modi\u0000ed or deleted after they are stored.\nWhat should a solutions architect do to meet this requirement?",
+      "options": [
+        [
+          "A",
+          "Store the uploaded documents in an Amazon S3 bucket with S3 Versioning and S3 Object Lock enabled."
+        ],
+        [
+          "B",
+          "Store the uploaded documents in an Amazon S3 bucket. Con\u0000gure an S3 Lifecycle policy to archive the documents periodically."
+        ],
+        [
+          "C",
+          "Store the uploaded documents in an Amazon S3 bucket with S3 Versioning enabled. Con\u0000gure an ACL to restrict all access to read-only."
+        ],
+        [
+          "D",
+          "Store the uploaded documents on an Amazon Elastic File System (Amazon EFS) volume. Access the data by mounting the volume in read-"
+        ]
+      ],
+      "question_type": "single_choice",
+      "expected_answers": 1,
+      "topic": "Monitoring & Management",
+      "aws_services": [
+        "GENERAL"
+      ]
+    },
+    {
+      "question_number": 86,
+      "question_text": "A company has several web servers that need to frequently access a common Amazon RDS MySQL Multi-AZ DB instance. The company wants a\nsecure method for the web servers to connect to the database while meeting a security requirement to rotate user credentials frequently.\nWhich solution meets these requirements?",
+      "options": [
+        [
+          "A",
+          "Store the database user credentials in AWS Secrets Manager. Grant the necessary IAM permissions to allow the web servers to access AWS"
+        ],
+        [
+          "B",
+          "Store the database user credentials in AWS Systems Manager OpsCenter. Grant the necessary IAM permissions to allow the web servers to"
+        ],
+        [
+          "C",
+          "Store the database user credentials in a secure Amazon S3 bucket. Grant the necessary IAM permissions to allow the web servers to"
+        ],
+        [
+          "D",
+          "Store the database user credentials in \u0000les encrypted with AWS Key Management Service (AWS KMS) on the web server \u0000le system. The"
+        ]
+      ],
+      "question_type": "single_choice",
+      "expected_answers": 1,
+      "topic": "Databases",
+      "aws_services": [
+        "RDS",
+        "MYSQL",
+        "MULTI-AZ"
+      ]
+    },
+    {
+      "question_number": 87,
+      "question_text": "A company hosts an application on AWS Lambda functions that are invoked by an Amazon API Gateway API. The Lambda functions save\ncustomer data to an Amazon Aurora MySQL database. Whenever the company upgrades the database, the Lambda functions fail to establish\ndatabase connections until the upgrade is complete. The result is that customer data is not recorded for some of the event.\nA solutions architect needs to design a solution that stores customer data that is created during database upgrades.\nWhich solution will meet these requirements?",
+      "options": [
+        [
+          "A",
+          "Provision an Amazon RDS proxy to sit between the Lambda functions and the database. Con\u0000gure the Lambda functions to connect to the"
+        ],
+        [
+          "B",
+          "Increase the run time of the Lambda functions to the maximum. Create a retry mechanism in the code that stores the customer data in the"
+        ],
+        [
+          "C",
+          "Persist the customer data to Lambda local storage. Con\u0000gure new Lambda functions to scan the local storage to save the customer data to"
+        ],
+        [
+          "D",
+          "Store the customer data in an Amazon Simple Queue Service (Amazon SQS) FIFO queue. Create a new Lambda function that polls the"
+        ]
+      ],
+      "question_type": "single_choice",
+      "expected_answers": 1,
+      "topic": "Databases",
+      "aws_services": [
+        "MYSQL",
+        "AURORA"
+      ]
+    },
+    {
+      "question_number": 88,
+      "question_text": "A survey company has gathered data for several years from areas in the United States. The company hosts the data in an Amazon S3 bucket that\nis 3 TB in size and growing. The company has started to share the data with a European marketing \u0000rm that has S3 buckets. The company wants\nto ensure that its data transfer costs remain as low as possible.\nWhich solution will meet these requirements?",
+      "options": [
+        [
+          "A",
+          "Con\u0000gure the Requester Pays feature on the company's S3 bucket."
+        ],
+        [
+          "B",
+          "Con\u0000gure S3 Cross-Region Replication from the company's S3 bucket to one of the marketing \u0000rm's S3 buckets."
+        ],
+        [
+          "C",
+          "Con\u0000gure cross-account access for the marketing \u0000rm so that the marketing \u0000rm has access to the company's S3 bucket."
+        ],
+        [
+          "D",
+          "Con\u0000gure the company's S3 bucket to use S3 Intelligent-Tiering. Sync the S3 bucket to one of the marketing \u0000rm's S3 buckets."
+        ]
+      ],
+      "question_type": "single_choice",
+      "expected_answers": 1,
+      "topic": "Storage Services",
+      "aws_services": [
+        "S3",
+        "BUCKET"
+      ]
+    },
+    {
+      "question_number": 89,
+      "question_text": "A company uses Amazon S3 to store its con\u0000dential audit documents. The S3 bucket uses bucket policies to restrict access to audit team IAM\nuser credentials according to the principle of least privilege. Company managers are worried about accidental deletion of documents in the S3\nbucket and want a more secure solution.\nWhat should a solutions architect do to secure the audit documents?",
+      "options": [
+        [
+          "A",
+          "Enable the versioning and MFA Delete features on the S3 bucket."
+        ],
+        [
+          "B",
+          "Enable multi-factor authentication (MFA) on the IAM user credentials for each audit team IAM user account."
+        ],
+        [
+          "C",
+          "Add an S3 Lifecycle policy to the audit team's IAM user accounts to deny the s3:DeleteObject action during audit dates."
+        ],
+        [
+          "D",
+          "Use AWS Key Management Service (AWS KMS) to encrypt the S3 bucket and restrict audit team IAM user accounts from accessing the KMS"
+        ]
+      ],
+      "question_type": "single_choice",
+      "expected_answers": 1,
+      "topic": "Security & Identity",
+      "aws_services": [
+        "IAM",
+        "USER",
+        "AUDIT"
+      ]
+    },
+    {
+      "question_number": 90,
+      "question_text": "A company is using a SQL database to store movie data that is publicly accessible. The database runs on an Amazon RDS Single-AZ DB instance.\nA script runs queries at random intervals each day to record the number of new movies that have been added to the database. The script must\nreport a \u0000nal total during business hours.\nThe company's development team notices that the database performance is inadequate for development tasks when the script is running. A\nsolutions architect must recommend a solution to resolve this issue.\nWhich solution will meet this requirement with the LEAST operational overhead?",
+      "options": [
+        [
+          "A",
+          "Modify the DB instance to be a Multi-AZ deployment."
+        ],
+        [
+          "B",
+          "Create a read replica of the database. Con\u0000gure the script to query only the read replica."
+        ],
+        [
+          "C",
+          "Instruct the development team to manually export the entries in the database at the end of each day."
+        ],
+        [
+          "D",
+          "Use Amazon ElastiCache to cache the common queries that the script runs against the database."
+        ]
+      ],
+      "question_type": "single_choice",
+      "expected_answers": 1,
+      "topic": "Compute Services",
+      "aws_services": [
+        "INSTANCE"
+      ]
+    },
+    {
+      "question_number": 91,
+      "question_text": "A company has applications that run on Amazon EC2 instances in a VPC. One of the applications needs to call the Amazon S3 API to store and\nread objects. According to the company's security regulations, no tra\u0000c from the applications is allowed to travel across the internet.\nWhich solution will meet these requirements?",
+      "options": [
+        [
+          "A",
+          "Con\u0000gure an S3 gateway endpoint."
+        ],
+        [
+          "B",
+          "Create an S3 bucket in a private subnet."
+        ],
+        [
+          "C",
+          "Create an S3 bucket in the same AWS Region as the EC2 instances."
+        ],
+        [
+          "D",
+          "Con\u0000gure a NAT gateway in the same subnet as the EC2 instances."
+        ]
+      ],
+      "question_type": "single_choice",
+      "expected_answers": 1,
+      "topic": "Storage Services",
+      "aws_services": [
+        "S3"
+      ]
+    },
+    {
+      "question_number": 92,
+      "question_text": "A company is storing sensitive user information in an Amazon S3 bucket. The company wants to provide secure access to this bucket from the\napplication tier running on Amazon EC2 instances inside a VPC.\nWhich combination of steps should a solutions architect take to accomplish this? (Choose two.)",
+      "options": [
+        [
+          "A",
+          "Con\u0000gure a VPC gateway endpoint for Amazon S3 within the VPC."
+        ],
+        [
+          "B",
+          "Create a bucket policy to make the objects in the S3 bucket public."
+        ],
+        [
+          "C",
+          "Create a bucket policy that limits access to only the application tier running in the VPC."
+        ],
+        [
+          "D",
+          "Create an IAM user with an S3 access policy and copy the IAM credentials to the EC2 instance."
+        ],
+        [
+          "E",
+          "Create a NAT instance and have the EC2 instances use the NAT instance to access the S3 bucket."
+        ]
+      ],
+      "question_type": "multiple_choice_2",
+      "expected_answers": 2,
+      "topic": "Storage Services",
+      "aws_services": [
+        "S3",
+        "BUCKET"
+      ]
+    },
+    {
+      "question_number": 93,
+      "question_text": "A company runs an on-premises application that is powered by a MySQL database. The company is migrating the application to AWS to increase\nthe application's elasticity and availability.\nThe current architecture shows heavy read activity on the database during times of normal operation. Every 4 hours, the company's development\nteam pulls a full export of the production database to populate a database in the staging environment. During this period, users experience\nunacceptable application latency. The development team is unable to use the staging environment until the procedure completes.\nA solutions architect must recommend replacement architecture that alleviates the application latency issue. The replacement architecture also\nmust give the development team the ability to continue using the staging environment without delay.\nWhich solution meets these requirements?",
+      "options": [
+        [
+          "A",
+          "Use Amazon Aurora MySQL with Multi-AZ Aurora Replicas for production. Populate the staging database by implementing a backup and"
+        ],
+        [
+          "B",
+          "Use Amazon Aurora MySQL with Multi-AZ Aurora Replicas for production. Use database cloning to create the staging database on-demand."
+        ],
+        [
+          "C",
+          "Use Amazon RDS for MySQL with a Multi-AZ deployment and read replicas for production. Use the standby instance for the staging"
+        ],
+        [
+          "D",
+          "Use Amazon RDS for MySQL with a Multi-AZ deployment and read replicas for production. Populate the staging database by implementing"
+        ]
+      ],
+      "question_type": "single_choice",
+      "expected_answers": 1,
+      "topic": "Databases",
+      "aws_services": [
+        "MYSQL"
+      ]
+    },
+    {
+      "question_number": 94,
+      "question_text": "A company is designing an application where users upload small \u0000les into Amazon S3. After a user uploads a \u0000le, the \u0000le requires one-time simple\nprocessing to transform the data and save the data in JSON format for later analysis.\nEach \u0000le must be processed as quickly as possible after it is uploaded. Demand will vary. On some days, users will upload a high number of \u0000les.\nOn other days, users will upload a few \u0000les or no \u0000les.\nWhich solution meets these requirements with the LEAST operational overhead?",
+      "options": [
+        [
+          "A",
+          "Con\u0000gure Amazon EMR to read text \u0000les from Amazon S3. Run processing scripts to transform the data. Store the resulting JSON \u0000le in an"
+        ],
+        [
+          "B",
+          "Con\u0000gure Amazon S3 to send an event noti\u0000cation to an Amazon Simple Queue Service (Amazon SQS) queue. Use Amazon EC2 instances"
+        ],
+        [
+          "C",
+          "Con\u0000gure Amazon S3 to send an event noti\u0000cation to an Amazon Simple Queue Service (Amazon SQS) queue. Use an AWS Lambda"
+        ],
+        [
+          "D",
+          "Con\u0000gure Amazon EventBridge (Amazon CloudWatch Events) to send an event to Amazon Kinesis Data Streams when a new \u0000le is"
+        ]
+      ],
+      "question_type": "single_choice",
+      "expected_answers": 1,
+      "topic": "Storage Services",
+      "aws_services": [
+        "S3"
+      ]
+    },
+    {
+      "question_number": 95,
+      "question_text": "An application allows users at a company's headquarters to access product data. The product data is stored in an Amazon RDS MySQL DB\ninstance. The operations team has isolated an application performance slowdown and wants to separate read tra\u0000c from write tra\u0000c. A solutions\narchitect needs to optimize the application's performance quickly.\nWhat should the solutions architect recommend?",
+      "options": [
+        [
+          "A",
+          "Change the existing database to a Multi-AZ deployment. Serve the read requests from the primary Availability Zone."
+        ],
+        [
+          "B",
+          "Change the existing database to a Multi-AZ deployment. Serve the read requests from the secondary Availability Zone."
+        ],
+        [
+          "C",
+          "Create read replicas for the database. Con\u0000gure the read replicas with half of the compute and storage resources as the source database."
+        ],
+        [
+          "D",
+          "Create read replicas for the database. Con\u0000gure the read replicas with the same compute and storage resources as the source database."
+        ]
+      ],
+      "question_type": "single_choice",
+      "expected_answers": 1,
+      "topic": "Databases",
+      "aws_services": [
+        "RDS",
+        "MYSQL"
+      ]
+    },
+    {
+      "question_number": 96,
+      "question_text": "An Amazon EC2 administrator created the following policy associated with an IAM group containing several users:\nWhat is the effect of this policy?",
+      "options": [
+        [
+          "A",
+          "Users can terminate an EC2 instance in any AWS Region except us-east-1."
+        ],
+        [
+          "B",
+          "Users can terminate an EC2 instance with the IP address 10.100.100.1 in the us-east-1 Region."
+        ],
+        [
+          "C",
+          "Users can terminate an EC2 instance in the us-east-1 Region when the user's source IP is 10.100.100.254."
+        ],
+        [
+          "D",
+          "Users cannot terminate an EC2 instance in the us-east-1 Region when the user's source IP is 10.100.100.254."
+        ]
+      ],
+      "question_type": "single_choice",
+      "expected_answers": 1,
+      "topic": "Security & Identity",
+      "aws_services": [
+        "IAM",
+        "POLICY"
+      ]
+    },
+    {
+      "question_number": 97,
+      "question_text": "A company has a large Microsoft SharePoint deployment running on-premises that requires Microsoft Windows shared \u0000le storage. The company\nwants to migrate this workload to the AWS Cloud and is considering various storage options. The storage solution must be highly available and\nintegrated with Active Directory for access control.\nWhich solution will satisfy these requirements?",
+      "options": [
+        [
+          "A",
+          "Con\u0000gure Amazon EFS storage and set the Active Directory domain for authentication."
+        ],
+        [
+          "B",
+          "Create an SMB \u0000le share on an AWS Storage Gateway \u0000le gateway in two Availability Zones."
+        ],
+        [
+          "C",
+          "Create an Amazon S3 bucket and con\u0000gure Microsoft Windows Server to mount it as a volume."
+        ],
+        [
+          "D",
+          "Create an Amazon FSx for Windows File Server \u0000le system on AWS and set the Active Directory domain for authentication."
+        ]
+      ],
+      "question_type": "single_choice",
+      "expected_answers": 1,
+      "topic": "Monitoring & Management",
+      "aws_services": [
+        "GENERAL"
+      ]
+    },
+    {
+      "question_number": 98,
+      "question_text": "An image-processing company has a web application that users use to upload images. The application uploads the images into an Amazon S3\nbucket. The company has set up S3 event noti\u0000cations to publish the object creation events to an Amazon Simple Queue Service (Amazon SQS)\nstandard queue. The SQS queue serves as the event source for an AWS Lambda function that processes the images and sends the results to\nusers through email.\nUsers report that they are receiving multiple email messages for every uploaded image. A solutions architect determines that SQS messages are\ninvoking the Lambda function more than once, resulting in multiple email messages.\nWhat should the solutions architect do to resolve this issue with the LEAST operational overhead?",
+      "options": [
+        [
+          "A",
+          "Set up long polling in the SQS queue by increasing the ReceiveMessage wait time to 30 seconds."
+        ],
+        [
+          "B",
+          "Change the SQS standard queue to an SQS FIFO queue. Use the message deduplication ID to discard duplicate messages."
+        ],
+        [
+          "C",
+          "Increase the visibility timeout in the SQS queue to a value that is greater than the total of the function timeout and the batch window"
+        ],
+        [
+          "D",
+          "Modify the Lambda function to delete each message from the SQS queue immediately after the message is read before processing."
+        ]
+      ],
+      "question_type": "single_choice",
+      "expected_answers": 1,
+      "topic": "Messaging & Integration",
+      "aws_services": [
+        "SQS",
+        "SIMPLE QUEUE SERVICE",
+        "QUEUE",
+        "STANDARD QUEUE",
+        "PUBLISH"
+      ]
+    },
+    {
+      "question_number": 99,
+      "question_text": "A company is implementing a shared storage solution for a gaming application that is hosted in an on-premises data center. The company needs\nthe ability to use Lustre clients to access data. The solution must be fully managed.\nWhich solution meets these requirements?",
+      "options": [
+        [
+          "A",
+          "Create an AWS Storage Gateway \u0000le gateway. Create a \u0000le share that uses the required client protocol. Connect the application server to"
+        ],
+        [
+          "B",
+          "Create an Amazon EC2 Windows instance. Install and con\u0000gure a Windows \u0000le share role on the instance. Connect the application server to"
+        ],
+        [
+          "C",
+          "Create an Amazon Elastic File System (Amazon EFS) \u0000le system, and con\u0000gure it to support Lustre. Attach the \u0000le system to the origin"
+        ],
+        [
+          "D",
+          "Create an Amazon FSx for Lustre \u0000le system. Attach the \u0000le system to the origin server. Connect the application server to the \u0000le system."
+        ]
+      ],
+      "question_type": "single_choice",
+      "expected_answers": 1,
+      "topic": "Monitoring & Management",
+      "aws_services": [
+        "GENERAL"
+      ]
+    }
+  ]
+}
