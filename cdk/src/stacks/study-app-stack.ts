@@ -185,7 +185,7 @@ export class StudyAppStack extends cdk.Stack {
 
     // Provider routes (authorization required)
     const providers = v1.addResource('providers');
-    ApiFactory.addRoute(providers, 'GET', functions.providerFunction); // Temporarily disabled authorizer for testing
+    ApiFactory.addRoute(providers, 'GET', functions.providerFunction, authorizer);
     const providerById = providers.addResource('{providerId}');
     ApiFactory.addRoute(providerById, 'GET', functions.providerFunction, authorizer);
     ApiFactory.addRoute(providerById.addResource('exams'), 'GET', functions.providerFunction, authorizer);

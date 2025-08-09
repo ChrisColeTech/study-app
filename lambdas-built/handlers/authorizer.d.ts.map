@@ -1,0 +1,1 @@
+{"version":3,"file":"authorizer.d.ts","sourceRoot":"","sources":["../../src/handlers/authorizer.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,gCAAgC,EAAE,0BAA0B,EAAE,MAAM,YAAY,CAAC;AAK1F,eAAO,MAAM,OAAO,GAClB,OAAO,gCAAgC,KACtC,OAAO,CAAC,0BAA0B,CAkCpC,CAAC"}

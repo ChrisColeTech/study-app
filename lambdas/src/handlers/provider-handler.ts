@@ -15,8 +15,14 @@ export const handler = async (
       return ResponseBuilder.success('', 200);
     }
 
+    // Debug: Log request context to see what authorizer data is available
+    console.log('Request context:', JSON.stringify(event.requestContext, null, 2));
+    console.log('Authorizer data:', JSON.stringify(event.requestContext.authorizer, null, 2));
+    
     // Check authorization
     const userId = event.requestContext.authorizer?.userId;
+    console.log('Extracted userId:', userId);
+    
     if (!userId) {
       return ResponseBuilder.unauthorized('User not authenticated');
     }
