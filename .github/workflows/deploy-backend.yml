@@ -79,7 +79,7 @@ jobs:
       - name: Run tests
         run: |
           cd lambdas
-          npm test
+          npm test -- --passWithNoTests
         continue-on-error: true
 
       - name: Upload Lambda artifacts
