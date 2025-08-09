@@ -7,6 +7,7 @@ exports.handler = void 0;
 const joi_1 = __importDefault(require("joi"));
 const question_service_1 = require("../services/question-service");
 const response_builder_1 = require("../shared/response-builder");
+const auth_middleware_1 = require("../shared/auth-middleware");
 const questionService = new question_service_1.QuestionService();
 const questionsQuerySchema = joi_1.default.object({
     provider: joi_1.default.string().optional(),
@@ -22,96 +23,69 @@ const searchSchema = joi_1.default.object({
     exam: joi_1.default.string().optional(),
     limit: joi_1.default.number().integer().min(1).max(50).optional(),
 });
-const handler = async (event) => {
-    try {
-        const { httpMethod, resource, pathParameters } = event;
-        // Handle OPTIONS request for CORS
-        if (httpMethod === 'OPTIONS') {
-            return response_builder_1.ResponseBuilder.success('', 200);
-        }
-        // Debug: Log request context to see what authorizer data is available
-        console.log('Question handler - Request context:', JSON.stringify(event.requestContext, null, 2));
-        console.log('Question handler - Authorizer data:', JSON.stringify(event.requestContext.authorizer, null, 2));
-        // Check authorization
-        const userId = event.requestContext.authorizer?.userId;
-        console.log('Question handler - Extracted userId:', userId);
-        if (!userId) {
-            return response_builder_1.ResponseBuilder.unauthorized('User not authenticated');
-        }
-        switch (`${httpMethod} ${resource}`) {
-            case 'GET /api/v1/questions':
-                return await handleGetQuestions(event);
-            case 'POST /api/v1/questions/search':
-                return await handleSearchQuestions(event);
-            case 'GET /api/v1/questions/{questionId}':
-                return await handleGetQuestion(event);
-            default:
-                return response_builder_1.ResponseBuilder.notFound('Route not found');
-        }
-    }
-    catch (error) {
-        console.error('Question handler error:', error);
-        return response_builder_1.ResponseBuilder.error(error instanceof Error ? error.message : 'Internal server error');
+// Core question handler - focused on business logic only
+const questionHandler = async (event, userId) => {
+    const { route } = (0, auth_middleware_1.extractRequestInfo)(event);
+    console.log(`[QUESTION] Handling ${route} for user ${userId}`);
+    switch (route) {
+        case 'GET /api/v1/questions':
+            return await handleGetQuestions(event, userId);
+        case 'POST /api/v1/questions/search':
+            return await handleSearchQuestions(event, userId);
+        case 'GET /api/v1/questions/{questionId}':
+            return await handleGetQuestion(event, userId);
+        default:
+            return response_builder_1.ResponseBuilder.notFound('Route not found');
     }
 };
-exports.handler = handler;
-async function handleGetQuestions(event) {
-    try {
-        const queryParams = event.queryStringParameters || {};
-        // Parse topics if it's a comma-separated string
-        if (queryParams.topics && typeof queryParams.topics === 'string') {
-            queryParams.topics = queryParams.topics.split(',');
-        }
-        // Convert numeric strings
-        if (queryParams.limit)
-            queryParams.limit = parseInt(queryParams.limit);
-        if (queryParams.offset)
-            queryParams.offset = parseInt(queryParams.offset);
-        const { error, value } = questionsQuerySchema.validate(queryParams);
-        if (error) {
-            return response_builder_1.ResponseBuilder.validation(error.details[0].message);
-        }
-        const result = await questionService.getQuestions(value);
-        return response_builder_1.ResponseBuilder.success(result);
+// Export the handler wrapped with authentication middleware
+exports.handler = (0, auth_middleware_1.withAuth)(questionHandler);
+async function handleGetQuestions(event, userId) {
+    const { queryStringParameters } = (0, auth_middleware_1.extractRequestInfo)(event);
+    console.log(`[QUESTION] Getting questions for user ${userId}`);
+    const queryParams = queryStringParameters;
+    // Parse topics if it's a comma-separated string
+    if (queryParams.topics && typeof queryParams.topics === 'string') {
+        queryParams.topics = queryParams.topics.split(',');
     }
-    catch (error) {
-        throw error;
+    // Convert numeric strings
+    if (queryParams.limit)
+        queryParams.limit = parseInt(queryParams.limit);
+    if (queryParams.offset)
+        queryParams.offset = parseInt(queryParams.offset);
+    const { error, value } = questionsQuerySchema.validate(queryParams);
+    if (error) {
+        return response_builder_1.ResponseBuilder.validation(error.details[0].message);
     }
+    const result = await questionService.getQuestions(value);
+    return response_builder_1.ResponseBuilder.success(result);
 }
-async function handleSearchQuestions(event) {
-    try {
-        if (!event.body) {
-            return response_builder_1.ResponseBuilder.validation('Request body is required');
-        }
-        const body = JSON.parse(event.body);
-        const { error, value } = searchSchema.validate(body);
-        if (error) {
-            return response_builder_1.ResponseBuilder.validation(error.details[0].message);
-        }
-        const result = await questionService.searchQuestions(value);
-        return response_builder_1.ResponseBuilder.success(result);
+async function handleSearchQuestions(event, userId) {
+    const { body } = (0, auth_middleware_1.extractRequestInfo)(event);
+    console.log(`[QUESTION] Searching questions for user ${userId}`);
+    if (!body) {
+        return response_builder_1.ResponseBuilder.validation('Request body is required');
     }
-    catch (error) {
-        throw error;
+    const { error, value } = searchSchema.validate(body);
+    if (error) {
+        return response_builder_1.ResponseBuilder.validation(error.details[0].message);
     }
+    const result = await questionService.searchQuestions(value);
+    return response_builder_1.ResponseBuilder.success(result);
 }
-async function handleGetQuestion(event) {
-    try {
-        const questionId = event.pathParameters?.questionId;
-        if (!questionId) {
-            return response_builder_1.ResponseBuilder.validation('Question ID is required');
-        }
-        const queryParams = event.queryStringParameters || {};
-        const provider = queryParams.provider || 'aws';
-        const exam = queryParams.exam || 'saa-c03';
-        const question = await questionService.getQuestionById(provider, exam, questionId);
-        if (!question) {
-            return response_builder_1.ResponseBuilder.notFound('Question not found');
-        }
-        return response_builder_1.ResponseBuilder.success({ question });
+async function handleGetQuestion(event, userId) {
+    const { pathParameters, queryStringParameters } = (0, auth_middleware_1.extractRequestInfo)(event);
+    const questionId = pathParameters.questionId;
+    if (!questionId) {
+        return response_builder_1.ResponseBuilder.validation('Question ID is required');
     }
-    catch (error) {
-        throw error;
+    const provider = queryStringParameters.provider || 'aws';
+    const exam = queryStringParameters.exam || 'saa-c03';
+    console.log(`[QUESTION] Getting question ${questionId} (${provider}/${exam}) for user ${userId}`);
+    const question = await questionService.getQuestionById(provider, exam, questionId);
+    if (!question) {
+        return response_builder_1.ResponseBuilder.notFound('Question not found');
     }
+    return response_builder_1.ResponseBuilder.success({ question });
 }
 //# sourceMappingURL=question-handler.js.map
