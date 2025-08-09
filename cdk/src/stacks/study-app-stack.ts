@@ -152,7 +152,7 @@ export class StudyAppStack extends cdk.Stack {
     });
 
     // Create CloudFront distribution
-    this.distribution = this.createCloudFrontDistribution();
+    this.distribution = this.createCloudFrontDistribution(stage);
 
     // Output important values
     this.createOutputs();
@@ -243,10 +243,10 @@ export class StudyAppStack extends cdk.Stack {
     ApiFactory.addRoute(sessionById.addResource('complete'), 'POST', functions.sessionFunction, authorizer, validator);
   }
 
-  private createCloudFrontDistribution(): cloudfront.Distribution {
+  private createCloudFrontDistribution(stage: string): cloudfront.Distribution {
     // Create custom origin request policy for API routes to properly handle Authorization headers
     const apiOriginRequestPolicy = new cloudfront.OriginRequestPolicy(this, 'ApiOriginRequestPolicy', {
-      originRequestPolicyName: `study-app-api-${this.stage}`,
+      originRequestPolicyName: `study-app-api-${stage}`,
       comment: 'Policy for API routes to properly forward Authorization headers and all viewer data',
       headerBehavior: cloudfront.OriginRequestHeaderBehavior.all(),
       queryStringBehavior: cloudfront.OriginRequestQueryStringBehavior.all(),
