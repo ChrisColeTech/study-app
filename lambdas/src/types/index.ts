@@ -72,6 +72,32 @@ export interface Exam {
   name: string;
   description: string;
   questionCount: number;
+  providerId?: string;
+  providerName?: string;
+}
+
+export interface StudyGoal {
+  goalId: string;
+  userId: string;
+  title: string;
+  description: string;
+  targetDate: string;
+  provider: string;
+  exam: string;
+  targetScore: number;
+  currentScore: number;
+  isCompleted: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface GoalRequest {
+  title: string;
+  description: string;
+  targetDate: string;
+  provider: string;
+  exam: string;
+  targetScore: number;
 }
 
 export interface QuestionRequest {

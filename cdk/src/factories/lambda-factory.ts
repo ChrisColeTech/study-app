@@ -97,4 +97,34 @@ export class LambdaFactory {
       timeout: 5,
     });
   }
+
+  static createExamFunction(scope: Construct, props: LambdaProps): lambda.Function {
+    return this.createFunction(scope, 'ExamFunction', {
+      ...props,
+      functionName: 'exam-handler',
+      handler: 'handlers/exam-handler.handler',
+      memorySize: 256,
+      timeout: 15,
+    });
+  }
+
+  static createGoalFunction(scope: Construct, props: LambdaProps): lambda.Function {
+    return this.createFunction(scope, 'GoalFunction', {
+      ...props,
+      functionName: 'goal-handler',
+      handler: 'handlers/goal-handler.handler',
+      memorySize: 256,
+      timeout: 15,
+    });
+  }
+
+  static createHealthFunction(scope: Construct, props: LambdaProps): lambda.Function {
+    return this.createFunction(scope, 'HealthFunction', {
+      ...props,
+      functionName: 'health-handler',
+      handler: 'handlers/health-handler.handler',
+      memorySize: 128,
+      timeout: 10,
+    });
+  }
 }

@@ -54,6 +54,9 @@ export const handler = async (
       case 'POST /api/v1/sessions/adaptive':
         return await handleCreateAdaptiveSession(event, userId);
       
+      case 'POST /api/v1/sessions/{sessionId}/complete':
+        return await handleCompleteSession(event, userId);
+      
       default:
         return ResponseBuilder.notFound('Route not found');
     }
@@ -224,6 +227,34 @@ async function handleCreateAdaptiveSession(
 
     const result = await sessionService.createAdaptiveSession(userId, value);
     return ResponseBuilder.success(result);
+  } catch (error) {
+    throw error;
+  }
+}
+
+async function handleCompleteSession(
+  event: APIGatewayProxyEvent, 
+  userId: string
+): Promise<APIGatewayProxyResult> {
+  try {
+    const sessionId = event.pathParameters?.sessionId;
+    if (!sessionId) {
+      return ResponseBuilder.validation('Session ID is required');
+    }
+
+    const completedSession = await sessionService.completeSession(sessionId, userId);
+    
+    if (!completedSession) {
+      return ResponseBuilder.notFound('Session not found');
+    }
+
+    // Get session statistics for the response
+    const stats = await sessionService.getSessionStats(sessionId, userId);
+
+    return ResponseBuilder.success({ 
+      session: completedSession,
+      statistics: stats,
+    });
   } catch (error) {
     throw error;
   }

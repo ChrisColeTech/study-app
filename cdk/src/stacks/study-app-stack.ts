@@ -104,9 +104,31 @@ export class StudyAppStack extends cdk.Stack {
       },
     });
 
+    const examFunction = LambdaFactory.createExamFunction(this, {
+      stage,
+      functionName: 'exam-handler',
+      handler: 'handlers/exam-handler.handler',
+      environment: commonEnv,
+    });
+
+    const goalFunction = LambdaFactory.createGoalFunction(this, {
+      stage,
+      functionName: 'goal-handler',
+      handler: 'handlers/goal-handler.handler',
+      environment: commonEnv,
+    });
+
+    const healthFunction = LambdaFactory.createHealthFunction(this, {
+      stage,
+      functionName: 'health-handler',
+      handler: 'handlers/health-handler.handler',
+      environment: commonEnv,
+    });
+
     // Grant permissions to Lambda functions
     this.grantPermissions(authFunction, questionFunction, sessionFunction, 
-                         providerFunction, analyticsFunction, recommendationFunction, authorizerFunction);
+                         providerFunction, analyticsFunction, recommendationFunction, authorizerFunction,
+                         examFunction, goalFunction, healthFunction);
 
     // Create API Gateway
     this.api = ApiFactory.createRestApi(this, 'API', `study-app-api-${stage}`);
@@ -127,6 +149,9 @@ export class StudyAppStack extends cdk.Stack {
       providerFunction,
       analyticsFunction,
       recommendationFunction,
+      examFunction,
+      goalFunction,
+      healthFunction,
     });
 
     // Create CloudFront distribution
@@ -194,6 +219,31 @@ export class StudyAppStack extends cdk.Stack {
 
     // Recommendation routes (authorization required)
     ApiFactory.addRoute(v1.addResource('recommendations'), 'GET', functions.recommendationFunction, authorizer);
+
+    // Exam routes (authorization required)
+    const exams = v1.addResource('exams');
+    ApiFactory.addRoute(exams, 'GET', functions.examFunction, authorizer);
+    const examById = exams.addResource('{examId}');
+    ApiFactory.addRoute(examById, 'GET', functions.examFunction, authorizer);
+    ApiFactory.addRoute(examById.addResource('topics'), 'GET', functions.examFunction, authorizer);
+
+    // Goal routes (authorization required)
+    const goals = v1.addResource('goals');
+    ApiFactory.addRoute(goals, 'POST', functions.goalFunction, authorizer, validator);
+    ApiFactory.addRoute(goals, 'GET', functions.goalFunction, authorizer);
+    const goalById = goals.addResource('{goalId}');
+    ApiFactory.addRoute(goalById, 'GET', functions.goalFunction, authorizer);
+    ApiFactory.addRoute(goalById, 'PUT', functions.goalFunction, authorizer, validator);
+    ApiFactory.addRoute(goalById, 'DELETE', functions.goalFunction, authorizer);
+    ApiFactory.addRoute(goalById.addResource('progress'), 'GET', functions.goalFunction, authorizer);
+
+    // Health routes (no authorization required for basic health, optional for detailed)
+    const health = v1.addResource('health');
+    ApiFactory.addRoute(health, 'GET', functions.healthFunction);
+    ApiFactory.addRoute(health.addResource('detailed'), 'GET', functions.healthFunction, authorizer);
+
+    // Session completion route (authorization required)
+    ApiFactory.addRoute(sessionById.addResource('complete'), 'POST', functions.sessionFunction, authorizer, validator);
   }
 
   private createCloudFrontDistribution(): cloudfront.Distribution {
