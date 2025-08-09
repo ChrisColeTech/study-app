@@ -29,8 +29,7 @@ const commonConfig = {
     // AWS SDK is available in Lambda runtime
     'aws-sdk',
     '@aws-sdk/*',
-    // bcrypt has native dependencies that should be handled separately
-    'bcrypt',
+    // Test mocks should not be bundled
     'mock-aws-s3',
     'nock'
   ],
