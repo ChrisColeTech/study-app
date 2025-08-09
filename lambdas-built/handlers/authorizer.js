@@ -12,8 +12,17 @@ const handler = async (event) => {
         if (!authHeader) {
             throw new Error('No authorization header provided');
         }
-        const token = authHeader.replace('Bearer ', '');
+        console.log('Raw auth header value:', JSON.stringify(authHeader));
+        // More robust token extraction
+        let token = authHeader;
+        if (token.startsWith('Bearer ')) {
+            token = token.substring(7); // Remove 'Bearer ' prefix
+        }
+        else if (token === 'Bearer') {
+            throw new Error('Authorization header contains "Bearer" without token');
+        }
         console.log('Extracted token:', token);
+        console.log('Token length:', token.length);
         if (!token) {
             throw new Error('No token provided');
         }
