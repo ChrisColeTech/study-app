@@ -114,8 +114,8 @@ export class GoalService {
   constructor() {
     this.dynamoClient = new DynamoDBClient({ region: process.env.AWS_REGION || 'us-east-1' });
     this.logger = new Logger('GoalService');
-    this.goalsTableName = process.env.GOALS_TABLE_NAME || 'StudyGoals';
-    this.analyticsTableName = process.env.ANALYTICS_TABLE_NAME || 'StudyAnalytics';
+    this.goalsTableName = process.env.GOALS_TABLE || 'StudyGoals';
+    this.analyticsTableName = process.env.ANALYTICS_TABLE || 'StudyAnalytics';
   }
 
   // ============================================================================

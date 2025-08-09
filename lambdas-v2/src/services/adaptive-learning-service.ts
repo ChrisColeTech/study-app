@@ -140,8 +140,8 @@ export class AdaptiveLearningService {
   constructor() {
     this.dynamoClient = new DynamoDBClient({ region: process.env.AWS_REGION || 'us-east-1' });
     this.logger = new Logger('AdaptiveLearningService');
-    this.adaptiveTableName = process.env.ADAPTIVE_TABLE_NAME || 'AdaptiveLearning';
-    this.sessionsTableName = process.env.SESSIONS_TABLE_NAME || 'StudySessions';
+    this.adaptiveTableName = process.env.ADAPTIVE_TABLE || 'AdaptiveLearning';
+    this.sessionsTableName = process.env.SESSIONS_TABLE || 'StudySessions';
   }
 
   // ============================================================================

@@ -21,7 +21,7 @@ export class UserService {
     });
     this.client = DynamoDBDocumentClient.from(dynamoClient);
     
-    this.tableName = process.env.USERS_TABLE_NAME || 'StudyApp-Users';
+    this.tableName = process.env.USERS_TABLE || 'StudyApp-Users';
     
     this.logger.info('UserService initialized', {
       tableName: this.tableName,

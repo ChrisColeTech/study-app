@@ -240,9 +240,9 @@ export class StudyPlanService {
     this.analyticsService = new AnalyticsService();
     this.adaptiveLearningService = new AdaptiveLearningService();
     this.logger = new Logger('StudyPlanService');
-    this.studyPlansTableName = process.env.STUDY_PLANS_TABLE_NAME || 'StudyPlans';
-    this.templatesTableName = process.env.PLAN_TEMPLATES_TABLE_NAME || 'StudyPlanTemplates';
-    this.progressTableName = process.env.PLAN_PROGRESS_TABLE_NAME || 'StudyPlanProgress';
+    this.studyPlansTableName = process.env.STUDY_PLANS_TABLE || 'StudyPlans';
+    this.templatesTableName = process.env.PLAN_TEMPLATES_TABLE || 'StudyPlanTemplates';
+    this.progressTableName = process.env.PLAN_PROGRESS_TABLE || 'StudyPlanProgress';
 
     this.initializeBuiltInTemplates();
   }

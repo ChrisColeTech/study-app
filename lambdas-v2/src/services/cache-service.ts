@@ -14,7 +14,7 @@ export class CacheService {
 
   constructor() {
     this.logger = new Logger('CacheService');
-    this.tableName = process.env.CACHE_TABLE_NAME || 'study-app-cache';
+    this.tableName = process.env.CACHE_TABLE || 'study-app-cache';
     this.region = process.env.AWS_REGION || 'us-east-1';
 
     const ddbClient = new DynamoDBClient({ region: this.region });

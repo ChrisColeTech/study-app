@@ -238,9 +238,9 @@ export class LearningPathService {
     this.analyticsService = new AnalyticsService();
     this.adaptiveLearningService = new AdaptiveLearningService();
     this.logger = new Logger('LearningPathService');
-    this.pathsTableName = process.env.LEARNING_PATHS_TABLE_NAME || 'LearningPaths';
-    this.nodesTableName = process.env.LEARNING_NODES_TABLE_NAME || 'LearningPathNodes';
-    this.analyticsTableName = process.env.PATH_ANALYTICS_TABLE_NAME || 'LearningPathAnalytics';
+    this.pathsTableName = process.env.LEARNING_PATHS_TABLE || 'LearningPaths';
+    this.nodesTableName = process.env.LEARNING_NODES_TABLE || 'LearningPathNodes';
+    this.analyticsTableName = process.env.PATH_ANALYTICS_TABLE || 'LearningPathAnalytics';
 
     this.conceptGraph = new ConceptGraph();
   }

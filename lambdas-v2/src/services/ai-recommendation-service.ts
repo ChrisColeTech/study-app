@@ -146,8 +146,8 @@ export class AIRecommendationService {
     this.analyticsService = new AnalyticsService();
     this.adaptiveLearningService = new AdaptiveLearningService();
     this.logger = new Logger('AIRecommendationService');
-    this.recommendationsTableName = process.env.RECOMMENDATIONS_TABLE_NAME || 'StudyRecommendations';
-    this.feedbackTableName = process.env.FEEDBACK_TABLE_NAME || 'RecommendationFeedback';
+    this.recommendationsTableName = process.env.RECOMMENDATIONS_TABLE || 'StudyRecommendations';
+    this.feedbackTableName = process.env.FEEDBACK_TABLE || 'RecommendationFeedback';
   }
 
   // ============================================================================

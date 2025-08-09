@@ -110,9 +110,9 @@ export class AchievementService {
     this.dynamoClient = new DynamoDBClient({ region: process.env.AWS_REGION || 'us-east-1' });
     this.analyticsService = new AnalyticsService();
     this.logger = new Logger('AchievementService');
-    this.achievementsTableName = process.env.ACHIEVEMENTS_TABLE_NAME || 'StudyAchievements';
-    this.userAchievementsTableName = process.env.USER_ACHIEVEMENTS_TABLE_NAME || 'UserAchievements';
-    this.leaderboardTableName = process.env.LEADERBOARD_TABLE_NAME || 'AchievementLeaderboard';
+    this.achievementsTableName = process.env.ACHIEVEMENTS_TABLE || 'StudyAchievements';
+    this.userAchievementsTableName = process.env.USER_ACHIEVEMENTS_TABLE || 'UserAchievements';
+    this.leaderboardTableName = process.env.LEADERBOARD_TABLE || 'AchievementLeaderboard';
 
     this.initializeBuiltInAchievements();
   }

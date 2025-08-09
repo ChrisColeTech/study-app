@@ -65,9 +65,9 @@ export class AnalyticsService {
     this.sessionService = new SessionService();
     this.userService = new UserService();
     this.logger = new Logger('AnalyticsService');
-    this.analyticsTableName = process.env.ANALYTICS_TABLE_NAME || 'StudyAnalytics';
-    this.aggregationTableName = process.env.AGGREGATION_TABLE_NAME || 'StudyAggregations';
-    this.sessionsTableName = process.env.SESSIONS_TABLE_NAME || 'StudySessions';
+    this.analyticsTableName = process.env.ANALYTICS_TABLE || 'StudyAnalytics';
+    this.aggregationTableName = process.env.AGGREGATION_TABLE || 'StudyAggregations';
+    this.sessionsTableName = process.env.SESSIONS_TABLE || 'StudySessions';
   }
 
   // ============================================================================

@@ -35,8 +35,8 @@ export class SessionService {
     this.dynamoClient = new DynamoDBClient({ region: process.env.AWS_REGION || 'us-east-1' });
     this.questionService = new QuestionService();
     this.logger = new Logger('SessionService');
-    this.sessionsTableName = process.env.SESSIONS_TABLE_NAME || 'StudySessions';
-    this.answersTableName = process.env.ANSWERS_TABLE_NAME || 'SessionAnswers';
+    this.sessionsTableName = process.env.SESSIONS_TABLE || 'StudySessions';
+    this.answersTableName = process.env.ANSWERS_TABLE || 'SessionAnswers';
   }
 
   /**
