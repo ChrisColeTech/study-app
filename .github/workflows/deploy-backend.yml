@@ -217,11 +217,11 @@ jobs:
             echo "JWT secret created successfully"
           fi
 
-  # Upload sample data (dev/staging only)
+  # Upload sample data (all environments)
   upload-sample-data:
     runs-on: ubuntu-latest
     needs: [determine-stage, deploy-infrastructure]
-    if: ${{ github.event.inputs.destroy != 'true' && needs.determine-stage.outputs.stage != 'prod' }}
+    if: ${{ github.event.inputs.destroy != 'true' }}
     environment: ${{ needs.determine-stage.outputs.stage }}
     steps:
       - name: Checkout code
