@@ -24,7 +24,7 @@ export class CloudFrontConstruct extends Construct {
     // Custom Origin Request Policy - V2 with new logical ID
     // This FIXES the JWT header truncation issue from V1
     this.originRequestPolicy = new cloudfront.OriginRequestPolicy(this, 'Origin-Request-Policy-V2', {
-      originRequestPolicyName: `StudyAppV2-OriginPolicy-${props.stage}`,
+      originRequestPolicyName: `StudyAppV2-OriginPolicy-${props.stage}-${Date.now()}`,
       comment: 'V2 Origin request policy with full header forwarding for JWT tokens',
       headerBehavior: cloudfront.OriginRequestHeaderBehavior.all(), // Forward ALL headers
       queryStringBehavior: cloudfront.OriginRequestQueryStringBehavior.all(),
@@ -33,7 +33,7 @@ export class CloudFrontConstruct extends Construct {
 
     // Custom Cache Policy - V2 with new logical ID
     this.cachePolicy = new cloudfront.CachePolicy(this, 'Cache-Policy-V2', {
-      cachePolicyName: `StudyAppV2-CachePolicy-${props.stage}`,
+      cachePolicyName: `StudyAppV2-CachePolicy-${props.stage}-${Date.now()}`,
       comment: 'V2 Cache policy for API responses with auth headers',
       defaultTtl: cdk.Duration.minutes(5),
       maxTtl: cdk.Duration.hours(24),

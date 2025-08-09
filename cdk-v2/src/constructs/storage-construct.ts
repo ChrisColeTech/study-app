@@ -18,7 +18,7 @@ export class StorageConstruct extends Construct {
 
     // Data Bucket for study materials - V2 with new logical ID
     this.dataBucket = new s3.Bucket(this, 'Data-Bucket-V2', {
-      bucketName: `studyappv2-data-${props.stage}-${cdk.Stack.of(this).account}`,
+      bucketName: `studyappv2-data-${props.stage}-${cdk.Stack.of(this).account}-${Date.now()}`,
       versioned: props.config.versioning,
       publicReadAccess: false,
       blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
@@ -59,7 +59,7 @@ export class StorageConstruct extends Construct {
 
       // Server access logging
       serverAccessLogsBucket: props.stage === 'prod' ? new s3.Bucket(this, 'Access-Logs-Bucket-V2', {
-        bucketName: `studyappv2-access-logs-${props.stage}-${cdk.Stack.of(this).account}`,
+        bucketName: `studyappv2-access-logs-${props.stage}-${cdk.Stack.of(this).account}-${Date.now()}`,
         removalPolicy: cdk.RemovalPolicy.DESTROY,
         autoDeleteObjects: true,
         lifecycleRules: [{
@@ -72,7 +72,7 @@ export class StorageConstruct extends Construct {
 
     // Static Assets Bucket for frontend - V2 with new logical ID
     this.staticBucket = new s3.Bucket(this, 'Static-Bucket-V2', {
-      bucketName: `studyappv2-static-${props.stage}-${cdk.Stack.of(this).account}`,
+      bucketName: `studyappv2-static-${props.stage}-${cdk.Stack.of(this).account}-${Date.now()}`,
       versioned: false,
       publicReadAccess: true, // For CloudFront access
       blockPublicAccess: new s3.BlockPublicAccess({
