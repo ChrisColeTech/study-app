@@ -119,7 +119,7 @@ export abstract class CrudHandler<T = any> extends BaseHandler {
     };
   }
 
-  private badRequest(message: string): APIGatewayProxyResult {
+  protected override badRequest(message: string): APIGatewayProxyResult {
     return {
       statusCode: 400,
       headers: { 'Content-Type': 'application/json' },

@@ -28,7 +28,11 @@ const commonConfig = {
   external: [
     // AWS SDK is available in Lambda runtime
     'aws-sdk',
-    '@aws-sdk/*'
+    '@aws-sdk/*',
+    // bcrypt has native dependencies that should be handled separately
+    'bcrypt',
+    'mock-aws-s3',
+    'nock'
   ],
   define: {
     'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'production')

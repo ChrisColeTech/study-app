@@ -225,4 +225,25 @@ export abstract class BaseHandler {
   protected noContent(): APIGatewayProxyResult {
     return ResponseBuilder.success(null, 204);
   }
+
+  /**
+   * Helper: Create bad request response
+   */
+  protected badRequest(message: string, details?: any): APIGatewayProxyResult {
+    return ResponseBuilder.badRequest(message, details);
+  }
+
+  /**
+   * Helper: Create not found response
+   */
+  protected notFound(message: string): APIGatewayProxyResult {
+    return ResponseBuilder.notFound(message);
+  }
+
+  /**
+   * Helper: Create internal error response
+   */
+  protected internalError(message: string): APIGatewayProxyResult {
+    return ResponseBuilder.internalError(message);
+  }
 }
