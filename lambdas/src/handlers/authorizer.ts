@@ -10,11 +10,16 @@ export const handler = async (
     console.log('Authorizer event:', JSON.stringify(event, null, 2));
     console.log('Headers:', JSON.stringify(event.headers, null, 2));
     
-    const authHeader = event.headers?.Authorization || event.headers?.authorization;
+    // Support both standard Authorization header and custom X-Auth-Token header
+    // X-Auth-Token is a workaround for CloudFront header truncation issues
+    const authHeader = event.headers?.Authorization || 
+                      event.headers?.authorization ||
+                      event.headers?.['X-Auth-Token'] ||
+                      event.headers?.['x-auth-token'];
     console.log('Auth header:', authHeader);
     
     if (!authHeader) {
-      throw new Error('No authorization header provided');
+      throw new Error('No authorization header provided (checked Authorization and X-Auth-Token)');
     }
 
     console.log('Raw auth header value:', JSON.stringify(authHeader));

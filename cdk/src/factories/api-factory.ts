@@ -16,6 +16,7 @@ export class ApiFactory {
           'Content-Type',
           'X-Amz-Date',
           'Authorization',
+          'X-Auth-Token', // Custom header for CloudFront compatibility
           'X-Api-Key',
           'X-Amz-Security-Token',
           'X-Amz-User-Agent',
@@ -40,7 +41,10 @@ export class ApiFactory {
   ): apigateway.RequestAuthorizer {
     return new apigateway.RequestAuthorizer(scope, id, {
       handler: authorizerFunction,
-      identitySources: ['method.request.header.Authorization'],
+      identitySources: [
+        'method.request.header.Authorization',
+        'method.request.header.X-Auth-Token'
+      ],
       resultsCacheTtl: cdk.Duration.minutes(5),
       authorizerName: 'StudyAppAuthorizer',
     });
