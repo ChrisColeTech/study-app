@@ -1,14 +1,18 @@
-import { APIGatewayTokenAuthorizerEvent, APIGatewayAuthorizerResult } from 'aws-lambda';
+import { APIGatewayRequestAuthorizerEvent, APIGatewayAuthorizerResult } from 'aws-lambda';
 import { AuthService } from '../services/auth-service';
 
 const authService = new AuthService();
 
 export const handler = async (
-  event: APIGatewayTokenAuthorizerEvent
+  event: APIGatewayRequestAuthorizerEvent
 ): Promise<APIGatewayAuthorizerResult> => {
   try {
-    const token = event.authorizationToken?.replace('Bearer ', '');
-    
+    const authHeader = event.headers?.Authorization || event.headers?.authorization;
+    if (!authHeader) {
+      throw new Error('No authorization header provided');
+    }
+
+    const token = authHeader.replace('Bearer ', '');
     if (!token) {
       throw new Error('No token provided');
     }
