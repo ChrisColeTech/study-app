@@ -490,7 +490,7 @@ ab -n 100 -c 10 -H "Authorization: Bearer $TOKEN" \
 
 ---
 
-## 📚 Lessons Learned from V1
+## 📚 Lessons Learned from V1 & V2
 
 ### 1. API Gateway Authorizer Issues
 
@@ -576,6 +576,31 @@ this.originRequestPolicy = new cloudfront.OriginRequestPolicy(this, 'Origin-Requ
 - Faster cold starts with ARM64
 
 **Key Learning:** Individual bundling dramatically improves Lambda performance.
+
+### 6. CI/CD Debugging Process (NEW)
+
+**V2 Problem:** CI failed and I made assumptions about the cause without checking logs
+- Assumed missing secrets or configuration issues
+- Started implementing fixes without seeing actual error
+- Nearly hardcoded account ID as "quick fix"
+
+**V2 Solution:** Check GitHub Actions logs first
+```bash
+# Always check the actual failure logs first
+gh run list --repo owner/repo --branch branch-name
+gh run view <run-id> --log-failed
+```
+
+**Actual Error:** `sh: 1: cdk: not found` - missing CDK CLI in devDependencies
+
+**Proper Fix:** Add `aws-cdk: ^2.210.0` to CDK package.json devDependencies
+
+**Key Learning:** 
+- ✅ **Always check actual error logs BEFORE diagnosing**
+- ✅ **Don't make assumptions about failure causes**  
+- ✅ **Never hardcode secrets/IDs as "quick fixes"**
+- ✅ **Let failures fail properly - don't mask missing secrets**
+- ✅ **Use proper debugging tools: `gh run view --log-failed`**
 
 ---
 
