@@ -178,8 +178,24 @@ export abstract class BaseHandler {
     }
 
     try {
-      return JSON.parse(event.body) as T;
-    } catch (error) {
+      // Handle base64 encoded body
+      let bodyString = event.body;
+      if (event.isBase64Encoded) {
+        bodyString = Buffer.from(event.body, 'base64').toString('utf-8');
+      }
+      
+      this.logger.debug('Parsing request body', { 
+        isBase64Encoded: event.isBase64Encoded, 
+        bodyLength: bodyString.length 
+      });
+      
+      return JSON.parse(bodyString) as T;
+    } catch (error: any) {
+      this.logger.error('JSON parsing failed', { 
+        body: event.body, 
+        isBase64Encoded: event.isBase64Encoded, 
+        error: error.message 
+      });
       throw new ApiError(ErrorCode.VALIDATION_ERROR, 'Invalid JSON in request body');
     }
   }
