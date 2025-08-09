@@ -1,0 +1,256 @@
+name: Deploy Study App V2 Stack
+
+on:
+  push:
+    branches: [v2-complete-rewrite]
+  pull_request:
+    branches: [v2-complete-rewrite]
+  workflow_dispatch:
+    inputs:
+      stage:
+        description: 'Deployment stage (dev/staging/prod)'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - dev
+          - staging
+          - prod
+      destroy:
+        description: 'Destroy stack instead of deploy'
+        required: false
+        default: false
+        type: boolean
+
+env:
+  AWS_REGION: us-east-1
+  CDK_VERSION: 2.210.0
+  NODE_VERSION: 20.x
+
+jobs:
+  # Job 1: Build and Test
+  build-and-test:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: |
+            cdk-v2/package-lock.json
+            lambdas-v2/package-lock.json
+            
+      - name: Install CDK dependencies
+        working-directory: ./cdk-v2
+        run: npm ci
+        
+      - name: Install Lambda dependencies
+        working-directory: ./lambdas-v2
+        run: npm ci
+        
+      - name: Build CDK project
+        working-directory: ./cdk-v2
+        run: npm run build
+        
+      - name: Build and bundle Lambda functions
+        working-directory: ./lambdas-v2
+        run: npm run bundle
+        
+      - name: Run Lambda tests
+        working-directory: ./lambdas-v2
+        run: npm test -- --passWithNoTests
+        
+      - name: CDK Synth
+        working-directory: ./cdk-v2
+        run: |
+          export CDK_STAGE=${{ github.event.inputs.stage || 'dev' }}
+          export CDK_ACCOUNT=${{ secrets.AWS_ACCOUNT_ID }}
+          npm run synth
+          
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts-v2
+          path: |
+            cdk-v2/dist/
+            lambdas-v2/bundles/
+            cdk-v2/cdk.out/
+          retention-days: 7
+
+  # Job 2: Deploy Infrastructure
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build-and-test
+    if: github.ref == 'refs/heads/v2-complete-rewrite' && github.event_name != 'pull_request'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+          
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifacts-v2
+          
+      - name: Install CDK CLI
+        run: npm install -g aws-cdk@${{ env.CDK_VERSION }}
+        
+      - name: Install project dependencies
+        working-directory: ./cdk-v2
+        run: npm ci
+        
+      - name: Deploy or Destroy Stack
+        working-directory: ./cdk-v2
+        env:
+          CDK_STAGE: ${{ github.event.inputs.stage || 'dev' }}
+          CDK_ACCOUNT: ${{ secrets.AWS_ACCOUNT_ID }}
+        run: |
+          if [ "${{ github.event.inputs.destroy }}" == "true" ]; then
+            echo "🗑️ Destroying V2 stack..."
+            npm run destroy -- --force
+          else
+            echo "🚀 Deploying V2 stack..."
+            npm run deploy -- --require-approval never
+          fi
+          
+      - name: Output deployment results
+        if: github.event.inputs.destroy != 'true'
+        working-directory: ./cdk-v2
+        env:
+          CDK_STAGE: ${{ github.event.inputs.stage || 'dev' }}
+          CDK_ACCOUNT: ${{ secrets.AWS_ACCOUNT_ID }}
+        run: |
+          echo "📋 Stack Outputs:"
+          aws cloudformation describe-stacks \
+            --stack-name StudyAppStackV2-$CDK_STAGE \
+            --query 'Stacks[0].Outputs' \
+            --output table
+            
+  # Job 3: Integration Tests  
+  integration-tests:
+    runs-on: ubuntu-latest
+    needs: deploy
+    if: github.ref == 'refs/heads/v2-complete-rewrite' && github.event_name != 'pull_request' && github.event.inputs.destroy != 'true'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+          
+      - name: Get Stack Outputs
+        id: stack-outputs
+        env:
+          CDK_STAGE: ${{ github.event.inputs.stage || 'dev' }}
+        run: |
+          STACK_NAME="StudyAppStackV2-$CDK_STAGE"
+          
+          # Get API URL
+          API_URL=$(aws cloudformation describe-stacks \
+            --stack-name $STACK_NAME \
+            --query 'Stacks[0].Outputs[?OutputKey==`API-Gateway-URL-V2`].OutputValue' \
+            --output text)
+          echo "api_url=$API_URL" >> $GITHUB_OUTPUT
+          
+          # Get CloudFront URL  
+          CF_URL=$(aws cloudformation describe-stacks \
+            --stack-name $STACK_NAME \
+            --query 'Stacks[0].Outputs[?OutputKey==`CloudFront-URL-V2`].OutputValue' \
+            --output text)
+          echo "cloudfront_url=$CF_URL" >> $GITHUB_OUTPUT
+          
+      - name: Test Health Endpoint
+        run: |
+          echo "🏥 Testing health endpoint..."
+          curl -f -s "${{ steps.stack-outputs.outputs.api_url }}api/v1/health" | jq .
+          
+      - name: Test CloudFront Distribution
+        run: |
+          echo "☁️ Testing CloudFront distribution..."
+          curl -f -s -I "${{ steps.stack-outputs.outputs.cloudfront_url }}" | head -1
+          
+      - name: Generate Test JWT Token
+        id: jwt-token
+        working-directory: ./lambdas-v2
+        run: |
+          npm ci
+          TEST_TOKEN=$(node -e "
+            const jwt = require('jsonwebtoken');
+            const token = jwt.sign(
+              { userId: 'test-user-123', email: 'test@example.com' }, 
+              'your-jwt-secret', 
+              { expiresIn: '1h' }
+            );
+            console.log(token);
+          ")
+          echo "token=$TEST_TOKEN" >> $GITHUB_OUTPUT
+          
+      - name: Test Protected Endpoint (Providers)
+        run: |
+          echo "🔒 Testing protected providers endpoint..."
+          curl -f -s \
+            -H "Authorization: Bearer ${{ steps.jwt-token.outputs.token }}" \
+            "${{ steps.stack-outputs.outputs.api_url }}api/v1/providers" | jq .
+            
+      - name: Test Summary
+        run: |
+          echo "✅ All integration tests passed!"
+          echo "🌐 API URL: ${{ steps.stack-outputs.outputs.api_url }}"
+          echo "☁️ CloudFront URL: ${{ steps.stack-outputs.outputs.cloudfront_url }}"
+
+  # Job 4: Cleanup on Failure
+  cleanup-on-failure:
+    runs-on: ubuntu-latest
+    needs: [deploy, integration-tests]
+    if: failure() && github.event.inputs.stage == 'dev'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+          
+      - name: Install CDK CLI
+        run: npm install -g aws-cdk@${{ env.CDK_VERSION }}
+        
+      - name: Install dependencies and cleanup
+        working-directory: ./cdk-v2
+        env:
+          CDK_STAGE: dev
+          CDK_ACCOUNT: ${{ secrets.AWS_ACCOUNT_ID }}
+        run: |
+          npm ci
+          echo "🧹 Cleaning up failed dev deployment..."
+          npm run destroy -- --force || true
