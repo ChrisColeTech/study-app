@@ -35,6 +35,12 @@ export const handler = async (
       return ResponseBuilder.success('', 200);
     }
 
+    // Check authorization
+    const userId = event.requestContext.authorizer?.userId;
+    if (!userId) {
+      return ResponseBuilder.unauthorized('User not authenticated');
+    }
+
     switch (`${httpMethod} ${resource}`) {
       case 'GET /api/v1/questions':
         return await handleGetQuestions(event);
