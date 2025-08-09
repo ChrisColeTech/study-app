@@ -14,15 +14,19 @@ This document provides a comprehensive guide to the Study App V2 complete rewrit
 - **CI/CD Pipeline**: Automated deployment workflow operational
 - **API Gateway Integration**: Core API infrastructure functional
 - **Health Monitoring**: System health endpoints operational
+- **DynamoDB GSI Fix**: CRITICAL - Added missing email-index and UserIdIndex GSIs
+- **Auth System**: Complete authentication working (register/login/protected routes)
 
 ### 📍 Current API Endpoints
 - **API Gateway**: https://e5j3043jy0.execute-api.us-east-2.amazonaws.com/dev/
 - **CloudFront**: https://d2fb0g36budjjw.cloudfront.net
 - **Health Check**: https://e5j3043jy0.execute-api.us-east-2.amazonaws.com/dev/api/v1/health
 
-### 🔧 Minor Issue in Progress
-- Auth endpoint JSON body parsing: Under investigation with debug logging deployed
-- Core infrastructure is fully operational and ready for production use
+### ✅ BREAKTHROUGH: Auth System Operational
+- **Auth Registration**: ✅ Working - creates users with email uniqueness validation
+- **Auth Login**: ✅ Working - returns JWT tokens for API access
+- **Protected Routes**: ✅ Working - providers endpoint confirmed with TOKEN authorizer
+- **JWT Authorization**: ✅ TOKEN type authorizer fully operational
 
 **Key Achievements:**
 - ✅ **Complete infrastructure rewrite** with new logical IDs to avoid V1 conflicts
@@ -217,6 +221,35 @@ this.usersTable = new dynamodb.Table(this, 'Users-Table-V2', {
 - Sessions (study session tracking)  
 - Goals (learning objectives)
 - Analytics (performance data with TTL)
+
+**🚨 CRITICAL: Required Global Secondary Indexes**
+
+The following GSIs are **essential** for the application to function:
+
+```typescript
+// Users table - Required for email-based user lookup
+this.usersTable.addGlobalSecondaryIndex({
+  indexName: 'email-index',
+  partitionKey: { name: 'email', type: dynamodb.AttributeType.STRING },
+  projectionType: dynamodb.ProjectionType.ALL
+});
+
+// Sessions table - Required for user-based session queries  
+this.sessionsTable.addGlobalSecondaryIndex({
+  indexName: 'UserIdIndex',
+  partitionKey: { name: 'userId', type: dynamodb.AttributeType.STRING },
+  projectionType: dynamodb.ProjectionType.ALL
+});
+
+// Goals table - Required for user-based goal queries
+this.goalsTable.addGlobalSecondaryIndex({
+  indexName: 'UserIdIndex', 
+  partitionKey: { name: 'userId', type: dynamodb.AttributeType.STRING },
+  projectionType: dynamodb.ProjectionType.ALL
+});
+```
+
+⚠️ **Warning**: Missing these GSIs will cause auth registration to fail with "The table does not have the specified index" errors. This was the critical issue that prevented the authentication system from working initially.
 
 ---
 
