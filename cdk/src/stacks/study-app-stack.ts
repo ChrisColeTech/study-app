@@ -128,7 +128,7 @@ export class StudyAppStack extends cdk.Stack {
                          examFunction, goalFunction, healthFunction);
 
     // Create API Gateway
-    this.api = ApiFactory.createRestApi(this, 'API', `study-app-api-${stage}`);
+    this.api = ApiFactory.createRestApi(this, 'API', `study-app-api-${stage}`, stage);
 
     const authorizer = ApiFactory.createAuthorizer(
       this, 'Authorizer', this.api, authorizerFunction

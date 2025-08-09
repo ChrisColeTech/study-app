@@ -5,7 +5,7 @@ import { Construct } from 'constructs';
 import { ApiRouteProps } from '../types/stack-types';
 
 export class ApiFactory {
-  static createRestApi(scope: Construct, id: string, apiName: string): apigateway.RestApi {
+  static createRestApi(scope: Construct, id: string, apiName: string, stage: string): apigateway.RestApi {
     return new apigateway.RestApi(scope, id, {
       restApiName: apiName,
       description: 'Study App REST API',
@@ -23,7 +23,7 @@ export class ApiFactory {
         maxAge: cdk.Duration.hours(1),
       },
       deployOptions: {
-        stageName: 'api',
+        stageName: stage,
         tracingEnabled: true,
         metricsEnabled: true,
         loggingLevel: apigateway.MethodLoggingLevel.INFO,
