@@ -1,84 +1,74 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { ResponseBuilder } from '../shared/response-builder';
+import { withAuth, extractRequestInfo } from '../shared/auth-middleware';
 
-export const handler = async (
-  event: APIGatewayProxyEvent
+// Core recommendation handler - focused on business logic only
+const recommendationHandler = async (
+  event: APIGatewayProxyEvent,
+  userId: string
 ): Promise<APIGatewayProxyResult> => {
-  try {
-    const { httpMethod, resource } = event;
-    const userId = event.requestContext.authorizer?.userId;
-
-    if (!userId) {
-      return ResponseBuilder.unauthorized('User not authenticated');
-    }
-
-    // Handle OPTIONS request for CORS
-    if (httpMethod === 'OPTIONS') {
-      return ResponseBuilder.success('', 200);
-    }
-
-    if (httpMethod === 'GET' && resource === '/api/v1/recommendations') {
+  const { route } = extractRequestInfo(event);
+  
+  console.log(`[RECOMMENDATION] Handling ${route} for user ${userId}`);
+  
+  switch (route) {
+    case 'GET /api/v1/recommendations':
       return await handleGetRecommendations(event, userId);
-    }
-
-    return ResponseBuilder.notFound('Route not found');
-  } catch (error) {
-    console.error('Recommendation handler error:', error);
-    return ResponseBuilder.error(
-      error instanceof Error ? error.message : 'Internal server error'
-    );
+    
+    default:
+      return ResponseBuilder.notFound('Route not found');
   }
 };
+
+// Export the handler wrapped with authentication middleware
+export const handler = withAuth(recommendationHandler);
 
 async function handleGetRecommendations(
   event: APIGatewayProxyEvent, 
   userId: string
 ): Promise<APIGatewayProxyResult> {
-  try {
-    const queryParams = event.queryStringParameters || {};
-    
-    // Simplified recommendations response based on the API documentation
-    const response = {
-      performance: {
-        overallAccuracy: 0,
-        totalQuestions: 0,
-        totalCorrect: 0,
-        readinessScore: 0,
-        readinessLevel: 'Beginner',
+  const { queryStringParameters } = extractRequestInfo(event);
+  console.log(`[RECOMMENDATION] Getting recommendations for user ${userId}`);
+  
+  // Simplified recommendations response based on the API documentation
+  const response = {
+    performance: {
+      overallAccuracy: 0,
+      totalQuestions: 0,
+      totalCorrect: 0,
+      readinessScore: 0,
+      readinessLevel: 'Beginner',
+    },
+    weakTopics: [],
+    strongTopics: [],
+    recommendations: [
+      {
+        type: 'study_frequency',
+        priority: 'medium',
+        title: 'Increase Study Frequency',
+        description: 'Regular practice is key to retention and improvement',
+        action: 'Aim for at least 3-4 study sessions per week',
       },
-      weakTopics: [],
-      strongTopics: [],
-      recommendations: [
-        {
-          type: 'study_frequency',
-          priority: 'medium',
-          title: 'Increase Study Frequency',
-          description: 'Regular practice is key to retention and improvement',
-          action: 'Aim for at least 3-4 study sessions per week',
-        },
-      ],
-      studyPlan: [
-        {
-          week: 1,
-          focus: 'Foundation Building',
-          activities: [
-            'Review basic concepts and terminology',
-            'Practice 20-30 easy questions daily',
-            'Study explanations thoroughly for incorrect answers',
-          ],
-          target: 'Achieve 70% accuracy on easy questions',
-        },
-      ],
-      suggestedQuestions: [],
-      metrics: {
-        sessionsAnalyzed: 1,
-        topicsIdentified: 0,
-        lastStudyDate: new Date().toISOString(),
+    ],
+    studyPlan: [
+      {
+        week: 1,
+        focus: 'Foundation Building',
+        activities: [
+          'Review basic concepts and terminology',
+          'Practice 20-30 easy questions daily',
+          'Study explanations thoroughly for incorrect answers',
+        ],
+        target: 'Achieve 70% accuracy on easy questions',
       },
-    };
+    ],
+    suggestedQuestions: [],
+    metrics: {
+      sessionsAnalyzed: 1,
+      topicsIdentified: 0,
+      lastStudyDate: new Date().toISOString(),
+    },
+  };
 
-    return ResponseBuilder.success(response);
-  } catch (error) {
-    throw error;
-  }
+  return ResponseBuilder.success(response);
 }

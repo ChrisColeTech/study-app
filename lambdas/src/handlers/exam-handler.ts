@@ -1,108 +1,102 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { ExamService } from '../services/exam-service';
 import { ResponseBuilder } from '../shared/response-builder';
+import { withAuth, extractRequestInfo } from '../shared/auth-middleware';
 
 const examService = new ExamService();
 
-export const handler = async (
-  event: APIGatewayProxyEvent
+// Core exam handler - focused on business logic only
+const examHandler = async (
+  event: APIGatewayProxyEvent,
+  userId: string
 ): Promise<APIGatewayProxyResult> => {
-  try {
-    const { httpMethod, resource, pathParameters, queryStringParameters } = event;
-    const userId = event.requestContext.authorizer?.userId;
-
-    if (!userId) {
-      return ResponseBuilder.unauthorized('User not authenticated');
-    }
-
-    // Handle OPTIONS request for CORS
-    if (httpMethod === 'OPTIONS') {
-      return ResponseBuilder.success('', 200);
-    }
-
-    switch (`${httpMethod} ${resource}`) {
-      case 'GET /api/v1/exams':
-        return await handleGetAllExams(event);
-      
-      case 'GET /api/v1/exams/{examId}':
-        return await handleGetExamById(event);
-      
-      case 'GET /api/v1/exams/{examId}/topics':
-        return await handleGetExamTopics(event);
-      
-      default:
-        return ResponseBuilder.notFound('Route not found');
-    }
-  } catch (error) {
-    console.error('Exam handler error:', error);
-    return ResponseBuilder.error(
-      error instanceof Error ? error.message : 'Internal server error'
-    );
+  const { route } = extractRequestInfo(event);
+  
+  console.log(`[EXAM] Handling ${route} for user ${userId}`);
+  
+  switch (route) {
+    case 'GET /api/v1/exams':
+      return await handleGetAllExams(event, userId);
+    
+    case 'GET /api/v1/exams/{examId}':
+      return await handleGetExamById(event, userId);
+    
+    case 'GET /api/v1/exams/{examId}/topics':
+      return await handleGetExamTopics(event, userId);
+    
+    default:
+      return ResponseBuilder.notFound('Route not found');
   }
 };
 
-async function handleGetAllExams(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
-  try {
-    const queryParams = event.queryStringParameters || {};
-    const provider = queryParams.provider;
+// Export the handler wrapped with authentication middleware
+export const handler = withAuth(examHandler);
 
-    if (provider) {
-      // Get exams for specific provider
-      const result = await examService.getExamsByProvider(provider);
-      if (!result) {
-        return ResponseBuilder.notFound('Provider not found');
-      }
-      return ResponseBuilder.success(result);
-    } else {
-      // Get all exams across providers
-      const result = await examService.getAllExams();
-      return ResponseBuilder.success(result);
+async function handleGetAllExams(
+  event: APIGatewayProxyEvent,
+  userId: string
+): Promise<APIGatewayProxyResult> {
+  const { queryStringParameters } = extractRequestInfo(event);
+  console.log(`[EXAM] Getting all exams for user ${userId}`);
+  
+  const provider = queryStringParameters.provider;
+
+  if (provider) {
+    // Get exams for specific provider
+    const result = await examService.getExamsByProvider(provider);
+    if (!result) {
+      return ResponseBuilder.notFound('Provider not found');
     }
-  } catch (error) {
-    throw error;
+    return ResponseBuilder.success(result);
+  } else {
+    // Get all exams across providers
+    const result = await examService.getAllExams();
+    return ResponseBuilder.success(result);
   }
 }
 
-async function handleGetExamById(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
-  try {
-    const examId = event.pathParameters?.examId;
-    if (!examId) {
-      return ResponseBuilder.validation('Exam ID is required');
-    }
-
-    const queryParams = event.queryStringParameters || {};
-    const providerId = queryParams.provider;
-
-    const result = await examService.getExamById(examId, providerId);
-    
-    if (!result) {
-      return ResponseBuilder.notFound('Exam not found');
-    }
-
-    return ResponseBuilder.success(result);
-  } catch (error) {
-    throw error;
+async function handleGetExamById(
+  event: APIGatewayProxyEvent,
+  userId: string
+): Promise<APIGatewayProxyResult> {
+  const { pathParameters, queryStringParameters } = extractRequestInfo(event);
+  const examId = pathParameters.examId;
+  
+  if (!examId) {
+    return ResponseBuilder.validation('Exam ID is required');
   }
+
+  const providerId = queryStringParameters.provider;
+  console.log(`[EXAM] Getting exam ${examId} (provider: ${providerId}) for user ${userId}`);
+
+  const result = await examService.getExamById(examId, providerId);
+  
+  if (!result) {
+    return ResponseBuilder.notFound('Exam not found');
+  }
+
+  return ResponseBuilder.success(result);
 }
 
-async function handleGetExamTopics(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
-  try {
-    const examId = event.pathParameters?.examId;
-    if (!examId) {
-      return ResponseBuilder.validation('Exam ID is required');
-    }
-
-    const queryParams = event.queryStringParameters || {};
-    const providerId = queryParams.provider;
-
-    const result = await examService.getExamTopics(examId, providerId);
-    
-    if (!result) {
-      return ResponseBuilder.notFound('Exam topics not found');
-    }
-
-    return ResponseBuilder.success(result);
-  } catch (error) {
-    throw error;
+async function handleGetExamTopics(
+  event: APIGatewayProxyEvent,
+  userId: string
+): Promise<APIGatewayProxyResult> {
+  const { pathParameters, queryStringParameters } = extractRequestInfo(event);
+  const examId = pathParameters.examId;
+  
+  if (!examId) {
+    return ResponseBuilder.validation('Exam ID is required');
   }
+
+  const providerId = queryStringParameters.provider;
+  console.log(`[EXAM] Getting topics for exam ${examId} (provider: ${providerId}) for user ${userId}`);
+
+  const result = await examService.getExamTopics(examId, providerId);
+  
+  if (!result) {
+    return ResponseBuilder.notFound('Exam topics not found');
+  }
+
+  return ResponseBuilder.success(result);
 }
