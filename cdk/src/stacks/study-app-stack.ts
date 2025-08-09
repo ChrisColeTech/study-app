@@ -98,10 +98,7 @@ export class StudyAppStack extends cdk.Stack {
       stage,
       functionName: 'authorizer',
       handler: 'handlers/authorizer.handler',
-      environment: {
-        JWT_SECRET_NAME: this.auth.jwtSecret.secretName,
-        STAGE: stage,
-      },
+      environment: commonEnv,
     });
 
     const examFunction = LambdaFactory.createExamFunction(this, {
