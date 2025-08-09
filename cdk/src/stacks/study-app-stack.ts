@@ -164,8 +164,9 @@ export class StudyAppStack extends cdk.Stack {
     // Provider routes (authorization required)
     const providers = v1.addResource('providers');
     ApiFactory.addRoute(providers, 'GET', functions.providerFunction, authorizer);
-    ApiFactory.addRoute(providers.addResource('{providerId}'), 'GET', functions.providerFunction, authorizer);
-    ApiFactory.addRoute(providers.addResource('{providerId}').addResource('exams'), 'GET', functions.providerFunction, authorizer);
+    const providerById = providers.addResource('{providerId}');
+    ApiFactory.addRoute(providerById, 'GET', functions.providerFunction, authorizer);
+    ApiFactory.addRoute(providerById.addResource('exams'), 'GET', functions.providerFunction, authorizer);
 
     // Question routes (authorization required)  
     const questions = v1.addResource('questions');
@@ -177,16 +178,18 @@ export class StudyAppStack extends cdk.Stack {
     const sessions = v1.addResource('sessions');
     ApiFactory.addRoute(sessions, 'POST', functions.sessionFunction, authorizer, validator);
     ApiFactory.addRoute(sessions, 'GET', functions.sessionFunction, authorizer);
-    ApiFactory.addRoute(sessions.addResource('{sessionId}'), 'GET', functions.sessionFunction, authorizer);
-    ApiFactory.addRoute(sessions.addResource('{sessionId}'), 'PUT', functions.sessionFunction, authorizer, validator);
-    ApiFactory.addRoute(sessions.addResource('{sessionId}'), 'DELETE', functions.sessionFunction, authorizer);
-    ApiFactory.addRoute(sessions.addResource('{sessionId}').addResource('answers'), 'POST', functions.sessionFunction, authorizer, validator);
+    const sessionById = sessions.addResource('{sessionId}');
+    ApiFactory.addRoute(sessionById, 'GET', functions.sessionFunction, authorizer);
+    ApiFactory.addRoute(sessionById, 'PUT', functions.sessionFunction, authorizer, validator);
+    ApiFactory.addRoute(sessionById, 'DELETE', functions.sessionFunction, authorizer);
+    ApiFactory.addRoute(sessionById.addResource('answers'), 'POST', functions.sessionFunction, authorizer, validator);
     ApiFactory.addRoute(sessions.addResource('adaptive'), 'POST', functions.sessionFunction, authorizer, validator);
 
     // Analytics routes (authorization required)
     const analytics = v1.addResource('analytics');
     ApiFactory.addRoute(analytics.addResource('progress'), 'GET', functions.analyticsFunction, authorizer);
-    ApiFactory.addRoute(analytics.addResource('sessions').addResource('{sessionId}'), 'GET', functions.analyticsFunction, authorizer);
+    const analyticsSessions = analytics.addResource('sessions');
+    ApiFactory.addRoute(analyticsSessions.addResource('{sessionId}'), 'GET', functions.analyticsFunction, authorizer);
     ApiFactory.addRoute(analytics.addResource('performance'), 'GET', functions.analyticsFunction, authorizer);
 
     // Recommendation routes (authorization required)
