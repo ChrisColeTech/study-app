@@ -244,6 +244,15 @@ export class StudyAppStack extends cdk.Stack {
   }
 
   private createCloudFrontDistribution(): cloudfront.Distribution {
+    // Create custom origin request policy for API routes to properly handle Authorization headers
+    const apiOriginRequestPolicy = new cloudfront.OriginRequestPolicy(this, 'ApiOriginRequestPolicy', {
+      originRequestPolicyName: `study-app-api-${this.stage}`,
+      comment: 'Policy for API routes to properly forward Authorization headers and all viewer data',
+      headerBehavior: cloudfront.OriginRequestHeaderBehavior.all(),
+      queryStringBehavior: cloudfront.OriginRequestQueryStringBehavior.all(),
+      cookieBehavior: cloudfront.OriginRequestCookieBehavior.all(),
+    });
+
     return new cloudfront.Distribution(this, 'Distribution', {
       defaultBehavior: {
         origin: new origins.S3Origin(this.storage.frontendBucket),
@@ -260,7 +269,7 @@ export class StudyAppStack extends cdk.Stack {
           allowedMethods: cloudfront.AllowedMethods.ALLOW_ALL,
           cachedMethods: cloudfront.CachedMethods.CACHE_GET_HEAD,
           cachePolicy: cloudfront.CachePolicy.CACHING_DISABLED,
-          originRequestPolicy: cloudfront.OriginRequestPolicy.ALL_VIEWER,
+          originRequestPolicy: apiOriginRequestPolicy, // Use custom policy instead of ALL_VIEWER
         },
       },
       errorResponses: [
