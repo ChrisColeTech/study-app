@@ -43,9 +43,28 @@
 - ❓ **Analytics Collection**: Never verified user progress data is collected
 - ❓ **Goal Management**: Never tested goal creation/tracking functionality
 
+## 🚨 **MASSIVE SCOPE OF UNTESTED FUNCTIONALITY**
+
+**CRITICAL ADMISSION**: The initial handoff document severely understated the problem. After reviewing the API reference, here's the true scope:
+
+### Complete Features NEVER TESTED
+1. **Question Search & Filtering** - Advanced search with topic/difficulty filters
+2. **Study Session Workflow** - Complete session creation → question answering → completion
+3. **User Progress Analytics** - Progress tracking and performance metrics
+4. **AI-Powered Features** - Adaptive sessions and personalized recommendations  
+5. **Session Answer Submission** - Core functionality for answering questions
+6. **Health System Issues** - DynamoDB/S3 "unhealthy" status never investigated
+
+### The Real Problem Scale  
+- **31 API endpoints** exist in the system (discovered from backend docs)
+- **Only 3 endpoints confirmed working** (9.7% tested)
+- **2 endpoints failed** with "Unauthorized" - unclear root cause  
+- **25 endpoints never tested** (80.6% completely unknown)
+- **1 endpoint partial** (health shows "unhealthy" status)
+
 ## 🔧 **IMMEDIATE ACTION REQUIRED**
 
-### Token Expiration Issue (Blocking Testing)
+### Token Expiration Issue (Blocking All Testing)
 **Problem**: JWT tokens expire after 15 minutes, causing "Unauthorized" during testing  
 **Impact**: Cannot complete comprehensive endpoint testing  
 **Required Fix**: Either extend token expiration or implement proper token refresh for testing
@@ -76,24 +95,72 @@ aws s3 ls s3://studyappv2-data-dev-936777225289-1754771691341/
 # Test question data accessibility from Lambda
 ```
 
-### 3. Complete API Testing Matrix
+### 3. Complete API Testing Matrix (BRUTAL TRUTH - ALL 31 ENDPOINTS)
 
-| Endpoint | Method | Auth Required | Status | Issues |
-|----------|---------|---------------|---------|---------|
+**🚨 CRITICAL: After checking backend docs, discovered 31 TOTAL ENDPOINTS - Only 3 tested (10%)**
+
+#### **AUTH ENDPOINTS (4 total)**
+| Endpoint | Method | Auth | Status | Issues |
+|----------|---------|------|--------|---------|
 | /auth/register | POST | No | ✅ Working | None |
 | /auth/login | POST | No | ✅ Working | None |
+| /auth/refresh | POST | No | ❌ NEVER TESTED | Token refresh functionality unknown |
+| /auth/logout | POST | Yes | ❌ NEVER TESTED | Token invalidation unknown |
+
+#### **PROVIDER ENDPOINTS (7 total)**
+| Endpoint | Method | Auth | Status | Issues |
+|----------|---------|------|--------|---------|
 | /providers | GET | Yes | ✅ Working | None |
-| /questions | GET | Yes | ❓ Unknown | Token expiration suspected |
-| /sessions | POST | Yes | ❓ Unknown | Not tested |
-| /sessions/{id} | GET | Yes | ❓ Unknown | Not tested |
-| /sessions/{id} | PUT | Yes | ❓ Unknown | Not tested |
-| /sessions/{id}/answers | POST | Yes | ❓ Unknown | Not tested |
-| /sessions/{id}/complete | POST | Yes | ❓ Unknown | Not tested |
-| /goals | GET | Yes | ❓ Unknown | Not tested |
-| /goals | POST | Yes | ❓ Unknown | Not tested |
-| /goals/{id} | GET | Yes | ❓ Unknown | Not tested |
-| /analytics | GET | Yes | ❓ Unknown | Not tested |
-| /health | GET | No | ✅ Working | Shows "unhealthy" status |
+| /providers/{id} | GET | Yes | ❌ NEVER TESTED | Individual provider details |
+| /providers/{id}/exams | GET | Yes | ❌ NEVER TESTED | Provider exam lists |
+| /exams | GET | Yes | ❌ NEVER TESTED | Cross-provider exam catalog |
+| /exams/{id} | GET | Yes | ❌ NEVER TESTED | Individual exam details |
+| /exams/{id}/topics | GET | Yes | ❌ NEVER TESTED | Exam topic breakdowns |
+
+#### **QUESTION ENDPOINTS (3 total)**
+| Endpoint | Method | Auth | Status | Issues |
+|----------|---------|------|--------|---------|
+| /questions | GET | Yes | ❌ "Unauthorized" | Could be token expiration OR broken auth |
+| /questions/search | POST | Yes | ❌ NEVER TESTED | Text-based question search |
+| /questions/{id} | GET | Yes | ❌ NEVER TESTED | Individual question details |
+
+#### **SESSION ENDPOINTS (7 total)**
+| Endpoint | Method | Auth | Status | Issues |
+|----------|---------|------|--------|---------|
+| /sessions | POST | Yes | ❌ "Unauthorized" | Could be token expiration OR broken auth |
+| /sessions | GET | Yes | ❌ NEVER TESTED | List user sessions |
+| /sessions/{id} | GET | Yes | ❌ NEVER TESTED | Session details |
+| /sessions/{id} | PUT | Yes | ❌ NEVER TESTED | Update session |
+| /sessions/{id} | DELETE | Yes | ❌ NEVER TESTED | Delete session |
+| /sessions/{id}/answers | POST | Yes | ❌ NEVER TESTED | **CRITICAL** - Submit answers |
+| /sessions/{id}/complete | POST | Yes | ❌ NEVER TESTED | Complete session |
+
+#### **ANALYTICS & AI ENDPOINTS (8 total)**
+| Endpoint | Method | Auth | Status | Issues |
+|----------|---------|------|--------|---------|
+| /analytics/performance | GET | Yes | ❌ NEVER TESTED | Performance analytics |
+| /analytics/progress | GET | Yes | ❌ NEVER TESTED | Progress tracking |
+| /analytics/session/{id} | GET | Yes | ❌ NEVER TESTED | Session analytics |
+| /recommendations | GET | Yes | ❌ NEVER TESTED | AI study recommendations |
+| /goals | POST | Yes | ❌ NEVER TESTED | Create study goals |
+| /goals | GET | Yes | ❌ NEVER TESTED | List study goals |
+| /goals/{id} | PUT | Yes | ❌ NEVER TESTED | Update goals |
+| /goals/{id} | DELETE | Yes | ❌ NEVER TESTED | Delete goals |
+
+#### **HEALTH ENDPOINTS (2 total)**
+| Endpoint | Method | Auth | Status | Issues |
+|----------|---------|------|--------|---------|
+| /health | GET | No | 🟡 Partial | Shows "unhealthy" - never investigated |
+| /health/detailed | GET | No | ❌ NEVER TESTED | Detailed diagnostics |
+
+## **DEVASTATING SCOPE REALITY:**
+- **TOTAL ENDPOINTS**: 31
+- ✅ **WORKING**: 3 (9.7%)
+- ❌ **FAILED WITH "Unauthorized"**: 2 (6.5%) 
+- ❌ **NEVER TESTED AT ALL**: 25 (80.6%)
+- 🟡 **PARTIAL/ISSUES**: 1 (3.2%)
+
+**83.9% of the API is completely untested or broken.**
 
 ### 4. End-to-End Workflow Testing
 ```bash
