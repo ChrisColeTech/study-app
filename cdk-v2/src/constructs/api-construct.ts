@@ -155,23 +155,23 @@ export class ApiConstruct extends Construct {
       operationName: 'GetProviderExams'
     });
 
-    // All exams endpoint - GET /exams (proper separation: use examFunction)
+    // All exams endpoint - GET /exams (TEMPORARY: use providerFunction until exam function deployment fixed)
     const exams = v1.addResource('exams');
-    exams.addMethod('GET', new apigateway.LambdaIntegration(props.functions.examFunction), {
+    exams.addMethod('GET', new apigateway.LambdaIntegration(props.functions.providerFunction), {
       ...authOptions,
       operationName: 'GetAllExams'
     });
 
-    // Exam by ID - GET /exams/{examId} (proper separation: use examFunction)
+    // Exam by ID - GET /exams/{examId} (TEMPORARY: use providerFunction until exam function deployment fixed)
     const examById = exams.addResource('{examId}');
-    examById.addMethod('GET', new apigateway.LambdaIntegration(props.functions.examFunction), {
+    examById.addMethod('GET', new apigateway.LambdaIntegration(props.functions.providerFunction), {
       ...authOptions,
       operationName: 'GetExam'
     });
 
-    // Exam topics - GET /exams/{examId}/topics (proper separation: use examFunction)
+    // Exam topics - GET /exams/{examId}/topics (TEMPORARY: use providerFunction until exam function deployment fixed)
     const examTopics = examById.addResource('topics');
-    examTopics.addMethod('GET', new apigateway.LambdaIntegration(props.functions.examFunction), {
+    examTopics.addMethod('GET', new apigateway.LambdaIntegration(props.functions.providerFunction), {
       ...authOptions,
       operationName: 'GetExamTopics'
     });
