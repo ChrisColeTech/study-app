@@ -65,6 +65,9 @@ jobs:
         working-directory: ./backend/cdk-v3
         run: echo "Tests temporarily disabled - will fix in next commit"
         
+      - name: Install CDK CLI
+        run: npm install -g aws-cdk@${{ env.CDK_VERSION }}
+        
       - name: CDK Synth
         working-directory: ./backend/cdk-v3
         run: |
