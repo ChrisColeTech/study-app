@@ -1,0 +1,275 @@
+name: Deploy Study App V3 Stack
+
+on:
+  push:
+    branches: [v3-implementation]
+  pull_request:
+    branches: [v3-implementation]
+  workflow_dispatch:
+    inputs:
+      stage:
+        description: 'Deployment stage (dev/staging/prod)'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - dev
+          - staging
+          - prod
+      destroy:
+        description: 'Destroy stack instead of deploy'
+        required: false
+        default: false
+        type: boolean
+
+env:
+  AWS_REGION: us-east-2
+  CDK_VERSION: 2.1024.0
+  NODE_VERSION: 20.x
+
+jobs:
+  # Job 1: Build and Test
+  build-and-test:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: |
+            backend/cdk-v3/package-lock.json
+            backend/package-lock.json
+            
+      - name: Install CDK dependencies
+        working-directory: ./backend/cdk-v3
+        run: npm ci
+        
+      - name: Install Backend dependencies
+        working-directory: ./backend
+        run: npm ci
+        
+      - name: Build CDK project
+        working-directory: ./backend/cdk-v3
+        run: npm run build
+        
+      - name: Build Backend Lambda functions
+        working-directory: ./backend
+        run: npm run build
+        
+      - name: Run Backend tests
+        working-directory: ./backend
+        run: npm test -- --passWithNoTests
+        
+      - name: CDK Synth
+        working-directory: ./backend/cdk-v3
+        run: |
+          export CDK_STAGE=${{ github.event.inputs.stage || 'dev' }}
+          export CDK_ACCOUNT=${{ secrets.AWS_ACCOUNT_ID }}
+          npm run synth
+          
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts-v3
+          path: |
+            backend/cdk-v3/dist/
+            backend/dist/
+            backend/cdk-v3/cdk.out/
+          retention-days: 7
+
+  # Job 2: Deploy Infrastructure
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build-and-test
+    if: github.ref == 'refs/heads/v3-implementation' && github.event_name != 'pull_request'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+          
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifacts-v3
+          
+      - name: Install CDK CLI
+        run: npm install -g aws-cdk@${{ env.CDK_VERSION }}
+        
+      - name: Install project dependencies
+        working-directory: ./backend/cdk-v3
+        run: npm ci
+        
+      - name: Bootstrap CDK Environment
+        run: |
+          echo "🚀 Bootstrapping CDK environment..."
+          cdk bootstrap aws://${{ secrets.AWS_ACCOUNT_ID }}/${{ env.AWS_REGION }}
+        
+      - name: Deploy or Destroy Stack
+        working-directory: ./backend/cdk-v3
+        env:
+          CDK_STAGE: ${{ github.event.inputs.stage || 'dev' }}
+          CDK_ACCOUNT: ${{ secrets.AWS_ACCOUNT_ID }}
+        run: |
+          if [ "${{ github.event.inputs.destroy }}" == "true" ]; then
+            echo "🗑️ Destroying V3 stack..."
+            npm run destroy -- --force
+          else
+            echo "🚀 Deploying V3 stack..."
+            npm run deploy -- --require-approval never
+          fi
+          
+      - name: Output deployment results
+        if: github.event.inputs.destroy != 'true'
+        working-directory: ./backend/cdk-v3
+        env:
+          CDK_STAGE: ${{ github.event.inputs.stage || 'dev' }}
+          CDK_ACCOUNT: ${{ secrets.AWS_ACCOUNT_ID }}
+        run: |
+          echo "📋 Stack Outputs:"
+          aws cloudformation describe-stacks \
+            --stack-name StudyAppStackV3-$CDK_STAGE \
+            --query 'Stacks[0].Outputs' \
+            --output table
+          
+          echo ""
+          echo "🎉 Deployment completed successfully!"
+          
+          # Get key URLs for easy access
+          API_URL=$(aws cloudformation describe-stacks \
+            --stack-name StudyAppStackV3-$CDK_STAGE \
+            --query 'Stacks[0].Outputs[?contains(OutputKey, `API`) && contains(OutputKey, `URL`)].OutputValue' \
+            --output text | head -1)
+          
+          CF_URL=$(aws cloudformation describe-stacks \
+            --stack-name StudyAppStackV3-$CDK_STAGE \
+            --query 'Stacks[0].Outputs[?contains(OutputKey, `CloudFront`) && contains(OutputKey, `URL`)].OutputValue' \
+            --output text | head -1)
+          
+          echo "🌐 API Endpoint: $API_URL"
+          echo "☁️ CloudFront URL: $CF_URL" 
+          echo "🏥 Health Check: ${API_URL}api/v1/health"
+
+  # Job 3: Setup Secrets and Upload Data
+  setup-secrets-and-data:
+    runs-on: ubuntu-latest
+    needs: deploy
+    if: github.event.inputs.destroy != 'true'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Create JWT Secret
+        run: |
+          SECRET_NAME="study-app-v3-jwt-secret-${{ github.event.inputs.stage || 'dev' }}"
+          
+          # Check if secret already exists
+          if aws secretsmanager describe-secret --secret-id $SECRET_NAME 2>/dev/null; then
+            echo "JWT secret already exists"
+          else
+            # Generate a random JWT secret
+            JWT_SECRET=$(openssl rand -base64 64)
+            
+            # Create the secret
+            aws secretsmanager create-secret \
+              --name $SECRET_NAME \
+              --description "JWT secret for Study App V3 ${{ github.event.inputs.stage || 'dev' }} environment" \
+              --secret-string "{\"jwt_secret\":\"$JWT_SECRET\"}"
+            
+            echo "JWT secret created successfully"
+          fi
+
+      - name: Upload sample question data
+        run: |
+          STAGE=${{ github.event.inputs.stage || 'dev' }}
+          BUCKET_NAME="studyappv3-data-$STAGE-${{ secrets.AWS_ACCOUNT_ID }}"
+          
+          # Upload AWS sample questions if they exist
+          if [ -f "data/study_data_final.json" ]; then
+            aws s3 cp data/study_data_final.json s3://$BUCKET_NAME/questions/aws/saa-c03/questions.json
+            echo "Uploaded AWS SAA-C03 sample questions"
+          fi
+          
+          # Create provider metadata
+          echo '{
+            "providers": [
+              {
+                "id": "aws",
+                "name": "Amazon Web Services", 
+                "description": "AWS Certification Exams",
+                "logoUrl": "https://d1.awsstatic.com/logos/aws-logo-lockup.png",
+                "exams": [
+                  {
+                    "code": "saa-c03",
+                    "name": "AWS Certified Solutions Architect - Associate",
+                    "description": "Validate technical skills and expertise for designing and implementing solutions on AWS",
+                    "difficulty": "Associate",
+                    "duration": 130,
+                    "questionCount": 65
+                  }
+                ]
+              }
+            ]
+          }' | aws s3 cp - s3://$BUCKET_NAME/providers/metadata.json
+          
+          echo "Sample data uploaded successfully"
+
+  # Job 4: Deployment Summary
+  deployment-summary:
+    runs-on: ubuntu-latest
+    needs: [deploy, setup-secrets-and-data]
+    if: always() && github.event.inputs.destroy != 'true'
+    
+    steps:
+      - name: Deployment Summary
+        run: |
+          echo "## Study App V3 Deployment Summary 🚀" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Version:** V3 Implementation" >> $GITHUB_STEP_SUMMARY
+          echo "**Stage:** ${{ github.event.inputs.stage || 'dev' }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Region:** ${{ env.AWS_REGION }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Stack Name:** StudyAppStackV3-${{ github.event.inputs.stage || 'dev' }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Features Deployed:" >> $GITHUB_STEP_SUMMARY
+          echo "✅ **Authentication System** - Registration, Login, Token Refresh, Logout" >> $GITHUB_STEP_SUMMARY
+          echo "✅ **Infrastructure** - API Gateway, Lambda Functions, DynamoDB, S3" >> $GITHUB_STEP_SUMMARY
+          echo "✅ **Health Monitoring** - System health checks and monitoring" >> $GITHUB_STEP_SUMMARY
+          echo "✅ **Security** - JWT tokens, password hashing, token blacklisting" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### API Endpoints Available:" >> $GITHUB_STEP_SUMMARY
+          echo "- `POST /v1/auth/register` - User registration" >> $GITHUB_STEP_SUMMARY
+          echo "- `POST /v1/auth/login` - User login" >> $GITHUB_STEP_SUMMARY
+          echo "- `POST /v1/auth/refresh` - Token refresh" >> $GITHUB_STEP_SUMMARY
+          echo "- `POST /v1/auth/logout` - User logout" >> $GITHUB_STEP_SUMMARY
+          echo "- `GET /v1/health` - Health check" >> $GITHUB_STEP_SUMMARY
+          echo "- `GET /v1/health/status` - Detailed health status" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Next Steps:" >> $GITHUB_STEP_SUMMARY
+          echo "1. 🧪 Test authentication endpoints" >> $GITHUB_STEP_SUMMARY
+          echo "2. 📊 Monitor CloudWatch logs and metrics" >> $GITHUB_STEP_SUMMARY
+          echo "3. 🚀 Continue with Phase 6+ implementation" >> $GITHUB_STEP_SUMMARY
+          echo "4. 🎯 Deploy frontend integration" >> $GITHUB_STEP_SUMMARY

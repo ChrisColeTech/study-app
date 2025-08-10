@@ -1,0 +1,80 @@
+// Error codes and messages
+
+export const ERROR_CODES = {
+  // Generic errors
+  INTERNAL_ERROR: 'INTERNAL_ERROR',
+  VALIDATION_ERROR: 'VALIDATION_ERROR',
+  NOT_FOUND: 'NOT_FOUND',
+  UNAUTHORIZED: 'UNAUTHORIZED',
+  FORBIDDEN: 'FORBIDDEN',
+  CONFLICT: 'CONFLICT',
+  RATE_LIMITED: 'RATE_LIMITED',
+  
+  // Authentication errors
+  INVALID_CREDENTIALS: 'INVALID_CREDENTIALS',
+  TOKEN_EXPIRED: 'TOKEN_EXPIRED',
+  TOKEN_INVALID: 'TOKEN_INVALID',
+  ACCOUNT_DISABLED: 'ACCOUNT_DISABLED',
+  EMAIL_NOT_VERIFIED: 'EMAIL_NOT_VERIFIED',
+  
+  // Session errors
+  SESSION_NOT_FOUND: 'SESSION_NOT_FOUND',
+  SESSION_ALREADY_COMPLETED: 'SESSION_ALREADY_COMPLETED',
+  SESSION_EXPIRED: 'SESSION_EXPIRED',
+  INVALID_QUESTION_INDEX: 'INVALID_QUESTION_INDEX',
+  QUESTION_ALREADY_ANSWERED: 'QUESTION_ALREADY_ANSWERED',
+  
+  // Data errors
+  PROVIDER_NOT_FOUND: 'PROVIDER_NOT_FOUND',
+  EXAM_NOT_FOUND: 'EXAM_NOT_FOUND',
+  TOPIC_NOT_FOUND: 'TOPIC_NOT_FOUND',
+  QUESTION_NOT_FOUND: 'QUESTION_NOT_FOUND',
+  USER_NOT_FOUND: 'USER_NOT_FOUND',
+  GOAL_NOT_FOUND: 'GOAL_NOT_FOUND',
+  
+  // Business logic errors
+  INSUFFICIENT_QUESTIONS: 'INSUFFICIENT_QUESTIONS',
+  INVALID_SESSION_STATE: 'INVALID_SESSION_STATE',
+  GOAL_ALREADY_EXISTS: 'GOAL_ALREADY_EXISTS',
+  INVALID_DATE_RANGE: 'INVALID_DATE_RANGE',
+} as const;
+
+export const ERROR_MESSAGES = {
+  [ERROR_CODES.INTERNAL_ERROR]: 'An internal server error occurred',
+  [ERROR_CODES.VALIDATION_ERROR]: 'Request validation failed',
+  [ERROR_CODES.NOT_FOUND]: 'Resource not found',
+  [ERROR_CODES.UNAUTHORIZED]: 'Authentication required',
+  [ERROR_CODES.FORBIDDEN]: 'Access forbidden',
+  [ERROR_CODES.CONFLICT]: 'Resource conflict',
+  [ERROR_CODES.RATE_LIMITED]: 'Too many requests',
+  
+  // Authentication
+  [ERROR_CODES.INVALID_CREDENTIALS]: 'Invalid email or password',
+  [ERROR_CODES.TOKEN_EXPIRED]: 'Authentication token has expired',
+  [ERROR_CODES.TOKEN_INVALID]: 'Invalid authentication token',
+  [ERROR_CODES.ACCOUNT_DISABLED]: 'Account has been disabled',
+  [ERROR_CODES.EMAIL_NOT_VERIFIED]: 'Email address not verified',
+  
+  // Sessions
+  [ERROR_CODES.SESSION_NOT_FOUND]: 'Study session not found',
+  [ERROR_CODES.SESSION_ALREADY_COMPLETED]: 'Study session already completed',
+  [ERROR_CODES.SESSION_EXPIRED]: 'Study session has expired',
+  [ERROR_CODES.INVALID_QUESTION_INDEX]: 'Invalid question index',
+  [ERROR_CODES.QUESTION_ALREADY_ANSWERED]: 'Question already answered',
+  
+  // Data
+  [ERROR_CODES.PROVIDER_NOT_FOUND]: 'Exam provider not found',
+  [ERROR_CODES.EXAM_NOT_FOUND]: 'Exam not found',
+  [ERROR_CODES.TOPIC_NOT_FOUND]: 'Topic not found',
+  [ERROR_CODES.QUESTION_NOT_FOUND]: 'Question not found',
+  [ERROR_CODES.USER_NOT_FOUND]: 'User not found',
+  [ERROR_CODES.GOAL_NOT_FOUND]: 'Goal not found',
+  
+  // Business logic
+  [ERROR_CODES.INSUFFICIENT_QUESTIONS]: 'Not enough questions available',
+  [ERROR_CODES.INVALID_SESSION_STATE]: 'Invalid session state',
+  [ERROR_CODES.GOAL_ALREADY_EXISTS]: 'Goal already exists',
+  [ERROR_CODES.INVALID_DATE_RANGE]: 'Invalid date range',
+} as const;
+
+export type ErrorCode = keyof typeof ERROR_CODES;
