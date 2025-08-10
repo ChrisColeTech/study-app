@@ -98,6 +98,7 @@ export class LambdaConstruct extends Construct {
       functionName: StackConfig.getResourceName('auth', props.environment),
       description: 'Study App V3 Auth Lambda - Phase 3 Implementation with built-in crypto',
       code: cdk.aws_lambda.Code.fromAsset('./src/lambdas/auth'),
+      handler: 'index.handler',
     });
     this.functions['auth'] = authFunction;
 
