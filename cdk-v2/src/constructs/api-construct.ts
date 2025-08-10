@@ -140,6 +140,41 @@ export class ApiConstruct extends Construct {
       operationName: 'GetProviders'
     });
 
+    // Provider by ID - GET /providers/{providerId}
+    const providerById = providers.addResource('{providerId}');
+    providerById.addMethod('GET', new apigateway.LambdaIntegration(props.functions.providerFunction), {
+      ...authOptions,
+      operationName: 'GetProvider'
+    });
+
+    // Provider exams - GET /providers/{providerId}/exams
+    const providerExams = providerById.addResource('exams');
+    providerExams.addMethod('GET', new apigateway.LambdaIntegration(props.functions.providerFunction), {
+      ...authOptions,
+      operationName: 'GetProviderExams'
+    });
+
+    // All exams endpoint - GET /exams
+    const exams = v1.addResource('exams');
+    exams.addMethod('GET', new apigateway.LambdaIntegration(props.functions.providerFunction), {
+      ...authOptions,
+      operationName: 'GetAllExams'
+    });
+
+    // Exam by ID - GET /exams/{examId}
+    const examById = exams.addResource('{examId}');
+    examById.addMethod('GET', new apigateway.LambdaIntegration(props.functions.providerFunction), {
+      ...authOptions,
+      operationName: 'GetExam'
+    });
+
+    // Exam topics - GET /exams/{examId}/topics
+    const examTopics = examById.addResource('topics');
+    examTopics.addMethod('GET', new apigateway.LambdaIntegration(props.functions.providerFunction), {
+      ...authOptions,
+      operationName: 'GetExamTopics'
+    });
+
     // Questions endpoint
     const questions = v1.addResource('questions');
     questions.addMethod('GET', new apigateway.LambdaIntegration(props.functions.questionFunction), {
