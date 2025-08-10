@@ -147,7 +147,7 @@ jobs:
         run: |
           echo "📋 Stack Outputs:"
           aws cloudformation describe-stacks \
-            --stack-name StudyAppStackV3-$CDK_STAGE \
+            --stack-name StudyAppV3-$CDK_STAGE \
             --query 'Stacks[0].Outputs' \
             --output table
           
@@ -156,12 +156,12 @@ jobs:
           
           # Get key URLs for easy access
           API_URL=$(aws cloudformation describe-stacks \
-            --stack-name StudyAppStackV3-$CDK_STAGE \
+            --stack-name StudyAppV3-$CDK_STAGE \
             --query 'Stacks[0].Outputs[?contains(OutputKey, `API`) && contains(OutputKey, `URL`)].OutputValue' \
             --output text | head -1)
           
           CF_URL=$(aws cloudformation describe-stacks \
-            --stack-name StudyAppStackV3-$CDK_STAGE \
+            --stack-name StudyAppV3-$CDK_STAGE \
             --query 'Stacks[0].Outputs[?contains(OutputKey, `CloudFront`) && contains(OutputKey, `URL`)].OutputValue' \
             --output text | head -1)
           
@@ -255,7 +255,7 @@ jobs:
           echo "**Version:** V3 Implementation" >> $GITHUB_STEP_SUMMARY
           echo "**Stage:** ${{ github.event.inputs.stage || 'dev' }}" >> $GITHUB_STEP_SUMMARY
           echo "**Region:** ${{ env.AWS_REGION }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Stack Name:** StudyAppStackV3-${{ github.event.inputs.stage || 'dev' }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Stack Name:** StudyAppV3-${{ github.event.inputs.stage || 'dev' }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Features Deployed:" >> $GITHUB_STEP_SUMMARY
           echo "✅ **Authentication System** - Registration, Login, Token Refresh, Logout" >> $GITHUB_STEP_SUMMARY
