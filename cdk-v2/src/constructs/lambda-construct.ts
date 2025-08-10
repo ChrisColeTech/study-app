@@ -145,6 +145,7 @@ export class LambdaConstruct extends Construct {
     const functions = [
       this.authFunction,
       this.providerFunction,
+      this.examFunction,
       this.questionFunction,
       this.sessionFunction,
       this.goalFunction,

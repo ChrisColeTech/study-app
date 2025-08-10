@@ -1130,4 +1130,76 @@ This project demonstrates the value of **systematic problem-solving**, **learnin
 **Solution**: Get fresh tokens for each test session or extend token expiration time
 **Prevention**: Implement token refresh mechanism and consider longer expiration for development
 
+## 🔧 Latest Infrastructure Debugging Lessons (2025-08-10)
+
+### API Gateway 403 vs 404 Error Patterns
+**Issue**: Missing Lambda handlers cause 403 Forbidden errors instead of 404 Not Found
+**Root Cause**: API Gateway routes exist but handler logic is incomplete/missing, causing authorization failures
+**Solution**: Implement complete handler logic or remove unused routes
+**Prevention**: Always implement handlers for all defined API Gateway routes
+**Critical Insight**: 403 errors in API Gateway often indicate handler problems, not permission issues
+
+### Separation of Concerns in Lambda Architecture
+**Issue**: Provider handler was handling both provider AND exam endpoints, violating single responsibility
+**Root Cause**: Insufficient architectural planning led to mixed responsibilities
+**Solution**: Created dedicated exam-handler.ts for /exams, /exams/{id}, /exams/{id}/topics endpoints
+**Prevention**: Design handler responsibilities before implementation
+**Impact**: Proper separation prevents route conflicts and improves maintainability
+
+### JWT Validation Regex Precision
+**Issue**: API Gateway TOKEN authorizer rejecting valid JWT tokens with "missing equal-sign" error
+**Root Cause**: Validation regex `^Bearer [-0-9A-Za-z\\.]+$` didn't support full Base64URL character set
+**Solution**: Updated to `^Bearer [-0-9A-Za-z\\._/+=]+$` to include underscore, forward slash, plus, equals
+**Prevention**: Test JWT validation regex with actual generated tokens
+**Critical Fix**: This resolved authentication failures for all protected endpoints
+
+### S3 Data Directory Structure Requirements
+**Issue**: Questions endpoint returning 0 results despite S3 bucket containing data
+**Root Cause**: S3Service expected `/questions/provider/exam/` structure but data was in root
+**Solution**: Copied question data to proper directory structure: `/questions/aws/saa-c03/questions.json`
+**Prevention**: Document and validate expected S3 directory structures
+**Impact**: Fixed question loading - went from 0 to 681 questions available
+
+### Environment Variable Consistency
+**Issue**: Lambda functions receiving undefined values for expected environment variables
+**Root Cause**: CDK environment variable names didn't match handler expectations
+**Solution**: Added missing variables: `ACCESS_TOKEN_EXPIRES_IN: '2h'`, corrected S3 bucket names
+**Prevention**: Use consistent naming conventions between CDK and Lambda code
+**Testing**: Always verify environment variables are accessible in Lambda logs
+
+### CI/CD vs Manual Deployment Reliability
+**Issue**: Manual Lambda updates more error-prone and slower than CI/CD pipeline
+**Root Cause**: Manual processes bypass build/test/validation steps
+**Solution**: Always use `git commit && git push` to trigger automated deployments
+**Prevention**: Trust the CI/CD pipeline for all deployments
+**Time Savings**: CI/CD deployment is faster and more reliable than manual updates
+
+### JSON Parsing Error Debugging
+**Issue**: Auth endpoints returning "Invalid JSON in request body" for valid JSON
+**Root Cause**: Content-Type headers or request encoding causing parsing failures
+**Solution**: Enhanced logging to capture raw request body and headers for debugging
+**Prevention**: Add comprehensive logging for request parsing failures
+**Current Status**: Enhanced debug logging deployed via CI/CD to identify root cause
+
+### Provider Service Statistics Error Handling
+**Issue**: Provider endpoint returning 500 error with `undefined.length` error
+**Root Cause**: getProviderStats trying to call .length on undefined providers array
+**Solution**: Added null checks and proper array initialization in ProviderService
+**Prevention**: Always validate data structures before calling array/object methods
+**Result**: Provider endpoint now returns proper statistics for 3 providers
+
+### Session Validation Schema Evolution
+**Issue**: Session creation failing with "questionCount not allowed" validation error
+**Root Cause**: Handler validation schema expected different request format than client was sending
+**Solution**: Updated session creation to use `config: {questionCount: 5}` format
+**Prevention**: Keep validation schemas synchronized with API documentation
+**Success**: Session creation now works perfectly with proper question selection
+
+### DynamoDB Query Optimization
+**Issue**: Session queries failing with GSI-related errors in CloudWatch logs
+**Root Cause**: Missing or incorrect Global Secondary Index configuration
+**Solution**: Added proper UserIdIndex GSI to sessions table for user-based queries
+**Prevention**: Design GSI requirements during database schema planning
+**Performance**: Proper indexes ensure efficient session and goal queries
+
 
