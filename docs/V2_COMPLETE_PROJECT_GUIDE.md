@@ -1202,4 +1202,41 @@ This project demonstrates the value of **systematic problem-solving**, **learnin
 **Prevention**: Design GSI requirements during database schema planning
 **Performance**: Proper indexes ensure efficient session and goal queries
 
+### CDK API Gateway Deployment Triggers
+**Issue**: Exam routes existed in CloudFormation template but weren't accessible via API Gateway
+**Root Cause**: CDK didn't trigger a new API Gateway deployment when routes were added/modified
+**Solution**: Force deployment by updating API Gateway description property
+**Prevention**: Always verify API Gateway deployment after route changes
+**Critical Insight**: CloudFormation UPDATE_COMPLETE ≠ API Gateway routes are live
+**Debugging**: Check deployment timestamps vs CloudFormation update times
+
+### API Gateway Route Caching vs Missing Routes
+**Issue**: New routes returning AWS authorization errors instead of 404 or handler responses
+**Root Cause**: Routes were defined in CDK but not deployed, causing API Gateway to fall back to AWS service auth
+**Solution**: Force new API Gateway deployment to activate route changes
+**Prevention**: Validate that API Gateway resources match CDK template after deployment
+**Testing**: Use `aws apigateway get-resources` to verify routes exist after deployment
+
+### CloudFormation vs API Gateway State Synchronization
+**Issue**: CloudFormation shows resources as deployed but they don't exist in API Gateway
+**Root Cause**: API Gateway has separate deployment lifecycle from CloudFormation resources
+**Solution**: Monitor both CloudFormation events AND API Gateway deployment timestamps
+**Prevention**: Include deployment verification in CI/CD pipeline
+**Architecture**: Understand that API Gateway resources ≠ API Gateway deployments
+
+### Manual API Gateway Deployments Break Authorizer Configuration
+**Issue**: Manual API Gateway deployment causes all endpoints to return AWS authorization errors
+**Root Cause**: Manual deployments don't include proper authorizer configuration from CDK
+**Solution**: Only use CDK-managed deployments, never manual deployments
+**Prevention**: Fix CDK deployment triggers rather than working around them
+**Critical Insight**: Manual deployments can break working infrastructure
+**Recovery**: Redeploy through CDK to restore proper authorizer configuration
+
+### CDK API Gateway Deployment System Design Flaw
+**Issue**: CDK doesn't generate new API Gateway deployments when routes are modified
+**Root Cause**: CDK deployment logic doesn't detect route changes as requiring new deployment
+**Solution**: Requires architectural solution or workaround in CDK code
+**Impact**: New routes exist in CloudFormation but are inaccessible via API Gateway
+**Workaround**: Trigger deployments through CDK property changes, not manual deployments
+
 

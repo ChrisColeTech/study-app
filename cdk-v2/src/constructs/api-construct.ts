@@ -38,7 +38,7 @@ export class ApiConstruct extends Construct {
     // API Gateway Rest API - V2 with new logical ID
     this.api = new apigateway.RestApi(this, 'API-Gateway-V2', {
       restApiName: `StudyAppV2-API-${props.stage}`,
-      description: 'Study App V2 API Gateway with TOKEN authorization and exam routes',
+      description: 'Study App V2 API Gateway with TOKEN authorization - restored deployment',
       deployOptions: {
         stageName: props.config.stage,
         throttlingRateLimit: props.config.throttleRateLimit,
