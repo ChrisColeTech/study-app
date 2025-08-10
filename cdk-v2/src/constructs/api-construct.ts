@@ -80,7 +80,7 @@ export class ApiConstruct extends Construct {
       handler: props.functions.authorizerFunction,
       identitySource: 'method.request.header.Authorization',
       resultsCacheTtl: cdk.Duration.seconds(props.config.authorizerConfig.resultsCacheTtl),
-      validationRegex: '^Bearer [-0-9A-Za-z\\.]+$'
+      validationRegex: '^Bearer [-0-9A-Za-z\\._/+=]+$' // Fixed: Support full Base64URL character set
     });
 
     // Create API resources and methods
