@@ -30,7 +30,7 @@ module.exports = {
       statements: 80
     }
   },
-  moduleNameMapping: {
+  moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
     '^@/handlers/(.*)$': '<rootDir>/src/handlers/$1',
     '^@/services/(.*)$': '<rootDir>/src/services/$1',
