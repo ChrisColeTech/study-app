@@ -70,8 +70,7 @@ export class HealthService {
         s3: {
           enabled: true,
           buckets: [
-            process.env.DATA_BUCKET || 'study-app-data',
-            process.env.S3_STUDY_DATA_BUCKET || 'study-app-data'
+            process.env.DATA_BUCKET || 'study-app-data'
           ],
           performanceChecks: true
         },

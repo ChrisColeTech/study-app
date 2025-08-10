@@ -13,7 +13,7 @@ export class S3Service {
 
   constructor() {
     this.logger = new Logger('S3Service');
-    this.bucketName = process.env.S3_STUDY_DATA_BUCKET || 'study-app-data';
+    this.bucketName = process.env.DATA_BUCKET || 'study-app-data';
     this.region = process.env.AWS_REGION || 'us-east-1';
     
     this.client = new S3Client({
