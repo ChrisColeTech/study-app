@@ -43,6 +43,8 @@ export class LambdaConstruct extends Construct {
       DATA_BUCKET: props.dataBucket?.bucketName || '',
       LOG_LEVEL: props.stage === 'prod' ? 'INFO' : 'DEBUG',
       JWT_SECRET: 'your-jwt-secret', // TODO: Move to Parameter Store
+      ACCESS_TOKEN_EXPIRES_IN: '2h', // Extended for comprehensive testing
+      REFRESH_TOKEN_EXPIRES_IN: '7d', // Explicit refresh token expiration
       ...props.config.environment
     };
 
