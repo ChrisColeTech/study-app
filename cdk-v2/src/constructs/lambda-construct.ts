@@ -22,6 +22,7 @@ export interface LambdaConstructProps {
 export class LambdaConstruct extends Construct {
   public readonly authFunction: lambda.Function;
   public readonly providerFunction: lambda.Function;
+  public readonly examFunction: lambda.Function;
   public readonly questionFunction: lambda.Function;
   public readonly sessionFunction: lambda.Function;
   public readonly goalFunction: lambda.Function;
@@ -83,7 +84,16 @@ export class LambdaConstruct extends Construct {
       functionName: `StudyAppV2-Provider-${props.stage}`,
       handler: 'index.handler',
       code: lambda.Code.fromAsset('../lambdas-v2/bundles/provider-handler'),
-      description: 'V2 Provider and exam data management'
+      description: 'V2 Provider data management'
+    });
+
+    // Exam Handler Function - V2 with dedicated logical ID (proper separation of concerns)
+    this.examFunction = new lambda.Function(this, 'Exam-Function-V2', {
+      ...commonConfig,
+      functionName: `StudyAppV2-Exam-${props.stage}`,
+      handler: 'index.handler',
+      code: lambda.Code.fromAsset('../lambdas-v2/bundles/exam-handler'),
+      description: 'V2 Exam data management and topics'
     });
 
     // Question Handler Function - V2 with new logical ID

@@ -110,6 +110,7 @@ export class StudyAppV2Stack extends cdk.Stack {
         authorizerFunction: lambda.authorizerFunction,
         authFunction: lambda.authFunction,
         providerFunction: lambda.providerFunction,
+        examFunction: lambda.examFunction,
         questionFunction: lambda.questionFunction,
         sessionFunction: lambda.sessionFunction,
         goalFunction: lambda.goalFunction,

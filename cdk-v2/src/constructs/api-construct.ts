@@ -12,6 +12,7 @@ export interface ApiConstructProps {
     authorizerFunction: lambda.Function;
     authFunction: lambda.Function;
     providerFunction: lambda.Function;
+    examFunction: lambda.Function;
     questionFunction: lambda.Function;
     sessionFunction: lambda.Function;
     goalFunction: lambda.Function;
@@ -154,23 +155,23 @@ export class ApiConstruct extends Construct {
       operationName: 'GetProviderExams'
     });
 
-    // All exams endpoint - GET /exams
+    // All exams endpoint - GET /exams (proper separation: use examFunction)
     const exams = v1.addResource('exams');
-    exams.addMethod('GET', new apigateway.LambdaIntegration(props.functions.providerFunction), {
+    exams.addMethod('GET', new apigateway.LambdaIntegration(props.functions.examFunction), {
       ...authOptions,
       operationName: 'GetAllExams'
     });
 
-    // Exam by ID - GET /exams/{examId}
+    // Exam by ID - GET /exams/{examId} (proper separation: use examFunction)
     const examById = exams.addResource('{examId}');
-    examById.addMethod('GET', new apigateway.LambdaIntegration(props.functions.providerFunction), {
+    examById.addMethod('GET', new apigateway.LambdaIntegration(props.functions.examFunction), {
       ...authOptions,
       operationName: 'GetExam'
     });
 
-    // Exam topics - GET /exams/{examId}/topics
+    // Exam topics - GET /exams/{examId}/topics (proper separation: use examFunction)
     const examTopics = examById.addResource('topics');
-    examTopics.addMethod('GET', new apigateway.LambdaIntegration(props.functions.providerFunction), {
+    examTopics.addMethod('GET', new apigateway.LambdaIntegration(props.functions.examFunction), {
       ...authOptions,
       operationName: 'GetExamTopics'
     });

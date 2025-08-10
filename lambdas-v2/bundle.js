@@ -10,6 +10,7 @@ const lambdaEntries = {
   'token-authorizer': './src/token-authorizer.ts',
   'auth-handler': './src/handlers/auth-handler.ts',
   'provider-handler': './src/handlers/provider-handler.ts',
+  'exam-handler': './src/handlers/exam-handler.ts',
   'question-handler': './src/handlers/question-handler.ts',
   'session-handler': './src/handlers/session-handler.ts',
   'goal-handler': './src/handlers/goal-handler.ts',

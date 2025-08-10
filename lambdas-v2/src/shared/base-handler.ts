@@ -186,15 +186,18 @@ export abstract class BaseHandler {
       
       this.logger.debug('Parsing request body', { 
         isBase64Encoded: event.isBase64Encoded, 
-        bodyLength: bodyString.length 
+        bodyLength: bodyString.length,
+        rawBody: bodyString.substring(0, 200) // Log first 200 chars for debugging
       });
       
       return JSON.parse(bodyString) as T;
     } catch (error: any) {
       this.logger.error('JSON parsing failed', { 
         body: event.body, 
+        bodyString: bodyString.substring(0, 200),
         isBase64Encoded: event.isBase64Encoded, 
-        error: error.message 
+        error: error.message,
+        contentType: event.headers['Content-Type'] || event.headers['content-type']
       });
       throw new ApiError(ErrorCode.VALIDATION_ERROR, 'Invalid JSON in request body');
     }
