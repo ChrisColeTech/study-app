@@ -131,9 +131,9 @@ export class ProviderService {
       
       return {
         totalProviders: providers.length,
-        totalExams: providers.reduce((sum, p) => sum + p.exams.length, 0),
+        totalExams: providers.reduce((sum, p) => sum + (p.exams?.length || 0), 0),
         providerBreakdown: providers.reduce((breakdown, provider) => {
-          breakdown[provider.id] = provider.exams.length;
+          breakdown[provider.id] = provider.exams?.length || 0;
           return breakdown;
         }, {} as { [key: string]: number })
       };
