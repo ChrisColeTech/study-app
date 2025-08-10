@@ -2,9 +2,9 @@ name: Deploy Study App V2 Stack
 
 on:
   push:
-    branches: [v2-complete-rewrite]
+    branches: [main, v2-complete-rewrite]
   pull_request:
-    branches: [v2-complete-rewrite]
+    branches: [main, v2-complete-rewrite]
   workflow_dispatch:
     inputs:
       stage:

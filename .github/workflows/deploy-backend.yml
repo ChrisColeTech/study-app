@@ -3,9 +3,7 @@ name: Deploy Backend Infrastructure
 on:
   push:
     branches:
-      - main
-      - master
-      - develop
+      - v1-only  # Disabled for V2 - only runs on non-existent branch
     paths:
       - 'cdk/**'
       - 'lambdas/**'
