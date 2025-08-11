@@ -44,8 +44,8 @@ main() {
     echo
 
     # Test order matters - auth first to establish authentication patterns
-    # Other domains can be tested in parallel in the future
-    DOMAINS=("auth")  # Start with auth, add others as they're implemented
+    # Other domains can be tested independently since most are public endpoints for now
+    DOMAINS=("auth" "providers" "questions" "exams" "topics" "sessions")  # All currently available test scripts
     RESULTS=()
     PASSED=0
     FAILED=0
