@@ -1,0 +1,35 @@
+{
+  "description": "Test fixture for getting personalized recommendations for specific provider",
+  "method": "POST",
+  "endpoint": "/v1/providers/recommendations/personalized",
+  "body": {
+    "providerId": "aws",
+    "userPreferences": {
+      "careerGoals": ["Solutions Architect"],
+      "experienceLevel": "intermediate",
+      "timeCommitmentWeekly": 8,
+      "budgetLimit": 500,
+      "preferredProviders": ["aws"],
+      "avoidedProviders": [],
+      "learningStyle": ["visual", "reading_writing"],
+      "industryFocus": ["technology"],
+      "currentSkills": ["networking", "security"],
+      "targetSkills": ["aws architecture", "cost optimization"],
+      "timeframe": "3months"
+    },
+    "maxRecommendations": 3
+  },
+  "expectedStatus": 200,
+  "expectedFields": [
+    "studyPaths",
+    "certificationPriorities",
+    "recommendedResources",
+    "estimatedTimeline"
+  ],
+  "validation": {
+    "specificProvider": "aws",
+    "hasStudyPaths": true,
+    "maxStudyPaths": 3,
+    "providerSpecific": true
+  }
+}

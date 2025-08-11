@@ -1,0 +1,33 @@
+{
+  "description": "Test fixture for getting study path recommendations with alternative providers",
+  "method": "POST",
+  "endpoint": "/v1/providers/aws/recommendations/study-paths",
+  "body": {
+    "userPreferences": {
+      "careerGoals": ["Cloud Engineer"],
+      "experienceLevel": "beginner",
+      "timeCommitmentWeekly": 5,
+      "preferredProviders": [],
+      "avoidedProviders": [],
+      "learningStyle": ["reading_writing"],
+      "industryFocus": ["technology"],
+      "currentSkills": [],
+      "targetSkills": ["cloud computing"],
+      "timeframe": "1year"
+    },
+    "includeAlternativeProviders": true
+  },
+  "expectedStatus": 200,
+  "expectedFields": [
+    "recommendations",
+    "alternativeProviders",
+    "totalRecommendations"
+  ],
+  "validation": {
+    "providerId": "aws",
+    "hasRecommendations": true,
+    "hasAlternatives": true,
+    "minRecommendations": 1,
+    "minAlternatives": 1
+  }
+}

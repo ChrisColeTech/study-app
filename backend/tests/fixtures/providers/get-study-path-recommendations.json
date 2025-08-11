@@ -1,0 +1,40 @@
+{
+  "description": "Test fixture for getting personalized study path recommendations for AWS",
+  "method": "POST",
+  "endpoint": "/v1/providers/aws/recommendations/study-paths",
+  "body": {
+    "userPreferences": {
+      "careerGoals": ["Cloud Architect", "Solutions Architect"],
+      "experienceLevel": "intermediate",
+      "timeCommitmentWeekly": 10,
+      "budgetLimit": 1000,
+      "preferredProviders": ["aws"],
+      "avoidedProviders": [],
+      "learningStyle": ["practical", "visual"],
+      "industryFocus": ["technology", "finance"],
+      "currentSkills": ["networking", "linux"],
+      "targetSkills": ["aws", "cloud architecture", "serverless"],
+      "timeframe": "6months"
+    },
+    "includeAlternativeProviders": false
+  },
+  "expectedStatus": 200,
+  "expectedFields": [
+    "recommendations",
+    "totalRecommendations"
+  ],
+  "validation": {
+    "providerId": "aws",
+    "hasRecommendations": true,
+    "minRecommendations": 1,
+    "recommendationFields": [
+      "id",
+      "name",
+      "description",
+      "providerId",
+      "certifications",
+      "totalTimeMonths",
+      "confidenceScore"
+    ]
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "description": "Test fixture for getting AWS provider resources",
+  "method": "GET",
+  "endpoint": "/v1/providers/aws/resources",
+  "queryParams": {},
+  "expectedStatus": 200,
+  "expectedFields": [
+    "resources",
+    "total",
+    "pagination",
+    "filters"
+  ],
+  "validation": {
+    "providerId": "aws",
+    "hasResources": true,
+    "minResources": 1,
+    "resourceFields": [
+      "id",
+      "title",
+      "type",
+      "category",
+      "providerId",
+      "url",
+      "isFree"
+    ],
+    "hasPagination": true,
+    "hasFilters": true
+  }
+}
