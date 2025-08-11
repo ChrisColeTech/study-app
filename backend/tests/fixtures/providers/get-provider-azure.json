@@ -1,0 +1,19 @@
+{
+  "description": "Test fixture for getting Azure provider details without certifications",
+  "method": "GET",
+  "endpoint": "/v1/providers/azure",
+  "queryParams": {
+    "includeCertifications": "false"
+  },
+  "expectedStatus": 200,
+  "expectedFields": [
+    "provider"
+  ],
+  "validation": {
+    "providerId": "azure",
+    "providerName": "Azure",
+    "hasMetadata": true,
+    "hasCertifications": false,
+    "certificationsLength": 0
+  }
+}

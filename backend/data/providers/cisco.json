@@ -1,0 +1,151 @@
+{
+  "id": "cisco",
+  "name": "Cisco",
+  "fullName": "Cisco Systems",
+  "description": "Cisco Systems is a multinational technology conglomerate that develops, manufactures and sells networking hardware, software, telecommunications equipment and other high-technology services and products.",
+  "status": "active",
+  "website": "https://www.cisco.com/c/en/us/training-events/training-certifications.html",
+  "logoUrl": "https://upload.wikimedia.org/wikipedia/commons/0/08/Cisco_logo_blue_2016.svg",
+  "category": "networking",
+  "certifications": [
+    {
+      "id": "cisco-ccna",
+      "name": "CCNA",
+      "fullName": "Cisco Certified Network Associate",
+      "code": "200-301 CCNA",
+      "description": "The CCNA certification validates your ability to install, configure, operate, and troubleshoot medium-size routed and switched networks.",
+      "level": "associate",
+      "status": "active",
+      "examCode": "200-301 CCNA",
+      "passingScore": 825,
+      "maxScore": 1000,
+      "duration": 120,
+      "questionCount": 120,
+      "cost": 300,
+      "validityPeriod": 36,
+      "prerequisites": [],
+      "topics": [
+        "Network Fundamentals",
+        "Network Access",
+        "IP Connectivity",
+        "IP Services",
+        "Security Fundamentals",
+        "Automation and Programmability"
+      ],
+      "skillsValidated": [
+        "Install, configure, and operate a small to medium sized network",
+        "Configure and troubleshoot network connectivity",
+        "Configure and verify device management access",
+        "Configure device security features",
+        "Verify network status and switch operation"
+      ],
+      "examFormat": "multiple_choice",
+      "languages": ["English", "Japanese", "Arabic", "French", "Portuguese", "Russian", "Spanish", "Chinese"],
+      "retakePolicy": "5 calendar days waiting period after failed attempt",
+      "studyResources": [
+        {
+          "type": "official_guide",
+          "title": "CCNA 200-301 Official Cert Guide Library",
+          "url": "https://www.ciscopress.com/store/ccna-200-301-official-cert-guide-library-9781587147142",
+          "description": "Official Cisco Press study guide",
+          "isFree": false,
+          "provider": "Cisco Press"
+        },
+        {
+          "type": "training_course",
+          "title": "Implementing and Administering Cisco Solutions (CCNA)",
+          "url": "https://www.cisco.com/c/en/us/training-events/training-certifications/training/training-services/courses/implementing-and-administering-cisco-solutions-ccna.html",
+          "description": "Official Cisco training course",
+          "isFree": false,
+          "provider": "Cisco"
+        }
+      ],
+      "metadata": {
+        "difficultyLevel": 4,
+        "popularityRank": 1,
+        "passRate": 55,
+        "marketDemand": "high",
+        "salaryImpact": "high",
+        "jobRoles": ["Network Administrator", "Network Engineer", "Systems Administrator", "Help Desk Technician"],
+        "industries": ["Technology", "Telecommunications", "Finance", "Healthcare"],
+        "nextStepCertifications": ["cisco-ccnp", "cisco-ccda"],
+        "studyTimeRecommended": 150,
+        "handsOnExperience": true
+      },
+      "createdAt": "2023-01-01T00:00:00Z",
+      "updatedAt": "2024-01-01T00:00:00Z"
+    },
+    {
+      "id": "cisco-ccnp-enterprise",
+      "name": "CCNP Enterprise",
+      "fullName": "Cisco Certified Network Professional Enterprise",
+      "code": "350-401 ENCOR & Concentration Exam",
+      "description": "CCNP Enterprise certification validates the ability to plan, implement, verify and troubleshoot local and wide-area enterprise networks.",
+      "level": "professional",
+      "status": "active",
+      "examCode": "350-401 ENCOR & Concentration Exam",
+      "passingScore": 825,
+      "maxScore": 1000,
+      "duration": 120,
+      "questionCount": 120,
+      "cost": 600,
+      "validityPeriod": 36,
+      "prerequisites": ["CCNA certification recommended"],
+      "topics": [
+        "Architecture",
+        "Virtualization",
+        "Infrastructure",
+        "Network Assurance",
+        "Security",
+        "Automation"
+      ],
+      "skillsValidated": [
+        "Plan, design and deploy enterprise network solutions",
+        "Operate and optimize enterprise networks",
+        "Implement security principles within enterprise networks",
+        "Troubleshoot complex enterprise networks"
+      ],
+      "examFormat": "multiple_choice",
+      "languages": ["English", "Japanese", "Arabic", "French", "Portuguese", "Russian", "Spanish", "Chinese"],
+      "retakePolicy": "5 calendar days waiting period after failed attempt",
+      "studyResources": [
+        {
+          "type": "official_guide",
+          "title": "CCNP Enterprise Core ENCOR 350-401 Official Cert Guide",
+          "url": "https://www.ciscopress.com/store/ccnp-enterprise-core-encor-350-401-official-cert-guide-9781587145230",
+          "description": "Official Cisco Press study guide",
+          "isFree": false,
+          "provider": "Cisco Press"
+        }
+      ],
+      "metadata": {
+        "difficultyLevel": 5,
+        "popularityRank": 2,
+        "passRate": 45,
+        "marketDemand": "high",
+        "salaryImpact": "very-high",
+        "jobRoles": ["Senior Network Engineer", "Network Architect", "Systems Engineer"],
+        "industries": ["Enterprise", "Service Provider", "Technology", "Government"],
+        "nextStepCertifications": ["cisco-ccie"],
+        "studyTimeRecommended": 200,
+        "handsOnExperience": true
+      },
+      "createdAt": "2023-01-01T00:00:00Z",
+      "updatedAt": "2024-01-01T00:00:00Z"
+    }
+  ],
+  "metadata": {
+    "headquarters": "San Jose, California, USA",
+    "founded": 1984,
+    "industry": "Networking and Communications",
+    "specialization": ["Routing and Switching", "Network Security", "Data Center", "Collaboration", "Wireless"],
+    "marketShare": "Enterprise Networking Leader",
+    "popularCertifications": ["cisco-ccna", "cisco-ccnp-enterprise", "cisco-ccnp-security"],
+    "difficultyRating": 5,
+    "jobMarketDemand": "high",
+    "averageSalary": "$65,000 - $150,000",
+    "careerPaths": ["Network Engineer", "Network Administrator", "Network Architect", "Systems Engineer"]
+  },
+  "createdAt": "2023-01-01T00:00:00Z",
+  "updatedAt": "2024-01-01T00:00:00Z"
+}

@@ -1,0 +1,149 @@
+{
+  "id": "azure",
+  "name": "Azure",
+  "fullName": "Microsoft Azure",
+  "description": "Microsoft Azure is a cloud computing service created by Microsoft for building, testing, deploying, and managing applications and services through Microsoft-managed data centers.",
+  "status": "active",
+  "website": "https://docs.microsoft.com/en-us/learn/certifications/",
+  "logoUrl": "https://upload.wikimedia.org/wikipedia/commons/f/fa/Microsoft_Azure.svg",
+  "category": "cloud",
+  "certifications": [
+    {
+      "id": "azure-az-900",
+      "name": "Azure Fundamentals",
+      "fullName": "Microsoft Certified: Azure Fundamentals",
+      "code": "AZ-900",
+      "description": "Azure Fundamentals exam is an opportunity to prove knowledge of cloud concepts, Azure services, Azure workloads, security and privacy in Azure, as well as Azure pricing and support.",
+      "level": "foundational",
+      "status": "active",
+      "examCode": "AZ-900",
+      "passingScore": 700,
+      "maxScore": 1000,
+      "duration": 85,
+      "questionCount": 60,
+      "cost": 99,
+      "validityPeriod": 36,
+      "prerequisites": [],
+      "topics": [
+        "Cloud Concepts",
+        "Azure Services",
+        "Security, Privacy, Compliance, and Trust",
+        "Azure Pricing and Support"
+      ],
+      "skillsValidated": [
+        "Azure cloud concepts",
+        "Azure services",
+        "Azure workloads",
+        "Security and privacy in Azure",
+        "Azure pricing and support"
+      ],
+      "examFormat": "multiple_choice",
+      "languages": ["English", "Japanese", "Chinese (Simplified)", "Korean", "Spanish", "German", "French"],
+      "retakePolicy": "24 hours waiting period after failed attempt",
+      "studyResources": [
+        {
+          "type": "official_guide",
+          "title": "Azure Fundamentals Learning Path",
+          "url": "https://docs.microsoft.com/en-us/learn/paths/azure-fundamentals/",
+          "description": "Official Microsoft Learn path",
+          "isFree": true,
+          "provider": "Microsoft"
+        },
+        {
+          "type": "practice_exam",
+          "title": "AZ-900 Practice Assessment",
+          "url": "https://docs.microsoft.com/en-us/learn/certifications/azure-fundamentals/",
+          "description": "Official practice assessment from Microsoft",
+          "isFree": true,
+          "provider": "Microsoft"
+        }
+      ],
+      "metadata": {
+        "difficultyLevel": 2,
+        "popularityRank": 2,
+        "passRate": 80,
+        "marketDemand": "high",
+        "salaryImpact": "entry-level",
+        "jobRoles": ["Cloud Support Specialist", "Sales", "Marketing", "Business Analyst"],
+        "industries": ["Technology", "Finance", "Healthcare", "Government"],
+        "nextStepCertifications": ["azure-az-104", "azure-az-204", "azure-az-303"],
+        "studyTimeRecommended": 35,
+        "handsOnExperience": false
+      },
+      "createdAt": "2023-01-01T00:00:00Z",
+      "updatedAt": "2024-01-01T00:00:00Z"
+    },
+    {
+      "id": "azure-az-104",
+      "name": "Azure Administrator",
+      "fullName": "Microsoft Certified: Azure Administrator Associate",
+      "code": "AZ-104",
+      "description": "Earning Azure Administrator Associate certification validates the skills and knowledge to implement, manage, and monitor an organization's Microsoft Azure environment.",
+      "level": "associate",
+      "status": "active",
+      "examCode": "AZ-104",
+      "passingScore": 700,
+      "maxScore": 1000,
+      "duration": 120,
+      "questionCount": 60,
+      "cost": 165,
+      "validityPeriod": 36,
+      "prerequisites": ["6+ months hands-on experience administering Azure"],
+      "topics": [
+        "Manage Azure Identities and Governance",
+        "Implement and Manage Storage",
+        "Deploy and Manage Azure Compute Resources",
+        "Configure and Manage Virtual Networking",
+        "Monitor and Backup Azure Resources"
+      ],
+      "skillsValidated": [
+        "Manage Azure identities and governance",
+        "Implement and manage storage",
+        "Deploy and manage Azure compute resources",
+        "Configure and manage virtual networking",
+        "Monitor and backup Azure resources"
+      ],
+      "examFormat": "multiple_choice",
+      "languages": ["English", "Japanese", "Chinese (Simplified)", "Korean", "Spanish", "German", "French"],
+      "retakePolicy": "24 hours waiting period after failed attempt",
+      "studyResources": [
+        {
+          "type": "official_guide",
+          "title": "AZ-104 Microsoft Azure Administrator",
+          "url": "https://docs.microsoft.com/en-us/learn/paths/az-104-administrator-prerequisites/",
+          "description": "Official Microsoft Learn path",
+          "isFree": true,
+          "provider": "Microsoft"
+        }
+      ],
+      "metadata": {
+        "difficultyLevel": 4,
+        "popularityRank": 1,
+        "passRate": 65,
+        "marketDemand": "high",
+        "salaryImpact": "high",
+        "jobRoles": ["Azure Administrator", "Cloud Engineer", "Systems Administrator"],
+        "industries": ["Technology", "Finance", "Healthcare", "Manufacturing"],
+        "nextStepCertifications": ["azure-az-303", "azure-az-500"],
+        "studyTimeRecommended": 100,
+        "handsOnExperience": true
+      },
+      "createdAt": "2023-01-01T00:00:00Z",
+      "updatedAt": "2024-01-01T00:00:00Z"
+    }
+  ],
+  "metadata": {
+    "headquarters": "Redmond, Washington, USA",
+    "founded": 2010,
+    "industry": "Cloud Computing",
+    "specialization": ["Hybrid Cloud", "Enterprise Solutions", "AI and ML Services"],
+    "marketShare": "20%",
+    "popularCertifications": ["azure-az-104", "azure-az-900", "azure-az-204"],
+    "difficultyRating": 4,
+    "jobMarketDemand": "high",
+    "averageSalary": "$85,000 - $170,000",
+    "careerPaths": ["Cloud Administrator", "Solutions Architect", "DevOps Engineer", "Cloud Engineer"]
+  },
+  "createdAt": "2023-01-01T00:00:00Z",
+  "updatedAt": "2024-01-01T00:00:00Z"
+}

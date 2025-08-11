@@ -1,0 +1,19 @@
+{
+  "description": "Test fixture for getting AWS provider details with certifications",
+  "method": "GET",
+  "endpoint": "/v1/providers/aws",
+  "queryParams": {
+    "includeCertifications": "true"
+  },
+  "expectedStatus": 200,
+  "expectedFields": [
+    "provider"
+  ],
+  "validation": {
+    "providerId": "aws",
+    "providerName": "AWS",
+    "hasMetadata": true,
+    "hasCertifications": true,
+    "minCertifications": 2
+  }
+}

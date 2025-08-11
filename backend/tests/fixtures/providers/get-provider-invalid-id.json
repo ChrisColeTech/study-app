@@ -1,0 +1,15 @@
+{
+  "description": "Test fixture for getting non-existent provider (should return 404)",
+  "method": "GET",
+  "endpoint": "/v1/providers/invalid-provider-id",
+  "queryParams": {},
+  "expectedStatus": 404,
+  "expectedFields": [
+    "error",
+    "message"
+  ],
+  "validation": {
+    "errorType": "NOT_FOUND",
+    "messageContains": "not found"
+  }
+}

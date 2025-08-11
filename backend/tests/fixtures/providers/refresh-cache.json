@@ -1,0 +1,14 @@
+{
+  "description": "Test fixture for refreshing provider cache",
+  "method": "POST",
+  "endpoint": "/v1/providers/cache/refresh",
+  "queryParams": {},
+  "body": {},
+  "expectedStatus": 200,
+  "expectedFields": [
+    "message"
+  ],
+  "validation": {
+    "messageContains": "refreshed successfully"
+  }
+}

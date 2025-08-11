@@ -1,0 +1,17 @@
+{
+  "description": "Test fixture for invalid category filter (should return 400)",
+  "method": "GET",
+  "endpoint": "/v1/providers",
+  "queryParams": {
+    "category": "invalid_category"
+  },
+  "expectedStatus": 400,
+  "expectedFields": [
+    "error",
+    "message"
+  ],
+  "validation": {
+    "errorType": "VALIDATION_ERROR",
+    "messageContains": "Invalid category"
+  }
+}

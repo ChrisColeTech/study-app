@@ -1,0 +1,15 @@
+{
+  "description": "Test fixture for provider ID with invalid format (should return 400)",
+  "method": "GET",
+  "endpoint": "/v1/providers/invalid@provider!id",
+  "queryParams": {},
+  "expectedStatus": 400,
+  "expectedFields": [
+    "error",
+    "message"
+  ],
+  "validation": {
+    "errorType": "VALIDATION_ERROR",
+    "messageContains": "Invalid provider ID format"
+  }
+}

@@ -185,13 +185,57 @@ export class ResponseBuilder {
     if (apiResponse.success) {
       return ResponseBuilder.success(apiResponse.data, HTTP_STATUS_CODES.OK, apiResponse.message, requestId);
     } else {
+      // Map error codes to appropriate HTTP status codes
+      const statusCode = ResponseBuilder.getHttpStatusFromErrorCode(apiResponse.error.code);
+      
       return ResponseBuilder.error(
         apiResponse.error.code,
         apiResponse.error.message,
-        HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
+        statusCode,
         apiResponse.error.details,
         requestId
       );
+    }
+  }
+
+  /**
+   * Map error codes to HTTP status codes
+   */
+  private static getHttpStatusFromErrorCode(errorCode: string): number {
+    switch (errorCode) {
+      case ERROR_CODES.VALIDATION_ERROR:
+        return HTTP_STATUS_CODES.BAD_REQUEST;
+      
+      case ERROR_CODES.UNAUTHORIZED:
+      case ERROR_CODES.TOKEN_EXPIRED:
+      case ERROR_CODES.TOKEN_INVALID:
+        return HTTP_STATUS_CODES.UNAUTHORIZED;
+      
+      case ERROR_CODES.FORBIDDEN:
+      case ERROR_CODES.ACCOUNT_DISABLED:
+        return HTTP_STATUS_CODES.FORBIDDEN;
+      
+      case ERROR_CODES.NOT_FOUND:
+      case ERROR_CODES.PROVIDER_NOT_FOUND:
+      case ERROR_CODES.EXAM_NOT_FOUND:
+      case ERROR_CODES.TOPIC_NOT_FOUND:
+      case ERROR_CODES.QUESTION_NOT_FOUND:
+      case ERROR_CODES.USER_NOT_FOUND:
+      case ERROR_CODES.GOAL_NOT_FOUND:
+      case ERROR_CODES.SESSION_NOT_FOUND:
+        return HTTP_STATUS_CODES.NOT_FOUND;
+      
+      case ERROR_CODES.CONFLICT:
+      case ERROR_CODES.GOAL_ALREADY_EXISTS:
+      case ERROR_CODES.SESSION_ALREADY_COMPLETED:
+        return HTTP_STATUS_CODES.CONFLICT;
+      
+      case ERROR_CODES.RATE_LIMITED:
+        return 429; // Too Many Requests
+      
+      case ERROR_CODES.INTERNAL_ERROR:
+      default:
+        return HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR;
     }
   }
 }

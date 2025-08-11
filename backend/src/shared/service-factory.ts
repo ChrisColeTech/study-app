@@ -7,7 +7,8 @@ import { S3Client } from '@aws-sdk/client-s3';
 // Import service interfaces
 import type { IAuthService } from '../services/auth.service';
 import type { IUserService } from '../services/user.service';
-export type { IAuthService, IUserService };
+import type { IProviderService } from '../services/provider.service';
+export type { IAuthService, IUserService, IProviderService };
 
 export interface IQuestionService {
   // Question service methods will be added in Phase 2
@@ -91,6 +92,7 @@ export class ServiceFactory {
   // Services (lazy initialized)
   private _authService: IAuthService | null = null;
   private _userService: IUserService | null = null;
+  private _providerService: IProviderService | null = null;
   private _questionService: IQuestionService | null = null;
   private _sessionService: ISessionService | null = null;
   private _analyticsService: IAnalyticsService | null = null;
@@ -217,6 +219,17 @@ export class ServiceFactory {
   }
 
   /**
+   * Get Provider Service
+   */
+  public getProviderService(): IProviderService {
+    if (!this._providerService) {
+      const { ProviderService } = require('../services/provider.service');
+      this._providerService = new ProviderService(this.getS3Client(), this.getConfig().buckets.questionData);
+    }
+    return this._providerService!;
+  }
+
+  /**
    * Get Question Service
    */
   public getQuestionService(): IQuestionService {
@@ -325,6 +338,7 @@ export class ServiceFactory {
     this._s3Client = null;
     this._authService = null;
     this._userService = null;
+    this._providerService = null;
     this._questionService = null;
     this._sessionService = null;
     this._analyticsService = null;

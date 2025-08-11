@@ -1,0 +1,19 @@
+{
+  "description": "Test fixture for searching providers by name",
+  "method": "GET",
+  "endpoint": "/v1/providers",
+  "queryParams": {
+    "search": "aws"
+  },
+  "expectedStatus": 200,
+  "expectedFields": [
+    "providers",
+    "total",
+    "filters"
+  ],
+  "validation": {
+    "minProviders": 1,
+    "searchTerm": "aws",
+    "searchInFields": ["name", "fullName", "description"]
+  }
+}

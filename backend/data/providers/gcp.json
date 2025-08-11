@@ -1,0 +1,141 @@
+{
+  "id": "gcp",
+  "name": "GCP",
+  "fullName": "Google Cloud Platform",
+  "description": "Google Cloud Platform (GCP) is a suite of cloud computing services that runs on the same infrastructure that Google uses internally for its end-user products.",
+  "status": "active",
+  "website": "https://cloud.google.com/certification",
+  "logoUrl": "https://cloud.google.com/_static/cloud/images/cloud-logo.svg",
+  "category": "cloud",
+  "certifications": [
+    {
+      "id": "gcp-cloud-digital-leader",
+      "name": "Cloud Digital Leader",
+      "fullName": "Google Cloud Certified - Cloud Digital Leader",
+      "code": "Cloud Digital Leader",
+      "description": "The Cloud Digital Leader exam assesses your knowledge of cloud computing basics and how Google Cloud products and services can be used to achieve an organization's goals.",
+      "level": "foundational",
+      "status": "active",
+      "examCode": "Cloud Digital Leader",
+      "passingScore": null,
+      "maxScore": null,
+      "duration": 90,
+      "questionCount": 50,
+      "cost": 99,
+      "validityPeriod": 36,
+      "prerequisites": [],
+      "topics": [
+        "Digital transformation with Google Cloud",
+        "Innovating with data and Google Cloud",
+        "Infrastructure and application modernization",
+        "Understanding Google Cloud security and operations"
+      ],
+      "skillsValidated": [
+        "General cloud knowledge",
+        "General Google Cloud knowledge",
+        "Google Cloud products and services",
+        "Common business use cases",
+        "Benefits of Google Cloud"
+      ],
+      "examFormat": "multiple_choice",
+      "languages": ["English", "Spanish", "Portuguese", "French", "German", "Italian", "Indonesian", "Japanese"],
+      "retakePolicy": "14 days waiting period after failed attempt",
+      "studyResources": [
+        {
+          "type": "official_guide",
+          "title": "Cloud Digital Leader Learning Path",
+          "url": "https://cloud.google.com/training/business#cloud-digital-leader-path",
+          "description": "Official Google Cloud training path",
+          "isFree": true,
+          "provider": "Google Cloud"
+        }
+      ],
+      "metadata": {
+        "difficultyLevel": 2,
+        "popularityRank": 3,
+        "passRate": 75,
+        "marketDemand": "medium",
+        "salaryImpact": "entry-level",
+        "jobRoles": ["Business Analyst", "Marketing Manager", "Sales Representative", "Project Manager"],
+        "industries": ["Technology", "Retail", "Media", "Manufacturing"],
+        "nextStepCertifications": ["gcp-ace", "gcp-pca"],
+        "studyTimeRecommended": 30,
+        "handsOnExperience": false
+      },
+      "createdAt": "2023-01-01T00:00:00Z",
+      "updatedAt": "2024-01-01T00:00:00Z"
+    },
+    {
+      "id": "gcp-ace",
+      "name": "Associate Cloud Engineer",
+      "fullName": "Google Cloud Certified - Associate Cloud Engineer",
+      "code": "Associate Cloud Engineer",
+      "description": "The Associate Cloud Engineer exam assesses the skills required to deploy applications, monitor operations, and manage enterprise solutions.",
+      "level": "associate",
+      "status": "active",
+      "examCode": "Associate Cloud Engineer",
+      "passingScore": null,
+      "maxScore": null,
+      "duration": 120,
+      "questionCount": 50,
+      "cost": 125,
+      "validityPeriod": 36,
+      "prerequisites": ["6+ months hands-on experience with Google Cloud"],
+      "topics": [
+        "Setting up a cloud solution environment",
+        "Planning and configuring a cloud solution",
+        "Deploying and implementing a cloud solution",
+        "Ensuring successful operation of a cloud solution",
+        "Configuring access and security"
+      ],
+      "skillsValidated": [
+        "Set up a cloud solution environment",
+        "Plan and configure a cloud solution",
+        "Deploy and implement a cloud solution",
+        "Ensure successful operation of a cloud solution",
+        "Configure access and security"
+      ],
+      "examFormat": "multiple_choice",
+      "languages": ["English", "Spanish", "Portuguese", "French", "German", "Italian", "Indonesian", "Japanese"],
+      "retakePolicy": "14 days waiting period after failed attempt",
+      "studyResources": [
+        {
+          "type": "official_guide",
+          "title": "Associate Cloud Engineer Learning Path",
+          "url": "https://cloud.google.com/training/cloud-infrastructure#cloud-engineer-learning-path",
+          "description": "Official Google Cloud training path",
+          "isFree": true,
+          "provider": "Google Cloud"
+        }
+      ],
+      "metadata": {
+        "difficultyLevel": 3,
+        "popularityRank": 1,
+        "passRate": 68,
+        "marketDemand": "high",
+        "salaryImpact": "medium-high",
+        "jobRoles": ["Cloud Engineer", "DevOps Engineer", "Systems Administrator"],
+        "industries": ["Technology", "Finance", "Healthcare", "Media"],
+        "nextStepCertifications": ["gcp-pca", "gcp-pde"],
+        "studyTimeRecommended": 80,
+        "handsOnExperience": true
+      },
+      "createdAt": "2023-01-01T00:00:00Z",
+      "updatedAt": "2024-01-01T00:00:00Z"
+    }
+  ],
+  "metadata": {
+    "headquarters": "Mountain View, California, USA",
+    "founded": 2008,
+    "industry": "Cloud Computing",
+    "specialization": ["Machine Learning", "Data Analytics", "Kubernetes", "Open Source"],
+    "marketShare": "9%",
+    "popularCertifications": ["gcp-ace", "gcp-pca", "gcp-pde"],
+    "difficultyRating": 4,
+    "jobMarketDemand": "medium",
+    "averageSalary": "$80,000 - $160,000",
+    "careerPaths": ["Cloud Engineer", "Data Engineer", "ML Engineer", "DevOps Engineer"]
+  },
+  "createdAt": "2023-01-01T00:00:00Z",
+  "updatedAt": "2024-01-01T00:00:00Z"
+}

@@ -1,0 +1,150 @@
+{
+  "id": "comptia",
+  "name": "CompTIA",
+  "fullName": "Computing Technology Industry Association",
+  "description": "CompTIA is a non-profit trade association that provides professional certifications for the information technology industry.",
+  "status": "active",
+  "website": "https://www.comptia.org/certifications",
+  "logoUrl": "https://www.comptia.org/etc/designs/comptia/images/logos/comptia-logo.svg",
+  "category": "general_it",
+  "certifications": [
+    {
+      "id": "comptia-a-plus",
+      "name": "A+",
+      "fullName": "CompTIA A+ Certification",
+      "code": "220-1101 & 220-1102",
+      "description": "CompTIA A+ is an entry-level certification that validates the foundation-level skills necessary to perform core IT job functions.",
+      "level": "foundational",
+      "status": "active",
+      "examCode": "220-1101 & 220-1102",
+      "passingScore": 675,
+      "maxScore": 900,
+      "duration": 90,
+      "questionCount": 90,
+      "cost": 370,
+      "validityPeriod": 36,
+      "prerequisites": [],
+      "topics": [
+        "Hardware and Network Troubleshooting",
+        "Operating Systems",
+        "Security",
+        "Software Troubleshooting",
+        "Operational Procedures"
+      ],
+      "skillsValidated": [
+        "Install and configure PC system unit components",
+        "Install and configure laptop components",
+        "Use appropriate safety procedures",
+        "Install and configure printers",
+        "Install and configure mobile devices"
+      ],
+      "examFormat": "multiple_choice",
+      "languages": ["English", "Spanish", "Portuguese", "German", "Arabic", "Thai", "Vietnamese"],
+      "retakePolicy": "No waiting period for first retake",
+      "studyResources": [
+        {
+          "type": "official_guide",
+          "title": "CompTIA A+ Core Series",
+          "url": "https://www.comptia.org/training/resources/comptia-a-core-series",
+          "description": "Official CompTIA training materials",
+          "isFree": false,
+          "provider": "CompTIA"
+        },
+        {
+          "type": "practice_exam",
+          "title": "CompTIA A+ Practice Tests",
+          "url": "https://www.comptia.org/training/resources/practice-tests",
+          "description": "Official practice tests from CompTIA",
+          "isFree": false,
+          "provider": "CompTIA"
+        }
+      ],
+      "metadata": {
+        "difficultyLevel": 2,
+        "popularityRank": 1,
+        "passRate": 78,
+        "marketDemand": "high",
+        "salaryImpact": "entry-level",
+        "jobRoles": ["Help Desk Technician", "Field Service Technician", "Desktop Support Specialist"],
+        "industries": ["All Industries"],
+        "nextStepCertifications": ["comptia-network-plus", "comptia-security-plus"],
+        "studyTimeRecommended": 60,
+        "handsOnExperience": true
+      },
+      "createdAt": "2023-01-01T00:00:00Z",
+      "updatedAt": "2024-01-01T00:00:00Z"
+    },
+    {
+      "id": "comptia-security-plus",
+      "name": "Security+",
+      "fullName": "CompTIA Security+ Certification",
+      "code": "SY0-601",
+      "description": "CompTIA Security+ is a global certification that validates the baseline skills necessary to perform core security functions.",
+      "level": "associate",
+      "status": "active",
+      "examCode": "SY0-601",
+      "passingScore": 750,
+      "maxScore": 900,
+      "duration": 90,
+      "questionCount": 90,
+      "cost": 370,
+      "validityPeriod": 36,
+      "prerequisites": ["2 years experience in IT administration with security focus"],
+      "topics": [
+        "Attacks, Threats, and Vulnerabilities",
+        "Architecture and Design",
+        "Implementation",
+        "Operations and Incident Response",
+        "Governance, Risk, and Compliance"
+      ],
+      "skillsValidated": [
+        "Install and configure network components",
+        "Assess organizational security posture",
+        "Research and analyze security threats",
+        "Implement secure network architecture",
+        "Install and configure security controls"
+      ],
+      "examFormat": "multiple_choice",
+      "languages": ["English", "Spanish", "Portuguese", "German", "Arabic", "Thai", "Vietnamese"],
+      "retakePolicy": "No waiting period for first retake",
+      "studyResources": [
+        {
+          "type": "official_guide",
+          "title": "CompTIA Security+ Study Guide",
+          "url": "https://www.comptia.org/training/resources/study-guides",
+          "description": "Official CompTIA study guide",
+          "isFree": false,
+          "provider": "CompTIA"
+        }
+      ],
+      "metadata": {
+        "difficultyLevel": 3,
+        "popularityRank": 1,
+        "passRate": 83,
+        "marketDemand": "high",
+        "salaryImpact": "high",
+        "jobRoles": ["Security Specialist", "Security Administrator", "Systems Administrator", "Network Administrator"],
+        "industries": ["Government", "Finance", "Healthcare", "Technology"],
+        "nextStepCertifications": ["comptia-cysa-plus", "comptia-casp-plus"],
+        "studyTimeRecommended": 80,
+        "handsOnExperience": true
+      },
+      "createdAt": "2023-01-01T00:00:00Z",
+      "updatedAt": "2024-01-01T00:00:00Z"
+    }
+  ],
+  "metadata": {
+    "headquarters": "Downers Grove, Illinois, USA",
+    "founded": 1982,
+    "industry": "IT Certification",
+    "specialization": ["Vendor-neutral certifications", "Entry-level IT", "Security", "Networking"],
+    "marketShare": "Industry Standard",
+    "popularCertifications": ["comptia-security-plus", "comptia-a-plus", "comptia-network-plus"],
+    "difficultyRating": 3,
+    "jobMarketDemand": "high",
+    "averageSalary": "$45,000 - $120,000",
+    "careerPaths": ["IT Support Specialist", "Network Administrator", "Security Analyst", "Systems Administrator"]
+  },
+  "createdAt": "2023-01-01T00:00:00Z",
+  "updatedAt": "2024-01-01T00:00:00Z"
+}

@@ -12,6 +12,9 @@ export * from './auth.types';
 // Session Types
 export * from './session.types';
 
+// Provider Types
+export * from './provider.types';
+
 // Re-export commonly used AWS Lambda types
 export type {
   APIGatewayProxyEvent,

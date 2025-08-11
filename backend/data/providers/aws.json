@@ -1,0 +1,147 @@
+{
+  "id": "aws",
+  "name": "AWS",
+  "fullName": "Amazon Web Services",
+  "description": "Amazon Web Services (AWS) is the world's most comprehensive and broadly adopted cloud platform, offering over 200 fully featured services from data centers globally.",
+  "status": "active",
+  "website": "https://aws.amazon.com/certification/",
+  "logoUrl": "https://d1.awsstatic.com/logos/aws-logo-lockups/poweredbyaws/PB_AWS_logo_RGB.png",
+  "category": "cloud",
+  "certifications": [
+    {
+      "id": "aws-clf-c02",
+      "name": "Cloud Practitioner",
+      "fullName": "AWS Certified Cloud Practitioner",
+      "code": "CLF-C02",
+      "description": "The AWS Certified Cloud Practitioner validates foundational, high-level understanding of AWS Cloud, services, and terminology.",
+      "level": "foundational",
+      "status": "active",
+      "examCode": "CLF-C02",
+      "passingScore": 700,
+      "maxScore": 1000,
+      "duration": 90,
+      "questionCount": 65,
+      "cost": 100,
+      "validityPeriod": 36,
+      "prerequisites": [],
+      "topics": [
+        "Cloud Concepts",
+        "AWS Services",
+        "Security and Compliance",
+        "Billing and Pricing"
+      ],
+      "skillsValidated": [
+        "AWS Cloud concepts",
+        "AWS services and their common use cases",
+        "AWS Cloud architecture principles",
+        "Security and compliance within the AWS Cloud",
+        "AWS pricing models"
+      ],
+      "examFormat": "multiple_choice",
+      "languages": ["English", "Japanese", "Korean", "Simplified Chinese"],
+      "retakePolicy": "14 days waiting period after failed attempt",
+      "studyResources": [
+        {
+          "type": "official_guide",
+          "title": "AWS Cloud Practitioner Essentials",
+          "url": "https://aws.amazon.com/training/digital/aws-cloud-practitioner-essentials/",
+          "description": "Official AWS training course",
+          "isFree": true,
+          "provider": "AWS"
+        },
+        {
+          "type": "practice_exam",
+          "title": "AWS Certified Cloud Practitioner Official Practice Question Set",
+          "url": "https://aws.amazon.com/certification/certified-cloud-practitioner/",
+          "description": "Official practice questions from AWS",
+          "isFree": false,
+          "provider": "AWS"
+        }
+      ],
+      "metadata": {
+        "difficultyLevel": 2,
+        "popularityRank": 1,
+        "passRate": 85,
+        "marketDemand": "high",
+        "salaryImpact": "entry-level",
+        "jobRoles": ["Cloud Support Associate", "Sales", "Marketing", "Business Analyst"],
+        "industries": ["Technology", "Finance", "Healthcare", "Retail"],
+        "nextStepCertifications": ["aws-saa-c03", "aws-dva-c01", "aws-soa-c02"],
+        "studyTimeRecommended": 40,
+        "handsOnExperience": false
+      },
+      "createdAt": "2023-01-01T00:00:00Z",
+      "updatedAt": "2024-01-01T00:00:00Z"
+    },
+    {
+      "id": "aws-saa-c03",
+      "name": "Solutions Architect Associate",
+      "fullName": "AWS Certified Solutions Architect - Associate",
+      "code": "SAA-C03",
+      "description": "The AWS Certified Solutions Architect - Associate examination is intended for individuals who perform a solutions architect role and have one or more years of hands-on experience designing available, cost-efficient, fault-tolerant, and scalable distributed systems on AWS.",
+      "level": "associate",
+      "status": "active",
+      "examCode": "SAA-C03",
+      "passingScore": 720,
+      "maxScore": 1000,
+      "duration": 130,
+      "questionCount": 65,
+      "cost": 150,
+      "validityPeriod": 36,
+      "prerequisites": ["6-12 months hands-on experience with AWS"],
+      "topics": [
+        "Design Resilient Architectures",
+        "Design High-Performing Architectures",
+        "Design Secure Applications and Architectures",
+        "Design Cost-Optimized Architectures"
+      ],
+      "skillsValidated": [
+        "Design resilient architectures",
+        "Design high-performing architectures",
+        "Design secure applications and architectures",
+        "Design cost-optimized architectures"
+      ],
+      "examFormat": "multiple_choice",
+      "languages": ["English", "Japanese", "Korean", "Simplified Chinese"],
+      "retakePolicy": "14 days waiting period after failed attempt",
+      "studyResources": [
+        {
+          "type": "official_guide",
+          "title": "Architecting on AWS",
+          "url": "https://aws.amazon.com/training/classroom/architecting-on-aws/",
+          "description": "Official AWS training course",
+          "isFree": false,
+          "provider": "AWS"
+        }
+      ],
+      "metadata": {
+        "difficultyLevel": 4,
+        "popularityRank": 1,
+        "passRate": 70,
+        "marketDemand": "high",
+        "salaryImpact": "high",
+        "jobRoles": ["Solutions Architect", "Cloud Engineer", "DevOps Engineer"],
+        "industries": ["Technology", "Finance", "Healthcare", "Government"],
+        "nextStepCertifications": ["aws-sap-c02", "aws-ans-c01"],
+        "studyTimeRecommended": 120,
+        "handsOnExperience": true
+      },
+      "createdAt": "2023-01-01T00:00:00Z",
+      "updatedAt": "2024-01-01T00:00:00Z"
+    }
+  ],
+  "metadata": {
+    "headquarters": "Seattle, Washington, USA",
+    "founded": 2006,
+    "industry": "Cloud Computing",
+    "specialization": ["Infrastructure as a Service", "Platform as a Service", "Software as a Service"],
+    "marketShare": "32%",
+    "popularCertifications": ["aws-saa-c03", "aws-clf-c02", "aws-dva-c01"],
+    "difficultyRating": 4,
+    "jobMarketDemand": "high",
+    "averageSalary": "$95,000 - $180,000",
+    "careerPaths": ["Cloud Architect", "DevOps Engineer", "Cloud Engineer", "Solutions Architect"]
+  },
+  "createdAt": "2023-01-01T00:00:00Z",
+  "updatedAt": "2024-01-01T00:00:00Z"
+}

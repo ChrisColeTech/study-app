@@ -1,0 +1,20 @@
+{
+  "description": "Test fixture for listing providers with filters",
+  "method": "GET",
+  "endpoint": "/v1/providers",
+  "queryParams": {
+    "category": "cloud",
+    "status": "active"
+  },
+  "expectedStatus": 200,
+  "expectedFields": [
+    "providers",
+    "total",
+    "filters"
+  ],
+  "validation": {
+    "minProviders": 3,
+    "allProvidersCategory": "cloud",
+    "allProvidersStatus": "active"
+  }
+}
