@@ -33,7 +33,7 @@ export class TopicRepository implements ITopicRepository {
   }
 
   /**
-   * Get all topics from S3
+   * Get all topics from S3 (extracted from question files)
    */
   async findAll(): Promise<Topic[]> {
     const cacheKey = 'all-topics';
@@ -48,10 +48,10 @@ export class TopicRepository implements ITopicRepository {
     try {
       this.logger.info('Loading all topics from S3', { bucket: this.bucketName });
 
-      // List all provider directories to find topic files
+      // List all question files to extract topics from
       const listCommand = new ListObjectsV2Command({
         Bucket: this.bucketName,
-        Prefix: this.PROVIDERS_PREFIX,
+        Prefix: 'questions/',
         MaxKeys: 1000
       });
 
@@ -59,22 +59,22 @@ export class TopicRepository implements ITopicRepository {
       const allTopics: Topic[] = [];
 
       if (listResult.Contents) {
-        // Find all topics.json files
-        const topicFiles = listResult.Contents.filter(obj => 
+        // Find all questions.json files
+        const questionFiles = listResult.Contents.filter(obj => 
           obj.Key && 
-          obj.Key.includes('/topics.json')
+          obj.Key.endsWith('/questions.json')
         );
 
-        this.logger.info('Found topic files', { count: topicFiles.length });
+        this.logger.info('Found question files to extract topics from', { count: questionFiles.length });
 
-        // Load each topic file
-        for (const file of topicFiles) {
+        // Load each question file and extract topics
+        for (const file of questionFiles) {
           if (file.Key) {
             try {
-              const topics = await this.loadTopicFile(file.Key);
+              const topics = await this.loadTopicsFromQuestionFile(file.Key);
               allTopics.push(...topics);
             } catch (error) {
-              this.logger.warn('Failed to load topic file', { 
+              this.logger.warn('Failed to load topics from question file', { 
                 file: file.Key,
                 error: (error as Error).message
               });
@@ -92,6 +92,16 @@ export class TopicRepository implements ITopicRepository {
 
       return allTopics;
     } catch (error) {
+      // Handle specific S3 errors gracefully
+      const errorName = (error as any).name;
+      if (errorName === 'NoSuchBucket' || errorName === 'AccessDenied') {
+        this.logger.warn('S3 bucket not accessible - returning empty results', { 
+          bucket: this.bucketName,
+          error: (error as Error).message 
+        });
+        return [];
+      }
+      
       this.logger.error('Failed to load topics from S3', error as Error);
       throw new Error('Failed to load topic data');
     }
@@ -178,8 +188,37 @@ export class TopicRepository implements ITopicRepository {
     try {
       this.logger.info('Loading topics by provider from S3', { providerId, bucket: this.bucketName });
 
-      const topicKey = `${this.PROVIDERS_PREFIX}${providerId}/topics.json`;
-      const topics = await this.loadTopicFile(topicKey);
+      // List question files for this provider
+      const listCommand = new ListObjectsV2Command({
+        Bucket: this.bucketName,
+        Prefix: `questions/${providerId}/`,
+        MaxKeys: 1000
+      });
+
+      const listResult = await this.s3Client.send(listCommand);
+      const topics: Topic[] = [];
+
+      if (listResult.Contents) {
+        const questionFiles = listResult.Contents.filter(obj => 
+          obj.Key && 
+          obj.Key.endsWith('/questions.json')
+        );
+
+        // Load each question file and extract topics for this provider
+        for (const file of questionFiles) {
+          if (file.Key) {
+            try {
+              const providerTopics = await this.loadTopicsFromQuestionFile(file.Key);
+              topics.push(...providerTopics);
+            } catch (error) {
+              this.logger.warn('Failed to load topics from question file', { 
+                file: file.Key,
+                error: (error as Error).message
+              });
+            }
+          }
+        }
+      }
 
       // Cache the results
       this.setCache(cacheKey, topics);
@@ -205,9 +244,9 @@ export class TopicRepository implements ITopicRepository {
   }
 
   /**
-   * Load a single topic file from S3
+   * Load topics from a question file (extract topics from question data)
    */
-  private async loadTopicFile(key: string): Promise<Topic[]> {
+  private async loadTopicsFromQuestionFile(key: string): Promise<Topic[]> {
     try {
       const getCommand = new GetObjectCommand({
         Bucket: this.bucketName,
@@ -218,19 +257,50 @@ export class TopicRepository implements ITopicRepository {
       
       if (result.Body) {
         const content = await result.Body.transformToString();
-        const topicData = JSON.parse(content);
+        const questionData = JSON.parse(content);
         
-        // Handle different topic file formats
-        if (Array.isArray(topicData)) {
-          return topicData as Topic[];
-        } else if (topicData.topics && Array.isArray(topicData.topics)) {
-          return topicData.topics as Topic[];
-        } else if (this.isValidTopic(topicData)) {
-          return [topicData as Topic];
-        } else {
-          this.logger.warn('Invalid topic file format', { key });
-          return [];
+        // Extract provider and exam info from file path
+        // e.g., questions/aws/saa-c03/questions.json -> provider=aws, exam=saa-c03
+        const pathParts = key.split('/');
+        const providerId = pathParts[1] || 'unknown';
+        const examId = pathParts[2] || 'unknown';
+        
+        // Extract unique topics from question data
+        const topicsMap = new Map<string, any>();
+        
+        // First, get topic statistics from metadata if available
+        if (questionData.metadata?.topic_statistics) {
+          Object.entries(questionData.metadata.topic_statistics).forEach(([topicName, stats]: [string, any]) => {
+            topicsMap.set(topicName, {
+              name: topicName,
+              questionCount: stats.total_questions || stats.answered_questions || 0,
+              coverage: stats.coverage_percentage || 0
+            });
+          });
         }
+        
+        // Then, extract topics from individual questions
+        if (questionData.study_data && Array.isArray(questionData.study_data)) {
+          questionData.study_data.forEach((item: any) => {
+            const topic = item.question?.topic || item.topic;
+            if (topic && typeof topic === 'string') {
+              if (!topicsMap.has(topic)) {
+                topicsMap.set(topic, { name: topic, questionCount: 1 });
+              } else {
+                const existing = topicsMap.get(topic);
+                existing.questionCount = (existing.questionCount || 0) + 1;
+              }
+            }
+          });
+        }
+        
+        // Transform to Topic objects
+        const topics: Topic[] = Array.from(topicsMap.entries()).map(([topicName, data]) => 
+          this.transformToTopic(topicName, data, providerId, examId, questionData.metadata)
+        );
+        
+        this.logger.debug(`Extracted ${topics.length} topics from ${key}`);
+        return topics;
       }
       return [];
     } catch (error) {
@@ -239,6 +309,180 @@ export class TopicRepository implements ITopicRepository {
       }
       throw error;
     }
+  }
+
+  /**
+   * Transform topic data to Topic format
+   */
+  private transformToTopic(topicName: string, data: any, providerId: string, examId: string, metadata?: any): Topic {
+    const topicId = `${providerId}-${examId}-${topicName.toLowerCase().replace(/[^a-z0-9]/g, '-')}`;
+    
+    return {
+      id: topicId,
+      name: topicName,
+      category: this.mapTopicToCategory(topicName),
+      providerId,
+      providerName: this.getProviderName(providerId),
+      examId,
+      examName: this.getExamName(examId),
+      examCode: examId.toUpperCase(),
+      level: this.inferTopicLevel(topicName, examId),
+      description: `${topicName} topics for ${examId.toUpperCase()} certification`,
+      skillsValidated: this.extractSkills(topicName),
+      metadata: {
+        difficultyLevel: this.mapDifficultyLevel(topicName),
+        marketDemand: this.assessMarketDemand(topicName),
+        jobRoles: this.getRelevantJobRoles(topicName),
+        industries: this.getRelevantIndustries(topicName),
+        studyTimeRecommended: this.estimateStudyTime(data.questionCount || 0),
+        customFields: {
+          questionCount: data.questionCount || 0,
+          coverage: data.coverage,
+          extractedFrom: 'question-data'
+        }
+      },
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+  }
+
+  /**
+   * Map topic names to categories
+   */
+  private mapTopicToCategory(topicName: string): string {
+    const categoryMap: Record<string, string> = {
+      'Storage Services': 'storage',
+      'Compute Services': 'compute',
+      'Monitoring & Management': 'management',
+      'Messaging & Integration': 'integration',
+      'Databases': 'database',
+      'Networking & Content Delivery': 'networking',
+      'Security & Identity': 'security'
+    };
+    return categoryMap[topicName] || 'general';
+  }
+
+  /**
+   * Get provider display name
+   */
+  private getProviderName(providerId: string): string {
+    const providerNames: Record<string, string> = {
+      'aws': 'Amazon Web Services',
+      'azure': 'Microsoft Azure',
+      'gcp': 'Google Cloud Platform',
+      'cisco': 'Cisco',
+      'comptia': 'CompTIA'
+    };
+    return providerNames[providerId] || providerId.toUpperCase();
+  }
+
+  /**
+   * Get exam display name
+   */
+  private getExamName(examId: string): string {
+    const examNames: Record<string, string> = {
+      'saa-c03': 'Solutions Architect Associate',
+      'saa-c02': 'Solutions Architect Associate',
+      'dva-c01': 'Developer Associate',
+      'soa-c02': 'SysOps Administrator Associate'
+    };
+    return examNames[examId] || examId.toUpperCase();
+  }
+
+  /**
+   * Infer topic level from exam
+   */
+  private inferTopicLevel(topicName: string, examId: string): string {
+    if (examId.includes('associate')) return 'associate';
+    if (examId.includes('professional')) return 'professional';
+    if (examId.includes('specialty')) return 'specialty';
+    if (examId.includes('foundational')) return 'foundational';
+    
+    // Default mapping based on exam patterns
+    if (examId.includes('saa') || examId.includes('dva') || examId.includes('soa')) return 'associate';
+    
+    return 'foundational';
+  }
+
+  /**
+   * Extract relevant skills from topic name
+   */
+  private extractSkills(topicName: string): string[] {
+    const skillsMap: Record<string, string[]> = {
+      'Storage Services': ['S3', 'EBS', 'EFS', 'Storage Gateway', 'Data lifecycle management'],
+      'Compute Services': ['EC2', 'Lambda', 'ECS', 'Auto Scaling', 'Load Balancing'],
+      'Monitoring & Management': ['CloudWatch', 'CloudTrail', 'Config', 'Systems Manager'],
+      'Messaging & Integration': ['SQS', 'SNS', 'EventBridge', 'API Gateway'],
+      'Databases': ['RDS', 'DynamoDB', 'Aurora', 'ElastiCache', 'Redshift'],
+      'Networking & Content Delivery': ['VPC', 'CloudFront', 'Route 53', 'Direct Connect'],
+      'Security & Identity': ['IAM', 'KMS', 'Cognito', 'WAF', 'Shield']
+    };
+    return skillsMap[topicName] || [topicName];
+  }
+
+  /**
+   * Map difficulty level (1-5 scale)
+   */
+  private mapDifficultyLevel(topicName: string): number {
+    const difficultyMap: Record<string, number> = {
+      'Storage Services': 3,
+      'Compute Services': 4,
+      'Monitoring & Management': 3,
+      'Messaging & Integration': 4,
+      'Databases': 4,
+      'Networking & Content Delivery': 5,
+      'Security & Identity': 5
+    };
+    return difficultyMap[topicName] || 3;
+  }
+
+  /**
+   * Assess market demand
+   */
+  private assessMarketDemand(topicName: string): string {
+    const demandMap: Record<string, string> = {
+      'Storage Services': 'high',
+      'Compute Services': 'high',
+      'Monitoring & Management': 'medium',
+      'Messaging & Integration': 'high',
+      'Databases': 'high',
+      'Networking & Content Delivery': 'medium',
+      'Security & Identity': 'high'
+    };
+    return demandMap[topicName] || 'medium';
+  }
+
+  /**
+   * Get relevant job roles
+   */
+  private getRelevantJobRoles(topicName: string): string[] {
+    const jobRolesMap: Record<string, string[]> = {
+      'Storage Services': ['Solutions Architect', 'Cloud Engineer', 'DevOps Engineer'],
+      'Compute Services': ['Solutions Architect', 'Cloud Engineer', 'DevOps Engineer', 'Software Developer'],
+      'Monitoring & Management': ['DevOps Engineer', 'Site Reliability Engineer', 'Cloud Operations'],
+      'Messaging & Integration': ['Solutions Architect', 'Integration Developer', 'API Developer'],
+      'Databases': ['Database Administrator', 'Data Engineer', 'Solutions Architect'],
+      'Networking & Content Delivery': ['Network Engineer', 'Solutions Architect', 'Cloud Engineer'],
+      'Security & Identity': ['Security Engineer', 'Solutions Architect', 'Compliance Officer']
+    };
+    return jobRolesMap[topicName] || ['Cloud Professional'];
+  }
+
+  /**
+   * Get relevant industries
+   */
+  private getRelevantIndustries(topicName: string): string[] {
+    return ['Technology', 'Financial Services', 'Healthcare', 'E-commerce', 'Media', 'Government'];
+  }
+
+  /**
+   * Estimate study time based on question count
+   */
+  private estimateStudyTime(questionCount: number): number {
+    // Estimate 30 minutes per 10 questions + base study time
+    const baseHours = 8;
+    const questionHours = Math.ceil(questionCount / 10) * 0.5;
+    return baseHours + questionHours;
   }
 
   /**

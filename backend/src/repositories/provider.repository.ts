@@ -129,7 +129,7 @@ export class ProviderRepository implements IProviderRepository {
       this.logger.info('Loading provider from S3', { providerId, bucket: this.bucketName });
 
       // Try to load the specific provider file
-      const providerKey = `${this.PROVIDERS_PREFIX}${providerId}/provider.json`;
+      const providerKey = `${this.PROVIDERS_PREFIX}${providerId}.json`;
       const provider = await this.loadProviderFile(providerKey);
 
       if (provider) {
