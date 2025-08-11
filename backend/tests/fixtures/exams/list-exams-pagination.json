@@ -1,0 +1,41 @@
+{
+  "description": "Test fixture for exam pagination with limit and offset",
+  "method": "GET",
+  "endpoint": "/v1/exams",
+  "queryParams": {
+    "limit": "5",
+    "offset": "0"
+  },
+  "expectedStatus": 200,
+  "expectedFields": [
+    "exams",
+    "total", 
+    "filters",
+    "pagination"
+  ],
+  "validation": {
+    "paginationSettings": {
+      "limit": 5,
+      "offset": 0
+    },
+    "maxReturnedExams": 5,
+    "requiredPaginationFields": [
+      "limit",
+      "offset", 
+      "hasMore"
+    ],
+    "requiredExamFields": [
+      "examId",
+      "examName",
+      "examCode",
+      "providerId", 
+      "providerName",
+      "description",
+      "level",
+      "questionCount",
+      "topics",
+      "isActive",
+      "metadata"
+    ]
+  }
+}

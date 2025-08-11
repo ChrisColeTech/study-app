@@ -1,0 +1,36 @@
+{
+  "description": "Test fixture for listing all exams without filters",
+  "method": "GET",
+  "endpoint": "/v1/exams",
+  "queryParams": {},
+  "expectedStatus": 200,
+  "expectedFields": [
+    "exams",
+    "total",
+    "filters",
+    "pagination"
+  ],
+  "validation": {
+    "minExams": 10,
+    "requiredExamFields": [
+      "examId",
+      "examName",
+      "examCode",
+      "providerId",
+      "providerName",
+      "description",
+      "level",
+      "questionCount",
+      "topics",
+      "isActive",
+      "metadata"
+    ],
+    "validLevels": [
+      "foundational",
+      "associate", 
+      "professional",
+      "specialty",
+      "expert"
+    ]
+  }
+}

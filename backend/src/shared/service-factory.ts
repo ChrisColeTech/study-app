@@ -8,7 +8,8 @@ import { S3Client } from '@aws-sdk/client-s3';
 import type { IAuthService } from '../services/auth.service';
 import type { IUserService } from '../services/user.service';
 import type { IProviderService } from '../services/provider.service';
-export type { IAuthService, IUserService, IProviderService };
+import type { IExamService } from '../services/exam.service';
+export type { IAuthService, IUserService, IProviderService, IExamService };
 
 export interface IQuestionService {
   // Question service methods will be added in Phase 2
@@ -93,6 +94,7 @@ export class ServiceFactory {
   private _authService: IAuthService | null = null;
   private _userService: IUserService | null = null;
   private _providerService: IProviderService | null = null;
+  private _examService: IExamService | null = null;
   private _questionService: IQuestionService | null = null;
   private _sessionService: ISessionService | null = null;
   private _analyticsService: IAnalyticsService | null = null;
@@ -230,6 +232,17 @@ export class ServiceFactory {
   }
 
   /**
+   * Get Exam Service
+   */
+  public getExamService(): IExamService {
+    if (!this._examService) {
+      const { ExamService } = require('../services/exam.service');
+      this._examService = new ExamService(this.getS3Client(), this.getConfig().buckets.questionData);
+    }
+    return this._examService!;
+  }
+
+  /**
    * Get Question Service
    */
   public getQuestionService(): IQuestionService {
@@ -339,6 +352,7 @@ export class ServiceFactory {
     this._authService = null;
     this._userService = null;
     this._providerService = null;
+    this._examService = null;
     this._questionService = null;
     this._sessionService = null;
     this._analyticsService = null;

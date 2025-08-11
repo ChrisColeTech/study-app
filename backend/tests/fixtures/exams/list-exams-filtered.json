@@ -1,0 +1,35 @@
+{
+  "description": "Test fixture for listing exams with provider and level filters",
+  "method": "GET",
+  "endpoint": "/v1/exams",
+  "queryParams": {
+    "provider": "aws",
+    "level": "associate"
+  },
+  "expectedStatus": 200,
+  "expectedFields": [
+    "exams",
+    "total",
+    "filters",
+    "pagination"
+  ],
+  "validation": {
+    "filterValidation": {
+      "provider": "aws",
+      "level": "associate"
+    },
+    "requiredExamFields": [
+      "examId",
+      "examName", 
+      "examCode",
+      "providerId",
+      "providerName",
+      "description",
+      "level",
+      "questionCount",
+      "topics",
+      "isActive",
+      "metadata"
+    ]
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "description": "Test fixture for searching exams by name/description",
+  "method": "GET", 
+  "endpoint": "/v1/exams",
+  "queryParams": {
+    "search": "solutions"
+  },
+  "expectedStatus": 200,
+  "expectedFields": [
+    "exams",
+    "total",
+    "filters", 
+    "pagination"
+  ],
+  "validation": {
+    "searchTerm": "solutions",
+    "searchFields": [
+      "examName",
+      "description",
+      "topics"
+    ],
+    "requiredExamFields": [
+      "examId",
+      "examName",
+      "examCode", 
+      "providerId",
+      "providerName",
+      "description",
+      "level",
+      "questionCount",
+      "topics",
+      "isActive",
+      "metadata"
+    ]
+  }
+}

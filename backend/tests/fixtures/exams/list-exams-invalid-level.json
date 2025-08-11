@@ -1,0 +1,18 @@
+{
+  "description": "Test fixture for invalid level filter (should return 400 error)",
+  "method": "GET",
+  "endpoint": "/v1/exams",
+  "queryParams": {
+    "level": "invalid_level"
+  },
+  "expectedStatus": 400,
+  "expectedFields": [
+    "success",
+    "error"
+  ],
+  "validation": {
+    "shouldFail": true,
+    "errorType": "validation_error",
+    "errorMessage": "Invalid level"
+  }
+}

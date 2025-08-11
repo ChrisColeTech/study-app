@@ -1,0 +1,19 @@
+{
+  "description": "Test fixture for invalid pagination parameters (should return 400 error)",
+  "method": "GET", 
+  "endpoint": "/v1/exams",
+  "queryParams": {
+    "limit": "-5",
+    "offset": "invalid"
+  },
+  "expectedStatus": 400,
+  "expectedFields": [
+    "success",
+    "error"
+  ],
+  "validation": {
+    "shouldFail": true,
+    "errorType": "validation_error", 
+    "errorMessage": "Limit must be a number between 1 and 100"
+  }
+}
