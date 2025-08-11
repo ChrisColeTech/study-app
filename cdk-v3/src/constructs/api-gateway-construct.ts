@@ -9,7 +9,6 @@ export interface ApiGatewayConstructProps extends ApiGatewayProps {
 
 export class ApiGatewayConstruct extends Construct {
   public readonly restApi: cdk.aws_apigateway.RestApi;
-  public readonly tokenAuthorizer: cdk.aws_apigateway.TokenAuthorizer;
 
   constructor(scope: Construct, id: string, props: ApiGatewayConstructProps) {
     super(scope, id);
@@ -48,12 +47,7 @@ export class ApiGatewayConstruct extends Construct {
       },
     });
 
-    // Create TOKEN authorizer for protected endpoints (placeholder for Phase 2)
-    this.tokenAuthorizer = new cdk.aws_apigateway.TokenAuthorizer(this, 'TokenAuthorizer', {
-      handler: props.lambdaFunctions.auth, // Will be properly implemented in Phase 2
-      identitySource: 'method.request.header.Authorization',
-      resultsCacheTtl: cdk.Duration.minutes(5),
-    });
+    // Authorization will be implemented in a future phase
 
     // Health endpoint (public - no authorization required)
     const healthResource = this.restApi.root.addResource('health');
@@ -76,9 +70,26 @@ export class ApiGatewayConstruct extends Construct {
     // API version 1 routes
     const v1 = this.restApi.root.addResource('v1');
 
-    // Phase 1: Minimal endpoint structure for future implementation
+    // Auth endpoints with proper sub-paths
+    const authResource = v1.addResource('auth');
+    const authLambda = props.lambdaFunctions.auth;
+    const authIntegration = new cdk.aws_apigateway.LambdaIntegration(authLambda, {
+      proxy: true,
+      allowTestInvoke: !config.isProduction,
+    });
+
+    // Auth sub-resources (all public - no authorization)
+    const authSubPaths = ['register', 'login', 'refresh', 'logout', 'verify'];
+    authSubPaths.forEach(subPath => {
+      const subResource = authResource.addResource(subPath);
+      subResource.addMethod('POST', authIntegration);
+      if (subPath === 'verify') {
+        subResource.addMethod('GET', authIntegration); // GET for token verification
+      }
+    });
+
+    // Other endpoint configurations
     const endpointConfigs = [
-      { resource: 'auth', methods: ['POST', 'GET', 'PUT', 'DELETE'] },
       { resource: 'providers', methods: ['GET'] },
       { resource: 'exams', methods: ['GET'] },
       { resource: 'topics', methods: ['GET'] },
@@ -99,14 +110,8 @@ export class ApiGatewayConstruct extends Construct {
           allowTestInvoke: !config.isProduction,
         });
 
-        // Apply authorization based on endpoint
-        const methodOptions: cdk.aws_apigateway.MethodOptions = {
-          authorizer: resource === 'providers' || resource === 'exams' || resource === 'topics' || resource === 'auth' ? 
-            undefined : // Public endpoints (including auth for registration/login)
-            this.tokenAuthorizer, // Protected endpoints
-        };
-
-        apiResource.addMethod(method, integration, methodOptions);
+        // All endpoints are public for now - authorization in future phase
+        apiResource.addMethod(method, integration);
       });
 
       // Add {id} resource for individual resource operations
@@ -114,10 +119,7 @@ export class ApiGatewayConstruct extends Construct {
       ['GET', 'PUT', 'DELETE'].forEach(method => {
         idResource.addMethod(method, new cdk.aws_apigateway.LambdaIntegration(lambda, {
           proxy: true,
-        }), {
-          authorizer: resource === 'providers' || resource === 'exams' || resource === 'topics' || resource === 'auth' ? 
-            undefined : this.tokenAuthorizer, // Auth endpoints should also be public
-        });
+        }));
       });
     });
 
