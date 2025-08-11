@@ -1,0 +1,30 @@
+{
+  "description": "Test fixture for getting a single question by ID with default parameters",
+  "method": "GET",
+  "endpoint": "/v1/questions/aws-saa-c03-ec2-001",
+  "pathParams": {
+    "id": "aws-saa-c03-ec2-001"
+  },
+  "queryParams": {},
+  "expectedStatus": 200,
+  "expectedFields": [
+    "question"
+  ],
+  "validation": {
+    "requiredQuestionFields": [
+      "questionId",
+      "providerId",
+      "examId",
+      "questionText",
+      "options",
+      "correctAnswer",
+      "difficulty",
+      "type",
+      "explanation",
+      "metadata"
+    ],
+    "questionId": "aws-saa-c03-ec2-001",
+    "hasExplanation": true,
+    "hasMetadata": true
+  }
+}

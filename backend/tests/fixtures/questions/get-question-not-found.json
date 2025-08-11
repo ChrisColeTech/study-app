@@ -1,0 +1,18 @@
+{
+  "description": "Test fixture for getting a question that doesn't exist",
+  "method": "GET",
+  "endpoint": "/v1/questions/nonexistent-question-id",
+  "pathParams": {
+    "id": "nonexistent-question-id"
+  },
+  "queryParams": {},
+  "expectedStatus": 404,
+  "expectedFields": [
+    "success",
+    "message"
+  ],
+  "validation": {
+    "success": false,
+    "messageContains": "Question not found"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "description": "Test fixture for getting a single question by ID without explanation",
+  "method": "GET",
+  "endpoint": "/v1/questions/azure-az-900-compute-001",
+  "pathParams": {
+    "id": "azure-az-900-compute-001"
+  },
+  "queryParams": {
+    "includeExplanation": "false"
+  },
+  "expectedStatus": 200,
+  "expectedFields": [
+    "question"
+  ],
+  "validation": {
+    "requiredQuestionFields": [
+      "questionId",
+      "providerId", 
+      "examId",
+      "questionText",
+      "options",
+      "correctAnswer",
+      "difficulty",
+      "type",
+      "metadata"
+    ],
+    "excludedFields": ["explanation"],
+    "questionId": "azure-az-900-compute-001",
+    "hasExplanation": false,
+    "hasMetadata": true
+  }
+}

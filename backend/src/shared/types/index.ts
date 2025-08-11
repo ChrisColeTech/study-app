@@ -3,8 +3,15 @@
 // API Types
 export * from './api.types';
 
-// Domain Types  
-export * from './domain.types';
+// Domain Types (excluding conflicting interfaces that are redefined in specific type files)
+export type { 
+  User, 
+  UserPreferences, 
+  StudySession, 
+  SessionQuestion,
+  ExamProvider,
+  TopicAnalytics
+} from './domain.types';
 
 // Auth Types
 export * from './auth.types';

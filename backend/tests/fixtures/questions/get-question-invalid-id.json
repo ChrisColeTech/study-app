@@ -1,0 +1,18 @@
+{
+  "description": "Test fixture for getting a question with invalid ID format",
+  "method": "GET",
+  "endpoint": "/v1/questions/invalid@id#format",
+  "pathParams": {
+    "id": "invalid@id#format"
+  },
+  "queryParams": {},
+  "expectedStatus": 400,
+  "expectedFields": [
+    "success",
+    "message"
+  ],
+  "validation": {
+    "success": false,
+    "messageContains": "Invalid question ID format"
+  }
+}

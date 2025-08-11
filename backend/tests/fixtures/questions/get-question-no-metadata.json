@@ -1,0 +1,32 @@
+{
+  "description": "Test fixture for getting a single question by ID without metadata",
+  "method": "GET",
+  "endpoint": "/v1/questions/gcp-ace-storage-001",
+  "pathParams": {
+    "id": "gcp-ace-storage-001"
+  },
+  "queryParams": {
+    "includeMetadata": "false"
+  },
+  "expectedStatus": 200,
+  "expectedFields": [
+    "question"
+  ],
+  "validation": {
+    "requiredQuestionFields": [
+      "questionId",
+      "providerId",
+      "examId", 
+      "questionText",
+      "options",
+      "correctAnswer",
+      "difficulty",
+      "type",
+      "explanation"
+    ],
+    "questionId": "gcp-ace-storage-001",
+    "hasExplanation": true,
+    "hasMetadata": false,
+    "metadataEmpty": true
+  }
+}

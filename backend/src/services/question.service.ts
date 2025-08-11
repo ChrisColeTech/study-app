@@ -5,7 +5,9 @@ import { S3Client, GetObjectCommand, ListObjectsV2Command } from '@aws-sdk/clien
 import { 
   Question, 
   GetQuestionsRequest, 
-  GetQuestionsResponse, 
+  GetQuestionsResponse,
+  GetQuestionRequest,
+  GetQuestionResponse,
   IQuestionService,
   QuestionDifficulty,
   QuestionType
@@ -119,6 +121,205 @@ export class QuestionService implements IQuestionService {
       this.logger.error('Failed to get questions', error as Error);
       throw new Error('Failed to retrieve questions');
     }
+  }
+
+  /**
+   * Get individual question by ID
+   * Phase 13: Question Details Feature
+   */
+  async getQuestion(request: GetQuestionRequest): Promise<GetQuestionResponse> {
+    this.logger.info('Getting question by ID', { 
+      questionId: request.questionId,
+      includeExplanation: request.includeExplanation,
+      includeMetadata: request.includeMetadata
+    });
+
+    try {
+      // Check individual question cache first
+      const cacheKey = `question:${request.questionId}`;
+      const cached = this.getFromCache<Question>(cacheKey);
+      if (cached) {
+        this.logger.debug('Question retrieved from cache', { questionId: request.questionId });
+        
+        const question = this.processQuestionOutput(cached, request);
+        return { question };
+      }
+
+      // Search across all question files to find the question
+      const question = await this.findQuestionById(request.questionId);
+      
+      if (!question) {
+        this.logger.warn('Question not found', { questionId: request.questionId });
+        throw new Error(`Question not found: ${request.questionId}`);
+      }
+
+      // Cache the individual question
+      this.setCache(cacheKey, question);
+
+      const processedQuestion = this.processQuestionOutput(question, request);
+      
+      this.logger.info('Question retrieved successfully', { 
+        questionId: request.questionId,
+        providerId: processedQuestion.providerId,
+        examId: processedQuestion.examId
+      });
+
+      return { question: processedQuestion };
+
+    } catch (error) {
+      this.logger.error('Failed to get question', error as Error, { questionId: request.questionId });
+      
+      if ((error as Error).message.includes('not found')) {
+        throw error; // Re-throw not found errors as-is
+      }
+      
+      throw new Error(`Failed to retrieve question: ${request.questionId}`);
+    }
+  }
+
+  /**
+   * Find a specific question by ID across all S3 data
+   */
+  private async findQuestionById(questionId: string): Promise<Question | null> {
+    this.logger.debug('Searching for question across all data', { questionId });
+
+    try {
+      // Try to get all questions from cache first (most efficient if cache is warm)
+      const allQuestions = this.getFromCache<Question[]>('questions:all');
+      if (allQuestions) {
+        const question = allQuestions.find(q => q.questionId === questionId);
+        if (question) {
+          this.logger.debug('Question found in cached all questions', { questionId });
+          return question;
+        }
+      }
+
+      // If not in cache, search through provider/exam structure
+      const listCommand = new ListObjectsV2Command({
+        Bucket: this.bucketName,
+        Prefix: this.QUESTIONS_PREFIX,
+        Delimiter: '/'
+      });
+
+      const listResponse = await this.s3Client.send(listCommand);
+
+      if (listResponse.CommonPrefixes) {
+        // Search each provider
+        for (const prefix of listResponse.CommonPrefixes) {
+          if (prefix.Prefix) {
+            const providerId = prefix.Prefix.replace(this.QUESTIONS_PREFIX, '').replace('/', '');
+            
+            const question = await this.findQuestionInProvider(questionId, providerId);
+            if (question) {
+              this.logger.debug('Question found in provider', { questionId, providerId });
+              return question;
+            }
+          }
+        }
+      }
+
+      this.logger.debug('Question not found in any provider', { questionId });
+      return null;
+
+    } catch (error) {
+      this.logger.error('Error searching for question', error as Error, { questionId });
+      throw error;
+    }
+  }
+
+  /**
+   * Search for question within a specific provider
+   */
+  private async findQuestionInProvider(questionId: string, providerId: string): Promise<Question | null> {
+    try {
+      // Check if provider questions are cached
+      const providerQuestions = this.getFromCache<Question[]>(`questions:${providerId}:all`);
+      if (providerQuestions) {
+        const question = providerQuestions.find(q => q.questionId === questionId);
+        if (question) {
+          return question;
+        }
+      }
+
+      // List exams in the provider
+      const listCommand = new ListObjectsV2Command({
+        Bucket: this.bucketName,
+        Prefix: `${this.QUESTIONS_PREFIX}${providerId}/`,
+        Delimiter: '/'
+      });
+
+      const listResponse = await this.s3Client.send(listCommand);
+
+      if (listResponse.CommonPrefixes) {
+        // Search each exam
+        for (const prefix of listResponse.CommonPrefixes) {
+          if (prefix.Prefix) {
+            const examId = prefix.Prefix.replace(`${this.QUESTIONS_PREFIX}${providerId}/`, '').replace('/', '');
+            
+            const question = await this.findQuestionInProviderExam(questionId, providerId, examId);
+            if (question) {
+              return question;
+            }
+          }
+        }
+      }
+
+      return null;
+
+    } catch (error) {
+      this.logger.debug('Error searching provider for question', { questionId, providerId, error: (error as Error).message });
+      return null; // Continue searching other providers
+    }
+  }
+
+  /**
+   * Search for question within a specific provider/exam
+   */
+  private async findQuestionInProviderExam(questionId: string, providerId: string, examId: string): Promise<Question | null> {
+    try {
+      // Check if provider/exam questions are cached
+      const examQuestions = this.getFromCache<Question[]>(`questions:${providerId}:${examId}`);
+      if (examQuestions) {
+        const question = examQuestions.find(q => q.questionId === questionId);
+        if (question) {
+          return question;
+        }
+      }
+
+      // Load questions from S3 for this provider/exam
+      const questions = await this.loadQuestionsFromS3(providerId, examId);
+      const question = questions.find(q => q.questionId === questionId);
+      
+      return question || null;
+
+    } catch (error) {
+      this.logger.debug('Error searching provider/exam for question', { 
+        questionId, 
+        providerId, 
+        examId, 
+        error: (error as Error).message 
+      });
+      return null; // Continue searching
+    }
+  }
+
+  /**
+   * Process question output based on request flags
+   */
+  private processQuestionOutput(question: Question, request: GetQuestionRequest): Question {
+    const processedQuestion = { ...question };
+
+    // Strip explanation if not requested (default true for details endpoint)
+    if (request.includeExplanation === false) {
+      delete processedQuestion.explanation;
+    }
+
+    // Strip metadata if not requested (default true for details endpoint)  
+    if (request.includeMetadata === false) {
+      processedQuestion.metadata = {};
+    }
+
+    return processedQuestion;
   }
 
   /**

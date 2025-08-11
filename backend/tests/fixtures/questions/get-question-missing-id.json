@@ -1,0 +1,16 @@
+{
+  "description": "Test fixture for question endpoint without providing ID parameter",
+  "method": "GET", 
+  "endpoint": "/v1/questions/",
+  "pathParams": {},
+  "queryParams": {},
+  "expectedStatus": 400,
+  "expectedFields": [
+    "success",
+    "message"
+  ],
+  "validation": {
+    "success": false,
+    "messageContains": "Question ID is required"
+  }
+}

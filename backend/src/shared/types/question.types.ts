@@ -105,7 +105,19 @@ export interface GetQuestionsResponse {
   };
 }
 
+// Request/Response types for Question Details (Phase 13)
+export interface GetQuestionRequest {
+  questionId: string;
+  includeExplanation?: boolean;
+  includeMetadata?: boolean;
+}
+
+export interface GetQuestionResponse {
+  question: Question;
+}
+
 // Service interface
 export interface IQuestionService {
   getQuestions(request: GetQuestionsRequest): Promise<GetQuestionsResponse>;
+  getQuestion(request: GetQuestionRequest): Promise<GetQuestionResponse>;
 }

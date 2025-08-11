@@ -281,6 +281,120 @@ validate_pagination() {
     fi
 }
 
+# Validate individual question response (Phase 13)
+validate_single_question() {
+    local response_file=$1
+    local expected_question_id=$2
+    local expected_has_explanation=${3:-true}
+    local expected_has_metadata=${4:-true}
+    
+    if ! command -v jq >/dev/null 2>&1; then
+        log_warn "jq not available, skipping single question validation"
+        return 0
+    fi
+    
+    local question=$(jq '.data.question' "$response_file" 2>/dev/null || echo "{}")
+    
+    if [[ "$question" == "{}" ]]; then
+        log_error "No question found in response"
+        return 1
+    fi
+    
+    local valid=true
+    local actual_question_id=$(echo "$question" | jq -r '.questionId' 2>/dev/null || echo "")
+    
+    # Validate question ID
+    if [[ -n "$expected_question_id" && "$actual_question_id" != "$expected_question_id" ]]; then
+        log_error "Question ID mismatch: expected $expected_question_id, got $actual_question_id"
+        valid=false
+    fi
+    
+    # Validate explanation presence
+    local has_explanation=$(echo "$question" | jq 'has("explanation")' 2>/dev/null || echo "false")
+    if [[ "$expected_has_explanation" == "true" && "$has_explanation" != "true" ]]; then
+        log_error "Expected explanation to be present but it's missing"
+        valid=false
+    elif [[ "$expected_has_explanation" == "false" && "$has_explanation" == "true" ]]; then
+        log_error "Expected explanation to be absent but it's present"
+        valid=false
+    fi
+    
+    # Validate metadata presence
+    local metadata=$(echo "$question" | jq '.metadata' 2>/dev/null || echo "{}")
+    local metadata_empty=$(echo "$metadata" | jq 'length == 0' 2>/dev/null || echo "true")
+    
+    if [[ "$expected_has_metadata" == "true" && "$metadata_empty" == "true" ]]; then
+        log_warn "Expected metadata to have content but it's empty"
+    elif [[ "$expected_has_metadata" == "false" && "$metadata_empty" != "true" ]]; then
+        log_error "Expected metadata to be empty but it has content"
+        valid=false
+    fi
+    
+    # Check required fields
+    local required_fields=("questionId" "providerId" "examId" "questionText" "options" "correctAnswer" "difficulty" "type")
+    for field in "${required_fields[@]}"; do
+        if ! echo "$question" | jq -e "has(\"$field\")" >/dev/null 2>&1; then
+            log_error "Missing required question field: $field"
+            valid=false
+        fi
+    done
+    
+    if [[ "$valid" == "true" ]]; then
+        log_info "✅ Single question validation passed (ID: $actual_question_id, explanation: $has_explanation, metadata: $expected_has_metadata)"
+        return 0
+    else
+        log_error "❌ Single question validation failed"
+        return 1
+    fi
+}
+
+# Test individual question endpoint with path parameter
+test_question_endpoint() {
+    local question_id=$1
+    local query_params=$2
+    local description=$3
+    local expected_status=${4:-200}
+    
+    log_test "$description"
+    
+    # Build URL with question ID and query parameters
+    local full_url="$BASE_URL/v1/questions/$question_id"
+    if [[ -n "$query_params" ]]; then
+        full_url="$full_url?$query_params"
+    fi
+    
+    echo "  URL: GET $full_url"
+    
+    local curl_cmd="curl -s -w '%{http_code}' -X GET '$full_url' -H 'Content-Type: application/json'"
+    
+    local response=$(eval $curl_cmd)
+    local http_code="${response: -3}"
+    local body="${response%???}"
+    
+    echo "  HTTP Code: $http_code (expected: $expected_status)"
+    
+    # Pretty print JSON response if possible
+    if command -v jq >/dev/null 2>&1 && [[ -n "$body" ]]; then
+        echo "  Response:"
+        echo "$body" | jq . 2>/dev/null | sed 's/^/    /' || echo "    $body"
+    else
+        echo "  Response: $body"
+    fi
+    
+    # Save response for potential reuse
+    local test_name=$(echo "$description" | tr ' ' '_' | tr '[:upper:]' '[:lower:]')
+    echo "$body" > "$TEMP_DIR/${test_name}_response.json"
+    
+    # Check if status code matches expected
+    if [[ "$http_code" == "$expected_status" ]]; then
+        log_info "✅ Test passed"
+        return 0
+    else
+        log_error "❌ Test failed - Expected $expected_status, got $http_code"
+        return 1
+    fi
+}
+
 # Main test sequence
 main() {
     log_info "Starting Question Endpoints Test Suite"
@@ -457,6 +571,94 @@ main() {
         test_results+=("✅ Exclude Explanations")
     else
         test_results+=("❌ Exclude Explanations")
+    fi
+    echo
+
+    # === Phase 13: Question Details Tests ===
+    log_info "=== Phase 13: Question Details Tests ==="
+    echo
+
+    # Test 14: Get question by ID (basic)
+    total_tests=$((total_tests + 1))
+    if test_question_endpoint "aws-saa-c03-ec2-001" "" "Get Question by ID (Basic)" 200; then
+        validate_response "$TEMP_DIR/get_question_by_id_(basic)_response.json" "data"
+        validate_single_question "$TEMP_DIR/get_question_by_id_(basic)_response.json" "aws-saa-c03-ec2-001" true true
+        passed_tests=$((passed_tests + 1))
+        test_results+=("✅ Get Question by ID (Basic)")
+    else
+        test_results+=("❌ Get Question by ID (Basic)")
+    fi
+    echo
+
+    # Test 15: Get question without explanation
+    total_tests=$((total_tests + 1))
+    if test_question_endpoint "azure-az-900-compute-001" "includeExplanation=false" "Get Question without Explanation" 200; then
+        validate_response "$TEMP_DIR/get_question_without_explanation_response.json" "data"
+        validate_single_question "$TEMP_DIR/get_question_without_explanation_response.json" "azure-az-900-compute-001" false true
+        passed_tests=$((passed_tests + 1))
+        test_results+=("✅ Get Question without Explanation")
+    else
+        test_results+=("❌ Get Question without Explanation)")
+    fi
+    echo
+
+    # Test 16: Get question without metadata
+    total_tests=$((total_tests + 1))
+    if test_question_endpoint "gcp-ace-storage-001" "includeMetadata=false" "Get Question without Metadata" 200; then
+        validate_response "$TEMP_DIR/get_question_without_metadata_response.json" "data"
+        validate_single_question "$TEMP_DIR/get_question_without_metadata_response.json" "gcp-ace-storage-001" true false
+        passed_tests=$((passed_tests + 1))
+        test_results+=("✅ Get Question without Metadata")
+    else
+        test_results+=("❌ Get Question without Metadata")
+    fi
+    echo
+
+    # Test 17: Get question minimal (no explanation, no metadata)
+    total_tests=$((total_tests + 1))
+    if test_question_endpoint "cisco-ccna-routing-001" "includeExplanation=false&includeMetadata=false" "Get Question Minimal" 200; then
+        validate_response "$TEMP_DIR/get_question_minimal_response.json" "data"
+        validate_single_question "$TEMP_DIR/get_question_minimal_response.json" "cisco-ccna-routing-001" false false
+        passed_tests=$((passed_tests + 1))
+        test_results+=("✅ Get Question Minimal")
+    else
+        test_results+=("❌ Get Question Minimal")
+    fi
+    echo
+
+    # Test 18: Question not found (should return 404)
+    total_tests=$((total_tests + 1))
+    if test_question_endpoint "nonexistent-question-id" "" "Question Not Found" 404; then
+        validate_response "$TEMP_DIR/question_not_found_response.json" "success" "message"
+        # Check error message contains "not found"
+        local error_message=$(jq -r '.message' "$TEMP_DIR/question_not_found_response.json" 2>/dev/null || echo "")
+        if [[ "$error_message" == *"not found"* ]]; then
+            log_info "✅ Error message correctly indicates not found"
+        else
+            log_warn "⚠️ Error message may not indicate not found: $error_message"
+        fi
+        passed_tests=$((passed_tests + 1))
+        test_results+=("✅ Question Not Found (404)")
+    else
+        test_results+=("❌ Question Not Found (404)")
+    fi
+    echo
+
+    # Test 19: Invalid question ID format (should return 400)
+    total_tests=$((total_tests + 1))
+    if test_question_endpoint "invalid@id#format" "" "Invalid Question ID Format" 400; then
+        validate_response "$TEMP_DIR/invalid_question_id_format_response.json" "success" "message"
+        # Check error message contains "Invalid"
+        local error_message=$(jq -r '.message' "$TEMP_DIR/invalid_question_id_format_response.json" 2>/dev/null || echo "")
+        if [[ "$error_message" == *"Invalid"* ]]; then
+            log_info "✅ Error message correctly indicates invalid format"
+        else
+            log_warn "⚠️ Error message may not indicate invalid format: $error_message"
+        fi
+        passed_tests=$((passed_tests + 1))
+        test_results+=("✅ Invalid Question ID Format (400)")
+    else
+        test_results+=("❌ Invalid Question ID Format (400)")
     fi
     echo
 

@@ -1,0 +1,33 @@
+{
+  "description": "Test fixture for getting a single question by ID without explanation or metadata", 
+  "method": "GET",
+  "endpoint": "/v1/questions/cisco-ccna-routing-001",
+  "pathParams": {
+    "id": "cisco-ccna-routing-001"
+  },
+  "queryParams": {
+    "includeExplanation": "false",
+    "includeMetadata": "false"
+  },
+  "expectedStatus": 200,
+  "expectedFields": [
+    "question"
+  ],
+  "validation": {
+    "requiredQuestionFields": [
+      "questionId",
+      "providerId",
+      "examId",
+      "questionText", 
+      "options",
+      "correctAnswer",
+      "difficulty",
+      "type"
+    ],
+    "excludedFields": ["explanation"],
+    "questionId": "cisco-ccna-routing-001",
+    "hasExplanation": false,
+    "hasMetadata": false,
+    "metadataEmpty": true
+  }
+}

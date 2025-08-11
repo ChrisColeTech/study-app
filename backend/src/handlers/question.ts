@@ -8,6 +8,7 @@ import { createLogger } from '../shared/logger';
 import { ERROR_CODES } from '../shared/constants/error.constants';
 import { 
   GetQuestionsRequest,
+  GetQuestionRequest,
   QuestionDifficulty,
   QuestionType 
 } from '../shared/types/question.types';
@@ -28,6 +29,13 @@ export class QuestionHandler extends BaseHandler {
         method: 'GET',
         path: '/v1/questions',
         handler: this.getQuestions.bind(this),
+        requireAuth: false, // Public endpoint for now
+      },
+      // Get individual question details endpoint (Phase 13)
+      {
+        method: 'GET',
+        path: '/v1/questions/{id}',
+        handler: this.getQuestion.bind(this),
         requireAuth: false, // Public endpoint for now
       }
     ];
@@ -204,6 +212,87 @@ export class QuestionHandler extends BaseHandler {
       return this.error(
         ERROR_CODES.INTERNAL_ERROR,
         'Failed to retrieve questions'
+      );
+    }
+  }
+
+  /**
+   * Get individual question by ID
+   * Phase 13: Question Details Feature
+   * GET /v1/questions/{id}?includeExplanation=true&includeMetadata=true
+   */
+  private async getQuestion(context: HandlerContext): Promise<ApiResponse> {
+    try {
+      this.logger.info('Getting question by ID', { 
+        requestId: context.requestId,
+        pathParameters: context.event.pathParameters,
+        queryParams: context.event.queryStringParameters
+      });
+
+      // Get question ID from path parameters
+      const questionId = context.event.pathParameters?.id;
+      if (!questionId) {
+        return this.error(
+          ERROR_CODES.VALIDATION_ERROR,
+          'Question ID is required'
+        );
+      }
+
+      // Validate question ID format
+      if (!/^[a-zA-Z0-9_-]+$/.test(questionId)) {
+        return this.error(
+          ERROR_CODES.VALIDATION_ERROR,
+          'Invalid question ID format. Use alphanumeric characters, hyphens, and underscores only'
+        );
+      }
+
+      // Parse query parameters
+      const queryParams = context.event.queryStringParameters || {};
+      
+      const request: GetQuestionRequest = {
+        questionId,
+        // Default to true for explanation and metadata on details endpoint
+        includeExplanation: queryParams.includeExplanation !== 'false',
+        includeMetadata: queryParams.includeMetadata !== 'false'
+      };
+
+      // Get question from service
+      const questionService = this.serviceFactory.getQuestionService();
+      const result = await questionService.getQuestion(request);
+
+      this.logger.info('Question retrieved successfully', { 
+        requestId: context.requestId,
+        questionId: result.question.questionId,
+        providerId: result.question.providerId,
+        examId: result.question.examId
+      });
+
+      return this.success(result, 'Question retrieved successfully');
+
+    } catch (error: any) {
+      this.logger.error('Failed to get question', error, { 
+        requestId: context.requestId,
+        pathParameters: context.event.pathParameters
+      });
+
+      // Handle specific error types
+      if (error.message.includes('not found')) {
+        return this.error(
+          ERROR_CODES.NOT_FOUND,
+          'Question not found'
+        );
+      }
+
+      if (error.message.includes('Invalid') || error.message.includes('validation')) {
+        return this.error(
+          ERROR_CODES.VALIDATION_ERROR,
+          error.message
+        );
+      }
+
+      return this.error(
+        ERROR_CODES.INTERNAL_ERROR,
+        'Failed to retrieve question'
       );
     }
   }
