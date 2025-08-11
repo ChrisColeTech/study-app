@@ -22,23 +22,30 @@ export class AuthHandler extends BaseHandler {
       // User registration endpoint
       {
         method: 'POST',
-        path: '/auth/register',
+        path: '/v1/auth/register',
         handler: this.register.bind(this),
         requireAuth: false, // Public endpoint
       },
       // User login endpoint
       {
         method: 'POST',
-        path: '/auth/login',
+        path: '/v1/auth/login',
         handler: this.login.bind(this),
         requireAuth: false, // Public endpoint
       },
       // Token refresh endpoint
       {
         method: 'POST',
-        path: '/auth/refresh',
+        path: '/v1/auth/refresh',
         handler: this.refresh.bind(this),
         requireAuth: false, // Public endpoint (uses refresh token)
+      },
+      // Token logout endpoint
+      {
+        method: 'POST',
+        path: '/v1/auth/logout',
+        handler: this.logout.bind(this),
+        requireAuth: false, // Public endpoint (validates token in handler)
       },
     ];
   }
@@ -232,6 +239,56 @@ export class AuthHandler extends BaseHandler {
       return this.error(
         ERROR_CODES.INTERNAL_ERROR,
         'Token refresh failed'
+      );
+    }
+  }
+
+  /**
+   * User logout endpoint
+   */
+  private async logout(context: HandlerContext): Promise<ApiResponse> {
+    try {
+      this.logger.info('User logout attempt', { 
+        requestId: context.requestId,
+      });
+
+      // Extract token from Authorization header
+      const authHeader = context.event.headers?.Authorization || context.event.headers?.authorization;
+      if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return this.error(
+          ERROR_CODES.VALIDATION_ERROR,
+          'Authorization header with Bearer token is required'
+        );
+      }
+
+      const token = authHeader.substring(7);
+      
+      // Logout user (invalidate token)
+      const authService = this.serviceFactory.getAuthService();
+      await authService.logoutUser(token);
+
+      this.logger.info('User logged out successfully', { 
+        requestId: context.requestId,
+      });
+
+      return this.success({ message: 'Logged out successfully' }, 'Logout successful');
+
+    } catch (error: any) {
+      this.logger.error('Logout failed', error, { 
+        requestId: context.requestId,
+      });
+
+      // Handle specific error types
+      if (error.message.includes('Invalid token') || error.message.includes('expired')) {
+        return this.error(
+          ERROR_CODES.UNAUTHORIZED,
+          'Invalid or expired token'
+        );
+      }
+
+      return this.error(
+        ERROR_CODES.INTERNAL_ERROR,
+        'Logout failed'
       );
     }
   }
