@@ -209,7 +209,7 @@ jobs:
       - name: Upload sample question data
         run: |
           STAGE=${{ github.event.inputs.stage || 'dev' }}
-          BUCKET_NAME="studyappv3-data-$STAGE-${{ secrets.AWS_ACCOUNT_ID }}"
+          BUCKET_NAME="study-app-v3-$STAGE-question-data"
           
           # Upload AWS sample questions if they exist
           if [ -f "data/study_data_final.json" ]; then

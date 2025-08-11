@@ -13,6 +13,7 @@ export interface IAuthService {
   loginUser(loginData: LoginRequest): Promise<LoginResponse>;
   validateToken(token: string): Promise<JwtPayload>;
   refreshToken(refreshToken: string): Promise<LoginResponse>;
+  logoutUser(token: string): Promise<void>;
   hashPassword(password: string): Promise<string>;
   verifyPassword(password: string, hashedPassword: string): Promise<boolean>;
 }
@@ -278,6 +279,30 @@ export class AuthService implements IAuthService {
     // Check for at least one special character
     if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
       throw new Error('Password must contain at least one special character');
+    }
+  }
+
+  /**
+   * Logout user by invalidating token
+   * In Phase 5, this will implement token blacklisting
+   */
+  async logoutUser(token: string): Promise<void> {
+    try {
+      // Validate the token first
+      const decoded = await this.validateToken(token);
+      
+      this.logger.info('User logged out successfully', { 
+        userId: decoded.userId,
+        email: decoded.email 
+      });
+
+      // TODO: In Phase 5, implement token blacklisting using DynamoDB
+      // For now, logout is handled client-side by removing the token
+      // Future implementation will store blacklisted tokens in DynamoDB
+      
+    } catch (error) {
+      this.logger.error('Logout failed', error as Error);
+      throw new Error('Invalid token for logout');
     }
   }
 
