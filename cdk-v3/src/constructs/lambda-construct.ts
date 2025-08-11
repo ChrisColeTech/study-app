@@ -49,16 +49,8 @@ export class LambdaConstruct extends Construct {
       ...lambdaProps,
       functionName: StackConfig.getResourceName('health', props.environment),
       description: 'Study App V3 Health Monitoring Lambda',
-      code: cdk.aws_lambda.Code.fromAsset('../backend', {
-        bundling: {
-          image: cdk.aws_lambda.Runtime.NODEJS_18_X.bundlingImage,
-          command: [
-            'bash', '-c',
-            'cp -r /asset-input/* /asset-output/ && cd /asset-output && npm ci --only=production'
-          ],
-        },
-      }),
-      handler: 'dist/handlers/health.handler',
+      code: cdk.aws_lambda.Code.fromAsset('../backend/dist/bundled'),
+      handler: 'health.handler',
     });
 
     // Store health function in functions map
@@ -74,16 +66,8 @@ export class LambdaConstruct extends Construct {
       ...lambdaProps,
       functionName: StackConfig.getResourceName('auth', props.environment),
       description: 'Study App V3 Auth Lambda - Phase 3 Implementation',
-      code: cdk.aws_lambda.Code.fromAsset('../backend', {
-        bundling: {
-          image: cdk.aws_lambda.Runtime.NODEJS_18_X.bundlingImage,
-          command: [
-            'bash', '-c',
-            'cp -r /asset-input/* /asset-output/ && cd /asset-output && npm ci --only=production'
-          ],
-        },
-      }),
-      handler: 'dist/handlers/auth.handler',
+      code: cdk.aws_lambda.Code.fromAsset('../backend/dist/bundled'),
+      handler: 'auth.handler',
     });
     this.functions['auth'] = authFunction;
 

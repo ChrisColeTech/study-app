@@ -59,7 +59,7 @@ jobs:
         
       - name: Build Backend Lambda functions
         working-directory: ./backend
-        run: npm run build
+        run: npm run package
         
       - name: Run CDK Lambda tests
         working-directory: ./cdk-v3
