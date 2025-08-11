@@ -389,11 +389,23 @@ export class QuestionRepository implements IQuestionRepository {
         // Generate a unique question ID
         const questionId = `${providerId}-${examId}-${String(studyItem.question_number || i + 1).padStart(3, '0')}`;
         
-        // Parse options from the question text (basic implementation)
-        const { questionText, options } = this.parseQuestionAndOptions(studyItem.question || '');
+        // Extract question data from the nested structure
+        const questionData = studyItem.question || {};
+        const questionText = questionData.text || '';
+        const rawOptions = questionData.options || [];
         
-        // Parse correct answer (basic implementation)
-        const correctAnswer = this.parseCorrectAnswer(studyItem.answer || '');
+        // Transform options from [["A", "text"], ["B", "text"]] to ["text1", "text2"]
+        const options = rawOptions.map((opt: any) => {
+          if (Array.isArray(opt) && opt.length >= 2) {
+            return opt[1]; // Take the text part, skip the letter part
+          }
+          return opt;
+        });
+        
+        // Extract other fields from the study item
+        const topic = questionData.topic || studyItem.topic || 'general';
+        const difficulty = studyItem.difficulty || 'intermediate';
+        const correctAnswerIndex = studyItem.correct_answer || 0;
         
         const question: Question = {
           questionId,
@@ -401,13 +413,13 @@ export class QuestionRepository implements IQuestionRepository {
           examId,
           questionText,
           options,
-          correctAnswer,
-          explanation: studyItem.answer || '',
-          difficulty: 'intermediate' as any, // Default difficulty
-          type: 'multiple_choice' as any, // Default type based on options
-          tags: [],
-          topicId: 'general',
-          metadata: studyItem.study_metadata || {},
+          correctAnswer: correctAnswerIndex,
+          explanation: studyItem.explanation || studyItem.answer || '',
+          difficulty: difficulty as any,
+          type: 'multiple_choice' as any,
+          tags: studyItem.tags || [],
+          topicId: topic,
+          metadata: studyItem.study_metadata || studyItem.metadata || {},
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString()
         };
