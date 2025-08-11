@@ -62,8 +62,8 @@ export class DatabaseConstruct extends Construct {
       },
     });
 
-    // User Progress Table
-    this.userProgressTable = new cdk.aws_dynamodb.Table(this, 'UserProgressTable', {
+    // User Progress Table (V2 - with progressKey)
+    this.userProgressTable = new cdk.aws_dynamodb.Table(this, 'UserProgressTableV2', {
       tableName: StackConfig.getResourceName('user-progress', props.environment),
       partitionKey: {
         name: 'userId',
