@@ -244,6 +244,48 @@ export class SessionService implements ISessionService {
   }
 
   /**
+   * Delete a study session
+   * Phase 19: Session Deletion Feature
+   */
+  async deleteSession(sessionId: string): Promise<{ success: boolean; message: string }> {
+    this.logger.info('Deleting session', { sessionId });
+
+    try {
+      // First check if session exists
+      const existingSession = await this.sessionRepository.findById(sessionId);
+
+      if (!existingSession) {
+        throw new Error(`Session not found: ${sessionId}`);
+      }
+
+      // Check if session can be deleted (business logic)
+      if (existingSession.status === 'completed') {
+        throw new Error('Cannot delete completed sessions - they are archived for analytics');
+      }
+
+      // Update session status to 'abandoned' instead of hard delete for audit trail
+      await this.sessionRepository.update(sessionId, { 
+        status: 'abandoned',
+        updatedAt: new Date().toISOString()
+      });
+
+      this.logger.info('Session deleted successfully', { 
+        sessionId,
+        previousStatus: existingSession.status
+      });
+
+      return { 
+        success: true, 
+        message: 'Session deleted successfully' 
+      };
+
+    } catch (error) {
+      this.logger.error('Failed to delete session', error as Error, { sessionId });
+      throw error;
+    }
+  }
+
+  /**
    * Validate session creation request
    */
   private async validateSessionRequest(request: CreateSessionRequest): Promise<void> {

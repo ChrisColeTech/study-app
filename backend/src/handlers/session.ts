@@ -50,6 +50,12 @@ export class SessionHandler extends BaseHandler {
         path: '/v1/sessions/{id}',
         handler: this.updateSession.bind(this),
         requireAuth: false,
+      },
+      {
+        method: 'DELETE',
+        path: '/v1/sessions/{id}',
+        handler: this.deleteSession.bind(this),
+        requireAuth: false,
       }
     ];
   }
@@ -187,6 +193,43 @@ export class SessionHandler extends BaseHandler {
     });
 
     return ErrorHandlingMiddleware.createSuccessResponse(result, 'Session updated successfully');
+  }
+
+  /**
+   * Delete a study session - Phase 19 implementation
+   */
+  private async deleteSession(context: HandlerContext): Promise<ApiResponse> {
+    // No authentication required - sessions work independently (auth association in Phase 30)
+
+    // Parse path parameters using middleware
+    const { data: pathParams, error: parseError } = ParsingMiddleware.parsePathParams(context);
+    if (parseError) return parseError;
+
+    // Validate session ID
+    const sessionValidationError = this.validateSessionId(pathParams.id);
+    if (sessionValidationError) return sessionValidationError;
+
+    // Business logic only - delegate error handling to middleware
+    const { result, error } = await ErrorHandlingMiddleware.withErrorHandling(
+      async () => {
+        const sessionService = this.serviceFactory.getSessionService();
+        return await sessionService.deleteSession(pathParams.id);
+      },
+      {
+        requestId: context.requestId,
+        operation: ErrorContexts.Session.DELETE,
+        additionalInfo: { sessionId: pathParams.id }
+      }
+    );
+
+    if (error) return error;
+
+    this.logger.info('Session deleted successfully', { 
+      requestId: context.requestId,
+      sessionId: pathParams.id
+    });
+
+    return ErrorHandlingMiddleware.createSuccessResponse(result, 'Session deleted successfully');
   }
 
   /**

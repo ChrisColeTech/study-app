@@ -123,4 +123,5 @@ export interface ISessionService {
   createSession(request: CreateSessionRequest): Promise<CreateSessionResponse>;
   getSession(sessionId: string): Promise<GetSessionResponse>;
   updateSession(sessionId: string, request: UpdateSessionRequest): Promise<UpdateSessionResponse>;
+  deleteSession(sessionId: string): Promise<{ success: boolean; message: string }>;
 }
