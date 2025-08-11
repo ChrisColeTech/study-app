@@ -398,6 +398,18 @@ export class QuestionRepository implements IQuestionRepository {
         const content = await result.Body.transformToString();
         const questionData = JSON.parse(content);
         
+        // Debug logging to diagnose S3 reading issue
+        this.logger.info('Parsed question data structure', {
+          key,
+          isArray: Array.isArray(questionData),
+          hasQuestions: !!(questionData?.questions),
+          questionsIsArray: Array.isArray(questionData?.questions),
+          hasStudyData: !!(questionData?.study_data),
+          studyDataIsArray: Array.isArray(questionData?.study_data),
+          studyDataLength: questionData?.study_data?.length || 0,
+          topLevelKeys: typeof questionData === 'object' ? Object.keys(questionData) : 'not-object'
+        });
+        
         // Handle different question file formats
         if (Array.isArray(questionData)) {
           return questionData as Question[];
