@@ -1,0 +1,43 @@
+{
+  "description": "Test fixture for listing questions with comprehensive filters",
+  "method": "GET",
+  "endpoint": "/v1/questions",
+  "queryParams": {
+    "provider": "aws",
+    "exam": "saa-c03",
+    "topic": "ec2",
+    "difficulty": "intermediate",
+    "type": "multiple_choice",
+    "limit": "10",
+    "offset": "0",
+    "includeExplanations": "true",
+    "includeMetadata": "false"
+  },
+  "expectedStatus": 200,
+  "expectedFields": [
+    "questions",
+    "total",
+    "filters",
+    "pagination"
+  ],
+  "validation": {
+    "maxQuestions": 10,
+    "requiredQuestionFields": [
+      "questionId",
+      "providerId", 
+      "examId",
+      "questionText",
+      "options",
+      "correctAnswer",
+      "difficulty",
+      "type",
+      "explanation"
+    ],
+    "filteredValues": {
+      "providerId": "aws",
+      "examId": "saa-c03",
+      "difficulty": "intermediate",
+      "type": "multiple_choice"
+    }
+  }
+}

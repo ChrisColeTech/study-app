@@ -1,0 +1,24 @@
+{
+  "description": "Test fixture for question pagination with limit and offset",
+  "method": "GET",
+  "endpoint": "/v1/questions",
+  "queryParams": {
+    "limit": "5",
+    "offset": "10"
+  },
+  "expectedStatus": 200,
+  "expectedFields": [
+    "questions",
+    "total",
+    "filters",
+    "pagination"
+  ],
+  "validation": {
+    "maxQuestions": 5,
+    "pagination": {
+      "limit": 5,
+      "offset": 10,
+      "hasMoreCheck": true
+    }
+  }
+}

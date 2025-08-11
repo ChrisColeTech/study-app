@@ -1,0 +1,29 @@
+{
+  "description": "Test fixture for searching questions by text content",
+  "method": "GET",
+  "endpoint": "/v1/questions",
+  "queryParams": {
+    "search": "instance",
+    "limit": "20",
+    "includeExplanations": "true"
+  },
+  "expectedStatus": 200,
+  "expectedFields": [
+    "questions",
+    "total",
+    "filters",
+    "pagination"
+  ],
+  "validation": {
+    "maxQuestions": 20,
+    "searchValidation": {
+      "term": "instance",
+      "searchFields": [
+        "questionText",
+        "options",
+        "explanation",
+        "tags"
+      ]
+    }
+  }
+}

@@ -10,11 +10,8 @@ import type { IUserService } from '../services/user.service';
 import type { IProviderService } from '../services/provider.service';
 import type { IExamService } from '../services/exam.service';
 import type { ITopicService } from '../services/topic.service';
-export type { IAuthService, IUserService, IProviderService, IExamService, ITopicService };
-
-export interface IQuestionService {
-  // Question service methods will be added in Phase 2
-}
+import type { IQuestionService } from '../services/question.service';
+export type { IAuthService, IUserService, IProviderService, IExamService, ITopicService, IQuestionService };
 
 export interface ISessionService {
   // Session service methods will be added in Phase 2
@@ -260,10 +257,10 @@ export class ServiceFactory {
    */
   public getQuestionService(): IQuestionService {
     if (!this._questionService) {
-      // Will be implemented in Phase 2
-      throw new Error('QuestionService not implemented yet - Phase 2');
+      const { QuestionService } = require('../services/question.service');
+      this._questionService = new QuestionService(this.getS3Client(), this.getConfig().buckets.questionData);
     }
-    return this._questionService;
+    return this._questionService!;
   }
 
   /**

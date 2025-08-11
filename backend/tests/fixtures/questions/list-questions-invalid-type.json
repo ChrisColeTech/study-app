@@ -1,0 +1,14 @@
+{
+  "description": "Test fixture for invalid question type parameter validation",
+  "method": "GET",
+  "endpoint": "/v1/questions",
+  "queryParams": {
+    "type": "invalid_type",
+    "exam": "saa-c03"
+  },
+  "expectedStatus": 400,
+  "expectedError": {
+    "code": "VALIDATION_ERROR",
+    "messageContains": "Invalid type"
+  }
+}

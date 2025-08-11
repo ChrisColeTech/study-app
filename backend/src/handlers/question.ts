@@ -1,0 +1,229 @@
+// Question handler for Study App V3 Backend
+// Phase 12: Question Listing Feature
+
+import { BaseHandler, RouteConfig } from '../shared/base-handler';
+import { HandlerContext, ApiResponse } from '../shared/types/api.types';
+import { ServiceFactory } from '../shared/service-factory';
+import { createLogger } from '../shared/logger';
+import { ERROR_CODES } from '../shared/constants/error.constants';
+import { 
+  GetQuestionsRequest,
+  QuestionDifficulty,
+  QuestionType 
+} from '../shared/types/question.types';
+
+export class QuestionHandler extends BaseHandler {
+  private serviceFactory: ServiceFactory;
+  private logger = createLogger({ handler: 'QuestionHandler' });
+
+  constructor() {
+    super();
+    this.serviceFactory = ServiceFactory.getInstance();
+  }
+
+  protected setupRoutes(): void {
+    this.routes = [
+      // Get questions with filtering endpoint
+      {
+        method: 'GET',
+        path: '/v1/questions',
+        handler: this.getQuestions.bind(this),
+        requireAuth: false, // Public endpoint for now
+      }
+    ];
+  }
+
+  /**
+   * Get questions with comprehensive filtering
+   * GET /v1/questions?provider=aws&exam=saa-c03&topic=ec2&difficulty=intermediate&type=multiple_choice&search=instance&limit=20&offset=0&includeExplanations=true&includeMetadata=false
+   */
+  private async getQuestions(context: HandlerContext): Promise<ApiResponse> {
+    try {
+      this.logger.info('Getting questions', { 
+        requestId: context.requestId,
+        queryParams: context.event.queryStringParameters
+      });
+
+      // Parse query parameters
+      const queryParams = context.event.queryStringParameters || {};
+      
+      const request: GetQuestionsRequest = {};
+      
+      // Provider filter
+      if (queryParams.provider) {
+        request.provider = decodeURIComponent(queryParams.provider);
+      }
+      
+      // Exam filter
+      if (queryParams.exam) {
+        request.exam = decodeURIComponent(queryParams.exam);
+      }
+      
+      // Topic filter
+      if (queryParams.topic) {
+        request.topic = decodeURIComponent(queryParams.topic);
+      }
+      
+      // Difficulty filter
+      if (queryParams.difficulty) {
+        const difficulty = this.parseEnumParam(queryParams.difficulty, QuestionDifficulty);
+        if (difficulty) {
+          request.difficulty = difficulty;
+        } else {
+          return this.error(
+            ERROR_CODES.VALIDATION_ERROR,
+            `Invalid difficulty. Valid options: ${Object.values(QuestionDifficulty).join(', ')}`
+          );
+        }
+      }
+      
+      // Type filter
+      if (queryParams.type) {
+        const type = this.parseEnumParam(queryParams.type, QuestionType);
+        if (type) {
+          request.type = type;
+        } else {
+          return this.error(
+            ERROR_CODES.VALIDATION_ERROR,
+            `Invalid type. Valid options: ${Object.values(QuestionType).join(', ')}`
+          );
+        }
+      }
+      
+      // Tags filter (comma-separated)
+      if (queryParams.tags) {
+        request.tags = decodeURIComponent(queryParams.tags).split(',').map(tag => tag.trim());
+      }
+      
+      // Search filter
+      if (queryParams.search) {
+        request.search = decodeURIComponent(queryParams.search);
+      }
+      
+      // Pagination parameters
+      if (queryParams.limit) {
+        const limit = parseInt(queryParams.limit, 10);
+        if (isNaN(limit) || limit < 1 || limit > 100) {
+          return this.error(
+            ERROR_CODES.VALIDATION_ERROR,
+            'Limit must be a number between 1 and 100'
+          );
+        }
+        request.limit = limit;
+      }
+      
+      if (queryParams.offset) {
+        const offset = parseInt(queryParams.offset, 10);
+        if (isNaN(offset) || offset < 0) {
+          return this.error(
+            ERROR_CODES.VALIDATION_ERROR,
+            'Offset must be a non-negative number'
+          );
+        }
+        request.offset = offset;
+      }
+      
+      // Include flags
+      request.includeExplanations = queryParams.includeExplanations === 'true';
+      request.includeMetadata = queryParams.includeMetadata === 'true';
+
+      // Validate provider format if provided
+      if (request.provider && !/^[a-zA-Z0-9_-]+$/.test(request.provider)) {
+        return this.error(
+          ERROR_CODES.VALIDATION_ERROR,
+          'Invalid provider format. Use alphanumeric characters, hyphens, and underscores only'
+        );
+      }
+
+      // Validate exam format if provided
+      if (request.exam && !/^[a-zA-Z0-9_-]+$/.test(request.exam)) {
+        return this.error(
+          ERROR_CODES.VALIDATION_ERROR,
+          'Invalid exam format. Use alphanumeric characters, hyphens, and underscores only'
+        );
+      }
+
+      // Validate topic format if provided
+      if (request.topic && !/^[a-zA-Z0-9_-]+$/.test(request.topic)) {
+        return this.error(
+          ERROR_CODES.VALIDATION_ERROR,
+          'Invalid topic format. Use alphanumeric characters, hyphens, and underscores only'
+        );
+      }
+
+      // Validate search length
+      if (request.search && request.search.length > 200) {
+        return this.error(
+          ERROR_CODES.VALIDATION_ERROR,
+          'Search term too long. Maximum 200 characters'
+        );
+      }
+
+      // Get questions from service
+      const questionService = this.serviceFactory.getQuestionService();
+      const result = await questionService.getQuestions(request);
+
+      this.logger.info('Questions retrieved successfully', { 
+        requestId: context.requestId,
+        total: result.total,
+        returned: result.questions.length,
+        filters: {
+          provider: request.provider,
+          exam: request.exam,
+          topic: request.topic,
+          difficulty: request.difficulty,
+          type: request.type,
+          search: request.search,
+          tags: request.tags
+        }
+      });
+
+      return this.success(result, 'Questions retrieved successfully');
+
+    } catch (error: any) {
+      this.logger.error('Failed to get questions', error, { 
+        requestId: context.requestId,
+        queryParams: context.event.queryStringParameters
+      });
+
+      // Handle specific error types
+      if (error.message.includes('not found') || error.message.includes('NoSuchKey')) {
+        return this.error(
+          ERROR_CODES.NOT_FOUND,
+          'Questions not found for the specified criteria'
+        );
+      }
+
+      if (error.message.includes('Invalid') || error.message.includes('validation')) {
+        return this.error(
+          ERROR_CODES.VALIDATION_ERROR,
+          error.message
+        );
+      }
+
+      return this.error(
+        ERROR_CODES.INTERNAL_ERROR,
+        'Failed to retrieve questions'
+      );
+    }
+  }
+
+  /**
+   * Helper method to parse enum parameters safely
+   */
+  private parseEnumParam<T extends Record<string, string>>(
+    value: string | undefined, 
+    enumObj: T
+  ): T[keyof T] | undefined {
+    if (!value) return undefined;
+    
+    const upperValue = value.toUpperCase();
+    const enumValues = Object.values(enumObj) as string[];
+    
+    return enumValues.find(v => v.toUpperCase() === upperValue) as T[keyof T] | undefined;
+  }
+}
+
+// Export handler function for Lambda
+const questionHandler = new QuestionHandler();
+export const handler = questionHandler.handle;

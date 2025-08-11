@@ -15,6 +15,15 @@ export * from './session.types';
 // Provider Types
 export * from './provider.types';
 
+// Exam Types
+export * from './exam.types';
+
+// Topic Types
+export * from './topic.types';
+
+// Question Types
+export * from './question.types';
+
 // Re-export commonly used AWS Lambda types
 export type {
   APIGatewayProxyEvent,

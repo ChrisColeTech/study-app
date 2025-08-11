@@ -1,0 +1,14 @@
+{
+  "description": "Test fixture for invalid pagination parameters",
+  "method": "GET",
+  "endpoint": "/v1/questions",
+  "queryParams": {
+    "limit": "150",
+    "offset": "-5"
+  },
+  "expectedStatus": 400,
+  "expectedError": {
+    "code": "VALIDATION_ERROR",
+    "messageContains": "Limit must be a number between 1 and 100"
+  }
+}

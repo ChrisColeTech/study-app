@@ -1,0 +1,36 @@
+{
+  "description": "Test fixture for filtering questions by provider and exam",
+  "method": "GET",
+  "endpoint": "/v1/questions",
+  "queryParams": {
+    "provider": "aws",
+    "exam": "saa-c03",
+    "includeExplanations": "true",
+    "includeMetadata": "true"
+  },
+  "expectedStatus": 200,
+  "expectedFields": [
+    "questions",
+    "total", 
+    "filters",
+    "pagination"
+  ],
+  "validation": {
+    "requiredValues": {
+      "providerId": "aws",
+      "examId": "saa-c03"
+    },
+    "requiredFields": [
+      "questionId",
+      "providerId",
+      "examId",
+      "questionText",
+      "options",
+      "correctAnswer",
+      "difficulty",
+      "type",
+      "explanation",
+      "metadata"
+    ]
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "description": "Test fixture for invalid difficulty parameter validation",
+  "method": "GET",
+  "endpoint": "/v1/questions",
+  "queryParams": {
+    "difficulty": "invalid_difficulty",
+    "provider": "aws"
+  },
+  "expectedStatus": 400,
+  "expectedError": {
+    "code": "VALIDATION_ERROR",
+    "messageContains": "Invalid difficulty"
+  }
+}

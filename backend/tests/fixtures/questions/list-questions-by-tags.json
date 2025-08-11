@@ -1,0 +1,34 @@
+{
+  "description": "Test fixture for filtering questions by tags",
+  "method": "GET",
+  "endpoint": "/v1/questions",
+  "queryParams": {
+    "tags": "storage,ebs",
+    "provider": "aws",
+    "includeExplanations": "false",
+    "includeMetadata": "true"
+  },
+  "expectedStatus": 200,
+  "expectedFields": [
+    "questions",
+    "total",
+    "filters",
+    "pagination"
+  ],
+  "validation": {
+    "tagFilter": ["storage", "ebs"],
+    "requiredFields": [
+      "questionId",
+      "providerId",
+      "examId",
+      "questionText",
+      "options",
+      "correctAnswer",
+      "difficulty",
+      "type",
+      "tags",
+      "metadata"
+    ],
+    "excludedFields": ["explanation"]
+  }
+}
