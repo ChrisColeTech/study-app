@@ -27,6 +27,13 @@ export class SessionHandler extends BaseHandler {
         path: '/v1/sessions',
         handler: this.createSession.bind(this),
         requireAuth: true, // Sessions require authentication
+      },
+      // Get existing session endpoint  
+      {
+        method: 'GET',
+        path: '/v1/sessions/{id}',
+        handler: this.getSession.bind(this),
+        requireAuth: true, // Sessions require authentication
       }
     ];
   }
@@ -270,6 +277,90 @@ export class SessionHandler extends BaseHandler {
     }
 
     return null; // No validation errors
+  }
+
+  /**
+   * Get an existing study session with current progress
+   * GET /v1/sessions/{id}
+   * Phase 16: Session Retrieval Feature
+   */
+  private async getSession(context: HandlerContext): Promise<ApiResponse> {
+    const sessionId = context.event.pathParameters?.id;
+    
+    try {
+      this.logger.info('Getting session', { 
+        requestId: context.requestId,
+        ...(context.userId ? { userId: context.userId } : {}),
+        ...(sessionId ? { sessionId } : {})
+      });
+
+      // Validate authentication
+      if (!context.userId) {
+        return this.error(
+          ERROR_CODES.UNAUTHORIZED,
+          'Authentication required to access sessions'
+        );
+      }
+
+      // Validate session ID parameter
+      if (!sessionId) {
+        return this.error(
+          ERROR_CODES.VALIDATION_ERROR,
+          'Session ID is required'
+        );
+      }
+
+      // Validate session ID format
+      if (!/^[a-f0-9-]{36}$/.test(sessionId)) {
+        return this.error(
+          ERROR_CODES.VALIDATION_ERROR,
+          'Invalid session ID format'
+        );
+      }
+
+      this.logger.debug('Session retrieval request validated', {
+        requestId: context.requestId,
+        userId: context.userId,
+        sessionId
+      });
+
+      // Get session through service
+      const sessionService = this.serviceFactory.getSessionService();
+      const result = await sessionService.getSession(sessionId, context.userId);
+
+      this.logger.info('Session retrieved successfully', { 
+        requestId: context.requestId,
+        userId: context.userId,
+        sessionId: result.session.sessionId,
+        status: result.session.status,
+        currentQuestion: result.progress.currentQuestion,
+        totalQuestions: result.progress.totalQuestions,
+        accuracy: result.progress.accuracy
+      });
+
+      return this.success(result, 'Session retrieved successfully');
+
+    } catch (error: any) {
+      this.logger.error('Failed to get session', error, { 
+        requestId: context.requestId,
+        ...(context.userId ? { userId: context.userId } : {}),
+        ...(sessionId ? { sessionId } : {})
+      });
+
+      // Handle specific error types
+      if (error.message.includes('Session not found') || 
+          error.message.includes('access denied')) {
+        return this.error(
+          ERROR_CODES.NOT_FOUND,
+          'Session not found or access denied'
+        );
+      }
+
+      return this.error(
+        ERROR_CODES.INTERNAL_ERROR,
+        'Failed to retrieve session'
+      );
+    }
   }
 }
 

@@ -87,12 +87,62 @@ export class LambdaConstruct extends Construct {
     // Grant S3 permissions to provider function
     props.questionDataBucket.grantRead(providerFunction);
 
+    // Exam Lambda Function - Phase 8 implementation
+    const examFunction = new cdk.aws_lambda.Function(this, 'ExamFunction', {
+      ...lambdaProps,
+      functionName: StackConfig.getResourceName('exam', props.environment),
+      description: 'Study App V3 Exam Lambda - Phase 8 Implementation',
+      code: cdk.aws_lambda.Code.fromAsset('../backend/dist/bundled'),
+      handler: 'exam.handler',
+    });
+    this.functions['exams'] = examFunction;
+
+    // Grant S3 permissions to exam function
+    props.questionDataBucket.grantRead(examFunction);
+
+    // Topic Lambda Function - Phase 10 implementation
+    const topicFunction = new cdk.aws_lambda.Function(this, 'TopicFunction', {
+      ...lambdaProps,
+      functionName: StackConfig.getResourceName('topic', props.environment),
+      description: 'Study App V3 Topic Lambda - Phase 10 Implementation',
+      code: cdk.aws_lambda.Code.fromAsset('../backend/dist/bundled'),
+      handler: 'topic.handler',
+    });
+    this.functions['topics'] = topicFunction;
+
+    // Grant S3 permissions to topic function
+    props.questionDataBucket.grantRead(topicFunction);
+
+    // Question Lambda Function - Phase 12 implementation
+    const questionFunction = new cdk.aws_lambda.Function(this, 'QuestionFunction', {
+      ...lambdaProps,
+      functionName: StackConfig.getResourceName('question', props.environment),
+      description: 'Study App V3 Question Lambda - Phase 12 Implementation',
+      code: cdk.aws_lambda.Code.fromAsset('../backend/dist/bundled'),
+      handler: 'question.handler',
+    });
+    this.functions['questions'] = questionFunction;
+
+    // Grant S3 permissions to question function
+    props.questionDataBucket.grantRead(questionFunction);
+
+    // Session Lambda Function - Phase 15/16 implementation
+    const sessionFunction = new cdk.aws_lambda.Function(this, 'SessionFunction', {
+      ...lambdaProps,
+      functionName: StackConfig.getResourceName('session', props.environment),
+      description: 'Study App V3 Session Lambda - Phase 15/16 Implementation',
+      code: cdk.aws_lambda.Code.fromAsset('../backend/dist/bundled'),
+      handler: 'session.handler',
+    });
+    this.functions['sessions'] = sessionFunction;
+
+    // Grant DynamoDB permissions to session function
+    props.studySessionsTable.grantReadWriteData(sessionFunction);
+    // Also grant access to question data for session creation
+    props.questionDataBucket.grantRead(sessionFunction);
+
     // Placeholder functions for future phases - minimal implementation
     const placeholderFunctionNames = [
-      'exams',
-      'topics',
-      'questions',
-      'sessions',
       'analytics',
       'goals'
     ];
