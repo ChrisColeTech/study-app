@@ -154,38 +154,20 @@ export class LambdaConstruct extends Construct {
     // Grant DynamoDB permissions to goals function
     props.goalsTable.grantReadWriteData(goalsFunction);
 
-    // Placeholder functions for future phases - minimal implementation
-    const placeholderFunctionNames = [
-      'analytics'
-    ];
-
-    placeholderFunctionNames.forEach(name => {
-      const fn = new cdk.aws_lambda.Function(this, `${name}Function`, {
-        ...lambdaProps,
-        functionName: StackConfig.getResourceName(name, props.environment),
-        code: cdk.aws_lambda.Code.fromInline(`
-          exports.handler = async (event) => {
-            return {
-              statusCode: 501,
-              headers: {
-                'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Headers': 'Content-Type,Authorization',
-                'Access-Control-Allow-Methods': 'GET,POST,PUT,DELETE,OPTIONS'
-              },
-              body: JSON.stringify({
-                message: '${name} endpoint not implemented yet - Phase 2+',
-                timestamp: new Date().toISOString(),
-                path: event.path || '/${name}'
-              })
-            };
-          };
-        `),
-        handler: 'index.handler',
-      });
-
-      this.functions[name] = fn;
+    // Analytics Lambda Function - Phase 22 implementation
+    const analyticsFunction = new cdk.aws_lambda.Function(this, 'AnalyticsFunction', {
+      ...lambdaProps,
+      functionName: StackConfig.getResourceName('analytics', props.environment),
+      description: 'Study App V3 Analytics Lambda - Phase 22 Implementation',
+      code: cdk.aws_lambda.Code.fromAsset('../backend/dist/bundled'),
+      handler: 'analytics.handler',
     });
+    this.functions['analytics'] = analyticsFunction;
+
+    // Grant comprehensive permissions to analytics function for data aggregation
+    props.studySessionsTable.grantReadData(analyticsFunction);
+    props.userProgressTable.grantReadWriteData(analyticsFunction); // Read for progress data, write for snapshots
+    props.questionDataBucket.grantRead(analyticsFunction); // For question metadata enrichment
 
     // Output function names
     new cdk.CfnOutput(scope, 'HealthFunctionName', {

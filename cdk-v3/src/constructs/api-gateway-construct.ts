@@ -122,11 +122,45 @@ export class ApiGatewayConstruct extends Construct {
         }));
       });
 
+      // Special handling for sessions - add answers and complete sub-resources
+      if (resource === 'sessions') {
+        // Phase 20: Answer submission endpoint
+        const answersResource = idResource.addResource('answers');
+        answersResource.addMethod('POST', new cdk.aws_apigateway.LambdaIntegration(lambda, {
+          proxy: true,
+          allowTestInvoke: !config.isProduction,
+        }));
+
+        // Phase 21: Session completion endpoint
+        const completeResource = idResource.addResource('complete');
+        completeResource.addMethod('POST', new cdk.aws_apigateway.LambdaIntegration(lambda, {
+          proxy: true,
+          allowTestInvoke: !config.isProduction,
+        }));
+      }
+
       // Special handling for providers - add cache/refresh sub-resource
       if (resource === 'providers') {
         const cacheResource = apiResource.addResource('cache');
         const refreshResource = cacheResource.addResource('refresh');
         refreshResource.addMethod('POST', new cdk.aws_apigateway.LambdaIntegration(lambda, {
+          proxy: true,
+          allowTestInvoke: !config.isProduction,
+        }));
+      }
+
+      // Special handling for analytics - Phase 22 implementation
+      if (resource === 'analytics') {
+        // Progress analytics endpoint
+        const progressResource = apiResource.addResource('progress');
+        progressResource.addMethod('GET', new cdk.aws_apigateway.LambdaIntegration(lambda, {
+          proxy: true,
+          allowTestInvoke: !config.isProduction,
+        }));
+
+        // Analytics health endpoint
+        const healthResource = apiResource.addResource('health');
+        healthResource.addMethod('GET', new cdk.aws_apigateway.LambdaIntegration(lambda, {
           proxy: true,
           allowTestInvoke: !config.isProduction,
         }));
