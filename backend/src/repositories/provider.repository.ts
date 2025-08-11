@@ -63,7 +63,8 @@ export class ProviderRepository implements IProviderRepository {
         const providerFiles = listResult.Contents.filter(obj => 
           obj.Key && 
           !obj.Key.endsWith('/') &&
-          obj.Key.includes('/provider.json')
+          obj.Key.endsWith('.json') &&
+          !obj.Key.includes('metadata.json') // Exclude metadata file
         );
 
         this.logger.info('Found provider files', { count: providerFiles.length });
@@ -96,6 +97,16 @@ export class ProviderRepository implements IProviderRepository {
 
       return providers;
     } catch (error) {
+      // Handle specific S3 errors gracefully
+      const errorName = (error as any).name;
+      if (errorName === 'NoSuchBucket' || errorName === 'AccessDenied') {
+        this.logger.warn('S3 bucket not accessible - returning empty results', { 
+          bucket: this.bucketName,
+          error: (error as Error).message 
+        });
+        return [];
+      }
+      
       this.logger.error('Failed to load providers from S3', error as Error);
       throw new Error('Failed to load provider data');
     }
