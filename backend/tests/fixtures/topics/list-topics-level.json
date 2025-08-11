@@ -1,0 +1,31 @@
+{
+  "description": "List topics filtered by certification level",
+  "request": {
+    "method": "GET",
+    "path": "/v1/topics",
+    "queryParams": {
+      "level": "foundational"
+    }
+  },
+  "expectedResponse": {
+    "statusCode": 200,
+    "body": {
+      "success": true,
+      "data": {
+        "topics": "array",
+        "total": "number",
+        "filters": {
+          "providers": "array",
+          "exams": "array",
+          "categories": "array",
+          "levels": "array"
+        }
+      },
+      "message": "Topics retrieved successfully"
+    }
+  },
+  "validation": {
+    "allTopicsLevel": "foundational",
+    "hasFilters": true
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "description": "List topics filtered by exam",
+  "request": {
+    "method": "GET",
+    "path": "/v1/topics", 
+    "queryParams": {
+      "exam": "aws-clf-c02"
+    }
+  },
+  "expectedResponse": {
+    "statusCode": 200,
+    "body": {
+      "success": true,
+      "data": {
+        "topics": "array",
+        "total": "number",
+        "filters": {
+          "providers": "array",
+          "exams": "array",
+          "categories": "array",
+          "levels": "array"
+        }
+      },
+      "message": "Topics retrieved successfully"
+    }
+  },
+  "validation": {
+    "allTopicsFromExam": "aws-clf-c02",
+    "hasFilters": true
+  }
+}

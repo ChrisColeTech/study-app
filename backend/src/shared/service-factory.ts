@@ -9,7 +9,8 @@ import type { IAuthService } from '../services/auth.service';
 import type { IUserService } from '../services/user.service';
 import type { IProviderService } from '../services/provider.service';
 import type { IExamService } from '../services/exam.service';
-export type { IAuthService, IUserService, IProviderService, IExamService };
+import type { ITopicService } from '../services/topic.service';
+export type { IAuthService, IUserService, IProviderService, IExamService, ITopicService };
 
 export interface IQuestionService {
   // Question service methods will be added in Phase 2
@@ -95,6 +96,7 @@ export class ServiceFactory {
   private _userService: IUserService | null = null;
   private _providerService: IProviderService | null = null;
   private _examService: IExamService | null = null;
+  private _topicService: ITopicService | null = null;
   private _questionService: IQuestionService | null = null;
   private _sessionService: ISessionService | null = null;
   private _analyticsService: IAnalyticsService | null = null;
@@ -243,6 +245,17 @@ export class ServiceFactory {
   }
 
   /**
+   * Get Topic Service
+   */
+  public getTopicService(): ITopicService {
+    if (!this._topicService) {
+      const { TopicService } = require('../services/topic.service');
+      this._topicService = new TopicService(this.getS3Client(), this.getConfig().buckets.questionData);
+    }
+    return this._topicService!;
+  }
+
+  /**
    * Get Question Service
    */
   public getQuestionService(): IQuestionService {
@@ -353,6 +366,7 @@ export class ServiceFactory {
     this._userService = null;
     this._providerService = null;
     this._examService = null;
+    this._topicService = null;
     this._questionService = null;
     this._sessionService = null;
     this._analyticsService = null;
