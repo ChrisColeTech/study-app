@@ -31,6 +31,12 @@ export * from './topic.types';
 // Question Types
 export * from './question.types';
 
+// Analytics Types
+export * from './analytics.types';
+
+// Goals Types  
+export * from './goals.types';
+
 // Re-export commonly used AWS Lambda types
 export type {
   APIGatewayProxyEvent,

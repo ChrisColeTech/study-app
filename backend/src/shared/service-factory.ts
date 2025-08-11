@@ -24,11 +24,12 @@ import type { ITopicRepository } from '../repositories/topic.repository';
 import type { IQuestionRepository } from '../repositories/question.repository';
 import type { IGoalsRepository } from '../repositories/goals.repository';
 import type { IHealthRepository } from '../repositories/health.repository';
-export type { IUserRepository, ISessionRepository, IProviderRepository, IExamRepository, ITopicRepository, IQuestionRepository, IGoalsRepository, IHealthRepository };
+import type { IAnalyticsRepository } from '../repositories/analytics.repository';
+export type { IUserRepository, ISessionRepository, IProviderRepository, IExamRepository, ITopicRepository, IQuestionRepository, IGoalsRepository, IHealthRepository, IAnalyticsRepository };
 
-export interface IAnalyticsService {
-  // Analytics service methods will be added in later phases
-}
+// Import analytics service interface from types
+import type { IAnalyticsService } from '../shared/types/analytics.types';
+export type { IAnalyticsService };
 
 export interface IHealthService {
   checkHealth(): Promise<{
@@ -94,6 +95,7 @@ export class ServiceFactory {
   private _questionRepository: IQuestionRepository | null = null;
   private _goalsRepository: IGoalsRepository | null = null;
   private _healthRepository: IHealthRepository | null = null;
+  private _analyticsRepository: IAnalyticsRepository | null = null;
 
   // Services (lazy initialized)
   private _authService: IAuthService | null = null;
@@ -374,14 +376,30 @@ export class ServiceFactory {
   }
 
   /**
+   * Get Analytics Repository
+   */
+  public getAnalyticsRepository(): IAnalyticsRepository {
+    if (!this._analyticsRepository) {
+      const { AnalyticsRepository } = require('../repositories/analytics.repository');
+      this._analyticsRepository = new AnalyticsRepository(this.getDynamoClient(), this.getConfig());
+    }
+    return this._analyticsRepository!;
+  }
+
+  /**
    * Get Analytics Service
    */
   public getAnalyticsService(): IAnalyticsService {
     if (!this._analyticsService) {
-      // Will be implemented in later phases
-      throw new Error('AnalyticsService not implemented yet - later phases');
+      const { AnalyticsService } = require('../services/analytics.service');
+      this._analyticsService = new AnalyticsService(
+        this.getAnalyticsRepository(),
+        this.getProviderService(),
+        this.getExamService(),
+        this.getTopicService()
+      );
     }
-    return this._analyticsService;
+    return this._analyticsService!;
   }
 
   /**
@@ -416,6 +434,7 @@ export class ServiceFactory {
     this._questionRepository = null;
     this._goalsRepository = null;
     this._healthRepository = null;
+    this._analyticsRepository = null;
 
     // Reset services
     this._authService = null;

@@ -9,7 +9,8 @@ import { createLogger } from '../shared/logger';
 import { ERROR_CODES } from '../shared/constants/error.constants';
 import { 
   CreateSessionRequest,
-  UpdateSessionRequest
+  UpdateSessionRequest,
+  SubmitAnswerRequest
 } from '../shared/types/session.types';
 
 // Import new middleware
@@ -17,6 +18,8 @@ import {
   ParsingMiddleware,
   ErrorHandlingMiddleware,
   ErrorContexts,
+  ValidationMiddleware,
+  ValidationRules,
   AuthMiddleware,
   AuthConfigs,
   AuthenticatedContext
@@ -56,6 +59,24 @@ export class SessionHandler extends BaseHandler {
         path: '/v1/sessions/{id}',
         handler: this.deleteSession.bind(this),
         requireAuth: false,
+      },
+      {
+        method: 'POST',
+        path: '/v1/sessions/{id}/answers',
+        handler: this.submitAnswer.bind(this),
+        requireAuth: false,
+      },
+      {
+        method: 'POST',
+        path: '/v1/sessions/{id}/complete',
+        handler: this.completeSession.bind(this),
+        requireAuth: false,
+      },
+      {
+        method: 'POST',
+        path: '/v1/sessions/adaptive',
+        handler: this.createAdaptiveSession.bind(this),
+        requireAuth: false,
       }
     ];
   }
@@ -70,9 +91,20 @@ export class SessionHandler extends BaseHandler {
     const { data: requestBody, error: parseError } = ParsingMiddleware.parseRequestBody<CreateSessionRequest>(context, true);
     if (parseError) return parseError;
 
-    // Validate using helper method (extracted from massive validation block)
-    const validationError = this.validateCreateSessionRequest(requestBody);
-    if (validationError) return validationError;
+    // Use ValidationMiddleware properly
+    const validationResult = ValidationMiddleware.validateRequestBody(context, {
+      required: ['examId', 'providerId', 'sessionType'],
+      rules: [
+        { field: 'examId', validate: ValidationRules.stringLength(1) },
+        { field: 'providerId', validate: ValidationRules.stringLength(1) },
+        { field: 'sessionType', validate: (value) => 
+          ['practice', 'exam', 'review'].includes(value) 
+            ? { isValid: true }
+            : { isValid: false, error: 'Must be practice, exam, or review' }
+        }
+      ]
+    });
+    if (validationResult.error) return validationResult.error;
 
     // Business logic only - delegate error handling to middleware
     const { result, error } = await ErrorHandlingMiddleware.withErrorHandling(
@@ -219,7 +251,20 @@ export class SessionHandler extends BaseHandler {
         requestId: context.requestId,
         operation: ErrorContexts.Session.DELETE,
         additionalInfo: { sessionId: pathParams.id }
-      }
+      },
+      // Use service-specific error mappings for proper business logic error handling
+      [
+        {
+          keywords: ['Cannot delete completed'],
+          errorCode: 'CONFLICT',
+          statusCode: 409
+        },
+        {
+          keywords: ['Session not found'],
+          errorCode: 'NOT_FOUND',
+          statusCode: 404
+        }
+      ]
     );
 
     if (error) return error;
@@ -230,6 +275,169 @@ export class SessionHandler extends BaseHandler {
     });
 
     return ErrorHandlingMiddleware.createSuccessResponse(result, 'Session deleted successfully');
+  }
+
+  /**
+   * Submit answer for a question in a session - Phase 20 implementation
+   */
+  private async submitAnswer(context: HandlerContext): Promise<ApiResponse> {
+    // No authentication required - sessions work independently (auth association in Phase 30)
+
+    // Parse path parameters using middleware
+    const { data: pathParams, error: parseError } = ParsingMiddleware.parsePathParams(context);
+    if (parseError) return parseError;
+
+    // Parse and validate request body using middleware
+    const { data: requestBody, error: bodyParseError } = ParsingMiddleware.parseRequestBody<SubmitAnswerRequest>(context, true);
+    if (bodyParseError) return bodyParseError;
+
+    // Validate session ID
+    const sessionValidationError = this.validateSessionId(pathParams.id);
+    if (sessionValidationError) return sessionValidationError;
+
+    // Validate answer submission request
+    const answerValidationError = this.validateSubmitAnswerRequest(requestBody);
+    if (answerValidationError) return answerValidationError;
+
+    // Business logic only - delegate error handling to middleware
+    const { result, error } = await ErrorHandlingMiddleware.withErrorHandling(
+      async () => {
+        const sessionService = this.serviceFactory.getSessionService();
+        return await sessionService.submitAnswer(pathParams.id, requestBody);
+      },
+      {
+        requestId: context.requestId,
+        operation: 'SESSION_SUBMIT_ANSWER',
+        additionalInfo: { 
+          sessionId: pathParams.id,
+          questionId: requestBody.questionId
+        }
+      },
+      // Use service-specific error mappings for proper business logic error handling
+      [
+        {
+          keywords: ['Session not found'],
+          errorCode: 'NOT_FOUND',
+          statusCode: 404
+        },
+        {
+          keywords: ['Cannot submit answers to inactive'],
+          errorCode: 'CONFLICT',
+          statusCode: 409
+        },
+        {
+          keywords: ['Question not found in session'],
+          errorCode: 'VALIDATION_ERROR',
+          statusCode: 400
+        }
+      ]
+    );
+
+    if (error) return error;
+
+    this.logger.info('Answer submitted successfully', { 
+      requestId: context.requestId,
+      sessionId: pathParams.id,
+      questionId: requestBody.questionId,
+      isCorrect: result!.feedback.isCorrect,
+      score: result!.feedback.score,
+      sessionStatus: result!.session.status
+    });
+
+    return ErrorHandlingMiddleware.createSuccessResponse(result, 'Answer submitted successfully');
+  }
+
+  /**
+   * Complete a study session - Phase 21 implementation
+   */
+  private async completeSession(context: HandlerContext): Promise<ApiResponse> {
+    // No authentication required - sessions work independently (auth association in Phase 30)
+
+    // Parse path parameters using middleware
+    const { data: pathParams, error: parseError } = ParsingMiddleware.parsePathParams(context);
+    if (parseError) return parseError;
+
+    // Validate session ID
+    const sessionValidationError = this.validateSessionId(pathParams.id);
+    if (sessionValidationError) return sessionValidationError;
+
+    // Business logic only - delegate error handling to middleware
+    const { result, error } = await ErrorHandlingMiddleware.withErrorHandling(
+      async () => {
+        const sessionService = this.serviceFactory.getSessionService();
+        return await sessionService.completeSession(pathParams.id);
+      },
+      {
+        requestId: context.requestId,
+        operation: 'SESSION_COMPLETE',
+        additionalInfo: { sessionId: pathParams.id }
+      },
+      // Use service-specific error mappings for proper business logic error handling
+      [
+        {
+          keywords: ['Session not found'],
+          errorCode: 'NOT_FOUND',
+          statusCode: 404
+        },
+        {
+          keywords: ['Session is already completed'],
+          errorCode: 'CONFLICT',
+          statusCode: 409
+        },
+        {
+          keywords: ['Cannot complete abandoned session'],
+          errorCode: 'CONFLICT',
+          statusCode: 409
+        },
+        {
+          keywords: ['Cannot complete session:', 'questions remain unanswered'],
+          errorCode: 'VALIDATION_ERROR',
+          statusCode: 400
+        }
+      ]
+    );
+
+    if (error) return error;
+
+    this.logger.info('Session completed successfully', { 
+      requestId: context.requestId,
+      sessionId: pathParams.id,
+      finalScore: result!.detailedResults.finalScore,
+      accuracy: result!.detailedResults.accuracyPercentage,
+      overallRecommendation: result!.recommendations.overallRecommendation,
+      readinessForExam: result!.recommendations.readinessForExam
+    });
+
+    return ErrorHandlingMiddleware.createSuccessResponse(result, 'Session completed successfully');
+  }
+
+  /**
+   * Create an adaptive study session - Phase 22 implementation
+   * Reuses existing createSession logic with isAdaptive flag
+   */
+  private async createAdaptiveSession(context: HandlerContext): Promise<ApiResponse> {
+    // Parse and validate request body using middleware
+    const { data: requestBody, error: parseError } = ParsingMiddleware.parseRequestBody<CreateSessionRequest>(context, true);
+    if (parseError) return parseError;
+
+    // Use same validation as createSession
+    const validationResult = ValidationMiddleware.validateRequestBody(context, {
+      required: ['examId', 'providerId', 'sessionType'],
+      rules: [
+        { field: 'examId', validate: ValidationRules.stringLength(1) },
+        { field: 'providerId', validate: ValidationRules.stringLength(1) },
+        { field: 'sessionType', validate: (value) => 
+          ['practice', 'exam', 'review'].includes(value) 
+            ? { isValid: true }
+            : { isValid: false, error: 'Must be practice, exam, or review' }
+        }
+      ]
+    });
+    if (validationResult.error) return validationResult.error;
+
+    // Mark as adaptive and delegate to existing createSession logic
+    const adaptiveRequest = { ...requestBody, isAdaptive: true };
+    return await this.createSession({ ...context, event: { ...context.event, body: JSON.stringify(adaptiveRequest) } });
   }
 
   /**
@@ -419,6 +627,75 @@ export class SessionHandler extends BaseHandler {
           'timeSpent is required and must be a non-negative number when submitting an answer'
         );
       }
+    }
+
+    return null; // No validation errors
+  }
+
+  /**
+   * Helper method to validate submit answer request - Phase 20 implementation
+   */
+  private validateSubmitAnswerRequest(requestBody: any): ApiResponse | null {
+    // Check required fields
+    if (!requestBody.questionId || typeof requestBody.questionId !== 'string') {
+      return ErrorHandlingMiddleware.createErrorResponse(
+        ERROR_CODES.VALIDATION_ERROR,
+        'questionId is required and must be a string'
+      );
+    }
+
+    if (!requestBody.answer || !Array.isArray(requestBody.answer)) {
+      return ErrorHandlingMiddleware.createErrorResponse(
+        ERROR_CODES.VALIDATION_ERROR,
+        'answer is required and must be an array'
+      );
+    }
+
+    if (requestBody.answer.length === 0) {
+      return ErrorHandlingMiddleware.createErrorResponse(
+        ERROR_CODES.VALIDATION_ERROR,
+        'answer array cannot be empty'
+      );
+    }
+
+    // Validate all answers are strings
+    for (const answer of requestBody.answer) {
+      if (typeof answer !== 'string') {
+        return ErrorHandlingMiddleware.createErrorResponse(
+          ERROR_CODES.VALIDATION_ERROR,
+          'All answers must be strings'
+        );
+      }
+    }
+
+    if (requestBody.timeSpent === undefined || typeof requestBody.timeSpent !== 'number' || requestBody.timeSpent < 0) {
+      return ErrorHandlingMiddleware.createErrorResponse(
+        ERROR_CODES.VALIDATION_ERROR,
+        'timeSpent is required and must be a non-negative number'
+      );
+    }
+
+    // Validate optional fields
+    if (requestBody.skipped !== undefined && typeof requestBody.skipped !== 'boolean') {
+      return ErrorHandlingMiddleware.createErrorResponse(
+        ERROR_CODES.VALIDATION_ERROR,
+        'skipped must be a boolean if provided'
+      );
+    }
+
+    if (requestBody.markedForReview !== undefined && typeof requestBody.markedForReview !== 'boolean') {
+      return ErrorHandlingMiddleware.createErrorResponse(
+        ERROR_CODES.VALIDATION_ERROR,
+        'markedForReview must be a boolean if provided'
+      );
+    }
+
+    // Validate questionId format (should be a UUID or similar identifier)
+    if (!/^[a-zA-Z0-9_-]+$/.test(requestBody.questionId)) {
+      return ErrorHandlingMiddleware.createErrorResponse(
+        ERROR_CODES.VALIDATION_ERROR,
+        'Invalid questionId format. Use alphanumeric characters, hyphens, and underscores only'
+      );
     }
 
     return null; // No validation errors

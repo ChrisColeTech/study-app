@@ -10,6 +10,7 @@ export interface CreateSessionRequest {
   topics?: string[];
   difficulty?: 'easy' | 'medium' | 'hard';
   timeLimit?: number; // minutes
+  isAdaptive?: boolean; // Phase 22: Adaptive sessions
 }
 
 export interface UpdateSessionRequest {
@@ -27,8 +28,29 @@ export interface SubmitAnswerRequest {
   questionId: string;
   answer: string[];
   timeSpent: number; // seconds
-  skipped: boolean;
-  markedForReview: boolean;
+  skipped?: boolean;
+  markedForReview?: boolean;
+}
+
+export interface SubmitAnswerResponse {
+  success: boolean;
+  feedback: AnswerFeedback;
+  session: StudySession;
+  progress: SessionProgress;
+  nextQuestion?: QuestionResponse;
+}
+
+export interface AnswerFeedback {
+  questionId: string;
+  isCorrect: boolean;
+  correctAnswer: string[];
+  userAnswer: string[];
+  explanation: string;
+  score: number; // Points earned for this question
+  timeSpent: number;
+  questionDifficulty: 'easy' | 'medium' | 'hard';
+  topicId: string;
+  topicName: string;
 }
 
 export interface SessionSummary {
@@ -119,9 +141,112 @@ export interface UpdateSessionResponse {
   progress: SessionProgress;
 }
 
+export interface CompleteSessionResponse {
+  success: boolean;
+  sessionSummary: SessionSummary;
+  detailedResults: DetailedSessionResults;
+  userProgress?: UserProgressUpdate[];
+  recommendations: StudyRecommendations;
+}
+
+export interface DetailedSessionResults {
+  sessionId: string;
+  finalScore: number;
+  maxPossibleScore: number;
+  accuracyPercentage: number;
+  totalTimeSpent: number; // seconds
+  averageTimePerQuestion: number; // seconds
+  questionsBreakdown: QuestionResultBreakdown[];
+  performanceByDifficulty: DifficultyPerformance[];
+  performanceByTopic: TopicPerformanceBreakdown[];
+  timeDistribution: TimeDistribution;
+  completedAt: string;
+  sessionDuration: number; // seconds from start to completion
+}
+
+export interface QuestionResultBreakdown {
+  questionId: string;
+  questionText: string;
+  userAnswer: string[];
+  correctAnswer: string[];
+  isCorrect: boolean;
+  timeSpent: number;
+  score: number;
+  difficulty: 'easy' | 'medium' | 'hard';
+  topicId: string;
+  topicName: string;
+  explanation: string;
+  markedForReview: boolean;
+  skipped: boolean;
+}
+
+export interface DifficultyPerformance {
+  difficulty: 'easy' | 'medium' | 'hard';
+  totalQuestions: number;
+  correctQuestions: number;
+  accuracy: number;
+  averageTime: number;
+  totalScore: number;
+  maxPossibleScore: number;
+}
+
+export interface TopicPerformanceBreakdown extends SessionTopicBreakdown {
+  strongestArea: boolean; // true if this is the best performing topic
+  weakestArea: boolean; // true if this is the worst performing topic
+  needsImprovement: boolean; // true if accuracy < 70%
+  totalScore: number;
+  maxPossibleScore: number;
+}
+
+export interface TimeDistribution {
+  fastQuestions: number; // < 50% of expected time
+  normalQuestions: number; // 50-100% of expected time
+  slowQuestions: number; // > 100% of expected time
+  averageTimeEasy: number;
+  averageTimeMedium: number;
+  averageTimeHard: number;
+}
+
+export interface UserProgressUpdate {
+  topicId: string;
+  topicName: string;
+  previousAccuracy: number;
+  newAccuracy: number;
+  previousMasteryLevel: string;
+  newMasteryLevel: string;
+  improvementDirection: 'improved' | 'declined' | 'maintained';
+}
+
+export interface StudyRecommendations {
+  overallRecommendation: 'excellent' | 'good' | 'needs_improvement' | 'requires_focused_study';
+  readinessForExam: boolean;
+  suggestedStudyTime: number; // minutes per day
+  focusAreas: FocusArea[];
+  nextSessionRecommendation: {
+    sessionType: 'practice' | 'exam' | 'review';
+    topics: string[];
+    difficulty: 'easy' | 'medium' | 'hard';
+    questionCount: number;
+  };
+  motivationalMessage: string;
+}
+
+export interface FocusArea {
+  topicId: string;
+  topicName: string;
+  priority: 'high' | 'medium' | 'low';
+  currentAccuracy: number;
+  targetAccuracy: number;
+  estimatedStudyTime: number; // minutes needed
+  specificWeaknesses: string[];
+  recommendedResources: string[];
+}
+
 export interface ISessionService {
   createSession(request: CreateSessionRequest): Promise<CreateSessionResponse>;
   getSession(sessionId: string): Promise<GetSessionResponse>;
   updateSession(sessionId: string, request: UpdateSessionRequest): Promise<UpdateSessionResponse>;
   deleteSession(sessionId: string): Promise<{ success: boolean; message: string }>;
+  submitAnswer(sessionId: string, request: SubmitAnswerRequest): Promise<SubmitAnswerResponse>;
+  completeSession(sessionId: string): Promise<CompleteSessionResponse>;
 }

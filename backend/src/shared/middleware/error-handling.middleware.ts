@@ -289,7 +289,7 @@ export class ErrorHandlingMiddleware {
         statusCode: 404
       },
       {
-        keywords: ['Cannot update completed', 'Cannot pause', 'Invalid transition'],
+        keywords: ['Cannot update completed', 'Cannot delete completed', 'Cannot pause', 'Invalid transition'],
         errorCode: ERROR_CODES.CONFLICT,
         statusCode: 409
       }
