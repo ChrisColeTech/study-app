@@ -298,9 +298,12 @@ export class ProviderHandler extends BaseHandler {
       const queryParams = context.event.queryStringParameters || {};
       
       const request: GetCertificationRoadmapRequest = {
-        providerId,
-        roadmapId: queryParams.roadmapId
+        providerId
       };
+      
+      if (queryParams.roadmapId) {
+        request.roadmapId = queryParams.roadmapId;
+      }
 
       // If this is a POST request, parse user preferences from body
       if (context.event.httpMethod === 'POST' && context.event.body) {
@@ -454,16 +457,45 @@ export class ProviderHandler extends BaseHandler {
       const queryParams = context.event.queryStringParameters || {};
       
       const request: GetProviderResourcesRequest = {
-        providerId,
-        certificationId: queryParams.certificationId,
-        category: this.parseEnumParam(queryParams.category, ResourceCategory),
-        type: this.parseEnumParam(queryParams.type, ResourceType),
-        isFree: queryParams.isFree === 'true' ? true : queryParams.isFree === 'false' ? false : undefined,
-        maxCost: queryParams.maxCost ? parseInt(queryParams.maxCost, 10) : undefined,
-        language: queryParams.language,
-        limit: queryParams.limit ? parseInt(queryParams.limit, 10) : undefined,
-        offset: queryParams.offset ? parseInt(queryParams.offset, 10) : undefined
+        providerId
       };
+      
+      // Only set optional properties if they have values
+      if (queryParams.certificationId) {
+        request.certificationId = queryParams.certificationId;
+      }
+      
+      const category = this.parseEnumParam(queryParams.category, ResourceCategory);
+      if (category) {
+        request.category = category;
+      }
+      
+      const type = this.parseEnumParam(queryParams.type, ResourceType);
+      if (type) {
+        request.type = type;
+      }
+      
+      if (queryParams.isFree === 'true') {
+        request.isFree = true;
+      } else if (queryParams.isFree === 'false') {
+        request.isFree = false;
+      }
+      
+      if (queryParams.maxCost) {
+        request.maxCost = parseInt(queryParams.maxCost, 10);
+      }
+      
+      if (queryParams.language) {
+        request.language = queryParams.language;
+      }
+      
+      if (queryParams.limit) {
+        request.limit = parseInt(queryParams.limit, 10);
+      }
+      
+      if (queryParams.offset) {
+        request.offset = parseInt(queryParams.offset, 10);
+      }
 
       // Validate numeric parameters
       if (queryParams.maxCost && isNaN(request.maxCost!)) {
