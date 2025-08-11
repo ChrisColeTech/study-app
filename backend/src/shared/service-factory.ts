@@ -11,7 +11,7 @@ import type { IProviderService } from '../services/provider.service';
 import type { IExamService } from '../services/exam.service';
 import type { ITopicService } from '../services/topic.service';
 import type { IQuestionService } from '../services/question.service';
-import type { ISessionService } from '../services/session.service';
+import type { ISessionService } from './types/session.types';
 export type { IAuthService, IUserService, IProviderService, IExamService, ITopicService, IQuestionService, ISessionService };
 
 export interface IAnalyticsService {
