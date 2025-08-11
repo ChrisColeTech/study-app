@@ -9,6 +9,7 @@ export interface Exam {
   providerName: string;
   description: string;
   level: 'foundational' | 'associate' | 'professional' | 'specialty' | 'expert';
+  category: string;
   duration: number | undefined; // minutes
   questionCount: number;
   passingScore: number | undefined;

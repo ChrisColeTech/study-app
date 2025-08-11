@@ -11,15 +11,25 @@ import type { IProviderService } from '../services/provider.service';
 import type { IExamService } from '../services/exam.service';
 import type { ITopicService } from '../services/topic.service';
 import type { IQuestionService } from '../services/question.service';
-import type { ISessionService } from './types/session.types';
+import type { ISessionService } from '../services/session.service';
 export type { IAuthService, IUserService, IProviderService, IExamService, ITopicService, IQuestionService, ISessionService };
 
+// Import repository interfaces
+import type { IUserRepository } from '../repositories/user.repository';
+import type { ISessionRepository } from '../repositories/session.repository';
+import type { IProviderRepository } from '../repositories/provider.repository';
+import type { IExamRepository } from '../repositories/exam.repository';
+import type { ITopicRepository } from '../repositories/topic.repository';
+import type { IQuestionRepository } from '../repositories/question.repository';
+import type { IHealthRepository } from '../repositories/health.repository';
+export type { IUserRepository, ISessionRepository, IProviderRepository, IExamRepository, ITopicRepository, IQuestionRepository, IHealthRepository };
+
 export interface IAnalyticsService {
-  // Analytics service methods will be added in Phase 2
+  // Analytics service methods will be added in later phases
 }
 
 export interface IGoalsService {
-  // Goals service methods will be added in Phase 2
+  // Goals service methods will be added in later phases
 }
 
 export interface IHealthService {
@@ -28,33 +38,22 @@ export interface IHealthService {
     timestamp: string;
     environment: string;
     version: string;
-    dependencies: {
-      database: { status: string; responseTime?: number };
-      storage: { status: string; responseTime?: number };
-    };
+    dependencies?: { [key: string]: any };
+    error?: string;
+    totalTime?: number;
   }>;
-  checkDatabaseHealth(): Promise<{ status: string; responseTime?: number }>;
-  checkStorageHealth(): Promise<{ status: string; responseTime?: number }>;
-}
-
-// Import repository interfaces
-import type { IUserRepository } from '../repositories/user.repository';
-export type { IUserRepository };
-
-export interface ISessionRepository {
-  // Session repository methods will be added in Phase 2
-}
-
-export interface IQuestionRepository {
-  // Question repository methods will be added in Phase 2
-}
-
-export interface IProgressRepository {
-  // Progress repository methods will be added in Phase 2
-}
-
-export interface IGoalsRepository {
-  // Goals repository methods will be added in Phase 2
+  checkDatabaseHealth(): Promise<{
+    service: string;
+    status: 'healthy' | 'unhealthy';
+    responseTime: number;
+    error?: string;
+  }>;
+  checkStorageHealth(): Promise<{
+    service: string;
+    status: 'healthy' | 'unhealthy';
+    responseTime: number;
+    error?: string;
+  }>;
 }
 
 // Configuration interface
@@ -66,6 +65,9 @@ export interface ServiceConfig {
     studySessions: string;
     userProgress: string;
     goals: string;
+  };
+  s3: {
+    bucketName: string;
   };
   buckets: {
     questionData: string;
@@ -85,6 +87,15 @@ export class ServiceFactory {
   private _dynamoClient: DynamoDBDocumentClient | null = null;
   private _s3Client: S3Client | null = null;
 
+  // Repositories (lazy initialized)
+  private _userRepository: IUserRepository | null = null;
+  private _sessionRepository: ISessionRepository | null = null;
+  private _providerRepository: IProviderRepository | null = null;
+  private _examRepository: IExamRepository | null = null;
+  private _topicRepository: ITopicRepository | null = null;
+  private _questionRepository: IQuestionRepository | null = null;
+  private _healthRepository: IHealthRepository | null = null;
+
   // Services (lazy initialized)
   private _authService: IAuthService | null = null;
   private _userService: IUserService | null = null;
@@ -96,13 +107,6 @@ export class ServiceFactory {
   private _analyticsService: IAnalyticsService | null = null;
   private _goalsService: IGoalsService | null = null;
   private _healthService: IHealthService | null = null;
-
-  // Repositories (lazy initialized)
-  private _userRepository: IUserRepository | null = null;
-  private _sessionRepository: ISessionRepository | null = null;
-  private _questionRepository: IQuestionRepository | null = null;
-  private _progressRepository: IProgressRepository | null = null;
-  private _goalsRepository: IGoalsRepository | null = null;
 
   private constructor() {
     this.config = this.loadConfig();
@@ -122,6 +126,7 @@ export class ServiceFactory {
    * Load configuration from environment variables
    */
   private loadConfig(): ServiceConfig {
+    const questionDataBucket = process.env.QUESTION_DATA_BUCKET_NAME || '';
     return {
       region: process.env.AWS_REGION || 'us-east-1',
       environment: process.env.NODE_ENV || 'dev',
@@ -131,8 +136,11 @@ export class ServiceFactory {
         userProgress: process.env.USER_PROGRESS_TABLE_NAME || '',
         goals: process.env.GOALS_TABLE_NAME || '',
       },
+      s3: {
+        bucketName: questionDataBucket,
+      },
       buckets: {
-        questionData: process.env.QUESTION_DATA_BUCKET_NAME || '',
+        questionData: questionDataBucket,
         assets: process.env.ASSETS_BUCKET_NAME || '',
       },
     };
@@ -180,19 +188,86 @@ export class ServiceFactory {
     return this.config;
   }
 
+  // Repository getters
+
   /**
-   * Get Health Service
+   * Get User Repository
    */
-  public getHealthService(): IHealthService {
-    if (!this._healthService) {
-      // Import and instantiate HealthService when needed
-      const { HealthService } = require('../services/health.service');
-      this._healthService = new HealthService(this);
+  public getUserRepository(): IUserRepository {
+    if (!this._userRepository) {
+      const { UserRepository } = require('../repositories/user.repository');
+      this._userRepository = new UserRepository(this.getDynamoClient(), this.getConfig());
     }
-    return this._healthService!;
+    return this._userRepository!;
   }
 
-  // Phase 2+ service getters (placeholder implementations)
+  /**
+   * Get Session Repository
+   */
+  public getSessionRepository(): ISessionRepository {
+    if (!this._sessionRepository) {
+      const { SessionRepository } = require('../repositories/session.repository');
+      this._sessionRepository = new SessionRepository(this.getDynamoClient(), this.getConfig());
+    }
+    return this._sessionRepository!;
+  }
+
+  /**
+   * Get Provider Repository
+   */
+  public getProviderRepository(): IProviderRepository {
+    if (!this._providerRepository) {
+      const { ProviderRepository } = require('../repositories/provider.repository');
+      this._providerRepository = new ProviderRepository(this.getS3Client(), this.getConfig());
+    }
+    return this._providerRepository!;
+  }
+
+  /**
+   * Get Exam Repository
+   */
+  public getExamRepository(): IExamRepository {
+    if (!this._examRepository) {
+      const { ExamRepository } = require('../repositories/exam.repository');
+      this._examRepository = new ExamRepository(this.getS3Client(), this.getConfig());
+    }
+    return this._examRepository!;
+  }
+
+  /**
+   * Get Topic Repository
+   */
+  public getTopicRepository(): ITopicRepository {
+    if (!this._topicRepository) {
+      const { TopicRepository } = require('../repositories/topic.repository');
+      this._topicRepository = new TopicRepository(this.getS3Client(), this.getConfig());
+    }
+    return this._topicRepository!;
+  }
+
+  /**
+   * Get Question Repository
+   */
+  public getQuestionRepository(): IQuestionRepository {
+    if (!this._questionRepository) {
+      const { QuestionRepository } = require('../repositories/question.repository');
+      this._questionRepository = new QuestionRepository(this.getS3Client(), this.getConfig());
+    }
+    return this._questionRepository!;
+  }
+
+  /**
+   * Get Health Repository
+   */
+  public getHealthRepository(): IHealthRepository {
+    if (!this._healthRepository) {
+      const { HealthRepository } = require('../repositories/health.repository');
+      this._healthRepository = new HealthRepository(this.getDynamoClient(), this.getS3Client(), this.getConfig());
+    }
+    return this._healthRepository!;
+  }
+
+  // Service getters
   
   /**
    * Get Auth Service
@@ -222,7 +297,7 @@ export class ServiceFactory {
   public getProviderService(): IProviderService {
     if (!this._providerService) {
       const { ProviderService } = require('../services/provider.service');
-      this._providerService = new ProviderService(this.getS3Client(), this.getConfig().buckets.questionData);
+      this._providerService = new ProviderService(this.getProviderRepository());
     }
     return this._providerService!;
   }
@@ -233,7 +308,7 @@ export class ServiceFactory {
   public getExamService(): IExamService {
     if (!this._examService) {
       const { ExamService } = require('../services/exam.service');
-      this._examService = new ExamService(this.getS3Client(), this.getConfig().buckets.questionData);
+      this._examService = new ExamService(this.getExamRepository());
     }
     return this._examService!;
   }
@@ -244,7 +319,7 @@ export class ServiceFactory {
   public getTopicService(): ITopicService {
     if (!this._topicService) {
       const { TopicService } = require('../services/topic.service');
-      this._topicService = new TopicService(this.getS3Client(), this.getConfig().buckets.questionData);
+      this._topicService = new TopicService(this.getTopicRepository());
     }
     return this._topicService!;
   }
@@ -255,7 +330,7 @@ export class ServiceFactory {
   public getQuestionService(): IQuestionService {
     if (!this._questionService) {
       const { QuestionService } = require('../services/question.service');
-      this._questionService = new QuestionService(this.getS3Client(), this.getConfig().buckets.questionData);
+      this._questionService = new QuestionService(this.getQuestionRepository());
     }
     return this._questionService!;
   }
@@ -267,12 +342,25 @@ export class ServiceFactory {
     if (!this._sessionService) {
       const { SessionService } = require('../services/session.service');
       this._sessionService = new SessionService(
-        this.getDynamoClient(),
-        this,
-        this.getConfig().tables.studySessions
+        this.getSessionRepository(),
+        this.getProviderService(),
+        this.getExamService(),
+        this.getTopicService(),
+        this.getQuestionService()
       );
     }
     return this._sessionService!;
+  }
+
+  /**
+   * Get Health Service
+   */
+  public getHealthService(): IHealthService {
+    if (!this._healthService) {
+      const { HealthService } = require('../services/health.service');
+      this._healthService = new HealthService(this.getHealthRepository());
+    }
+    return this._healthService!;
   }
 
   /**
@@ -280,8 +368,8 @@ export class ServiceFactory {
    */
   public getAnalyticsService(): IAnalyticsService {
     if (!this._analyticsService) {
-      // Will be implemented in Phase 2
-      throw new Error('AnalyticsService not implemented yet - Phase 2');
+      // Will be implemented in later phases
+      throw new Error('AnalyticsService not implemented yet - later phases');
     }
     return this._analyticsService;
   }
@@ -291,67 +379,10 @@ export class ServiceFactory {
    */
   public getGoalsService(): IGoalsService {
     if (!this._goalsService) {
-      // Will be implemented in Phase 2
-      throw new Error('GoalsService not implemented yet - Phase 2');
+      // Will be implemented in later phases
+      throw new Error('GoalsService not implemented yet - later phases');
     }
     return this._goalsService;
-  }
-
-  // Repository getters (Phase 2+ implementations)
-
-  /**
-   * Get User Repository
-   */
-  public getUserRepository(): IUserRepository {
-    if (!this._userRepository) {
-      const { UserRepository } = require('../repositories/user.repository');
-      this._userRepository = new UserRepository(this.getDynamoClient(), this.getConfig());
-    }
-    return this._userRepository!;
-  }
-
-  /**
-   * Get Session Repository
-   */
-  public getSessionRepository(): ISessionRepository {
-    if (!this._sessionRepository) {
-      // Will be implemented in Phase 2
-      throw new Error('SessionRepository not implemented yet - Phase 2');
-    }
-    return this._sessionRepository;
-  }
-
-  /**
-   * Get Question Repository
-   */
-  public getQuestionRepository(): IQuestionRepository {
-    if (!this._questionRepository) {
-      // Will be implemented in Phase 2
-      throw new Error('QuestionRepository not implemented yet - Phase 2');
-    }
-    return this._questionRepository;
-  }
-
-  /**
-   * Get Progress Repository
-   */
-  public getProgressRepository(): IProgressRepository {
-    if (!this._progressRepository) {
-      // Will be implemented in Phase 2
-      throw new Error('ProgressRepository not implemented yet - Phase 2');
-    }
-    return this._progressRepository;
-  }
-
-  /**
-   * Get Goals Repository
-   */
-  public getGoalsRepository(): IGoalsRepository {
-    if (!this._goalsRepository) {
-      // Will be implemented in Phase 2
-      throw new Error('GoalsRepository not implemented yet - Phase 2');
-    }
-    return this._goalsRepository;
   }
 
   /**
@@ -360,6 +391,17 @@ export class ServiceFactory {
   public reset(): void {
     this._dynamoClient = null;
     this._s3Client = null;
+    
+    // Reset repositories
+    this._userRepository = null;
+    this._sessionRepository = null;
+    this._providerRepository = null;
+    this._examRepository = null;
+    this._topicRepository = null;
+    this._questionRepository = null;
+    this._healthRepository = null;
+
+    // Reset services
     this._authService = null;
     this._userService = null;
     this._providerService = null;
@@ -370,10 +412,5 @@ export class ServiceFactory {
     this._analyticsService = null;
     this._goalsService = null;
     this._healthService = null;
-    this._userRepository = null;
-    this._sessionRepository = null;
-    this._questionRepository = null;
-    this._progressRepository = null;
-    this._goalsRepository = null;
   }
 }

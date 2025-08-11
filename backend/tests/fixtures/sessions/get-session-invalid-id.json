@@ -1,0 +1,17 @@
+{
+  "name": "Get session - invalid session ID format",
+  "description": "Attempt to get session with invalid UUID format",
+  "method": "GET",
+  "path": "/v1/sessions/invalid-session-id",
+  "headers": {
+    "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ1c2VyLTEyMyIsImVtYWlsIjoidGVzdEB0ZXN0LmNvbSIsInNlc3Npb25JZCI6InNlc3MtMTIzIiwiaWF0IjoxNzA5MjQ0MDAwLCJleHAiOjE3MDkyNDc2MDB9.test"
+  },
+  "expectedStatus": 400,
+  "expectedResponse": {
+    "success": false,
+    "error": {
+      "code": "VALIDATION_ERROR",
+      "message": "Invalid session ID format"
+    }
+  }
+}

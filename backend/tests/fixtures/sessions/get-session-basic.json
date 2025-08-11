@@ -1,0 +1,87 @@
+{
+  "name": "Get session - basic valid request",
+  "description": "Get an existing active session with questions and progress",
+  "method": "GET",
+  "path": "/v1/sessions/550e8400-e29b-41d4-a716-446655440001",
+  "headers": {
+    "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ1c2VyLTEyMyIsImVtYWlsIjoidGVzdEB0ZXN0LmNvbSIsInNlc3Npb25JZCI6InNlc3MtMTIzIiwiaWF0IjoxNzA5MjQ0MDAwLCJleHAiOjE3MDkyNDc2MDB9.test"
+  },
+  "expectedStatus": 200,
+  "expectedResponse": {
+    "success": true,
+    "message": "Session retrieved successfully",
+    "data": {
+      "session": {
+        "sessionId": "550e8400-e29b-41d4-a716-446655440001",
+        "userId": "user-123",
+        "examId": "saa-c03",
+        "providerId": "aws",
+        "startTime": "2024-03-01T10:00:00.000Z",
+        "status": "active",
+        "questions": [
+          {
+            "questionId": "q-aws-saa-001",
+            "correctAnswer": ["option-0"],
+            "timeSpent": 0,
+            "skipped": false,
+            "markedForReview": false
+          },
+          {
+            "questionId": "q-aws-saa-002", 
+            "userAnswer": ["option-1"],
+            "correctAnswer": ["option-1"],
+            "isCorrect": true,
+            "timeSpent": 45,
+            "skipped": false,
+            "markedForReview": false,
+            "answeredAt": "2024-03-01T10:01:30.000Z"
+          }
+        ],
+        "currentQuestionIndex": 1,
+        "totalQuestions": 10,
+        "correctAnswers": 1,
+        "createdAt": "2024-03-01T10:00:00.000Z",
+        "updatedAt": "2024-03-01T10:01:30.000Z"
+      },
+      "questions": [
+        {
+          "questionId": "q-aws-saa-001",
+          "text": "Which AWS service provides managed relational database hosting?",
+          "options": [
+            {
+              "id": "option-0",
+              "text": "Amazon RDS"
+            },
+            {
+              "id": "option-1", 
+              "text": "Amazon S3"
+            },
+            {
+              "id": "option-2",
+              "text": "Amazon EC2"
+            },
+            {
+              "id": "option-3",
+              "text": "Amazon DynamoDB"
+            }
+          ],
+          "topicId": "databases",
+          "topicName": "Databases",
+          "difficulty": "easy",
+          "timeAllowed": 60,
+          "markedForReview": false
+        }
+      ],
+      "progress": {
+        "sessionId": "550e8400-e29b-41d4-a716-446655440001",
+        "currentQuestion": 2,
+        "totalQuestions": 10,
+        "answeredQuestions": 1,
+        "correctAnswers": 1,
+        "timeElapsed": 45,
+        "timeRemaining": 405,
+        "accuracy": 100
+      }
+    }
+  }
+}

@@ -142,6 +142,8 @@ export interface GetProvidersRequest {
   status?: ProviderStatus;
   search?: string;
   includeInactive?: boolean;
+  limit?: number;
+  offset?: number;
 }
 
 export interface GetProvidersResponse {
@@ -151,11 +153,17 @@ export interface GetProvidersResponse {
     categories: ProviderCategory[];
     statuses: ProviderStatus[];
   };
+  pagination?: {
+    limit: number;
+    offset: number;
+    hasMore: boolean;
+  };
 }
 
 export interface GetProviderRequest {
   id: string;
   includeCertifications?: boolean;
+  includeInactive?: boolean;
 }
 
 export interface GetProviderResponse {

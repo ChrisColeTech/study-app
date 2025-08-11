@@ -8,7 +8,8 @@ import { SessionService } from '../services/session.service';
 import { createLogger } from '../shared/logger';
 import { ERROR_CODES } from '../shared/constants/error.constants';
 import { 
-  CreateSessionRequest
+  CreateSessionRequest,
+  UpdateSessionRequest
 } from '../shared/types/session.types';
 
 export class SessionHandler extends BaseHandler {
@@ -34,6 +35,13 @@ export class SessionHandler extends BaseHandler {
         method: 'GET',
         path: '/v1/sessions/{id}',
         handler: this.getSession.bind(this),
+        requireAuth: true, // Sessions require authentication
+      },
+      // Update existing session endpoint
+      {
+        method: 'PUT',
+        path: '/v1/sessions/{id}',
+        handler: this.updateSession.bind(this),
         requireAuth: true, // Sessions require authentication
       }
     ];
@@ -362,6 +370,251 @@ export class SessionHandler extends BaseHandler {
         'Failed to retrieve session'
       );
     }
+  }
+
+  /**
+   * Update an existing study session for pause/resume and navigation
+   * PUT /v1/sessions/{id}
+   * Phase 17: Session Update Feature
+   */
+  private async updateSession(context: HandlerContext): Promise<ApiResponse> {
+    const sessionId = context.event.pathParameters?.id;
+    
+    try {
+      this.logger.info('Updating session', { 
+        requestId: context.requestId,
+        ...(context.userId ? { userId: context.userId } : {}),
+        ...(sessionId ? { sessionId } : {}),
+        hasBody: !!context.event.body
+      });
+
+      // Validate authentication
+      if (!context.userId) {
+        return this.error(
+          ERROR_CODES.UNAUTHORIZED,
+          'Authentication required to update sessions'
+        );
+      }
+
+      // Validate session ID parameter
+      if (!sessionId) {
+        return this.error(
+          ERROR_CODES.VALIDATION_ERROR,
+          'Session ID is required'
+        );
+      }
+
+      // Validate session ID format
+      if (!/^[a-f0-9-]{36}$/.test(sessionId)) {
+        return this.error(
+          ERROR_CODES.VALIDATION_ERROR,
+          'Invalid session ID format'
+        );
+      }
+
+      // Parse and validate request body
+      if (!context.event.body) {
+        return this.error(
+          ERROR_CODES.VALIDATION_ERROR,
+          'Request body is required'
+        );
+      }
+
+      let requestBody: any;
+      try {
+        requestBody = JSON.parse(context.event.body);
+      } catch (error) {
+        return this.error(
+          ERROR_CODES.VALIDATION_ERROR,
+          'Invalid JSON in request body'
+        );
+      }
+
+      // Validate request body
+      const validationError = this.validateUpdateSessionRequest(requestBody);
+      if (validationError) {
+        return validationError;
+      }
+
+      // Build session update request
+      const request: UpdateSessionRequest = {
+        action: requestBody.action,
+        currentQuestionIndex: requestBody.currentQuestionIndex,
+        status: requestBody.status,
+        questionId: requestBody.questionId,
+        userAnswer: requestBody.userAnswer,
+        timeSpent: requestBody.timeSpent,
+        skipped: requestBody.skipped,
+        markedForReview: requestBody.markedForReview
+      };
+
+      this.logger.debug('Session update request validated', {
+        requestId: context.requestId,
+        userId: context.userId,
+        sessionId,
+        action: request.action,
+        status: request.status,
+        currentQuestionIndex: request.currentQuestionIndex
+      });
+
+      // Update session through service
+      const sessionService: SessionService = this.serviceFactory.getSessionService() as SessionService;
+      const result = await sessionService.updateSession(sessionId, context.userId, request);
+
+      this.logger.info('Session updated successfully', { 
+        requestId: context.requestId,
+        userId: context.userId,
+        sessionId: result.session.sessionId,
+        status: result.session.status,
+        currentQuestion: result.progress.currentQuestion,
+        action: request.action
+      });
+
+      return this.success(result, 'Session updated successfully');
+
+    } catch (error: any) {
+      this.logger.error('Failed to update session', error, { 
+        requestId: context.requestId,
+        ...(context.userId ? { userId: context.userId } : {}),
+        ...(sessionId ? { sessionId } : {}),
+        hasBody: !!context.event.body
+      });
+
+      // Handle specific error types
+      if (error.message.includes('Session not found') || 
+          error.message.includes('access denied')) {
+        return this.error(
+          ERROR_CODES.NOT_FOUND,
+          'Session not found or access denied'
+        );
+      }
+
+      if (error.message.includes('Invalid transition') ||
+          error.message.includes('Invalid action') ||
+          error.message.includes('Cannot pause') ||
+          error.message.includes('Cannot resume') ||
+          error.message.includes('validation') ||
+          error.message.includes('Invalid')) {
+        return this.error(
+          ERROR_CODES.VALIDATION_ERROR,
+          error.message
+        );
+      }
+
+      if (error.message.includes('already completed') ||
+          error.message.includes('already abandoned')) {
+        return this.error(
+          ERROR_CODES.CONFLICT,
+          error.message
+        );
+      }
+
+      return this.error(
+        ERROR_CODES.INTERNAL_ERROR,
+        'Failed to update session'
+      );
+    }
+  }
+
+  /**
+   * Validate update session request body
+   */
+  private validateUpdateSessionRequest(requestBody: any): ApiResponse | null {
+    // Check required action field
+    if (!requestBody.action || typeof requestBody.action !== 'string') {
+      return this.error(
+        ERROR_CODES.VALIDATION_ERROR,
+        'action is required and must be a string'
+      );
+    }
+
+    // Validate action enum
+    const validActions = ['pause', 'resume', 'next', 'previous', 'answer', 'mark_for_review', 'complete'];
+    if (!validActions.includes(requestBody.action)) {
+      return this.error(
+        ERROR_CODES.VALIDATION_ERROR,
+        `action must be one of: ${validActions.join(', ')}`
+      );
+    }
+
+    // Validate status if provided
+    if (requestBody.status !== undefined) {
+      const validStatuses = ['active', 'paused', 'completed', 'abandoned'];
+      if (!validStatuses.includes(requestBody.status)) {
+        return this.error(
+          ERROR_CODES.VALIDATION_ERROR,
+          `status must be one of: ${validStatuses.join(', ')}`
+        );
+      }
+    }
+
+    // Validate currentQuestionIndex if provided
+    if (requestBody.currentQuestionIndex !== undefined) {
+      if (typeof requestBody.currentQuestionIndex !== 'number' || 
+          requestBody.currentQuestionIndex < 0) {
+        return this.error(
+          ERROR_CODES.VALIDATION_ERROR,
+          'currentQuestionIndex must be a non-negative number'
+        );
+      }
+    }
+
+    // Validate answer-specific fields
+    if (requestBody.action === 'answer') {
+      if (!requestBody.questionId || typeof requestBody.questionId !== 'string') {
+        return this.error(
+          ERROR_CODES.VALIDATION_ERROR,
+          'questionId is required when submitting an answer'
+        );
+      }
+
+      if (!requestBody.userAnswer || !Array.isArray(requestBody.userAnswer)) {
+        return this.error(
+          ERROR_CODES.VALIDATION_ERROR,
+          'userAnswer is required and must be an array when submitting an answer'
+        );
+      }
+
+      if (requestBody.timeSpent === undefined || typeof requestBody.timeSpent !== 'number' || requestBody.timeSpent < 0) {
+        return this.error(
+          ERROR_CODES.VALIDATION_ERROR,
+          'timeSpent is required and must be a non-negative number when submitting an answer'
+        );
+      }
+
+      if (requestBody.skipped !== undefined && typeof requestBody.skipped !== 'boolean') {
+        return this.error(
+          ERROR_CODES.VALIDATION_ERROR,
+          'skipped must be a boolean'
+        );
+      }
+
+      if (requestBody.markedForReview !== undefined && typeof requestBody.markedForReview !== 'boolean') {
+        return this.error(
+          ERROR_CODES.VALIDATION_ERROR,
+          'markedForReview must be a boolean'
+        );
+      }
+    }
+
+    // Validate mark for review specific fields
+    if (requestBody.action === 'mark_for_review') {
+      if (!requestBody.questionId || typeof requestBody.questionId !== 'string') {
+        return this.error(
+          ERROR_CODES.VALIDATION_ERROR,
+          'questionId is required when marking for review'
+        );
+      }
+
+      if (requestBody.markedForReview === undefined || typeof requestBody.markedForReview !== 'boolean') {
+        return this.error(
+          ERROR_CODES.VALIDATION_ERROR,
+          'markedForReview is required and must be a boolean when marking for review'
+        );
+      }
+    }
+
+    return null; // No validation errors
   }
 }
 

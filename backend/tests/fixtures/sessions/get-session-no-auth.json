@@ -1,0 +1,15 @@
+{
+  "name": "Get session - no authentication",
+  "description": "Attempt to get session without authentication token",
+  "method": "GET",
+  "path": "/v1/sessions/550e8400-e29b-41d4-a716-446655440001",
+  "headers": {},
+  "expectedStatus": 401,
+  "expectedResponse": {
+    "success": false,
+    "error": {
+      "code": "UNAUTHORIZED",
+      "message": "Authentication required to access sessions"
+    }
+  }
+}

@@ -13,8 +13,14 @@ export interface CreateSessionRequest {
 }
 
 export interface UpdateSessionRequest {
+  action: 'pause' | 'resume' | 'next' | 'previous' | 'answer' | 'mark_for_review' | 'complete';
   currentQuestionIndex?: number;
   status?: 'active' | 'paused' | 'completed' | 'abandoned';
+  questionId?: string; // Required for answer and mark_for_review actions
+  userAnswer?: string[]; // Required for answer action
+  timeSpent?: number; // Required for answer action (in seconds)
+  skipped?: boolean; // Optional for answer action
+  markedForReview?: boolean; // Required for mark_for_review action
 }
 
 export interface SubmitAnswerRequest {
@@ -101,6 +107,20 @@ export interface CreateSessionResponse {
   questions: QuestionResponse[];
 }
 
+export interface GetSessionResponse {
+  session: StudySession;
+  questions: QuestionResponse[];
+  progress: SessionProgress;
+}
+
+export interface UpdateSessionResponse {
+  session: StudySession;
+  questions: QuestionResponse[];
+  progress: SessionProgress;
+}
+
 export interface ISessionService {
   createSession(userId: string, request: CreateSessionRequest): Promise<CreateSessionResponse>;
+  getSession(sessionId: string, userId: string): Promise<GetSessionResponse>;
+  updateSession(sessionId: string, userId: string, request: UpdateSessionRequest): Promise<UpdateSessionResponse>;
 }

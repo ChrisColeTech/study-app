@@ -1,39 +1,23 @@
 // Topic service for Study App V3 Backend
 
-import { S3Client, GetObjectCommand, ListObjectsV2Command } from '@aws-sdk/client-s3';
 import { 
   Topic, 
   GetTopicsRequest, 
   GetTopicsResponse, 
   GetTopicRequest,
   GetTopicResponse,
-  ITopicService,
-  TopicMetadata
+  ITopicService
 } from '../shared/types/topic.types';
-import { Provider } from '../shared/types/provider.types';
+import { ITopicRepository } from '../repositories/topic.repository';
+import { createLogger } from '../shared/logger';
 
 // Re-export the interface for ServiceFactory
 export type { ITopicService };
-import { createLogger } from '../shared/logger';
-
-interface CacheEntry<T> {
-  data: T;
-  timestamp: number;
-  ttl: number;
-}
 
 export class TopicService implements ITopicService {
   private logger = createLogger({ component: 'TopicService' });
-  private s3Client: S3Client;
-  private bucketName: string;
-  private cache = new Map<string, CacheEntry<any>>();
-  private readonly CACHE_TTL = 15 * 60 * 1000; // 15 minutes in milliseconds
-  private readonly PROVIDERS_PREFIX = 'providers/';
 
-  constructor(s3Client: S3Client, bucketName: string) {
-    this.s3Client = s3Client;
-    this.bucketName = bucketName;
-  }
+  constructor(private topicRepository: ITopicRepository) {}
 
   /**
    * Get all topics with optional filtering
@@ -48,31 +32,21 @@ export class TopicService implements ITopicService {
     });
 
     try {
-      // Get all topics from cache or S3
-      const allTopics = await this.getAllTopics();
+      // Get topics from repository based on filters
+      let allTopics: Topic[];
+      
+      if (request.provider) {
+        allTopics = await this.topicRepository.findByProvider(request.provider);
+      } else if (request.exam) {
+        allTopics = await this.topicRepository.findByExam(request.exam);
+      } else {
+        allTopics = await this.topicRepository.findAll();
+      }
 
       // Apply filters
       let filteredTopics = allTopics;
 
-      // Filter by provider
-      if (request.provider) {
-        filteredTopics = filteredTopics.filter(t => 
-          t.providerId.toLowerCase() === request.provider!.toLowerCase() ||
-          t.providerName.toLowerCase().includes(request.provider!.toLowerCase())
-        );
-      }
-
-      // Filter by exam
-      if (request.exam) {
-        const searchLower = request.exam.toLowerCase();
-        filteredTopics = filteredTopics.filter(t => 
-          t.examId.toLowerCase() === searchLower ||
-          t.examName.toLowerCase().includes(searchLower) ||
-          t.examCode.toLowerCase().includes(searchLower)
-        );
-      }
-
-      // Filter by category
+      // Apply additional filters that weren't handled by repository methods
       if (request.category) {
         filteredTopics = filteredTopics.filter(t => 
           t.category?.toLowerCase().includes(request.category!.toLowerCase())
@@ -82,7 +56,17 @@ export class TopicService implements ITopicService {
       // Filter by level
       if (request.level) {
         filteredTopics = filteredTopics.filter(t => 
-          t.level.toLowerCase() === request.level!.toLowerCase()
+          t.level?.toLowerCase() === request.level!.toLowerCase()
+        );
+      }
+      
+      // Filter by exam if not already filtered by repository
+      if (request.exam && !request.provider) {
+        const searchLower = request.exam.toLowerCase();
+        filteredTopics = filteredTopics.filter(t => 
+          t.examId?.toLowerCase() === searchLower ||
+          t.examName?.toLowerCase().includes(searchLower) ||
+          (t.examCode && t.examCode.toLowerCase().includes(searchLower))
         );
       }
 
@@ -150,17 +134,8 @@ export class TopicService implements ITopicService {
     });
 
     try {
-      // Check cache first
-      const cacheKey = `topic:${request.id}`;
-      const cached = this.getFromCache<GetTopicResponse>(cacheKey);
-      if (cached) {
-        this.logger.debug('Topic retrieved from cache', { id: request.id });
-        return cached;
-      }
-
-      // Find topic by searching through all topics
-      const allTopics = await this.getAllTopics();
-      const topic = allTopics.find(t => t.id === request.id);
+      // Get topic from repository
+      const topic = await this.topicRepository.findById(request.id);
 
       if (!topic) {
         this.logger.warn('Topic not found', { id: request.id });
@@ -174,38 +149,24 @@ export class TopicService implements ITopicService {
 
       // Add provider context if requested
       if (request.includeProvider) {
-        try {
-          const provider = await this.loadProviderFromS3(topic.providerId);
-          response.providerContext = {
-            id: provider.id,
-            name: provider.name,
-            category: provider.category,
-            status: provider.status
-          };
-        } catch (error) {
-          this.logger.warn('Failed to load provider context', { providerId: topic.providerId, error: (error as Error).message });
-        }
+        response.providerContext = {
+          id: topic.providerId,
+          name: topic.providerName,
+          category: topic.category || 'other',
+          status: 'active'
+        };
       }
 
       // Add exam context if requested
       if (request.includeExam) {
-        try {
-          const provider = await this.loadProviderFromS3(topic.providerId);
-          const certification = provider.certifications?.find(cert => cert.id === topic.examId);
-          
-          if (certification) {
-            response.examContext = {
-              id: certification.id,
-              name: certification.name,
-              code: certification.code,
-              level: certification.level,
-              fullName: certification.fullName,
-              skillsValidated: certification.skillsValidated || []
-            };
-          }
-        } catch (error) {
-          this.logger.warn('Failed to load exam context', { providerId: topic.providerId, examId: topic.examId, error: (error as Error).message });
-        }
+        response.examContext = {
+          id: topic.examId,
+          name: topic.examName,
+          code: topic.examCode || topic.examId,
+          level: topic.level,
+          fullName: topic.examName,
+          skillsValidated: topic.skillsValidated || []
+        };
       }
 
       // Add basic stats (could be enhanced with real data)
@@ -218,9 +179,6 @@ export class TopicService implements ITopicService {
         response.stats.difficultyDistribution = { [topic.metadata.difficultyLevel.toString()]: 1 };
       }
 
-      // Cache the response
-      this.setCache(cacheKey, response);
-
       this.logger.info('Topic retrieved successfully', { id: request.id });
       return response;
 
@@ -231,259 +189,21 @@ export class TopicService implements ITopicService {
   }
 
   /**
-   * Get all topics from cache or S3
+   * Refresh topic cache (admin operation)
    */
-  private async getAllTopics(): Promise<Topic[]> {
-    const cacheKey = 'topics:all';
-
-    // Check cache first
-    const cached = this.getFromCache<Topic[]>(cacheKey);
-    if (cached) {
-      this.logger.debug('All topics retrieved from cache');
-      return cached;
-    }
-
-    // Load all topics from S3
-    const topics = await this.loadAllTopicsFromS3();
-
-    // Cache the results
-    this.setCache(cacheKey, topics);
-
-    this.logger.info('All topics loaded from S3', { count: topics.length });
-
-    return topics;
-  }
-
-  /**
-   * Load all topics from S3 by extracting from provider certification data
-   */
-  private async loadAllTopicsFromS3(): Promise<Topic[]> {
-    this.logger.debug('Loading all topics from S3 provider data');
+  async refreshCache(): Promise<void> {
+    this.logger.info('Refreshing topic cache');
 
     try {
-      // List all provider files in S3
-      const listCommand = new ListObjectsV2Command({
-        Bucket: this.bucketName,
-        Prefix: this.PROVIDERS_PREFIX,
-        MaxKeys: 100 // Should be enough for providers
-      });
-
-      const listResponse = await this.s3Client.send(listCommand);
+      this.topicRepository.clearCache();
       
-      if (!listResponse.Contents || listResponse.Contents.length === 0) {
-        this.logger.warn('No provider files found in S3');
-        return [];
-      }
-
-      // Load each provider file and extract topics
-      const allTopics: Topic[] = [];
+      // Warm up the cache by loading all topics
+      await this.topicRepository.findAll();
       
-      for (const item of listResponse.Contents) {
-        if (!item.Key || !item.Key.endsWith('.json')) continue;
-
-        try {
-          const providerId = item.Key.replace(this.PROVIDERS_PREFIX, '').replace('.json', '');
-          const provider = await this.loadProviderFromS3(providerId);
-          const providerTopics = this.extractTopicsFromProvider(provider);
-          allTopics.push(...providerTopics);
-        } catch (error) {
-          this.logger.warn('Failed to load topics from provider file', { key: item.Key, error: (error as Error).message });
-          // Continue loading other providers
-        }
-      }
-
-      // Remove duplicates based on topic name and provider/exam combination
-      const uniqueTopics = this.deduplicateTopics(allTopics);
-
-      return uniqueTopics;
-
+      this.logger.info('Topic cache refreshed successfully');
     } catch (error) {
-      this.logger.error('Failed to load topics from S3', error as Error);
-      throw new Error('Failed to load topics from storage');
-    }
-  }
-
-  /**
-   * Load a specific provider from S3
-   */
-  private async loadProviderFromS3(providerId: string): Promise<Provider> {
-    this.logger.debug('Loading provider from S3 for topic extraction', { id: providerId });
-
-    try {
-      const key = `${this.PROVIDERS_PREFIX}${providerId}.json`;
-      
-      const command = new GetObjectCommand({
-        Bucket: this.bucketName,
-        Key: key
-      });
-
-      const response = await this.s3Client.send(command);
-      
-      if (!response.Body) {
-        throw new Error(`Provider file ${key} has no content`);
-      }
-
-      const content = await response.Body.transformToString();
-      const provider: Provider = JSON.parse(content);
-
-      // Validate that the provider has required fields
-      if (!provider.id || !provider.name || !provider.status) {
-        throw new Error(`Invalid provider data in ${key}: missing required fields`);
-      }
-
-      return provider;
-
-    } catch (error) {
-      this.logger.error('Failed to load provider from S3 for topics', error as Error, { id: providerId });
+      this.logger.error('Failed to refresh topic cache', error as Error);
       throw error;
     }
-  }
-
-  /**
-   * Extract topics from a provider's certification data
-   */
-  private extractTopicsFromProvider(provider: Provider): Topic[] {
-    const topics: Topic[] = [];
-    const now = new Date().toISOString();
-
-    if (!provider.certifications || provider.certifications.length === 0) {
-      return topics;
-    }
-
-    for (const certification of provider.certifications) {
-      if (!certification.topics || certification.topics.length === 0) {
-        continue;
-      }
-
-      for (const topicName of certification.topics) {
-        const topicId = this.generateTopicId(provider.id, certification.id, topicName);
-        
-        const metadata: TopicMetadata = {};
-        
-        // Only set fields that have values
-        if (certification.metadata?.difficultyLevel !== undefined) {
-          metadata.difficultyLevel = certification.metadata.difficultyLevel;
-        }
-        if (certification.metadata?.popularityRank !== undefined) {
-          metadata.popularityRank = certification.metadata.popularityRank;
-        }
-        if (certification.metadata?.marketDemand !== undefined) {
-          metadata.marketDemand = certification.metadata.marketDemand;
-        }
-        if (certification.metadata?.jobRoles !== undefined) {
-          metadata.jobRoles = certification.metadata.jobRoles;
-        }
-        if (certification.metadata?.industries !== undefined) {
-          metadata.industries = certification.metadata.industries;
-        }
-        if (certification.metadata?.studyTimeRecommended !== undefined) {
-          metadata.studyTimeRecommended = certification.metadata.studyTimeRecommended;
-        }
-
-        const topic: Topic = {
-          id: topicId,
-          name: topicName,
-          category: provider.category,
-          providerId: provider.id,
-          providerName: provider.name,
-          examId: certification.id,
-          examName: certification.name,
-          examCode: certification.code,
-          level: certification.level,
-          description: `${topicName} - covered in ${certification.fullName}`,
-          skillsValidated: certification.skillsValidated ?? [],
-          metadata,
-          createdAt: now,
-          updatedAt: now
-        };
-
-        topics.push(topic);
-      }
-    }
-
-    return topics;
-  }
-
-  /**
-   * Generate a consistent topic ID
-   */
-  private generateTopicId(providerId: string, certificationId: string, topicName: string): string {
-    const normalizedTopic = topicName.toLowerCase()
-      .replace(/[^a-z0-9\s]/g, '') // Remove special characters
-      .replace(/\s+/g, '-') // Replace spaces with hyphens
-      .replace(/^-+|-+$/g, ''); // Remove leading/trailing hyphens
-
-    return `${providerId}-${certificationId}-${normalizedTopic}`;
-  }
-
-  /**
-   * Remove duplicate topics based on name and provider/exam combination
-   */
-  private deduplicateTopics(topics: Topic[]): Topic[] {
-    const seen = new Set<string>();
-    const uniqueTopics: Topic[] = [];
-
-    for (const topic of topics) {
-      const key = `${topic.providerId}-${topic.examId}-${topic.name.toLowerCase()}`;
-      
-      if (!seen.has(key)) {
-        seen.add(key);
-        uniqueTopics.push(topic);
-      }
-    }
-
-    return uniqueTopics;
-  }
-
-  /**
-   * Get data from cache if not expired
-   */
-  private getFromCache<T>(key: string): T | null {
-    const entry = this.cache.get(key);
-    
-    if (!entry) {
-      return null;
-    }
-
-    // Check if expired
-    if (Date.now() > entry.timestamp + entry.ttl) {
-      this.cache.delete(key);
-      return null;
-    }
-
-    return entry.data as T;
-  }
-
-  /**
-   * Set data in cache with TTL
-   */
-  private setCache<T>(key: string, data: T, ttl: number = this.CACHE_TTL): void {
-    const entry: CacheEntry<T> = {
-      data,
-      timestamp: Date.now(),
-      ttl
-    };
-
-    this.cache.set(key, entry);
-  }
-
-  /**
-   * Get cache statistics (useful for monitoring)
-   */
-  public getCacheStats(): {
-    size: number;
-    entries: Array<{ key: string; age: number; ttl: number }>;
-  } {
-    const now = Date.now();
-    const entries = Array.from(this.cache.entries()).map(([key, entry]) => ({
-      key,
-      age: now - entry.timestamp,
-      ttl: entry.ttl
-    }));
-
-    return {
-      size: this.cache.size,
-      entries
-    };
   }
 }

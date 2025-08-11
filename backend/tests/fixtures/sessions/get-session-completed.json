@@ -1,0 +1,63 @@
+{
+  "name": "Get session - completed session with full results",
+  "description": "Get a completed session showing final scores and results",
+  "method": "GET",
+  "path": "/v1/sessions/550e8400-e29b-41d4-a716-446655440003",
+  "headers": {
+    "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ1c2VyLTEyMyIsImVtYWlsIjoidGVzdEB0ZXN0LmNvbSIsInNlc3Npb25JZCI6InNlc3MtMTIzIiwiaWF0IjoxNzA5MjQ0MDAwLCJleHAiOjE3MDkyNDc2MDB9.test"
+  },
+  "expectedStatus": 200,
+  "expectedResponse": {
+    "success": true,
+    "message": "Session retrieved successfully",
+    "data": {
+      "session": {
+        "sessionId": "550e8400-e29b-41d4-a716-446655440003",
+        "userId": "user-123",
+        "examId": "saa-c03",
+        "providerId": "aws",
+        "startTime": "2024-03-01T10:00:00.000Z",
+        "endTime": "2024-03-01T10:15:00.000Z",
+        "status": "completed",
+        "questions": [
+          {
+            "questionId": "q-aws-saa-001",
+            "userAnswer": ["option-0"],
+            "correctAnswer": ["option-0"],
+            "isCorrect": true,
+            "timeSpent": 60,
+            "skipped": false,
+            "markedForReview": false,
+            "answeredAt": "2024-03-01T10:01:00.000Z"
+          },
+          {
+            "questionId": "q-aws-saa-002",
+            "userAnswer": ["option-2"],
+            "correctAnswer": ["option-1"],
+            "isCorrect": false,
+            "timeSpent": 90,
+            "skipped": false,
+            "markedForReview": true,
+            "answeredAt": "2024-03-01T10:02:30.000Z"
+          }
+        ],
+        "currentQuestionIndex": 2,
+        "totalQuestions": 2,
+        "correctAnswers": 1,
+        "score": 50,
+        "createdAt": "2024-03-01T10:00:00.000Z",
+        "updatedAt": "2024-03-01T10:15:00.000Z"
+      },
+      "questions": [],
+      "progress": {
+        "sessionId": "550e8400-e29b-41d4-a716-446655440003",
+        "currentQuestion": 2,
+        "totalQuestions": 2,
+        "answeredQuestions": 2,
+        "correctAnswers": 1,
+        "timeElapsed": 150,
+        "accuracy": 50
+      }
+    }
+  }
+}

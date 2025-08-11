@@ -1,7 +1,7 @@
 // Session service for Study App V3 Backend
 // Phase 15: Session Creation Feature
+// Phase 17: Session Update Feature
 
-import { DynamoDBDocumentClient, PutCommand, GetCommand } from '@aws-sdk/lib-dynamodb';
 import { v4 as uuidv4 } from 'uuid';
 import { 
   StudySession, 
@@ -11,11 +11,19 @@ import { Question } from '../shared/types/question.types';
 import {
   CreateSessionRequest,
   CreateSessionResponse,
+  GetSessionResponse,
+  UpdateSessionRequest,
+  UpdateSessionResponse,
   QuestionResponse,
   SessionQuestionOption,
+  SessionProgress,
   ISessionService
 } from '../shared/types/session.types';
-import { ServiceFactory } from '../shared/service-factory';
+import { ISessionRepository } from '../repositories/session.repository';
+import { IProviderService } from './provider.service';
+import { IExamService } from './exam.service';
+import { ITopicService } from './topic.service';
+import { IQuestionService } from './question.service';
 import { createLogger } from '../shared/logger';
 
 // Re-export the interface for ServiceFactory
@@ -23,15 +31,14 @@ export type { ISessionService };
 
 export class SessionService implements ISessionService {
   private logger = createLogger({ component: 'SessionService' });
-  private dynamoClient: DynamoDBDocumentClient;
-  private serviceFactory: ServiceFactory;
-  private studySessionsTable: string;
 
-  constructor(dynamoClient: DynamoDBDocumentClient, serviceFactory: ServiceFactory, studySessionsTable: string) {
-    this.dynamoClient = dynamoClient;
-    this.serviceFactory = serviceFactory;
-    this.studySessionsTable = studySessionsTable;
-  }
+  constructor(
+    private sessionRepository: ISessionRepository,
+    private providerService: IProviderService,
+    private examService: IExamService,
+    private topicService: ITopicService,
+    private questionService: IQuestionService
+  ) {}
 
   /**
    * Create a new study session with configuration
@@ -90,8 +97,8 @@ export class SessionService implements ISessionService {
         updatedAt: now
       };
 
-      // Store session in DynamoDB
-      await this.storeSession(session);
+      // Store session using repository
+      const createdSession = await this.sessionRepository.create(session);
 
       // Prepare question responses (without correct answers or explanations)
       const questionResponses: QuestionResponse[] = sessionQuestions.map(q => ({
@@ -109,16 +116,16 @@ export class SessionService implements ISessionService {
       }));
 
       const response: CreateSessionResponse = {
-        session,
+        session: createdSession,
         questions: questionResponses
       };
 
       this.logger.info('Session created successfully', { 
-        sessionId: session.sessionId,
+        sessionId: createdSession.sessionId,
         userId,
-        totalQuestions: session.totalQuestions,
-        providerId: session.providerId,
-        examId: session.examId
+        totalQuestions: createdSession.totalQuestions,
+        providerId: createdSession.providerId,
+        examId: createdSession.examId
       });
 
       return response;
@@ -133,21 +140,135 @@ export class SessionService implements ISessionService {
   }
 
   /**
+   * Get an existing study session
+   * Phase 16: Session Retrieval Feature
+   */
+  async getSession(sessionId: string, userId: string): Promise<GetSessionResponse> {
+    this.logger.info('Retrieving session', { sessionId, userId });
+
+    try {
+      // Retrieve session using repository
+      const session = await this.sessionRepository.findById(sessionId);
+
+      if (!session) {
+        throw new Error('Session not found');
+      }
+
+      // Verify session belongs to the user
+      if (session.userId !== userId) {
+        throw new Error('Session not found or access denied');
+      }
+
+      // Get full question details for current session
+      const questions = await this.getSessionQuestionsWithDetails(session);
+
+      // Calculate session progress
+      const progress = this.calculateSessionProgress(session);
+
+      const response: GetSessionResponse = {
+        session,
+        questions,
+        progress
+      };
+
+      this.logger.info('Session retrieved successfully', { 
+        sessionId: session.sessionId,
+        userId,
+        status: session.status,
+        currentQuestion: session.currentQuestionIndex,
+        totalQuestions: session.totalQuestions
+      });
+
+      return response;
+
+    } catch (error) {
+      this.logger.error('Failed to retrieve session', error as Error, { 
+        sessionId,
+        userId
+      });
+      throw error;
+    }
+  }
+
+  /**
+   * Update session (Phase 17: Session Update Feature)
+   */
+  async updateSession(sessionId: string, userId: string, request: UpdateSessionRequest): Promise<UpdateSessionResponse> {
+    this.logger.info('Updating session', { sessionId, userId, updates: Object.keys(request) });
+
+    try {
+      // First verify the session exists and belongs to the user
+      const existingSession = await this.sessionRepository.findById(sessionId);
+
+      if (!existingSession) {
+        throw new Error('Session not found');
+      }
+
+      if (existingSession.userId !== userId) {
+        throw new Error('Session not found or access denied');
+      }
+
+      // Validate the update request
+      this.validateUpdateRequest(request, existingSession);
+
+      // Prepare update data
+      const updateData: Partial<StudySession> = {};
+
+      if (request.status !== undefined) {
+        updateData.status = request.status;
+      }
+
+      if (request.currentQuestionIndex !== undefined) {
+        updateData.currentQuestionIndex = request.currentQuestionIndex;
+      }
+
+
+      // Update session using repository
+      const updatedSession = await this.sessionRepository.update(sessionId, updateData);
+
+      // Get updated question details and progress
+      const questions = await this.getSessionQuestionsWithDetails(updatedSession);
+      const progress = this.calculateSessionProgress(updatedSession);
+
+      const response: UpdateSessionResponse = {
+        session: updatedSession,
+        questions,
+        progress
+      };
+
+      this.logger.info('Session updated successfully', { 
+        sessionId: updatedSession.sessionId,
+        userId,
+        status: updatedSession.status,
+        currentQuestion: updatedSession.currentQuestionIndex
+      });
+
+      return response;
+
+    } catch (error) {
+      this.logger.error('Failed to update session', error as Error, { 
+        sessionId,
+        userId,
+        request
+      });
+      throw error;
+    }
+  }
+
+  /**
    * Validate session creation request
    */
   private async validateSessionRequest(request: CreateSessionRequest): Promise<void> {
     // Validate provider exists
-    const providerService = this.serviceFactory.getProviderService();
     try {
-      await providerService.getProvider({ id: request.providerId });
+      await this.providerService.getProvider({ id: request.providerId });
     } catch (error) {
       throw new Error(`Invalid provider: ${request.providerId}`);
     }
 
     // Validate exam exists for the provider
-    const examService = this.serviceFactory.getExamService();
     try {
-      const examResponse = await examService.getExam(request.examId, { 
+      const examResponse = await this.examService.getExam(request.examId, { 
         includeProvider: true
       });
       if (examResponse.exam.providerId !== request.providerId) {
@@ -159,10 +280,9 @@ export class SessionService implements ISessionService {
 
     // Validate topics if provided
     if (request.topics && request.topics.length > 0) {
-      const topicService = this.serviceFactory.getTopicService();
       for (const topicId of request.topics) {
         try {
-          const topicResponse = await topicService.getTopic({ 
+          const topicResponse = await this.topicService.getTopic({ 
             id: topicId
           });
           if (topicResponse.topic.examId !== request.examId) {
@@ -186,11 +306,39 @@ export class SessionService implements ISessionService {
   }
 
   /**
+   * Validate session update request
+   */
+  private validateUpdateRequest(request: UpdateSessionRequest, existingSession: StudySession): void {
+    // Can't update completed or abandoned sessions
+    if (existingSession.status === 'completed' || existingSession.status === 'abandoned') {
+      throw new Error('Cannot update completed or abandoned sessions');
+    }
+
+    // Validate status transitions
+    if (request.status !== undefined) {
+      const validTransitions: { [key: string]: string[] } = {
+        'active': ['paused', 'completed', 'abandoned'],
+        'paused': ['active', 'abandoned']
+      };
+
+      const allowedStatuses = validTransitions[existingSession.status] || [];
+      if (!allowedStatuses.includes(request.status)) {
+        throw new Error(`Invalid status transition from ${existingSession.status} to ${request.status}`);
+      }
+    }
+
+    // Validate question index
+    if (request.currentQuestionIndex !== undefined) {
+      if (request.currentQuestionIndex < 0 || request.currentQuestionIndex >= existingSession.totalQuestions) {
+        throw new Error('Invalid question index');
+      }
+    }
+  }
+
+  /**
    * Get questions for the session based on configuration
    */
   private async getQuestionsForSession(request: CreateSessionRequest): Promise<Question[]> {
-    const questionService = this.serviceFactory.getQuestionService();
-
     // Build question request parameters
     const questionRequest: any = {
       provider: request.providerId,
@@ -209,7 +357,7 @@ export class SessionService implements ISessionService {
 
     this.logger.debug('Fetching questions for session', questionRequest);
 
-    const questionResponse = await questionService.getQuestions(questionRequest);
+    const questionResponse = await this.questionService.getQuestions(questionRequest);
 
     let questions = questionResponse.questions;
 
@@ -239,34 +387,102 @@ export class SessionService implements ISessionService {
   }
 
   /**
-   * Store session in DynamoDB
+   * Get full question details for the session
    */
-  private async storeSession(session: StudySession): Promise<void> {
-    this.logger.debug('Storing session in DynamoDB', { 
+  private async getSessionQuestionsWithDetails(session: StudySession): Promise<QuestionResponse[]> {
+    const questions: QuestionResponse[] = [];
+
+    this.logger.debug('Getting question details for session', {
       sessionId: session.sessionId,
-      tableName: this.studySessionsTable 
+      questionCount: session.questions.length
     });
 
-    const command = new PutCommand({
-      TableName: this.studySessionsTable,
-      Item: session,
-      ConditionExpression: 'attribute_not_exists(sessionId)' // Prevent overwriting existing sessions
-    });
+    // Get details for each question in the session
+    for (const sessionQuestion of session.questions) {
+      try {
+        const questionResponse = await this.questionService.getQuestion({
+          questionId: sessionQuestion.questionId,
+          includeExplanation: false, // Don't include explanations until session is completed
+          includeMetadata: true
+        });
 
-    try {
-      await this.dynamoClient.send(command);
-      this.logger.debug('Session stored successfully', { sessionId: session.sessionId });
-    } catch (error) {
-      this.logger.error('Failed to store session in DynamoDB', error as Error, { 
-        sessionId: session.sessionId 
-      });
-      
-      if ((error as any).name === 'ConditionalCheckFailedException') {
-        throw new Error('Session with this ID already exists');
+        const question = questionResponse.question;
+        
+        // Convert to session question format
+        const sessionQuestionResponse: QuestionResponse = {
+          questionId: question.questionId,
+          text: question.questionText,
+          options: question.options.map((opt, index) => ({
+            id: `option-${index}`,
+            text: opt
+          })),
+          topicId: question.topicId || 'unknown',
+          topicName: question.topicId || 'Unknown Topic',
+          difficulty: this.mapDifficultyToSessionFormat(question.difficulty),
+          timeAllowed: this.calculateTimeAllowed(question.difficulty),
+          markedForReview: sessionQuestion.markedForReview
+        };
+
+        questions.push(sessionQuestionResponse);
+      } catch (error) {
+        this.logger.warn('Failed to get question details', {
+          error: (error as Error).message,
+          sessionId: session.sessionId,
+          questionId: sessionQuestion.questionId
+        });
+        
+        // Create a placeholder question response for missing questions
+        questions.push({
+          questionId: sessionQuestion.questionId,
+          text: 'Question not available',
+          options: [],
+          topicId: 'unknown',
+          topicName: 'Unknown Topic',
+          difficulty: 'medium',
+          timeAllowed: 120,
+          markedForReview: sessionQuestion.markedForReview
+        });
       }
-      
-      throw new Error('Failed to store session');
     }
+
+    return questions;
+  }
+
+  /**
+   * Calculate session progress
+   */
+  private calculateSessionProgress(session: StudySession): SessionProgress {
+    const answeredQuestions = session.questions.filter(q => q.userAnswer && q.userAnswer.length > 0).length;
+    const correctAnswers = session.questions.filter(q => q.isCorrect === true).length;
+    const totalTimeSpent = session.questions.reduce((sum, q) => sum + q.timeSpent, 0);
+    
+    // Calculate accuracy - only count answered questions
+    const accuracy = answeredQuestions > 0 ? (correctAnswers / answeredQuestions) * 100 : 0;
+
+    // Calculate time remaining for timed sessions (if applicable)
+    let timeRemaining: number | undefined;
+    if (session.status === 'active' && session.questions.length > 0) {
+      // Estimate remaining time based on average time per question
+      const avgTimePerQuestion = totalTimeSpent / Math.max(answeredQuestions, 1);
+      const remainingQuestions = session.totalQuestions - answeredQuestions;
+      timeRemaining = remainingQuestions * avgTimePerQuestion;
+    }
+
+    const progress: SessionProgress = {
+      sessionId: session.sessionId,
+      currentQuestion: session.currentQuestionIndex + 1, // Convert to 1-based index for UI
+      totalQuestions: session.totalQuestions,
+      answeredQuestions,
+      correctAnswers,
+      timeElapsed: totalTimeSpent,
+      accuracy: Math.round(accuracy * 100) / 100 // Round to 2 decimal places
+    };
+
+    if (timeRemaining !== undefined) {
+      progress.timeRemaining = timeRemaining;
+    }
+
+    return progress;
   }
 
   /**

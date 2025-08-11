@@ -1,6 +1,5 @@
 // Provider service for Study App V3 Backend
 
-import { S3Client, GetObjectCommand, ListObjectsV2Command } from '@aws-sdk/client-s3';
 import { 
   Provider, 
   GetProvidersRequest, 
@@ -11,29 +10,16 @@ import {
   ProviderCategory,
   ProviderStatus
 } from '../shared/types/provider.types';
+import { IProviderRepository } from '../repositories/provider.repository';
+import { createLogger } from '../shared/logger';
 
 // Re-export the interface for ServiceFactory
 export type { IProviderService };
-import { createLogger } from '../shared/logger';
-
-interface CacheEntry<T> {
-  data: T;
-  timestamp: number;
-  ttl: number;
-}
 
 export class ProviderService implements IProviderService {
   private logger = createLogger({ component: 'ProviderService' });
-  private s3Client: S3Client;
-  private bucketName: string;
-  private cache = new Map<string, CacheEntry<any>>();
-  private readonly CACHE_TTL = 15 * 60 * 1000; // 15 minutes in milliseconds
-  private readonly PROVIDERS_PREFIX = 'providers/';
 
-  constructor(s3Client: S3Client, bucketName: string) {
-    this.s3Client = s3Client;
-    this.bucketName = bucketName;
-  }
+  constructor(private providerRepository: IProviderRepository) {}
 
   /**
    * Get all providers with optional filtering
@@ -47,63 +33,93 @@ export class ProviderService implements IProviderService {
     });
 
     try {
-      // Get all providers from cache or S3
-      const allProviders = await this.getAllProviders();
+      // Get all providers from repository
+      const allProviders = await this.providerRepository.findAll();
 
-      // Apply filters
+      // Apply filtering
       let filteredProviders = allProviders;
 
       // Filter by status
-      if (request.status) {
+      if (request.status !== undefined) {
         filteredProviders = filteredProviders.filter(p => p.status === request.status);
-      }
-
-      // Filter by category
-      if (request.category) {
-        filteredProviders = filteredProviders.filter(p => p.category === request.category);
-      }
-
-      // Filter out inactive providers unless explicitly requested
-      if (!request.includeInactive) {
+      } else if (!request.includeInactive) {
+        // Default: only show active providers unless explicitly requested
         filteredProviders = filteredProviders.filter(p => p.status === ProviderStatus.ACTIVE);
       }
 
-      // Apply search filter
-      if (request.search) {
-        const searchLower = request.search.toLowerCase();
+      // Filter by category
+      if (request.category !== undefined) {
         filteredProviders = filteredProviders.filter(p => 
-          p.name.toLowerCase().includes(searchLower) ||
-          p.fullName.toLowerCase().includes(searchLower) ||
-          p.description.toLowerCase().includes(searchLower)
+          p.category?.toLowerCase() === request.category!.toLowerCase()
         );
       }
 
-      // Sort by name for consistent ordering
-      filteredProviders.sort((a, b) => a.name.localeCompare(b.name));
+      // Filter by search term
+      if (request.search) {
+        const searchTerm = request.search.toLowerCase();
+        filteredProviders = filteredProviders.filter(p =>
+          p.name.toLowerCase().includes(searchTerm) ||
+          p.description.toLowerCase().includes(searchTerm) ||
+          p.id.toLowerCase().includes(searchTerm)
+        );
+      }
 
-      // Get available filter options
-      const availableCategories = [...new Set(allProviders.map(p => p.category))];
-      const availableStatuses = [...new Set(allProviders.map(p => p.status))];
+      // Sort providers (active first, then by name)
+      const sortedProviders = filteredProviders.sort((a, b) => {
+        if (a.status !== b.status) {
+          return a.status === ProviderStatus.ACTIVE ? -1 : 1; // Active providers first
+        }
+        return a.name.localeCompare(b.name); // Then by name
+      });
+
+      // Apply pagination if requested
+      const total = sortedProviders.length;
+      let pagedProviders = sortedProviders;
+      
+      if (request.limit || request.offset) {
+        const offset = request.offset || 0;
+        const limit = request.limit || total;
+        pagedProviders = sortedProviders.slice(offset, offset + limit);
+      }
+
+      // Collect available filter values for the response
+      const availableCategories = Array.from(new Set(
+        allProviders
+          .map(p => p.category)
+          .filter(c => c !== undefined && c !== null)
+      )) as ProviderCategory[];
 
       const response: GetProvidersResponse = {
-        providers: filteredProviders,
-        total: filteredProviders.length,
+        providers: pagedProviders,
+        total,
         filters: {
           categories: availableCategories,
-          statuses: availableStatuses
+          statuses: [ProviderStatus.ACTIVE, ProviderStatus.INACTIVE]
         }
       };
 
+      // Add pagination info if applicable
+      if (request.limit || request.offset) {
+        const offset = request.offset || 0;
+        const limit = request.limit || total;
+        
+        response.pagination = {
+          limit,
+          offset,
+          hasMore: offset + limit < total
+        };
+      }
+
       this.logger.info('Providers retrieved successfully', { 
-        total: response.total,
-        filtered: filteredProviders.length 
+        total,
+        filtered: pagedProviders.length,
+        activeProviders: pagedProviders.filter(p => p.status === ProviderStatus.ACTIVE).length
       });
 
       return response;
-
     } catch (error) {
-      this.logger.error('Failed to get providers', error as Error);
-      throw new Error('Failed to retrieve providers');
+      this.logger.error('Failed to get providers', error as Error, { request });
+      throw error;
     }
   }
 
@@ -111,245 +127,97 @@ export class ProviderService implements IProviderService {
    * Get a specific provider by ID
    */
   async getProvider(request: GetProviderRequest): Promise<GetProviderResponse> {
-    this.logger.info('Getting provider', { id: request.id, includeCertifications: request.includeCertifications });
+    this.logger.info('Getting provider', { providerId: request.id });
 
     try {
-      const cacheKey = `provider:${request.id}`;
-      
-      // Check cache first
-      const cached = this.getFromCache<Provider>(cacheKey);
-      if (cached) {
-        this.logger.debug('Provider retrieved from cache', { id: request.id });
-        
-        const provider = request.includeCertifications === false ? 
-          { ...cached, certifications: [] } : 
-          cached;
+      const provider = await this.providerRepository.findById(request.id);
 
-        return { provider };
+      if (!provider) {
+        throw new Error(`Provider not found: ${request.id}`);
       }
 
-      // Load from S3
-      const provider = await this.loadProviderFromS3(request.id);
+      // Check if provider is active (unless explicitly including inactive)
+      if (provider.status !== ProviderStatus.ACTIVE && !request.includeInactive) {
+        throw new Error(`Provider not found: ${request.id}`);
+      }
 
-      // Cache the result
-      this.setCache(cacheKey, provider);
-
-      // Filter certifications if requested
-      const responseProvider = request.includeCertifications === false ? 
-        { ...provider, certifications: [] } : 
-        provider;
+      const response: GetProviderResponse = {
+        provider
+      };
 
       this.logger.info('Provider retrieved successfully', { 
-        id: request.id,
+        providerId: provider.id,
         name: provider.name,
-        certificationsCount: provider.certifications.length
+        status: provider.status
       });
 
-      return { provider: responseProvider };
-
+      return response;
     } catch (error) {
-      this.logger.error('Failed to get provider', error as Error, { id: request.id });
-      
-      if ((error as any).name === 'NoSuchKey' || (error as Error).message.includes('does not exist')) {
-        throw new Error(`Provider '${request.id}' not found`);
-      }
-      
-      throw new Error('Failed to retrieve provider');
-    }
-  }
-
-  /**
-   * Refresh the provider cache
-   */
-  async refreshCache(): Promise<void> {
-    this.logger.info('Refreshing provider cache');
-
-    try {
-      // Clear existing cache
-      this.cache.clear();
-
-      // Pre-load all providers
-      await this.getAllProviders();
-
-      this.logger.info('Provider cache refreshed successfully');
-
-    } catch (error) {
-      this.logger.error('Failed to refresh cache', error as Error);
-      throw new Error('Failed to refresh provider cache');
-    }
-  }
-
-  /**
-   * Get all providers from cache or S3
-   */
-  private async getAllProviders(): Promise<Provider[]> {
-    const cacheKey = 'providers:all';
-
-    // Check cache first
-    const cached = this.getFromCache<Provider[]>(cacheKey);
-    if (cached) {
-      this.logger.debug('All providers retrieved from cache');
-      return cached;
-    }
-
-    // Load all providers from S3
-    const providers = await this.loadAllProvidersFromS3();
-
-    // Cache the results
-    this.setCache(cacheKey, providers);
-
-    this.logger.info('All providers loaded from S3', { count: providers.length });
-
-    return providers;
-  }
-
-  /**
-   * Load all providers from S3
-   */
-  private async loadAllProvidersFromS3(): Promise<Provider[]> {
-    this.logger.debug('Loading all providers from S3');
-
-    try {
-      // List all provider files in S3
-      const listCommand = new ListObjectsV2Command({
-        Bucket: this.bucketName,
-        Prefix: this.PROVIDERS_PREFIX,
-        MaxKeys: 100 // Should be enough for providers
+      this.logger.error('Failed to get provider', error as Error, { 
+        providerId: request.id 
       });
-
-      const listResponse = await this.s3Client.send(listCommand);
-      
-      if (!listResponse.Contents || listResponse.Contents.length === 0) {
-        this.logger.warn('No provider files found in S3');
-        return [];
-      }
-
-      // Load each provider file
-      const providers: Provider[] = [];
-      
-      for (const item of listResponse.Contents) {
-        if (!item.Key || !item.Key.endsWith('.json')) continue;
-
-        try {
-          const providerId = item.Key.replace(this.PROVIDERS_PREFIX, '').replace('.json', '');
-          const provider = await this.loadProviderFromS3(providerId);
-          providers.push(provider);
-        } catch (error) {
-          this.logger.warn('Failed to load provider file', { key: item.Key, error: (error as Error).message });
-          // Continue loading other providers
-        }
-      }
-
-      return providers;
-
-    } catch (error) {
-      this.logger.error('Failed to load providers from S3', error as Error);
-      throw new Error('Failed to load providers from storage');
-    }
-  }
-
-  /**
-   * Load a specific provider from S3
-   */
-  private async loadProviderFromS3(providerId: string): Promise<Provider> {
-    this.logger.debug('Loading provider from S3', { id: providerId });
-
-    try {
-      const key = `${this.PROVIDERS_PREFIX}${providerId}.json`;
-      
-      const command = new GetObjectCommand({
-        Bucket: this.bucketName,
-        Key: key
-      });
-
-      const response = await this.s3Client.send(command);
-      
-      if (!response.Body) {
-        throw new Error(`Provider file ${key} has no content`);
-      }
-
-      const content = await response.Body.transformToString();
-      const provider: Provider = JSON.parse(content);
-
-      // Validate that the provider has required fields
-      if (!provider.id || !provider.name || !provider.status) {
-        throw new Error(`Invalid provider data in ${key}: missing required fields`);
-      }
-
-      // Ensure the ID matches the filename
-      if (provider.id !== providerId) {
-        this.logger.warn('Provider ID mismatch', { 
-          fileId: providerId, 
-          dataId: provider.id,
-          key 
-        });
-        // Use the filename ID as authoritative
-        provider.id = providerId;
-      }
-
-      this.logger.debug('Provider loaded successfully', { 
-        id: provider.id,
-        name: provider.name,
-        certificationsCount: provider.certifications?.length || 0
-      });
-
-      return provider;
-
-    } catch (error) {
-      this.logger.error('Failed to load provider from S3', error as Error, { id: providerId });
       throw error;
     }
   }
 
   /**
-   * Get data from cache if not expired
+   * Get providers by category
    */
-  private getFromCache<T>(key: string): T | null {
-    const entry = this.cache.get(key);
-    
-    if (!entry) {
-      return null;
-    }
+  async getProvidersByCategory(category: ProviderCategory): Promise<Provider[]> {
+    this.logger.info('Getting providers by category', { category });
 
-    // Check if expired
-    if (Date.now() > entry.timestamp + entry.ttl) {
-      this.cache.delete(key);
-      return null;
-    }
+    try {
+      const providers = await this.providerRepository.findByCategory(category);
+      
+      this.logger.info('Providers by category retrieved successfully', { 
+        category,
+        count: providers.length
+      });
 
-    return entry.data as T;
+      return providers;
+    } catch (error) {
+      this.logger.error('Failed to get providers by category', error as Error, { category });
+      throw error;
+    }
   }
 
   /**
-   * Set data in cache with TTL
+   * Get providers by status
    */
-  private setCache<T>(key: string, data: T, ttl: number = this.CACHE_TTL): void {
-    const entry: CacheEntry<T> = {
-      data,
-      timestamp: Date.now(),
-      ttl
-    };
+  async getProvidersByStatus(status: ProviderStatus): Promise<Provider[]> {
+    this.logger.info('Getting providers by status', { status });
 
-    this.cache.set(key, entry);
+    try {
+      const providers = await this.providerRepository.findByStatus(status);
+      
+      this.logger.info('Providers by status retrieved successfully', { 
+        status,
+        count: providers.length
+      });
+
+      return providers;
+    } catch (error) {
+      this.logger.error('Failed to get providers by status', error as Error, { status });
+      throw error;
+    }
   }
 
   /**
-   * Get cache statistics (useful for monitoring)
+   * Refresh provider cache (admin operation)
    */
-  public getCacheStats(): {
-    size: number;
-    entries: Array<{ key: string; age: number; ttl: number }>;
-  } {
-    const now = Date.now();
-    const entries = Array.from(this.cache.entries()).map(([key, entry]) => ({
-      key,
-      age: now - entry.timestamp,
-      ttl: entry.ttl
-    }));
+  async refreshCache(): Promise<void> {
+    this.logger.info('Refreshing provider cache');
 
-    return {
-      size: this.cache.size,
-      entries
-    };
+    try {
+      this.providerRepository.clearCache();
+      
+      // Warm up the cache by loading all providers
+      await this.providerRepository.findAll();
+      
+      this.logger.info('Provider cache refreshed successfully');
+    } catch (error) {
+      this.logger.error('Failed to refresh provider cache', error as Error);
+      throw error;
+    }
   }
 }

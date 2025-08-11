@@ -1,17 +1,13 @@
 // Health service implementation for system monitoring
 
-import { IHealthService, ServiceFactory } from '../shared/service-factory';
+import { IHealthService } from '../shared/service-factory';
+import { IHealthRepository, HealthCheckResult } from '../repositories/health.repository';
 import { createLogger } from '../shared/logger';
-import { DescribeTableCommand } from '@aws-sdk/client-dynamodb';
-import { HeadBucketCommand } from '@aws-sdk/client-s3';
 
 export class HealthService implements IHealthService {
-  private serviceFactory: ServiceFactory;
   private logger = createLogger({ service: 'HealthService' });
 
-  constructor(serviceFactory: ServiceFactory) {
-    this.serviceFactory = serviceFactory;
-  }
+  constructor(private healthRepository: IHealthRepository) {}
 
   /**
    * Perform comprehensive health check
@@ -20,90 +16,78 @@ export class HealthService implements IHealthService {
     this.logger.info('Starting health check');
     
     const startTime = Date.now();
-    const config = this.serviceFactory.getConfig();
 
-    // Run health checks in parallel
-    const [databaseHealth, storageHealth] = await Promise.allSettled([
-      this.checkDatabaseHealth(),
-      this.checkStorageHealth(),
-    ]);
+    try {
+      // Get health check results from repository
+      const healthResults = await this.healthRepository.checkAllServices();
+      
+      // Transform results into response format
+      const dependencies: { [key: string]: any } = {};
+      
+      healthResults.forEach(result => {
+        dependencies[result.service] = {
+          status: result.status === 'healthy' ? 'healthy' : 'error',
+          responseTime: result.responseTime,
+          error: result.error
+        };
+      });
 
-    const response = {
-      status: 'healthy',
-      timestamp: new Date().toISOString(),
-      environment: config.environment,
-      version: process.env.AWS_LAMBDA_FUNCTION_VERSION || '1.0.0',
-      dependencies: {
-        database: databaseHealth.status === 'fulfilled' 
-          ? databaseHealth.value 
-          : { status: 'error', error: databaseHealth.reason?.message },
-        storage: storageHealth.status === 'fulfilled'
-          ? storageHealth.value
-          : { status: 'error', error: storageHealth.reason?.message },
-      },
-    };
+      const response = {
+        status: 'healthy' as string,
+        timestamp: new Date().toISOString(),
+        environment: process.env.NODE_ENV || 'development',
+        version: process.env.AWS_LAMBDA_FUNCTION_VERSION || '1.0.0',
+        dependencies
+      };
 
-    // Determine overall status
-    const hasUnhealthyDependencies = [
-      response.dependencies.database,
-      response.dependencies.storage,
-    ].some(dep => dep.status !== 'healthy');
+      // Determine overall status
+      const hasUnhealthyDependencies = healthResults.some(result => result.status !== 'healthy');
+      if (hasUnhealthyDependencies) {
+        response.status = 'degraded';
+      }
 
-    if (hasUnhealthyDependencies) {
-      response.status = 'degraded';
+      const totalTime = Date.now() - startTime;
+      this.logger.info('Health check completed', { 
+        status: response.status,
+        totalTime,
+        dependencies: healthResults.map(result => ({
+          name: result.service,
+          status: result.status,
+          responseTime: result.responseTime
+        }))
+      });
+
+      return response;
+    } catch (error) {
+      this.logger.error('Health check failed', error as Error);
+      
+      const totalTime = Date.now() - startTime;
+      return {
+        status: 'unhealthy',
+        timestamp: new Date().toISOString(),
+        environment: process.env.NODE_ENV || 'development',
+        version: process.env.AWS_LAMBDA_FUNCTION_VERSION || '1.0.0',
+        error: (error as Error).message,
+        totalTime
+      };
     }
-
-    const totalTime = Date.now() - startTime;
-    this.logger.info('Health check completed', { 
-      status: response.status,
-      totalTime,
-      dependencies: Object.keys(response.dependencies).map(key => ({
-        name: key,
-        status: response.dependencies[key as keyof typeof response.dependencies].status,
-      })),
-    });
-
-    return response;
   }
 
   /**
    * Check database (DynamoDB) health
    */
-  public async checkDatabaseHealth(): Promise<{ status: string; responseTime?: number }> {
-    const startTime = Date.now();
+  public async checkDatabaseHealth(): Promise<HealthCheckResult> {
+    this.logger.debug('Checking database health via repository');
     
     try {
-      this.logger.debug('Checking database health');
-      const config = this.serviceFactory.getConfig();
-      const dynamoClient = this.serviceFactory.getDynamoClient();
-
-      // Check primary table (users table) to verify connectivity
-      if (!config.tables.users) {
-        return {
-          status: 'unhealthy',
-          responseTime: Date.now() - startTime,
-        };
-      }
-
-      // Use DescribeTable to check connectivity without reading data
-      await dynamoClient.send(new DescribeTableCommand({
-        TableName: config.tables.users,
-      }));
-
-      const responseTime = Date.now() - startTime;
-      this.logger.debug('Database health check passed', { responseTime });
-
-      return {
-        status: 'healthy',
-        responseTime,
-      };
+      return await this.healthRepository.checkDynamoDbHealth();
     } catch (error) {
-      const responseTime = Date.now() - startTime;
-      this.logger.error('Database health check failed', error, { responseTime });
-      
+      this.logger.error('Database health check failed', error as Error);
       return {
+        service: 'dynamodb',
         status: 'unhealthy',
-        responseTime,
+        responseTime: 0,
+        error: (error as Error).message
       };
     }
   }
@@ -111,41 +95,18 @@ export class HealthService implements IHealthService {
   /**
    * Check storage (S3) health
    */
-  public async checkStorageHealth(): Promise<{ status: string; responseTime?: number }> {
-    const startTime = Date.now();
+  public async checkStorageHealth(): Promise<HealthCheckResult> {
+    this.logger.debug('Checking storage health via repository');
     
     try {
-      this.logger.debug('Checking storage health');
-      const config = this.serviceFactory.getConfig();
-      const s3Client = this.serviceFactory.getS3Client();
-
-      // Check primary bucket (question data bucket) to verify connectivity
-      if (!config.buckets.questionData) {
-        return {
-          status: 'unhealthy',
-          responseTime: Date.now() - startTime,
-        };
-      }
-
-      // Use HeadBucket to check connectivity without reading data
-      await s3Client.send(new HeadBucketCommand({
-        Bucket: config.buckets.questionData,
-      }));
-
-      const responseTime = Date.now() - startTime;
-      this.logger.debug('Storage health check passed', { responseTime });
-
-      return {
-        status: 'healthy',
-        responseTime,
-      };
+      return await this.healthRepository.checkS3Health();
     } catch (error) {
-      const responseTime = Date.now() - startTime;
-      this.logger.error('Storage health check failed', error, { responseTime });
-      
+      this.logger.error('Storage health check failed', error as Error);
       return {
+        service: 's3',
         status: 'unhealthy',
-        responseTime,
+        responseTime: 0,
+        error: (error as Error).message
       };
     }
   }
