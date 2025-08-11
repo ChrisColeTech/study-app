@@ -78,9 +78,9 @@ export class DatabaseConstruct extends Construct {
       removalPolicy,
     });
 
-    // Goals Table  
-    this.goalsTable = new cdk.aws_dynamodb.Table(this, 'GoalsTable', {
-      tableName: StackConfig.getResourceName('goals', props.environment),
+    // Goals Table V2 (with GSI support)
+    this.goalsTable = new cdk.aws_dynamodb.Table(this, 'GoalsTableV2', {
+      tableName: StackConfig.getResourceName('goals-v2', props.environment),
       partitionKey: {
         name: 'goalId',
         type: cdk.aws_dynamodb.AttributeType.STRING,
