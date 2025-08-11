@@ -120,7 +120,7 @@ export interface UpdateSessionResponse {
 }
 
 export interface ISessionService {
-  createSession(userId: string, request: CreateSessionRequest): Promise<CreateSessionResponse>;
-  getSession(sessionId: string, userId: string): Promise<GetSessionResponse>;
-  updateSession(sessionId: string, userId: string, request: UpdateSessionRequest): Promise<UpdateSessionResponse>;
+  createSession(request: CreateSessionRequest): Promise<CreateSessionResponse>;
+  getSession(sessionId: string): Promise<GetSessionResponse>;
+  updateSession(sessionId: string, request: UpdateSessionRequest): Promise<UpdateSessionResponse>;
 }

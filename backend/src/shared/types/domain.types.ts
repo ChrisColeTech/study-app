@@ -22,7 +22,8 @@ export interface UserPreferences {
 
 export interface StudySession {
   sessionId: string;
-  userId: string;
+  // userId will be associated in Phase 30 when authentication is added
+  userId?: string; 
   examId: string;
   providerId: string;
   startTime: string;

@@ -44,9 +44,8 @@ export class SessionService implements ISessionService {
    * Create a new study session with configuration
    * Phase 15: Session Creation Feature
    */
-  async createSession(userId: string, request: CreateSessionRequest): Promise<CreateSessionResponse> {
+  async createSession(request: CreateSessionRequest): Promise<CreateSessionResponse> {
     this.logger.info('Creating new session', { 
-      userId,
       examId: request.examId,
       providerId: request.providerId,
       sessionType: request.sessionType,
@@ -75,10 +74,10 @@ export class SessionService implements ISessionService {
       const sessionId = uuidv4();
       const now = new Date().toISOString();
 
-      // Create session object
+      // Create session object (no userId - auth association added in Phase 30)
       const session: StudySession = {
         sessionId,
-        userId,
+        // userId: undefined, // Will be associated when auth is added
         examId: request.examId,
         providerId: request.providerId,
         startTime: now,
@@ -122,7 +121,6 @@ export class SessionService implements ISessionService {
 
       this.logger.info('Session created successfully', { 
         sessionId: createdSession.sessionId,
-        userId,
         totalQuestions: createdSession.totalQuestions,
         providerId: createdSession.providerId,
         examId: createdSession.examId
@@ -132,7 +130,6 @@ export class SessionService implements ISessionService {
 
     } catch (error) {
       this.logger.error('Failed to create session', error as Error, { 
-        userId,
         request
       });
       throw error;
@@ -143,8 +140,8 @@ export class SessionService implements ISessionService {
    * Get an existing study session
    * Phase 16: Session Retrieval Feature
    */
-  async getSession(sessionId: string, userId: string): Promise<GetSessionResponse> {
-    this.logger.info('Retrieving session', { sessionId, userId });
+  async getSession(sessionId: string): Promise<GetSessionResponse> {
+    this.logger.info('Retrieving session', { sessionId });
 
     try {
       // Retrieve session using repository
@@ -154,10 +151,7 @@ export class SessionService implements ISessionService {
         throw new Error('Session not found');
       }
 
-      // Verify session belongs to the user
-      if (session.userId !== userId) {
-        throw new Error('Session not found or access denied');
-      }
+      // Session access is sessionId-based (userId association added in Phase 30)
 
       // Get full question details for current session
       const questions = await this.getSessionQuestionsWithDetails(session);
@@ -173,7 +167,6 @@ export class SessionService implements ISessionService {
 
       this.logger.info('Session retrieved successfully', { 
         sessionId: session.sessionId,
-        userId,
         status: session.status,
         currentQuestion: session.currentQuestionIndex,
         totalQuestions: session.totalQuestions
@@ -183,8 +176,7 @@ export class SessionService implements ISessionService {
 
     } catch (error) {
       this.logger.error('Failed to retrieve session', error as Error, { 
-        sessionId,
-        userId
+        sessionId
       });
       throw error;
     }
@@ -193,8 +185,8 @@ export class SessionService implements ISessionService {
   /**
    * Update session (Phase 17: Session Update Feature)
    */
-  async updateSession(sessionId: string, userId: string, request: UpdateSessionRequest): Promise<UpdateSessionResponse> {
-    this.logger.info('Updating session', { sessionId, userId, updates: Object.keys(request) });
+  async updateSession(sessionId: string, request: UpdateSessionRequest): Promise<UpdateSessionResponse> {
+    this.logger.info('Updating session', { sessionId, updates: Object.keys(request) });
 
     try {
       // First verify the session exists and belongs to the user
@@ -204,9 +196,7 @@ export class SessionService implements ISessionService {
         throw new Error('Session not found');
       }
 
-      if (existingSession.userId !== userId) {
-        throw new Error('Session not found or access denied');
-      }
+      // Session access is sessionId-based (userId association added in Phase 30)
 
       // Validate the update request
       this.validateUpdateRequest(request, existingSession);
@@ -238,7 +228,6 @@ export class SessionService implements ISessionService {
 
       this.logger.info('Session updated successfully', { 
         sessionId: updatedSession.sessionId,
-        userId,
         status: updatedSession.status,
         currentQuestion: updatedSession.currentQuestionIndex
       });
@@ -248,7 +237,6 @@ export class SessionService implements ISessionService {
     } catch (error) {
       this.logger.error('Failed to update session', error as Error, { 
         sessionId,
-        userId,
         request
       });
       throw error;

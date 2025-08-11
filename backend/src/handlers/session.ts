@@ -37,19 +37,19 @@ export class SessionHandler extends BaseHandler {
         method: 'POST',
         path: '/v1/sessions',
         handler: this.createSession.bind(this),
-        requireAuth: true,
+        requireAuth: false,
       },
       {
         method: 'GET',
         path: '/v1/sessions/{id}',
         handler: this.getSession.bind(this),
-        requireAuth: true,
+        requireAuth: false,
       },
       {
         method: 'PUT',
         path: '/v1/sessions/{id}',
         handler: this.updateSession.bind(this),
-        requireAuth: true,
+        requireAuth: false,
       }
     ];
   }
@@ -58,12 +58,7 @@ export class SessionHandler extends BaseHandler {
    * Create a new study session - now clean and focused
    */
   private async createSession(context: HandlerContext): Promise<ApiResponse> {
-    // Authenticate user using middleware
-    const { authenticatedContext, error: authError } = await AuthMiddleware.authenticateRequest(
-      context, 
-      AuthConfigs.AUTHENTICATED
-    );
-    if (authError) return authError;
+    // No authentication required - sessions work independently (auth association in Phase 30)
 
     // Parse and validate request body using middleware
     const { data: requestBody, error: parseError } = ParsingMiddleware.parseRequestBody<CreateSessionRequest>(context, true);
@@ -77,12 +72,11 @@ export class SessionHandler extends BaseHandler {
     const { result, error } = await ErrorHandlingMiddleware.withErrorHandling(
       async () => {
         const sessionService = this.serviceFactory.getSessionService();
-        return await sessionService.createSession(authenticatedContext!.userId, requestBody);
+        return await sessionService.createSession(requestBody);
       },
       {
         requestId: context.requestId,
         operation: ErrorContexts.Session.CREATE,
-        userId: authenticatedContext!.userId,
         additionalInfo: { 
           examId: requestBody.examId,
           providerId: requestBody.providerId,
@@ -95,7 +89,6 @@ export class SessionHandler extends BaseHandler {
 
     this.logger.info('Session created successfully', { 
       requestId: context.requestId,
-      userId: authenticatedContext!.userId,
       sessionId: result!.session.sessionId,
       totalQuestions: result!.session.totalQuestions,
       providerId: result!.session.providerId,
@@ -109,12 +102,7 @@ export class SessionHandler extends BaseHandler {
    * Get an existing study session - now clean and focused
    */
   private async getSession(context: HandlerContext): Promise<ApiResponse> {
-    // Authenticate user using middleware
-    const { authenticatedContext, error: authError } = await AuthMiddleware.authenticateRequest(
-      context, 
-      AuthConfigs.AUTHENTICATED
-    );
-    if (authError) return authError;
+    // No authentication required - sessions work independently (auth association in Phase 30)
 
     // Parse path parameters using middleware
     const { data: pathParams, error: parseError } = ParsingMiddleware.parsePathParams(context);
@@ -127,13 +115,12 @@ export class SessionHandler extends BaseHandler {
     // Business logic only - delegate error handling to middleware
     const { result, error } = await ErrorHandlingMiddleware.withErrorHandling(
       async () => {
-        const sessionService: SessionService = this.serviceFactory.getSessionService() as SessionService;
-        return await sessionService.getSession(pathParams.id, authenticatedContext!.userId);
+        const sessionService = this.serviceFactory.getSessionService();
+        return await sessionService.getSession(pathParams.id);
       },
       {
         requestId: context.requestId,
         operation: ErrorContexts.Session.GET,
-        userId: authenticatedContext!.userId,
         additionalInfo: { sessionId: pathParams.id }
       }
     );
@@ -142,7 +129,6 @@ export class SessionHandler extends BaseHandler {
 
     this.logger.info('Session retrieved successfully', { 
       requestId: context.requestId,
-      userId: authenticatedContext!.userId,
       sessionId: result!.session.sessionId,
       status: result!.session.status,
       currentQuestion: result!.progress.currentQuestion,
@@ -157,12 +143,7 @@ export class SessionHandler extends BaseHandler {
    * Update an existing study session - now clean and focused
    */
   private async updateSession(context: HandlerContext): Promise<ApiResponse> {
-    // Authenticate user using middleware
-    const { authenticatedContext, error: authError } = await AuthMiddleware.authenticateRequest(
-      context, 
-      AuthConfigs.AUTHENTICATED
-    );
-    if (authError) return authError;
+    // No authentication required - sessions work independently (auth association in Phase 30)
 
     // Parse path parameters using middleware
     const { data: pathParams, error: parseError } = ParsingMiddleware.parsePathParams(context);
@@ -182,13 +163,12 @@ export class SessionHandler extends BaseHandler {
     // Business logic only - delegate error handling to middleware
     const { result, error } = await ErrorHandlingMiddleware.withErrorHandling(
       async () => {
-        const sessionService: SessionService = this.serviceFactory.getSessionService() as SessionService;
-        return await sessionService.updateSession(pathParams.id, authenticatedContext!.userId, requestBody);
+        const sessionService = this.serviceFactory.getSessionService();
+        return await sessionService.updateSession(pathParams.id, requestBody);
       },
       {
         requestId: context.requestId,
         operation: ErrorContexts.Session.UPDATE,
-        userId: authenticatedContext!.userId,
         additionalInfo: { 
           sessionId: pathParams.id,
           action: requestBody.action
@@ -200,7 +180,6 @@ export class SessionHandler extends BaseHandler {
 
     this.logger.info('Session updated successfully', { 
       requestId: context.requestId,
-      userId: authenticatedContext!.userId,
       sessionId: result!.session.sessionId,
       status: result!.session.status,
       currentQuestion: result!.progress.currentQuestion,

@@ -37,7 +37,7 @@ export class SessionRepository implements ISessionRepository {
 
       this.logger.info('Session created successfully', { 
         sessionId: session.sessionId, 
-        userId: session.userId,
+        ...(session.userId && { userId: session.userId }),
         examId: session.examId,
         providerId: session.providerId
       });
