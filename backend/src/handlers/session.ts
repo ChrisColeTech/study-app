@@ -7,7 +7,8 @@ import { ServiceFactory } from '../shared/service-factory';
 import { createLogger } from '../shared/logger';
 import { ERROR_CODES } from '../shared/constants/error.constants';
 import { 
-  CreateSessionRequest
+  CreateSessionRequest,
+  ISessionService
 } from '../shared/types/session.types';
 
 export class SessionHandler extends BaseHandler {
@@ -325,7 +326,7 @@ export class SessionHandler extends BaseHandler {
       });
 
       // Get session through service
-      const sessionService = this.serviceFactory.getSessionService();
+      const sessionService: ISessionService = this.serviceFactory.getSessionService();
       const result = await sessionService.getSession(sessionId, context.userId);
 
       this.logger.info('Session retrieved successfully', { 
