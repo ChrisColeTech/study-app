@@ -47,7 +47,38 @@ export interface GetTopicsResponse {
   };
 }
 
+// Single topic request/response types
+export interface GetTopicRequest {
+  id: string;
+  includeProvider?: boolean;
+  includeExam?: boolean;
+}
+
+export interface GetTopicResponse {
+  topic: Topic;
+  providerContext?: {
+    id: string;
+    name: string;
+    category: string;
+    status: string;
+  };
+  examContext?: {
+    id: string;
+    name: string;
+    code: string;
+    level: string;
+    fullName: string;
+    skillsValidated: string[];
+  };
+  stats?: {
+    totalQuestions?: number;
+    difficultyDistribution?: Record<string, number>;
+    estimatedStudyTime?: number;
+  };
+}
+
 // Service interfaces
 export interface ITopicService {
   getTopics(request: GetTopicsRequest): Promise<GetTopicsResponse>;
+  getTopic(request: GetTopicRequest): Promise<GetTopicResponse>;
 }

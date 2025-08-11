@@ -5,6 +5,8 @@ import {
   Topic, 
   GetTopicsRequest, 
   GetTopicsResponse, 
+  GetTopicRequest,
+  GetTopicResponse,
   ITopicService,
   TopicMetadata
 } from '../shared/types/topic.types';
@@ -110,7 +112,7 @@ export class TopicService implements ITopicService {
       // Get available filter options from all topics
       const availableProviders = [...new Set(allTopics.map(t => t.providerId))].sort();
       const availableExams = [...new Set(allTopics.map(t => t.examId))].sort();
-      const availableCategories = [...new Set(allTopics.map(t => t.category).filter(Boolean))].sort();
+      const availableCategories = [...new Set(allTopics.map(t => t.category).filter((cat): cat is string => Boolean(cat)))].sort();
       const availableLevels = [...new Set(allTopics.map(t => t.level))].sort();
 
       const response: GetTopicsResponse = {
@@ -134,6 +136,97 @@ export class TopicService implements ITopicService {
     } catch (error) {
       this.logger.error('Failed to get topics', error as Error);
       throw new Error('Failed to retrieve topics');
+    }
+  }
+
+  /**
+   * Get a single topic by ID with optional context
+   */
+  async getTopic(request: GetTopicRequest): Promise<GetTopicResponse> {
+    this.logger.info('Getting topic by ID', { 
+      id: request.id,
+      includeProvider: request.includeProvider,
+      includeExam: request.includeExam
+    });
+
+    try {
+      // Check cache first
+      const cacheKey = `topic:${request.id}`;
+      const cached = this.getFromCache<GetTopicResponse>(cacheKey);
+      if (cached) {
+        this.logger.debug('Topic retrieved from cache', { id: request.id });
+        return cached;
+      }
+
+      // Find topic by searching through all topics
+      const allTopics = await this.getAllTopics();
+      const topic = allTopics.find(t => t.id === request.id);
+
+      if (!topic) {
+        this.logger.warn('Topic not found', { id: request.id });
+        throw new Error(`Topic with ID ${request.id} not found`);
+      }
+
+      // Build response with topic data
+      const response: GetTopicResponse = {
+        topic
+      };
+
+      // Add provider context if requested
+      if (request.includeProvider) {
+        try {
+          const provider = await this.loadProviderFromS3(topic.providerId);
+          response.providerContext = {
+            id: provider.id,
+            name: provider.name,
+            category: provider.category,
+            status: provider.status
+          };
+        } catch (error) {
+          this.logger.warn('Failed to load provider context', { providerId: topic.providerId, error: (error as Error).message });
+        }
+      }
+
+      // Add exam context if requested
+      if (request.includeExam) {
+        try {
+          const provider = await this.loadProviderFromS3(topic.providerId);
+          const certification = provider.certifications?.find(cert => cert.id === topic.examId);
+          
+          if (certification) {
+            response.examContext = {
+              id: certification.id,
+              name: certification.name,
+              code: certification.code,
+              level: certification.level,
+              fullName: certification.fullName,
+              skillsValidated: certification.skillsValidated || []
+            };
+          }
+        } catch (error) {
+          this.logger.warn('Failed to load exam context', { providerId: topic.providerId, examId: topic.examId, error: (error as Error).message });
+        }
+      }
+
+      // Add basic stats (could be enhanced with real data)
+      response.stats = {
+        estimatedStudyTime: topic.metadata?.studyTimeRecommended ?? 0
+      };
+
+      // Add difficulty distribution if available
+      if (topic.metadata?.difficultyLevel !== undefined) {
+        response.stats.difficultyDistribution = { [topic.metadata.difficultyLevel.toString()]: 1 };
+      }
+
+      // Cache the response
+      this.setCache(cacheKey, response);
+
+      this.logger.info('Topic retrieved successfully', { id: request.id });
+      return response;
+
+    } catch (error) {
+      this.logger.error('Failed to get topic', error as Error, { id: request.id });
+      throw error;
     }
   }
 
@@ -265,14 +358,27 @@ export class TopicService implements ITopicService {
       for (const topicName of certification.topics) {
         const topicId = this.generateTopicId(provider.id, certification.id, topicName);
         
-        const metadata: TopicMetadata = {
-          difficultyLevel: certification.metadata?.difficultyLevel,
-          popularityRank: certification.metadata?.popularityRank,
-          marketDemand: certification.metadata?.marketDemand,
-          jobRoles: certification.metadata?.jobRoles,
-          industries: certification.metadata?.industries,
-          studyTimeRecommended: certification.metadata?.studyTimeRecommended
-        };
+        const metadata: TopicMetadata = {};
+        
+        // Only set fields that have values
+        if (certification.metadata?.difficultyLevel !== undefined) {
+          metadata.difficultyLevel = certification.metadata.difficultyLevel;
+        }
+        if (certification.metadata?.popularityRank !== undefined) {
+          metadata.popularityRank = certification.metadata.popularityRank;
+        }
+        if (certification.metadata?.marketDemand !== undefined) {
+          metadata.marketDemand = certification.metadata.marketDemand;
+        }
+        if (certification.metadata?.jobRoles !== undefined) {
+          metadata.jobRoles = certification.metadata.jobRoles;
+        }
+        if (certification.metadata?.industries !== undefined) {
+          metadata.industries = certification.metadata.industries;
+        }
+        if (certification.metadata?.studyTimeRecommended !== undefined) {
+          metadata.studyTimeRecommended = certification.metadata.studyTimeRecommended;
+        }
 
         const topic: Topic = {
           id: topicId,
@@ -285,7 +391,7 @@ export class TopicService implements ITopicService {
           examCode: certification.code,
           level: certification.level,
           description: `${topicName} - covered in ${certification.fullName}`,
-          skillsValidated: certification.skillsValidated || [],
+          skillsValidated: certification.skillsValidated ?? [],
           metadata,
           createdAt: now,
           updatedAt: now

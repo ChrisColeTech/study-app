@@ -4,6 +4,7 @@ export const ERROR_CODES = {
   // Generic errors
   INTERNAL_ERROR: 'INTERNAL_ERROR',
   VALIDATION_ERROR: 'VALIDATION_ERROR',
+  BAD_REQUEST: 'BAD_REQUEST',
   NOT_FOUND: 'NOT_FOUND',
   UNAUTHORIZED: 'UNAUTHORIZED',
   FORBIDDEN: 'FORBIDDEN',
@@ -42,6 +43,7 @@ export const ERROR_CODES = {
 export const ERROR_MESSAGES = {
   [ERROR_CODES.INTERNAL_ERROR]: 'An internal server error occurred',
   [ERROR_CODES.VALIDATION_ERROR]: 'Request validation failed',
+  [ERROR_CODES.BAD_REQUEST]: 'Bad request',
   [ERROR_CODES.NOT_FOUND]: 'Resource not found',
   [ERROR_CODES.UNAUTHORIZED]: 'Authentication required',
   [ERROR_CODES.FORBIDDEN]: 'Access forbidden',

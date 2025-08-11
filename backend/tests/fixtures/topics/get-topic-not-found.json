@@ -1,0 +1,21 @@
+{
+  "description": "Get single topic by ID - topic not found",
+  "request": {
+    "method": "GET",
+    "path": "/v1/topics/non-existent-topic-id",
+    "queryParams": {}
+  },
+  "expectedResponse": {
+    "statusCode": 404,
+    "body": {
+      "success": false,
+      "error": {
+        "code": "NOT_FOUND",
+        "message": "Topic with ID non-existent-topic-id not found"
+      }
+    }
+  },
+  "validation": {
+    "isNotFoundError": true
+  }
+}

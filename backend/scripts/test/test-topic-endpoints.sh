@@ -226,6 +226,65 @@ validate_search_results() {
     fi
 }
 
+# Validate topic details response structure
+validate_topic_details_structure() {
+    local response_file=$1
+    local context_type=$2
+    
+    if ! command -v jq >/dev/null 2>&1; then
+        log_warn "jq not available, skipping topic details validation"
+        return 0
+    fi
+    
+    # Check basic topic structure
+    local has_topic=$(jq '.data | has("topic")' "$response_file" 2>/dev/null || echo "false")
+    local has_stats=$(jq '.data | has("stats")' "$response_file" 2>/dev/null || echo "false")
+    
+    if [[ "$has_topic" != "true" ]]; then
+        log_error "❌ Topic details validation failed: missing topic data"
+        return 1
+    fi
+    
+    if [[ "$has_stats" != "true" ]]; then
+        log_error "❌ Topic details validation failed: missing stats data"
+        return 1
+    fi
+    
+    # Check topic fields
+    local topic_id=$(jq '.data.topic | has("id")' "$response_file" 2>/dev/null || echo "false")
+    local topic_name=$(jq '.data.topic | has("name")' "$response_file" 2>/dev/null || echo "false")
+    local topic_provider=$(jq '.data.topic | has("providerId")' "$response_file" 2>/dev/null || echo "false")
+    
+    if [[ "$topic_id" != "true" || "$topic_name" != "true" || "$topic_provider" != "true" ]]; then
+        log_error "❌ Topic details validation failed: missing required topic fields"
+        return 1
+    fi
+    
+    # Check context-specific fields
+    case "$context_type" in
+        "provider"|"full")
+            local has_provider_context=$(jq '.data | has("providerContext")' "$response_file" 2>/dev/null || echo "false")
+            if [[ "$has_provider_context" != "true" ]]; then
+                log_error "❌ Topic details validation failed: missing provider context"
+                return 1
+            fi
+            ;;
+    esac
+    
+    case "$context_type" in
+        "exam"|"full")
+            local has_exam_context=$(jq '.data | has("examContext")' "$response_file" 2>/dev/null || echo "false")
+            if [[ "$has_exam_context" != "true" ]]; then
+                log_error "❌ Topic details validation failed: missing exam context"
+                return 1
+            fi
+            ;;
+    esac
+    
+    log_info "✅ Topic details structure validation passed for context: $context_type"
+    return 0
+}
+
 # Main test sequence
 main() {
     log_info "Starting Topic Endpoints Test Suite"
@@ -390,6 +449,81 @@ main() {
         test_results+=("✅ Search with No Results")
     else
         test_results+=("❌ Search with No Results")
+    fi
+    echo
+
+    # Topic Details Tests (Phase 11)
+    
+    # First get a valid topic ID from the list all topics response
+    local sample_topic_id=""
+    if [[ -f "$TEMP_DIR/list_all_topics_response.json" ]] && command -v jq >/dev/null 2>&1; then
+        sample_topic_id=$(jq -r '.data.topics[0].id // empty' "$TEMP_DIR/list_all_topics_response.json" 2>/dev/null)
+    fi
+    
+    if [[ -z "$sample_topic_id" ]]; then
+        log_warn "No sample topic ID available for detail tests, using default"
+        sample_topic_id="aws-clf-c02-cloud-concepts"
+    fi
+    
+    log_info "Using sample topic ID for tests: $sample_topic_id"
+    echo
+
+    # Test 14: Get topic details (basic)
+    total_tests=$((total_tests + 1))
+    if test_endpoint "GET" "/v1/topics/$sample_topic_id" "" "Get Topic Details (Basic)" 200; then
+        validate_response "$TEMP_DIR/get_topic_details_(basic)_response.json" "data"
+        validate_topic_details_structure "$TEMP_DIR/get_topic_details_(basic)_response.json" "basic"
+        passed_tests=$((passed_tests + 1))
+        test_results+=("✅ Get Topic Details (Basic)")
+    else
+        test_results+=("❌ Get Topic Details (Basic)")
+    fi
+    echo
+
+    # Test 15: Get topic details with provider context
+    total_tests=$((total_tests + 1))
+    if test_endpoint "GET" "/v1/topics/$sample_topic_id" "includeProvider=true" "Get Topic Details with Provider" 200; then
+        validate_response "$TEMP_DIR/get_topic_details_with_provider_response.json" "data"
+        validate_topic_details_structure "$TEMP_DIR/get_topic_details_with_provider_response.json" "provider"
+        passed_tests=$((passed_tests + 1))
+        test_results+=("✅ Get Topic Details with Provider")
+    else
+        test_results+=("❌ Get Topic Details with Provider")
+    fi
+    echo
+
+    # Test 16: Get topic details with exam context
+    total_tests=$((total_tests + 1))
+    if test_endpoint "GET" "/v1/topics/$sample_topic_id" "includeExam=true" "Get Topic Details with Exam" 200; then
+        validate_response "$TEMP_DIR/get_topic_details_with_exam_response.json" "data"
+        validate_topic_details_structure "$TEMP_DIR/get_topic_details_with_exam_response.json" "exam"
+        passed_tests=$((passed_tests + 1))
+        test_results+=("✅ Get Topic Details with Exam")
+    else
+        test_results+=("❌ Get Topic Details with Exam")
+    fi
+    echo
+
+    # Test 17: Get topic details with full context
+    total_tests=$((total_tests + 1))
+    if test_endpoint "GET" "/v1/topics/$sample_topic_id" "includeProvider=true&includeExam=true" "Get Topic Details (Full Context)" 200; then
+        validate_response "$TEMP_DIR/get_topic_details_(full_context)_response.json" "data"
+        validate_topic_details_structure "$TEMP_DIR/get_topic_details_(full_context)_response.json" "full"
+        passed_tests=$((passed_tests + 1))
+        test_results+=("✅ Get Topic Details (Full Context)")
+    else
+        test_results+=("❌ Get Topic Details (Full Context)")
+    fi
+    echo
+
+    # Test 18: Get topic not found
+    total_tests=$((total_tests + 1))
+    if test_endpoint "GET" "/v1/topics/non-existent-topic-id" "" "Get Topic Not Found" 404; then
+        validate_response "$TEMP_DIR/get_topic_not_found_response.json" "error"
+        passed_tests=$((passed_tests + 1))
+        test_results+=("✅ Get Topic Not Found")
+    else
+        test_results+=("❌ Get Topic Not Found")
     fi
     echo
 

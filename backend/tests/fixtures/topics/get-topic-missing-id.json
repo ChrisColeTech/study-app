@@ -1,0 +1,21 @@
+{
+  "description": "Get single topic without providing ID - bad request",
+  "request": {
+    "method": "GET",
+    "path": "/v1/topics/",
+    "queryParams": {}
+  },
+  "expectedResponse": {
+    "statusCode": 400,
+    "body": {
+      "success": false,
+      "error": {
+        "code": "BAD_REQUEST",
+        "message": "Topic ID is required"
+      }
+    }
+  },
+  "validation": {
+    "isBadRequestError": true
+  }
+}

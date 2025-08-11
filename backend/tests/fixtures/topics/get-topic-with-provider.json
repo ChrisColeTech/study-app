@@ -1,0 +1,49 @@
+{
+  "description": "Get single topic by ID with provider context",
+  "request": {
+    "method": "GET",
+    "path": "/v1/topics/aws-clf-c02-cloud-concepts",
+    "queryParams": {
+      "includeProvider": "true"
+    }
+  },
+  "expectedResponse": {
+    "statusCode": 200,
+    "body": {
+      "success": true,
+      "data": {
+        "topic": {
+          "id": "string",
+          "name": "string",
+          "category": "string",
+          "providerId": "string",
+          "providerName": "string",
+          "examId": "string",
+          "examName": "string",
+          "examCode": "string",
+          "level": "string",
+          "description": "string",
+          "skillsValidated": "array",
+          "metadata": "object",
+          "createdAt": "string",
+          "updatedAt": "string"
+        },
+        "providerContext": {
+          "id": "string",
+          "name": "string",
+          "category": "string",
+          "status": "string"
+        },
+        "stats": {
+          "estimatedStudyTime": "number"
+        }
+      },
+      "message": "Topic retrieved successfully"
+    }
+  },
+  "validation": {
+    "hasTopicData": true,
+    "hasProviderContext": true,
+    "hasStats": true
+  }
+}

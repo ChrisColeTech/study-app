@@ -6,7 +6,8 @@ import { ServiceFactory } from '../shared/service-factory';
 import { createLogger } from '../shared/logger';
 import { ERROR_CODES } from '../shared/constants/error.constants';
 import { 
-  GetTopicsRequest
+  GetTopicsRequest,
+  GetTopicRequest
 } from '../shared/types/topic.types';
 
 export class TopicHandler extends BaseHandler {
@@ -25,6 +26,13 @@ export class TopicHandler extends BaseHandler {
         method: 'GET',
         path: '/v1/topics',
         handler: this.getTopics.bind(this),
+        requireAuth: false, // Public endpoint for now
+      },
+      // Get single topic endpoint
+      {
+        method: 'GET',
+        path: '/v1/topics/{id}',
+        handler: this.getTopic.bind(this),
         requireAuth: false, // Public endpoint for now
       }
     ];
@@ -94,6 +102,83 @@ export class TopicHandler extends BaseHandler {
       return this.error(
         ERROR_CODES.INTERNAL_ERROR,
         'Failed to retrieve topics'
+      );
+    }
+  }
+
+  /**
+   * Get single topic by ID with optional context
+   * GET /v1/topics/{id}?includeProvider=true&includeExam=true
+   */
+  private async getTopic(context: HandlerContext): Promise<ApiResponse> {
+    try {
+      this.logger.info('Getting topic by ID', { 
+        requestId: context.requestId,
+        pathParams: context.event.pathParameters,
+        queryParams: context.event.queryStringParameters
+      });
+
+      // Extract topic ID from path parameters
+      const topicId = context.event.pathParameters?.id;
+      
+      if (!topicId) {
+        this.logger.warn('Topic ID missing from path parameters', { 
+          requestId: context.requestId 
+        });
+        
+        return this.error(
+          ERROR_CODES.BAD_REQUEST,
+          'Topic ID is required'
+        );
+      }
+
+      // Parse query parameters
+      const queryParams = context.event.queryStringParameters || {};
+      
+      const request: GetTopicRequest = {
+        id: decodeURIComponent(topicId)
+      };
+      
+      // Set optional parameters
+      if (queryParams.includeProvider === 'true') {
+        request.includeProvider = true;
+      }
+      
+      if (queryParams.includeExam === 'true') {
+        request.includeExam = true;
+      }
+
+      // Get topic from service
+      const topicService = this.serviceFactory.getTopicService();
+      const result = await topicService.getTopic(request);
+
+      this.logger.info('Topic retrieved successfully', { 
+        requestId: context.requestId,
+        topicId: request.id,
+        includeProvider: request.includeProvider,
+        includeExam: request.includeExam
+      });
+
+      return this.success(result, 'Topic retrieved successfully');
+
+    } catch (error: any) {
+      this.logger.error('Failed to get topic', error, { 
+        requestId: context.requestId,
+        pathParams: context.event.pathParameters,
+        queryParams: context.event.queryStringParameters
+      });
+
+      // Handle topic not found specifically
+      if (error.message && error.message.includes('not found')) {
+        return this.error(
+          ERROR_CODES.NOT_FOUND,
+          error.message
+        );
+      }
+
+      return this.error(
+        ERROR_CODES.INTERNAL_ERROR,
+        'Failed to retrieve topic'
       );
     }
   }
