@@ -5,8 +5,9 @@ import { DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb';
 import { S3Client } from '@aws-sdk/client-s3';
 
 // Import service interfaces
-export type { IAuthService } from '../services/auth.service';
-export type { IUserService } from '../services/user.service';
+import type { IAuthService } from '../services/auth.service';
+import type { IUserService } from '../services/user.service';
+export type { IAuthService, IUserService };
 
 export interface IQuestionService {
   // Question service methods will be added in Phase 2
@@ -40,7 +41,8 @@ export interface IHealthService {
 }
 
 // Import repository interfaces
-export type { IUserRepository } from '../repositories/user.repository';
+import type { IUserRepository } from '../repositories/user.repository';
+export type { IUserRepository };
 
 export interface ISessionRepository {
   // Session repository methods will be added in Phase 2
@@ -87,8 +89,8 @@ export class ServiceFactory {
   private _s3Client: S3Client | null = null;
 
   // Services (lazy initialized)
-  private _authService: any | null = null;
-  private _userService: any | null = null;
+  private _authService: IAuthService | null = null;
+  private _userService: IUserService | null = null;
   private _questionService: IQuestionService | null = null;
   private _sessionService: ISessionService | null = null;
   private _analyticsService: IAnalyticsService | null = null;
@@ -96,7 +98,7 @@ export class ServiceFactory {
   private _healthService: IHealthService | null = null;
 
   // Repositories (lazy initialized)
-  private _userRepository: any | null = null;
+  private _userRepository: IUserRepository | null = null;
   private _sessionRepository: ISessionRepository | null = null;
   private _questionRepository: IQuestionRepository | null = null;
   private _progressRepository: IProgressRepository | null = null;
@@ -195,23 +197,23 @@ export class ServiceFactory {
   /**
    * Get Auth Service
    */
-  public getAuthService(): any {
+  public getAuthService(): IAuthService {
     if (!this._authService) {
       const { AuthService } = require('../services/auth.service');
       this._authService = new AuthService(this.getUserService());
     }
-    return this._authService;
+    return this._authService!;
   }
 
   /**
    * Get User Service
    */
-  public getUserService(): any {
+  public getUserService(): IUserService {
     if (!this._userService) {
       const { UserService } = require('../services/user.service');
       this._userService = new UserService(this.getUserRepository());
     }
-    return this._userService;
+    return this._userService!;
   }
 
   /**
@@ -263,12 +265,12 @@ export class ServiceFactory {
   /**
    * Get User Repository
    */
-  public getUserRepository(): any {
+  public getUserRepository(): IUserRepository {
     if (!this._userRepository) {
       const { UserRepository } = require('../repositories/user.repository');
       this._userRepository = new UserRepository(this.getDynamoClient(), this.getConfig());
     }
-    return this._userRepository;
+    return this._userRepository!;
   }
 
   /**
