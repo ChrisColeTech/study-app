@@ -144,7 +144,7 @@ export class LambdaConstruct extends Construct {
     // Goals Lambda Function - Phase 18 implementation
     const goalsFunction = new cdk.aws_lambda.Function(this, 'GoalsFunction', {
       ...lambdaProps,
-      functionName: StackConfig.getResourceName('goals', props.environment),
+      functionName: StackConfig.getResourceName('goals-v2', props.environment),
       description: 'Study App V3 Goals Lambda - Phase 18 Implementation',
       code: cdk.aws_lambda.Code.fromAsset('../backend/dist/bundled'),
       handler: 'goals.handler',
