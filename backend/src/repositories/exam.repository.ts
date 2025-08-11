@@ -60,22 +60,24 @@ export class ExamRepository implements IExamRepository {
       const allExams: Exam[] = [];
 
       if (listResult.Contents) {
-        // Find all exam.json files
-        const examFiles = listResult.Contents.filter(obj => 
+        // Find all provider.json files (exams are embedded as certifications)
+        const providerFiles = listResult.Contents.filter(obj => 
           obj.Key && 
-          obj.Key.includes('/exams.json')
+          !obj.Key.endsWith('/') &&
+          obj.Key.endsWith('.json') &&
+          !obj.Key.includes('metadata.json') // Exclude metadata file
         );
 
-        this.logger.info('Found exam files', { count: examFiles.length });
+        this.logger.info('Found provider files to extract exams from', { count: providerFiles.length });
 
-        // Load each exam file
-        for (const file of examFiles) {
+        // Load each provider file and extract certifications as exams
+        for (const file of providerFiles) {
           if (file.Key) {
             try {
-              const exams = await this.loadExamFile(file.Key);
+              const exams = await this.loadExamsFromProviderFile(file.Key);
               allExams.push(...exams);
             } catch (error) {
-              this.logger.warn('Failed to load exam file', { 
+              this.logger.warn('Failed to load exams from provider file', { 
                 file: file.Key,
                 error: (error as Error).message
               });
@@ -94,6 +96,16 @@ export class ExamRepository implements IExamRepository {
 
       return allExams;
     } catch (error) {
+      // Handle specific S3 errors gracefully
+      const errorName = (error as any).name;
+      if (errorName === 'NoSuchBucket' || errorName === 'AccessDenied') {
+        this.logger.warn('S3 bucket not accessible - returning empty results', { 
+          bucket: this.bucketName,
+          error: (error as Error).message 
+        });
+        return [];
+      }
+      
       this.logger.error('Failed to load exams from S3', error as Error);
       throw new Error('Failed to load exam data');
     }
@@ -148,8 +160,8 @@ export class ExamRepository implements IExamRepository {
     try {
       this.logger.info('Loading exams by provider from S3', { provider, bucket: this.bucketName });
 
-      const examKey = `${this.PROVIDERS_PREFIX}${provider}/exams.json`;
-      const exams = await this.loadExamFile(examKey);
+      const examKey = `${this.PROVIDERS_PREFIX}${provider}.json`;
+      const exams = await this.loadExamsFromProviderFile(examKey);
 
       // Cache the results
       this.setCache(cacheKey, exams);
@@ -195,9 +207,9 @@ export class ExamRepository implements IExamRepository {
   }
 
   /**
-   * Load a single exam file from S3
+   * Load exams from a provider file (extract certifications)
    */
-  private async loadExamFile(key: string): Promise<Exam[]> {
+  private async loadExamsFromProviderFile(key: string): Promise<Exam[]> {
     try {
       const getCommand = new GetObjectCommand({
         Bucket: this.bucketName,
@@ -208,17 +220,18 @@ export class ExamRepository implements IExamRepository {
       
       if (result.Body) {
         const content = await result.Body.transformToString();
-        const examData = JSON.parse(content);
+        const providerData = JSON.parse(content);
         
-        // Handle different exam file formats
-        if (Array.isArray(examData)) {
-          return examData as Exam[];
-        } else if (examData.exams && Array.isArray(examData.exams)) {
-          return examData.exams as Exam[];
-        } else if (this.isValidExam(examData)) {
-          return [examData as Exam];
+        // Extract provider ID from file path (e.g., providers/aws.json -> aws)
+        const providerId = key.split('/').pop()?.replace('.json', '') || 'unknown';
+        
+        // Extract certifications as exams
+        if (providerData.certifications && Array.isArray(providerData.certifications)) {
+          const exams: Exam[] = providerData.certifications.map((cert: any) => this.transformCertificationToExam(cert, providerId, providerData.name));
+          this.logger.debug(`Extracted ${exams.length} exams from provider ${providerId}`);
+          return exams;
         } else {
-          this.logger.warn('Invalid exam file format', { key });
+          this.logger.warn('No certifications found in provider file', { key });
           return [];
         }
       }
@@ -229,6 +242,35 @@ export class ExamRepository implements IExamRepository {
       }
       throw error;
     }
+  }
+
+  /**
+   * Transform certification data to exam format
+   */
+  private transformCertificationToExam(certification: any, providerId: string, providerName: string): Exam {
+    return {
+      examId: certification.id || certification.examCode || 'unknown',
+      examName: certification.name || '',
+      examCode: certification.code || certification.examCode || '',
+      providerId,
+      providerName,
+      description: certification.description || '',
+      level: certification.level || 'foundational',
+      category: 'certification', // Default category
+      duration: certification.duration || undefined,
+      questionCount: certification.questionCount || 0,
+      passingScore: certification.passingScore || undefined,
+      topics: certification.topics || [],
+      isActive: certification.status === 'active',
+      metadata: {
+        lastUpdated: certification.updatedAt || new Date().toISOString(),
+        examUrl: certification.examUrl || undefined,
+        cost: certification.cost?.toString() || undefined,
+        validityPeriod: certification.validityPeriod ? parseInt(certification.validityPeriod) : undefined,
+        retakePolicy: certification.retakePolicy || undefined,
+        languages: certification.languages || undefined
+      }
+    };
   }
 
   /**
