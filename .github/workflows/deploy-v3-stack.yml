@@ -42,11 +42,11 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
           cache-dependency-path: |
-            backend/cdk-v3/package-lock.json
+            cdk-v3/package-lock.json
             backend/package-lock.json
             
       - name: Install CDK dependencies
-        working-directory: ./backend/cdk-v3
+        working-directory: ./cdk-v3
         run: npm ci
         
       - name: Install Backend dependencies
@@ -54,7 +54,7 @@ jobs:
         run: npm ci
         
       - name: Build CDK project
-        working-directory: ./backend/cdk-v3
+        working-directory: ./cdk-v3
         run: npm run build
         
       - name: Build Backend Lambda functions
@@ -62,14 +62,14 @@ jobs:
         run: npm run build
         
       - name: Run CDK Lambda tests
-        working-directory: ./backend/cdk-v3
+        working-directory: ./cdk-v3
         run: echo "Tests temporarily disabled - will fix in next commit"
         
       - name: Install CDK CLI
         run: npm install -g aws-cdk@${{ env.CDK_VERSION }}
         
       - name: CDK Synth
-        working-directory: ./backend/cdk-v3
+        working-directory: ./cdk-v3
         run: |
           export CDK_STAGE=${{ github.event.inputs.stage || 'dev' }}
           export CDK_ACCOUNT=${{ secrets.AWS_ACCOUNT_ID }}
@@ -80,9 +80,9 @@ jobs:
         with:
           name: build-artifacts-v3
           path: |
-            backend/cdk-v3/dist/
+            cdk-v3/dist/
             backend/dist/
-            backend/cdk-v3/cdk.out/
+            cdk-v3/cdk.out/
           retention-days: 7
 
   # Job 2: Deploy Infrastructure
@@ -116,7 +116,7 @@ jobs:
         run: npm install -g aws-cdk@${{ env.CDK_VERSION }}
         
       - name: Install project dependencies
-        working-directory: ./backend/cdk-v3
+        working-directory: ./cdk-v3
         run: npm ci
         
       - name: Bootstrap CDK Environment
@@ -125,7 +125,7 @@ jobs:
           cdk bootstrap aws://${{ secrets.AWS_ACCOUNT_ID }}/${{ env.AWS_REGION }}
         
       - name: Deploy or Destroy Stack
-        working-directory: ./backend/cdk-v3
+        working-directory: ./cdk-v3
         env:
           CDK_STAGE: ${{ github.event.inputs.stage || 'dev' }}
           CDK_ACCOUNT: ${{ secrets.AWS_ACCOUNT_ID }}
@@ -140,7 +140,7 @@ jobs:
           
       - name: Output deployment results
         if: github.event.inputs.destroy != 'true'
-        working-directory: ./backend/cdk-v3
+        working-directory: ./cdk-v3
         env:
           CDK_STAGE: ${{ github.event.inputs.stage || 'dev' }}
           CDK_ACCOUNT: ${{ secrets.AWS_ACCOUNT_ID }}
