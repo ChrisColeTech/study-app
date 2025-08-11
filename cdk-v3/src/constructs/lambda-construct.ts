@@ -87,21 +87,9 @@ export class LambdaConstruct extends Construct {
     // Grant S3 permissions to provider function
     props.questionDataBucket.grantRead(providerFunction);
 
-    // Exam Lambda Function - Phase 8 implementation
-    const examFunction = new cdk.aws_lambda.Function(this, 'ExamFunction', {
-      ...lambdaProps,
-      functionName: StackConfig.getResourceName('exam', props.environment),
-      description: 'Study App V3 Exam Lambda - Phase 8 Implementation',
-      code: cdk.aws_lambda.Code.fromAsset('../backend/dist/bundled'),
-      handler: 'exam.handler',
-    });
-    this.functions['exams'] = examFunction;
-
-    // Grant S3 permissions to exam function
-    props.questionDataBucket.grantRead(examFunction);
-
     // Placeholder functions for future phases - minimal implementation
     const placeholderFunctionNames = [
+      'exams',
       'topics',
       'questions',
       'sessions',
