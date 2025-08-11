@@ -248,7 +248,7 @@ describe('UserService', () => {
       const updateData = { firstName: '  ' };
 
       await expect(userService.updateUser('test-user-id', updateData))
-        .rejects.toThrow('First name cannot be empty');
+        .rejects.toThrow('First name is required');
 
       expect(mockUserRepository.update).not.toHaveBeenCalled();
     });

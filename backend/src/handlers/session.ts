@@ -1,5 +1,5 @@
-// Session handler for Study App V3 Backend
-// Phase 15: Session Creation Feature
+// Refactored Session handler using middleware pattern
+// Eliminates architecture violations: massive SRP violations, mixed routing/validation/parsing/error handling/business logic
 
 import { BaseHandler, RouteConfig } from '../shared/base-handler';
 import { HandlerContext, ApiResponse } from '../shared/types/api.types';
@@ -12,6 +12,16 @@ import {
   UpdateSessionRequest
 } from '../shared/types/session.types';
 
+// Import new middleware
+import {
+  ParsingMiddleware,
+  ErrorHandlingMiddleware,
+  ErrorContexts,
+  AuthMiddleware,
+  AuthConfigs,
+  AuthenticatedContext
+} from '../shared/middleware';
+
 export class SessionHandler extends BaseHandler {
   private serviceFactory: ServiceFactory;
   private logger = createLogger({ handler: 'SessionHandler' });
@@ -23,180 +33,204 @@ export class SessionHandler extends BaseHandler {
 
   protected setupRoutes(): void {
     this.routes = [
-      // Create new session endpoint
       {
         method: 'POST',
         path: '/v1/sessions',
         handler: this.createSession.bind(this),
-        requireAuth: true, // Sessions require authentication
+        requireAuth: true,
       },
-      // Get existing session endpoint  
       {
         method: 'GET',
         path: '/v1/sessions/{id}',
         handler: this.getSession.bind(this),
-        requireAuth: true, // Sessions require authentication
+        requireAuth: true,
       },
-      // Update existing session endpoint
       {
         method: 'PUT',
         path: '/v1/sessions/{id}',
         handler: this.updateSession.bind(this),
-        requireAuth: true, // Sessions require authentication
+        requireAuth: true,
       }
     ];
   }
 
   /**
-   * Create a new study session with configuration
-   * POST /v1/sessions
-   * Phase 15: Session Creation Feature
+   * Create a new study session - now clean and focused
    */
   private async createSession(context: HandlerContext): Promise<ApiResponse> {
-    try {
-      this.logger.info('Creating new session', { 
+    // Authenticate user using middleware
+    const { authenticatedContext, error: authError } = await AuthMiddleware.authenticateRequest(
+      context, 
+      AuthConfigs.AUTHENTICATED
+    );
+    if (authError) return authError;
+
+    // Parse and validate request body using middleware
+    const { data: requestBody, error: parseError } = ParsingMiddleware.parseRequestBody<CreateSessionRequest>(context, true);
+    if (parseError) return parseError;
+
+    // Validate using helper method (extracted from massive validation block)
+    const validationError = this.validateCreateSessionRequest(requestBody);
+    if (validationError) return validationError;
+
+    // Business logic only - delegate error handling to middleware
+    const { result, error } = await ErrorHandlingMiddleware.withErrorHandling(
+      async () => {
+        const sessionService = this.serviceFactory.getSessionService();
+        return await sessionService.createSession(authenticatedContext!.userId, requestBody);
+      },
+      {
         requestId: context.requestId,
-        ...(context.userId ? { userId: context.userId } : {}),
-        hasBody: !!context.event.body
-      });
-
-      // Validate authentication - user ID should be available from auth middleware
-      if (!context.userId) {
-        return this.error(
-          ERROR_CODES.UNAUTHORIZED,
-          'Authentication required to create sessions'
-        );
+        operation: ErrorContexts.Session.CREATE,
+        userId: authenticatedContext!.userId,
+        additionalInfo: { 
+          examId: requestBody.examId,
+          providerId: requestBody.providerId,
+          sessionType: requestBody.sessionType
+        }
       }
+    );
 
-      // Parse and validate request body
-      if (!context.event.body) {
-        return this.error(
-          ERROR_CODES.VALIDATION_ERROR,
-          'Request body is required'
-        );
-      }
+    if (error) return error;
 
-      let requestBody: any;
-      try {
-        requestBody = JSON.parse(context.event.body);
-      } catch (error) {
-        return this.error(
-          ERROR_CODES.VALIDATION_ERROR,
-          'Invalid JSON in request body'
-        );
-      }
+    this.logger.info('Session created successfully', { 
+      requestId: context.requestId,
+      userId: authenticatedContext!.userId,
+      sessionId: result!.session.sessionId,
+      totalQuestions: result!.session.totalQuestions,
+      providerId: result!.session.providerId,
+      examId: result!.session.examId
+    });
 
-      // Validate required fields
-      const validationError = this.validateCreateSessionRequest(requestBody);
-      if (validationError) {
-        return validationError;
-      }
-
-      // Build session creation request
-      const request: CreateSessionRequest = {
-        examId: requestBody.examId,
-        providerId: requestBody.providerId,
-        sessionType: requestBody.sessionType,
-        questionCount: requestBody.questionCount,
-        topics: requestBody.topics,
-        difficulty: requestBody.difficulty,
-        timeLimit: requestBody.timeLimit
-      };
-
-      this.logger.debug('Session creation request validated', {
-        requestId: context.requestId,
-        userId: context.userId,
-        examId: request.examId,
-        providerId: request.providerId,
-        sessionType: request.sessionType,
-        questionCount: request.questionCount,
-        topicsCount: request.topics?.length || 0
-      });
-
-      // Create session through service
-      const sessionService = this.serviceFactory.getSessionService();
-      const result = await sessionService.createSession(context.userId, request);
-
-      this.logger.info('Session created successfully', { 
-        requestId: context.requestId,
-        userId: context.userId,
-        sessionId: result.session.sessionId,
-        totalQuestions: result.session.totalQuestions,
-        providerId: result.session.providerId,
-        examId: result.session.examId
-      });
-
-      return this.success(result, 'Session created successfully');
-
-    } catch (error: any) {
-      this.logger.error('Failed to create session', error, { 
-        requestId: context.requestId,
-        ...(context.userId ? { userId: context.userId } : {}),
-        hasBody: !!context.event.body
-      });
-
-      // Handle specific error types
-      if (error.message.includes('Invalid provider') || 
-          error.message.includes('Invalid exam') ||
-          error.message.includes('Invalid topic')) {
-        return this.error(
-          ERROR_CODES.NOT_FOUND,
-          error.message
-        );
-      }
-
-      if (error.message.includes('No questions found')) {
-        return this.error(
-          ERROR_CODES.NOT_FOUND,
-          'No questions found matching the specified criteria. Please adjust your filters.'
-        );
-      }
-
-      if (error.message.includes('Question count must be') || 
-          error.message.includes('Time limit must be') ||
-          error.message.includes('validation') ||
-          error.message.includes('Invalid')) {
-        return this.error(
-          ERROR_CODES.VALIDATION_ERROR,
-          error.message
-        );
-      }
-
-      if (error.message.includes('already exists')) {
-        return this.error(
-          ERROR_CODES.CONFLICT,
-          'Session creation failed due to ID conflict. Please try again.'
-        );
-      }
-
-      return this.error(
-        ERROR_CODES.INTERNAL_ERROR,
-        'Failed to create session'
-      );
-    }
+    return ErrorHandlingMiddleware.createSuccessResponse(result, 'Session created successfully');
   }
 
   /**
-   * Validate create session request body
+   * Get an existing study session - now clean and focused
+   */
+  private async getSession(context: HandlerContext): Promise<ApiResponse> {
+    // Authenticate user using middleware
+    const { authenticatedContext, error: authError } = await AuthMiddleware.authenticateRequest(
+      context, 
+      AuthConfigs.AUTHENTICATED
+    );
+    if (authError) return authError;
+
+    // Parse path parameters using middleware
+    const { data: pathParams, error: parseError } = ParsingMiddleware.parsePathParams(context);
+    if (parseError) return parseError;
+
+    // Validate session ID
+    const sessionValidationError = this.validateSessionId(pathParams.id);
+    if (sessionValidationError) return sessionValidationError;
+
+    // Business logic only - delegate error handling to middleware
+    const { result, error } = await ErrorHandlingMiddleware.withErrorHandling(
+      async () => {
+        const sessionService: SessionService = this.serviceFactory.getSessionService() as SessionService;
+        return await sessionService.getSession(pathParams.id, authenticatedContext!.userId);
+      },
+      {
+        requestId: context.requestId,
+        operation: ErrorContexts.Session.GET,
+        userId: authenticatedContext!.userId,
+        additionalInfo: { sessionId: pathParams.id }
+      }
+    );
+
+    if (error) return error;
+
+    this.logger.info('Session retrieved successfully', { 
+      requestId: context.requestId,
+      userId: authenticatedContext!.userId,
+      sessionId: result!.session.sessionId,
+      status: result!.session.status,
+      currentQuestion: result!.progress.currentQuestion,
+      totalQuestions: result!.progress.totalQuestions,
+      accuracy: result!.progress.accuracy
+    });
+
+    return ErrorHandlingMiddleware.createSuccessResponse(result, 'Session retrieved successfully');
+  }
+
+  /**
+   * Update an existing study session - now clean and focused
+   */
+  private async updateSession(context: HandlerContext): Promise<ApiResponse> {
+    // Authenticate user using middleware
+    const { authenticatedContext, error: authError } = await AuthMiddleware.authenticateRequest(
+      context, 
+      AuthConfigs.AUTHENTICATED
+    );
+    if (authError) return authError;
+
+    // Parse path parameters using middleware
+    const { data: pathParams, error: parseError } = ParsingMiddleware.parsePathParams(context);
+    if (parseError) return parseError;
+
+    // Parse and validate request body using middleware
+    const { data: requestBody, error: bodyParseError } = ParsingMiddleware.parseRequestBody<UpdateSessionRequest>(context, true);
+    if (bodyParseError) return bodyParseError;
+
+    // Validate session ID and request body
+    const sessionValidationError = this.validateSessionId(pathParams.id);
+    if (sessionValidationError) return sessionValidationError;
+
+    const updateValidationError = this.validateUpdateSessionRequest(requestBody);
+    if (updateValidationError) return updateValidationError;
+
+    // Business logic only - delegate error handling to middleware
+    const { result, error } = await ErrorHandlingMiddleware.withErrorHandling(
+      async () => {
+        const sessionService: SessionService = this.serviceFactory.getSessionService() as SessionService;
+        return await sessionService.updateSession(pathParams.id, authenticatedContext!.userId, requestBody);
+      },
+      {
+        requestId: context.requestId,
+        operation: ErrorContexts.Session.UPDATE,
+        userId: authenticatedContext!.userId,
+        additionalInfo: { 
+          sessionId: pathParams.id,
+          action: requestBody.action
+        }
+      }
+    );
+
+    if (error) return error;
+
+    this.logger.info('Session updated successfully', { 
+      requestId: context.requestId,
+      userId: authenticatedContext!.userId,
+      sessionId: result!.session.sessionId,
+      status: result!.session.status,
+      currentQuestion: result!.progress.currentQuestion,
+      action: requestBody.action
+    });
+
+    return ErrorHandlingMiddleware.createSuccessResponse(result, 'Session updated successfully');
+  }
+
+  /**
+   * Helper method to validate create session request - extracted from 107-line validation block
    */
   private validateCreateSessionRequest(requestBody: any): ApiResponse | null {
     // Check required fields
     if (!requestBody.examId || typeof requestBody.examId !== 'string') {
-      return this.error(
+      return ErrorHandlingMiddleware.createErrorResponse(
         ERROR_CODES.VALIDATION_ERROR,
         'examId is required and must be a string'
       );
     }
 
     if (!requestBody.providerId || typeof requestBody.providerId !== 'string') {
-      return this.error(
+      return ErrorHandlingMiddleware.createErrorResponse(
         ERROR_CODES.VALIDATION_ERROR,
         'providerId is required and must be a string'
       );
     }
 
     if (!requestBody.sessionType || typeof requestBody.sessionType !== 'string') {
-      return this.error(
+      return ErrorHandlingMiddleware.createErrorResponse(
         ERROR_CODES.VALIDATION_ERROR,
         'sessionType is required and must be a string'
       );
@@ -205,23 +239,22 @@ export class SessionHandler extends BaseHandler {
     // Validate session type enum
     const validSessionTypes = ['practice', 'exam', 'review'];
     if (!validSessionTypes.includes(requestBody.sessionType)) {
-      return this.error(
+      return ErrorHandlingMiddleware.createErrorResponse(
         ERROR_CODES.VALIDATION_ERROR,
         `sessionType must be one of: ${validSessionTypes.join(', ')}`
       );
     }
 
-    // Validate provider ID format
+    // Validate ID formats
     if (!/^[a-zA-Z0-9_-]+$/.test(requestBody.providerId)) {
-      return this.error(
+      return ErrorHandlingMiddleware.createErrorResponse(
         ERROR_CODES.VALIDATION_ERROR,
         'Invalid providerId format. Use alphanumeric characters, hyphens, and underscores only'
       );
     }
 
-    // Validate exam ID format
     if (!/^[a-zA-Z0-9_-]+$/.test(requestBody.examId)) {
-      return this.error(
+      return ErrorHandlingMiddleware.createErrorResponse(
         ERROR_CODES.VALIDATION_ERROR,
         'Invalid examId format. Use alphanumeric characters, hyphens, and underscores only'
       );
@@ -232,7 +265,7 @@ export class SessionHandler extends BaseHandler {
       if (typeof requestBody.questionCount !== 'number' || 
           requestBody.questionCount < 1 || 
           requestBody.questionCount > 200) {
-        return this.error(
+        return ErrorHandlingMiddleware.createErrorResponse(
           ERROR_CODES.VALIDATION_ERROR,
           'questionCount must be a number between 1 and 200'
         );
@@ -241,36 +274,26 @@ export class SessionHandler extends BaseHandler {
 
     if (requestBody.topics !== undefined) {
       if (!Array.isArray(requestBody.topics)) {
-        return this.error(
+        return ErrorHandlingMiddleware.createErrorResponse(
           ERROR_CODES.VALIDATION_ERROR,
           'topics must be an array'
         );
       }
 
-      for (const topic of requestBody.topics) {
-        if (typeof topic !== 'string' || !/^[a-zA-Z0-9_-]+$/.test(topic)) {
-          return this.error(
-            ERROR_CODES.VALIDATION_ERROR,
-            'Each topic must be a string with alphanumeric characters, hyphens, and underscores only'
-          );
-        }
-      }
-
       if (requestBody.topics.length > 20) {
-        return this.error(
+        return ErrorHandlingMiddleware.createErrorResponse(
           ERROR_CODES.VALIDATION_ERROR,
           'Maximum 20 topics allowed'
         );
       }
-    }
 
-    if (requestBody.difficulty !== undefined) {
-      const validDifficulties = ['easy', 'medium', 'hard'];
-      if (!validDifficulties.includes(requestBody.difficulty)) {
-        return this.error(
-          ERROR_CODES.VALIDATION_ERROR,
-          `difficulty must be one of: ${validDifficulties.join(', ')}`
-        );
+      for (const topic of requestBody.topics) {
+        if (typeof topic !== 'string' || !/^[a-zA-Z0-9_-]+$/.test(topic)) {
+          return ErrorHandlingMiddleware.createErrorResponse(
+            ERROR_CODES.VALIDATION_ERROR,
+            'Each topic must be a string with alphanumeric characters, hyphens, and underscores only'
+          );
+        }
       }
     }
 
@@ -278,7 +301,7 @@ export class SessionHandler extends BaseHandler {
       if (typeof requestBody.timeLimit !== 'number' || 
           requestBody.timeLimit < 5 || 
           requestBody.timeLimit > 300) {
-        return this.error(
+        return ErrorHandlingMiddleware.createErrorResponse(
           ERROR_CODES.VALIDATION_ERROR,
           'timeLimit must be a number between 5 and 300 minutes'
         );
@@ -289,240 +312,33 @@ export class SessionHandler extends BaseHandler {
   }
 
   /**
-   * Get an existing study session with current progress
-   * GET /v1/sessions/{id}
-   * Phase 16: Session Retrieval Feature
+   * Helper method to validate session ID - extracted from repetitive validation
    */
-  private async getSession(context: HandlerContext): Promise<ApiResponse> {
-    const sessionId = context.event.pathParameters?.id;
-    
-    try {
-      this.logger.info('Getting session', { 
-        requestId: context.requestId,
-        ...(context.userId ? { userId: context.userId } : {}),
-        ...(sessionId ? { sessionId } : {})
-      });
-
-      // Validate authentication
-      if (!context.userId) {
-        return this.error(
-          ERROR_CODES.UNAUTHORIZED,
-          'Authentication required to access sessions'
-        );
-      }
-
-      // Validate session ID parameter
-      if (!sessionId) {
-        return this.error(
-          ERROR_CODES.VALIDATION_ERROR,
-          'Session ID is required'
-        );
-      }
-
-      // Validate session ID format
-      if (!/^[a-f0-9-]{36}$/.test(sessionId)) {
-        return this.error(
-          ERROR_CODES.VALIDATION_ERROR,
-          'Invalid session ID format'
-        );
-      }
-
-      this.logger.debug('Session retrieval request validated', {
-        requestId: context.requestId,
-        userId: context.userId,
-        sessionId
-      });
-
-      // Get session through service
-      const sessionService: SessionService = this.serviceFactory.getSessionService() as SessionService;
-      const result = await sessionService.getSession(sessionId, context.userId);
-
-      this.logger.info('Session retrieved successfully', { 
-        requestId: context.requestId,
-        userId: context.userId,
-        sessionId: result.session.sessionId,
-        status: result.session.status,
-        currentQuestion: result.progress.currentQuestion,
-        totalQuestions: result.progress.totalQuestions,
-        accuracy: result.progress.accuracy
-      });
-
-      return this.success(result, 'Session retrieved successfully');
-
-    } catch (error: any) {
-      this.logger.error('Failed to get session', error, { 
-        requestId: context.requestId,
-        ...(context.userId ? { userId: context.userId } : {}),
-        ...(sessionId ? { sessionId } : {})
-      });
-
-      // Handle specific error types
-      if (error.message.includes('Session not found') || 
-          error.message.includes('access denied')) {
-        return this.error(
-          ERROR_CODES.NOT_FOUND,
-          'Session not found or access denied'
-        );
-      }
-
-      return this.error(
-        ERROR_CODES.INTERNAL_ERROR,
-        'Failed to retrieve session'
+  private validateSessionId(sessionId: string | undefined): ApiResponse | null {
+    if (!sessionId) {
+      return ErrorHandlingMiddleware.createErrorResponse(
+        ERROR_CODES.VALIDATION_ERROR,
+        'Session ID is required'
       );
     }
+
+    if (!/^[a-f0-9-]{36}$/.test(sessionId)) {
+      return ErrorHandlingMiddleware.createErrorResponse(
+        ERROR_CODES.VALIDATION_ERROR,
+        'Invalid session ID format'
+      );
+    }
+
+    return null;
   }
 
   /**
-   * Update an existing study session for pause/resume and navigation
-   * PUT /v1/sessions/{id}
-   * Phase 17: Session Update Feature
-   */
-  private async updateSession(context: HandlerContext): Promise<ApiResponse> {
-    const sessionId = context.event.pathParameters?.id;
-    
-    try {
-      this.logger.info('Updating session', { 
-        requestId: context.requestId,
-        ...(context.userId ? { userId: context.userId } : {}),
-        ...(sessionId ? { sessionId } : {}),
-        hasBody: !!context.event.body
-      });
-
-      // Validate authentication
-      if (!context.userId) {
-        return this.error(
-          ERROR_CODES.UNAUTHORIZED,
-          'Authentication required to update sessions'
-        );
-      }
-
-      // Validate session ID parameter
-      if (!sessionId) {
-        return this.error(
-          ERROR_CODES.VALIDATION_ERROR,
-          'Session ID is required'
-        );
-      }
-
-      // Validate session ID format
-      if (!/^[a-f0-9-]{36}$/.test(sessionId)) {
-        return this.error(
-          ERROR_CODES.VALIDATION_ERROR,
-          'Invalid session ID format'
-        );
-      }
-
-      // Parse and validate request body
-      if (!context.event.body) {
-        return this.error(
-          ERROR_CODES.VALIDATION_ERROR,
-          'Request body is required'
-        );
-      }
-
-      let requestBody: any;
-      try {
-        requestBody = JSON.parse(context.event.body);
-      } catch (error) {
-        return this.error(
-          ERROR_CODES.VALIDATION_ERROR,
-          'Invalid JSON in request body'
-        );
-      }
-
-      // Validate request body
-      const validationError = this.validateUpdateSessionRequest(requestBody);
-      if (validationError) {
-        return validationError;
-      }
-
-      // Build session update request
-      const request: UpdateSessionRequest = {
-        action: requestBody.action,
-        currentQuestionIndex: requestBody.currentQuestionIndex,
-        status: requestBody.status,
-        questionId: requestBody.questionId,
-        userAnswer: requestBody.userAnswer,
-        timeSpent: requestBody.timeSpent,
-        skipped: requestBody.skipped,
-        markedForReview: requestBody.markedForReview
-      };
-
-      this.logger.debug('Session update request validated', {
-        requestId: context.requestId,
-        userId: context.userId,
-        sessionId,
-        action: request.action,
-        status: request.status,
-        currentQuestionIndex: request.currentQuestionIndex
-      });
-
-      // Update session through service
-      const sessionService: SessionService = this.serviceFactory.getSessionService() as SessionService;
-      const result = await sessionService.updateSession(sessionId, context.userId, request);
-
-      this.logger.info('Session updated successfully', { 
-        requestId: context.requestId,
-        userId: context.userId,
-        sessionId: result.session.sessionId,
-        status: result.session.status,
-        currentQuestion: result.progress.currentQuestion,
-        action: request.action
-      });
-
-      return this.success(result, 'Session updated successfully');
-
-    } catch (error: any) {
-      this.logger.error('Failed to update session', error, { 
-        requestId: context.requestId,
-        ...(context.userId ? { userId: context.userId } : {}),
-        ...(sessionId ? { sessionId } : {}),
-        hasBody: !!context.event.body
-      });
-
-      // Handle specific error types
-      if (error.message.includes('Session not found') || 
-          error.message.includes('access denied')) {
-        return this.error(
-          ERROR_CODES.NOT_FOUND,
-          'Session not found or access denied'
-        );
-      }
-
-      if (error.message.includes('Invalid transition') ||
-          error.message.includes('Invalid action') ||
-          error.message.includes('Cannot pause') ||
-          error.message.includes('Cannot resume') ||
-          error.message.includes('validation') ||
-          error.message.includes('Invalid')) {
-        return this.error(
-          ERROR_CODES.VALIDATION_ERROR,
-          error.message
-        );
-      }
-
-      if (error.message.includes('already completed') ||
-          error.message.includes('already abandoned')) {
-        return this.error(
-          ERROR_CODES.CONFLICT,
-          error.message
-        );
-      }
-
-      return this.error(
-        ERROR_CODES.INTERNAL_ERROR,
-        'Failed to update session'
-      );
-    }
-  }
-
-  /**
-   * Validate update session request body
+   * Helper method to validate update session request - extracted from 96-line validation block
    */
   private validateUpdateSessionRequest(requestBody: any): ApiResponse | null {
     // Check required action field
     if (!requestBody.action || typeof requestBody.action !== 'string') {
-      return this.error(
+      return ErrorHandlingMiddleware.createErrorResponse(
         ERROR_CODES.VALIDATION_ERROR,
         'action is required and must be a string'
       );
@@ -531,7 +347,7 @@ export class SessionHandler extends BaseHandler {
     // Validate action enum
     const validActions = ['pause', 'resume', 'next', 'previous', 'answer', 'mark_for_review', 'complete'];
     if (!validActions.includes(requestBody.action)) {
-      return this.error(
+      return ErrorHandlingMiddleware.createErrorResponse(
         ERROR_CODES.VALIDATION_ERROR,
         `action must be one of: ${validActions.join(', ')}`
       );
@@ -541,7 +357,7 @@ export class SessionHandler extends BaseHandler {
     if (requestBody.status !== undefined) {
       const validStatuses = ['active', 'paused', 'completed', 'abandoned'];
       if (!validStatuses.includes(requestBody.status)) {
-        return this.error(
+        return ErrorHandlingMiddleware.createErrorResponse(
           ERROR_CODES.VALIDATION_ERROR,
           `status must be one of: ${validStatuses.join(', ')}`
         );
@@ -552,7 +368,7 @@ export class SessionHandler extends BaseHandler {
     if (requestBody.currentQuestionIndex !== undefined) {
       if (typeof requestBody.currentQuestionIndex !== 'number' || 
           requestBody.currentQuestionIndex < 0) {
-        return this.error(
+        return ErrorHandlingMiddleware.createErrorResponse(
           ERROR_CODES.VALIDATION_ERROR,
           'currentQuestionIndex must be a non-negative number'
         );
@@ -562,54 +378,23 @@ export class SessionHandler extends BaseHandler {
     // Validate answer-specific fields
     if (requestBody.action === 'answer') {
       if (!requestBody.questionId || typeof requestBody.questionId !== 'string') {
-        return this.error(
+        return ErrorHandlingMiddleware.createErrorResponse(
           ERROR_CODES.VALIDATION_ERROR,
           'questionId is required when submitting an answer'
         );
       }
 
       if (!requestBody.userAnswer || !Array.isArray(requestBody.userAnswer)) {
-        return this.error(
+        return ErrorHandlingMiddleware.createErrorResponse(
           ERROR_CODES.VALIDATION_ERROR,
           'userAnswer is required and must be an array when submitting an answer'
         );
       }
 
       if (requestBody.timeSpent === undefined || typeof requestBody.timeSpent !== 'number' || requestBody.timeSpent < 0) {
-        return this.error(
+        return ErrorHandlingMiddleware.createErrorResponse(
           ERROR_CODES.VALIDATION_ERROR,
           'timeSpent is required and must be a non-negative number when submitting an answer'
-        );
-      }
-
-      if (requestBody.skipped !== undefined && typeof requestBody.skipped !== 'boolean') {
-        return this.error(
-          ERROR_CODES.VALIDATION_ERROR,
-          'skipped must be a boolean'
-        );
-      }
-
-      if (requestBody.markedForReview !== undefined && typeof requestBody.markedForReview !== 'boolean') {
-        return this.error(
-          ERROR_CODES.VALIDATION_ERROR,
-          'markedForReview must be a boolean'
-        );
-      }
-    }
-
-    // Validate mark for review specific fields
-    if (requestBody.action === 'mark_for_review') {
-      if (!requestBody.questionId || typeof requestBody.questionId !== 'string') {
-        return this.error(
-          ERROR_CODES.VALIDATION_ERROR,
-          'questionId is required when marking for review'
-        );
-      }
-
-      if (requestBody.markedForReview === undefined || typeof requestBody.markedForReview !== 'boolean') {
-        return this.error(
-          ERROR_CODES.VALIDATION_ERROR,
-          'markedForReview is required and must be a boolean when marking for review'
         );
       }
     }

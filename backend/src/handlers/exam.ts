@@ -1,5 +1,5 @@
-// Exam handler for Study App V3 Backend
-// Phase 8: Exam Listing Feature
+// Refactored Exam handler using middleware pattern
+// Eliminates architecture violations: repetitive validation patterns, mixed parsing/business logic
 
 import { BaseHandler } from '../shared/base-handler';
 import { HandlerContext, ApiResponse } from '../shared/types/api.types';
@@ -7,6 +7,14 @@ import { ServiceFactory } from '../shared/service-factory';
 import { createLogger } from '../shared/logger';
 import { ERROR_CODES } from '../shared/constants/error.constants';
 import { GetExamsRequest, GetExamRequest } from '../shared/types/exam.types';
+
+// Import new middleware
+import {
+  ParsingMiddleware,
+  ErrorHandlingMiddleware,
+  ErrorContexts,
+  CommonParsing
+} from '../shared/middleware';
 
 export class ExamHandler extends BaseHandler {
   private serviceFactory: ServiceFactory;
@@ -19,197 +27,134 @@ export class ExamHandler extends BaseHandler {
 
   protected setupRoutes(): void {
     this.routes = [
-      // Get all exams endpoint
       {
         method: 'GET',
         path: '/v1/exams',
         handler: this.getExams.bind(this),
-        requireAuth: false, // Public endpoint for now
+        requireAuth: false,
       },
-      // Get specific exam by ID endpoint
       {
         method: 'GET',
         path: '/v1/exams/{id}',
         handler: this.getExam.bind(this),
-        requireAuth: false, // Public endpoint for now
+        requireAuth: false,
       }
     ];
   }
 
   /**
-   * Get all exams with optional filtering
-   * GET /v1/exams?provider=aws&level=associate&search=solutions&includeInactive=false&limit=50&offset=0
+   * Get all exams with optional filtering - now clean and focused
    */
   private async getExams(context: HandlerContext): Promise<ApiResponse> {
-    try {
-      this.logger.info('Getting all exams', { 
-        requestId: context.requestId,
-        queryParams: context.event.queryStringParameters
-      });
+    // Parse query parameters using middleware
+    const { data: queryParams, error: parseError } = ParsingMiddleware.parseQueryParams(context, {
+      provider: { type: 'string', decode: true },
+      category: { type: 'string', decode: true },
+      level: { type: 'string', decode: true },
+      search: CommonParsing.search,
+      includeInactive: CommonParsing.booleanFlag,
+      ...CommonParsing.pagination
+    });
+    if (parseError) return parseError;
 
-      // Parse query parameters
-      const queryParams = context.event.queryStringParameters || {};
-      
-      const request: GetExamsRequest = {};
-      
-      // Provider filter
-      if (queryParams.provider) {
-        request.provider = decodeURIComponent(queryParams.provider);
+    // Validate level enum if provided
+    if (queryParams.level) {
+      const validLevels = ['foundational', 'associate', 'professional', 'specialty', 'expert'];
+      if (!validLevels.includes(queryParams.level.toLowerCase())) {
+        return ErrorHandlingMiddleware.createErrorResponse(
+          ERROR_CODES.VALIDATION_ERROR,
+          `Invalid level. Valid options: ${validLevels.join(', ')}`
+        );
       }
-      
-      // Category filter
-      if (queryParams.category) {
-        request.category = decodeURIComponent(queryParams.category);
-      }
-      
-      // Level filter
-      if (queryParams.level) {
-        const level = decodeURIComponent(queryParams.level).toLowerCase();
-        const validLevels = ['foundational', 'associate', 'professional', 'specialty', 'expert'];
-        
-        if (validLevels.includes(level)) {
-          request.level = level;
-        } else {
-          return this.error(
-            ERROR_CODES.VALIDATION_ERROR,
-            `Invalid level. Valid options: ${validLevels.join(', ')}`
-          );
-        }
-      }
-      
-      // Search filter
-      if (queryParams.search) {
-        request.search = decodeURIComponent(queryParams.search);
-      }
-      
-      // Include inactive filter
-      if (queryParams.includeInactive === 'true') {
-        request.includeInactive = true;
-      }
-
-      // Pagination
-      if (queryParams.limit) {
-        const limit = parseInt(queryParams.limit, 10);
-        if (isNaN(limit) || limit < 1 || limit > 100) {
-          return this.error(
-            ERROR_CODES.VALIDATION_ERROR,
-            'Limit must be a number between 1 and 100'
-          );
-        }
-        request.limit = limit;
-      }
-
-      if (queryParams.offset) {
-        const offset = parseInt(queryParams.offset, 10);
-        if (isNaN(offset) || offset < 0) {
-          return this.error(
-            ERROR_CODES.VALIDATION_ERROR,
-            'Offset must be a non-negative number'
-          );
-        }
-        request.offset = offset;
-      }
-
-      // Get exams from service
-      const examService = this.serviceFactory.getExamService();
-      const result = await examService.getExams(request);
-
-      this.logger.info('Exams retrieved successfully', { 
-        requestId: context.requestId,
-        total: result.total,
-        returned: result.exams.length,
-        filters: {
-          provider: request.provider,
-          category: request.category,
-          level: request.level,
-          search: request.search,
-          includeInactive: request.includeInactive
-        },
-        pagination: result.pagination
-      });
-
-      return this.success(result, 'Exams retrieved successfully');
-
-    } catch (error: any) {
-      this.logger.error('Failed to get exams', error, { 
-        requestId: context.requestId,
-        queryParams: context.event.queryStringParameters
-      });
-
-      return this.error(
-        ERROR_CODES.INTERNAL_ERROR,
-        'Failed to retrieve exams'
-      );
     }
+
+    // Build request object
+    const request: GetExamsRequest = {
+      ...(queryParams.provider && { provider: queryParams.provider }),
+      ...(queryParams.category && { category: queryParams.category }),
+      ...(queryParams.level && { level: queryParams.level.toLowerCase() }),
+      ...(queryParams.search && { search: queryParams.search }),
+      ...(queryParams.includeInactive && { includeInactive: queryParams.includeInactive }),
+      ...(queryParams.limit && { limit: queryParams.limit }),
+      ...(queryParams.offset && { offset: queryParams.offset })
+    };
+
+    // Business logic only - delegate error handling to middleware
+    const { result, error } = await ErrorHandlingMiddleware.withErrorHandling(
+      async () => {
+        const examService = this.serviceFactory.getExamService();
+        return await examService.getExams(request);
+      },
+      {
+        requestId: context.requestId,
+        operation: ErrorContexts.Exam.LIST,
+        additionalInfo: { filters: request }
+      }
+    );
+
+    if (error) return error;
+
+    this.logger.info('Exams retrieved successfully', { 
+      requestId: context.requestId,
+      total: result!.total,
+      returned: result!.exams.length,
+      filters: request,
+      pagination: result!.pagination
+    });
+
+    return ErrorHandlingMiddleware.createSuccessResponse(result, 'Exams retrieved successfully');
   }
 
   /**
-   * Get a specific exam by ID
-   * GET /v1/exams/{id}?includeProvider=true
+   * Get a specific exam by ID - now clean and focused
    */
   private async getExam(context: HandlerContext): Promise<ApiResponse> {
-    try {
-      // Extract exam ID from path parameters
-      const examId = context.event.pathParameters?.id;
-      
-      if (!examId) {
-        this.logger.warn('Exam ID not provided', { requestId: context.requestId });
-        return this.error(
-          ERROR_CODES.VALIDATION_ERROR,
-          'Exam ID is required'
-        );
-      }
+    // Parse path parameters using middleware
+    const { data: pathParams, error: parseError } = ParsingMiddleware.parsePathParams(context);
+    if (parseError) return parseError;
 
-      this.logger.info('Getting exam by ID', { 
-        requestId: context.requestId,
-        examId,
-        queryParams: context.event.queryStringParameters
-      });
-
-      // Parse query parameters
-      const queryParams = context.event.queryStringParameters || {};
-      
-      const request: GetExamRequest = {};
-      
-      // Include provider flag
-      if (queryParams.includeProvider === 'true') {
-        request.includeProvider = true;
-      }
-
-      // Get exam from service
-      const examService = this.serviceFactory.getExamService();
-      const result = await examService.getExam(examId, request);
-
-      this.logger.info('Exam retrieved successfully', { 
-        requestId: context.requestId,
-        examId,
-        examName: result.exam.examName,
-        providerId: result.exam.providerId,
-        includeProvider: request.includeProvider
-      });
-
-      return this.success(result, 'Exam retrieved successfully');
-
-    } catch (error: any) {
-      this.logger.error('Failed to get exam', error, { 
-        requestId: context.requestId,
-        examId: context.event.pathParameters?.id,
-        queryParams: context.event.queryStringParameters
-      });
-
-      // Check if it's a 'not found' error
-      if (error.message === 'Exam not found') {
-        return this.error(
-          ERROR_CODES.NOT_FOUND,
-          'Exam not found'
-        );
-      }
-
-      return this.error(
-        ERROR_CODES.INTERNAL_ERROR,
-        'Failed to retrieve exam'
+    // Validate path parameters
+    if (!pathParams.id) {
+      return ErrorHandlingMiddleware.createErrorResponse(
+        ERROR_CODES.VALIDATION_ERROR,
+        'Exam ID is required'
       );
     }
+
+    // Parse query parameters
+    const { data: queryParams } = ParsingMiddleware.parseQueryParams(context, {
+      includeProvider: CommonParsing.booleanFlag
+    });
+
+    // Build request object
+    const request: GetExamRequest = {
+      ...(queryParams?.includeProvider && { includeProvider: queryParams.includeProvider })
+    };
+
+    // Business logic only - delegate error handling to middleware
+    const { result, error } = await ErrorHandlingMiddleware.withErrorHandling(
+      async () => {
+        const examService = this.serviceFactory.getExamService();
+        return await examService.getExam(pathParams.id, request);
+      },
+      {
+        requestId: context.requestId,
+        operation: ErrorContexts.Exam.GET,
+        additionalInfo: { examId: pathParams.id }
+      }
+    );
+
+    if (error) return error;
+
+    this.logger.info('Exam retrieved successfully', { 
+      requestId: context.requestId,
+      examId: pathParams.id,
+      examName: result!.exam.examName,
+      providerId: result!.exam.providerId,
+      includeProvider: request.includeProvider
+    });
+
+    return ErrorHandlingMiddleware.createSuccessResponse(result, 'Exam retrieved successfully');
   }
 }
 

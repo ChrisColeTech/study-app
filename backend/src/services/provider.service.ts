@@ -1,4 +1,5 @@
-// Provider service for Study App V3 Backend
+// Refactored provider service using dedicated filters and mappers
+// Eliminates complex filtering logic mixed with business operations
 
 import { 
   Provider, 
@@ -11,6 +12,8 @@ import {
   ProviderStatus
 } from '../shared/types/provider.types';
 import { IProviderRepository } from '../repositories/provider.repository';
+import { ProviderFilter } from '../filters/provider.filter';
+import { ProviderMapper } from '../mappers/provider.mapper';
 import { createLogger } from '../shared/logger';
 
 // Re-export the interface for ServiceFactory
@@ -36,84 +39,24 @@ export class ProviderService implements IProviderService {
       // Get all providers from repository
       const allProviders = await this.providerRepository.findAll();
 
-      // Apply filtering
-      let filteredProviders = allProviders;
+      // Apply filters using dedicated filter class
+      const { filtered, total } = ProviderFilter.applyFilters(allProviders, request);
 
-      // Filter by status
-      if (request.status !== undefined) {
-        filteredProviders = filteredProviders.filter(p => p.status === request.status);
-      } else if (!request.includeInactive) {
-        // Default: only show active providers unless explicitly requested
-        filteredProviders = filteredProviders.filter(p => p.status === ProviderStatus.ACTIVE);
-      }
+      // Sort providers using dedicated filter class
+      const sortedProviders = ProviderFilter.sortProviders(filtered);
 
-      // Filter by category
-      if (request.category !== undefined) {
-        filteredProviders = filteredProviders.filter(p => 
-          p.category?.toLowerCase() === request.category!.toLowerCase()
-        );
-      }
-
-      // Filter by search term
-      if (request.search) {
-        const searchTerm = request.search.toLowerCase();
-        filteredProviders = filteredProviders.filter(p =>
-          p.name.toLowerCase().includes(searchTerm) ||
-          p.description.toLowerCase().includes(searchTerm) ||
-          p.id.toLowerCase().includes(searchTerm)
-        );
-      }
-
-      // Sort providers (active first, then by name)
-      const sortedProviders = filteredProviders.sort((a, b) => {
-        if (a.status !== b.status) {
-          return a.status === ProviderStatus.ACTIVE ? -1 : 1; // Active providers first
-        }
-        return a.name.localeCompare(b.name); // Then by name
-      });
-
-      // Apply pagination if requested
-      const total = sortedProviders.length;
-      let pagedProviders = sortedProviders;
-      
-      if (request.limit || request.offset) {
-        const offset = request.offset || 0;
-        const limit = request.limit || total;
-        pagedProviders = sortedProviders.slice(offset, offset + limit);
-      }
-
-      // Collect available filter values for the response
-      const availableCategories = Array.from(new Set(
-        allProviders
-          .map(p => p.category)
-          .filter(c => c !== undefined && c !== null)
-      )) as ProviderCategory[];
-
-      const response: GetProvidersResponse = {
-        providers: pagedProviders,
-        total,
-        filters: {
-          categories: availableCategories,
-          statuses: [ProviderStatus.ACTIVE, ProviderStatus.INACTIVE]
-        }
-      };
-
-      // Add pagination info if applicable
-      if (request.limit || request.offset) {
-        const offset = request.offset || 0;
-        const limit = request.limit || total;
-        
-        response.pagination = {
-          limit,
-          offset,
-          hasMore: offset + limit < total
-        };
-      }
+      // Create response using dedicated mapper
+      const response = ProviderMapper.toGetProvidersResponse(
+        sortedProviders, 
+        total, 
+        allProviders, 
+        request
+      );
 
       this.logger.info('Providers retrieved successfully', { 
-        total,
-        filtered: pagedProviders.length,
-        activeProviders: pagedProviders.filter(p => p.status === ProviderStatus.ACTIVE).length
+        total: response.total,
+        filtered: response.providers.length,
+        activeProviders: response.providers.filter(p => p.status === ProviderStatus.ACTIVE).length
       });
 
       return response;
@@ -141,9 +84,8 @@ export class ProviderService implements IProviderService {
         throw new Error(`Provider not found: ${request.id}`);
       }
 
-      const response: GetProviderResponse = {
-        provider
-      };
+      // Create response using dedicated mapper
+      const response = ProviderMapper.toGetProviderResponse(provider);
 
       this.logger.info('Provider retrieved successfully', { 
         providerId: provider.id,

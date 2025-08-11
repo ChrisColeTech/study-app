@@ -352,49 +352,6 @@ describe('AuthService', () => {
     });
   });
 
-  describe('hashPassword', () => {
-    it('should hash password successfully', async () => {
-      const hashedPassword = '$2b$12$hashedpassword';
-      mockBcrypt.hash.mockResolvedValue(hashedPassword);
-
-      const result = await authService.hashPassword('password123');
-
-      expect(result).toBe(hashedPassword);
-      expect(mockBcrypt.hash).toHaveBeenCalledWith('password123', 12);
-    });
-
-    it('should throw error when bcrypt fails', async () => {
-      mockBcrypt.hash.mockRejectedValue(new Error('Bcrypt error'));
-
-      await expect(authService.hashPassword('password123'))
-        .rejects.toThrow('Password processing failed');
-    });
-  });
-
-  describe('verifyPassword', () => {
-    it('should verify password successfully', async () => {
-      mockBcrypt.compare.mockResolvedValue(true);
-
-      const result = await authService.verifyPassword('password123', '$2b$12$hashedpassword');
-
-      expect(result).toBe(true);
-      expect(mockBcrypt.compare).toHaveBeenCalledWith('password123', '$2b$12$hashedpassword');
-    });
-
-    it('should return false for incorrect password', async () => {
-      mockBcrypt.compare.mockResolvedValue(false);
-
-      const result = await authService.verifyPassword('wrongpassword', '$2b$12$hashedpassword');
-
-      expect(result).toBe(false);
-    });
-
-    it('should return false when bcrypt fails', async () => {
-      mockBcrypt.compare.mockRejectedValue(new Error('Bcrypt error'));
-
-      const result = await authService.verifyPassword('password123', '$2b$12$hashedpassword');
-
-      expect(result).toBe(false);
-    });
-  });
+  // Note: hashPassword and verifyPassword methods have been moved to PasswordService
+  // These are tested separately in password.service.test.ts
 });

@@ -1,25 +1,50 @@
 // Unit tests for Session Update Service - Phase 17
 // Tests the updateSession method functionality
 
-import { DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb';
-import { mockClient } from 'aws-sdk-client-mock';
 import { SessionService } from '../../../src/services/session.service';
-import { ServiceFactory } from '../../../src/shared/service-factory';
+import { ISessionRepository } from '../../../src/repositories/session.repository';
+import { IProviderService } from '../../../src/services/provider.service';
+import { IExamService } from '../../../src/services/exam.service';
+import { ITopicService } from '../../../src/services/topic.service';
+import { IQuestionService } from '../../../src/services/question.service';
 import { StudySession, SessionQuestion } from '../../../src/shared/types/domain.types';
 import { UpdateSessionRequest } from '../../../src/shared/types/session.types';
 
-// Mock the DynamoDB client
-const mockDynamoClient = mockClient(DynamoDBDocumentClient);
+// Mock repositories and services
+const mockSessionRepository: jest.Mocked<ISessionRepository> = {
+  create: jest.fn(),
+  findById: jest.fn(),
+  findByUserId: jest.fn(),
+  update: jest.fn(),
+  delete: jest.fn(),
+  exists: jest.fn(),
+};
 
-// Mock ServiceFactory
-const mockServiceFactory = {
-  getProviderService: jest.fn(),
-  getExamService: jest.fn(),
-  getTopicService: jest.fn(),
-  getQuestionService: jest.fn(),
-  getSessionService: jest.fn(),
-  getUserService: jest.fn()
-} as unknown as ServiceFactory;
+const mockProviderService: jest.Mocked<IProviderService> = {
+  getProviders: jest.fn(),
+  getProvider: jest.fn(),
+  getProvidersByCategory: jest.fn(),
+  getProvidersByStatus: jest.fn(),
+  refreshCache: jest.fn(),
+};
+
+const mockExamService: jest.Mocked<IExamService> = {
+  getExams: jest.fn(),
+  getExam: jest.fn(),
+  getExamsByProvider: jest.fn(),
+};
+
+const mockTopicService: jest.Mocked<ITopicService> = {
+  getTopics: jest.fn(),
+  getTopic: jest.fn(),
+  getTopicsByExam: jest.fn(),
+};
+
+const mockQuestionService: jest.Mocked<IQuestionService> = {
+  getQuestions: jest.fn(),
+  getQuestion: jest.fn(),
+  searchQuestions: jest.fn(),
+};
 
 describe('SessionService - Phase 17 Update Functionality', () => {
   let sessionService: SessionService;
@@ -51,21 +76,25 @@ describe('SessionService - Phase 17 Update Functionality', () => {
   };
 
   beforeEach(() => {
-    mockDynamoClient.reset();
     jest.clearAllMocks();
     
     sessionService = new SessionService(
-      mockDynamoClient as unknown as DynamoDBDocumentClient,
-      mockServiceFactory,
-      mockTableName
+      mockSessionRepository,
+      mockProviderService,
+      mockExamService,
+      mockTopicService,
+      mockQuestionService
     );
   });
 
   describe('Session State Transitions', () => {
     test('should pause active session', async () => {
-      // Mock DynamoDB calls
-      mockDynamoClient.onAnyCommand().resolves({
-        Item: mockSession
+      // Mock repository calls
+      mockSessionRepository.findById.mockResolvedValue(mockSession);
+      mockSessionRepository.update.mockResolvedValue({
+        ...mockSession,
+        status: 'paused',
+        updatedAt: '2024-01-01T10:05:00Z'
       });
 
       const updateRequest: UpdateSessionRequest = {
@@ -76,6 +105,8 @@ describe('SessionService - Phase 17 Update Functionality', () => {
 
       expect(result.session.status).toBe('paused');
       expect(result.session.updatedAt).toBeDefined();
+      expect(mockSessionRepository.findById).toHaveBeenCalledWith(mockSessionId);
+      expect(mockSessionRepository.update).toHaveBeenCalled();
     });
 
     test('should resume paused session', async () => {

@@ -1,4 +1,5 @@
-// Provider handler for Study App V3 Backend
+// Refactored Provider handler using middleware pattern
+// Eliminates architecture violations: excessive validation boilerplate, mixed concerns, repetitive enum parsing
 
 import { BaseHandler, RouteConfig } from '../shared/base-handler';
 import { HandlerContext, ApiResponse } from '../shared/types/api.types';
@@ -12,6 +13,17 @@ import {
   ProviderStatus 
 } from '../shared/types/provider.types';
 
+// Import new middleware
+import {
+  ParsingMiddleware,
+  ValidationMiddleware,
+  ValidationRules,
+  ErrorHandlingMiddleware,
+  AuthMiddleware,
+  ErrorContexts,
+  CommonParsing
+} from '../shared/middleware';
+
 export class ProviderHandler extends BaseHandler {
   private serviceFactory: ServiceFactory;
   private logger = createLogger({ handler: 'ProviderHandler' });
@@ -23,21 +35,18 @@ export class ProviderHandler extends BaseHandler {
 
   protected setupRoutes(): void {
     this.routes = [
-      // Get all providers endpoint
       {
         method: 'GET',
         path: '/v1/providers',
         handler: this.getProviders.bind(this),
-        requireAuth: false, // Public endpoint for now
+        requireAuth: false,
       },
-      // Get specific provider endpoint
       {
         method: 'GET',
         path: '/v1/providers/{id}',
         handler: this.getProvider.bind(this),
-        requireAuth: false, // Public endpoint for now
+        requireAuth: false,
       },
-      // Refresh provider cache endpoint (admin only in future)
       {
         method: 'POST',
         path: '/v1/providers/cache/refresh',
@@ -48,206 +57,151 @@ export class ProviderHandler extends BaseHandler {
   }
 
   /**
-   * Get all providers with optional filtering
-   * GET /v1/providers?category=cloud&status=active&search=aws&includeInactive=false
+   * Get all providers with optional filtering - now clean and focused
    */
   private async getProviders(context: HandlerContext): Promise<ApiResponse> {
-    try {
-      this.logger.info('Getting all providers', { 
-        requestId: context.requestId,
-        queryParams: context.event.queryStringParameters
-      });
+    // Parse query parameters using middleware with specific config
+    const { data: queryParams, error: parseError } = ParsingMiddleware.parseQueryParams(context, {
+      category: { type: 'string', decode: true },
+      status: { type: 'string', decode: true },
+      search: CommonParsing.search,
+      includeInactive: CommonParsing.booleanFlag
+    });
+    if (parseError) return parseError;
 
-      // Parse query parameters
-      const queryParams = context.event.queryStringParameters || {};
-      
-      const request: GetProvidersRequest = {};
-      
-      // Only set properties if they have values
-      const category = this.parseEnumParam(queryParams.category, ProviderCategory);
-      if (category !== undefined) {
-        request.category = category;
-      }
-      
-      const status = this.parseEnumParam(queryParams.status, ProviderStatus);
-      if (status !== undefined) {
-        request.status = status;
-      }
-      
-      if (queryParams.search) {
-        request.search = decodeURIComponent(queryParams.search);
-      }
-      
-      if (queryParams.includeInactive === 'true') {
-        request.includeInactive = true;
-      }
-
-      // Validate category if provided
-      if (queryParams.category && !request.category) {
-        return this.error(
-          ERROR_CODES.VALIDATION_ERROR,
-          `Invalid category. Valid options: ${Object.values(ProviderCategory).join(', ')}`
-        );
-      }
-
-      // Validate status if provided
-      if (queryParams.status && !request.status) {
-        return this.error(
-          ERROR_CODES.VALIDATION_ERROR,
-          `Invalid status. Valid options: ${Object.values(ProviderStatus).join(', ')}`
-        );
-      }
-
-      // Get providers from service
-      const providerService = this.serviceFactory.getProviderService();
-      const result = await providerService.getProviders(request);
-
-      this.logger.info('Providers retrieved successfully', { 
-        requestId: context.requestId,
-        total: result.total,
-        filters: {
-          category: request.category,
-          status: request.status,
-          search: request.search,
-          includeInactive: request.includeInactive
-        }
-      });
-
-      return this.success(result, 'Providers retrieved successfully');
-
-    } catch (error: any) {
-      this.logger.error('Failed to get providers', error, { 
-        requestId: context.requestId,
-        queryParams: context.event.queryStringParameters
-      });
-
-      return this.error(
-        ERROR_CODES.INTERNAL_ERROR,
-        'Failed to retrieve providers'
+    // Validate enum values manually (simpler for now)
+    if (queryParams.category && !Object.values(ProviderCategory).includes(queryParams.category as ProviderCategory)) {
+      return ErrorHandlingMiddleware.createErrorResponse(
+        ERROR_CODES.VALIDATION_ERROR,
+        `Invalid category. Valid options: ${Object.values(ProviderCategory).join(', ')}`
       );
     }
+
+    if (queryParams.status && !Object.values(ProviderStatus).includes(queryParams.status as ProviderStatus)) {
+      return ErrorHandlingMiddleware.createErrorResponse(
+        ERROR_CODES.VALIDATION_ERROR,
+        `Invalid status. Valid options: ${Object.values(ProviderStatus).join(', ')}`
+      );
+    }
+
+    // Build request object
+    const request: GetProvidersRequest = {
+      ...(queryParams.category && { category: queryParams.category as ProviderCategory }),
+      ...(queryParams.status && { status: queryParams.status as ProviderStatus }),
+      ...(queryParams.search && { search: queryParams.search }),
+      ...(queryParams.includeInactive && { includeInactive: queryParams.includeInactive })
+    };
+
+    // Business logic only - delegate error handling to middleware
+    const { result, error } = await ErrorHandlingMiddleware.withErrorHandling(
+      async () => {
+        const providerService = this.serviceFactory.getProviderService();
+        return await providerService.getProviders(request);
+      },
+      {
+        requestId: context.requestId,
+        operation: ErrorContexts.Provider.LIST,
+        additionalInfo: { filters: request }
+      }
+    );
+
+    if (error) return error;
+
+    this.logger.info('Providers retrieved successfully', { 
+      requestId: context.requestId,
+      total: result!.total,
+      returned: result!.providers.length,
+      filters: request
+    });
+
+    return ErrorHandlingMiddleware.createSuccessResponse(result, 'Providers retrieved successfully');
   }
 
   /**
-   * Get a specific provider by ID
-   * GET /v1/providers/{id}?includeCertifications=true
+   * Get a specific provider by ID - now clean and focused
    */
   private async getProvider(context: HandlerContext): Promise<ApiResponse> {
-    try {
-      // Extract provider ID from path parameters
-      const providerId = context.event.pathParameters?.id;
-      
-      if (!providerId) {
-        return this.error(
-          ERROR_CODES.VALIDATION_ERROR,
-          'Provider ID is required'
-        );
-      }
+    // Parse path parameters using middleware
+    const { data: pathParams, error: parseError } = ParsingMiddleware.parsePathParams(context);
+    if (parseError) return parseError;
 
-      // Validate provider ID format (alphanumeric, hyphens, underscores)
-      if (!/^[a-zA-Z0-9_-]+$/.test(providerId)) {
-        return this.error(
-          ERROR_CODES.VALIDATION_ERROR,
-          'Invalid provider ID format'
-        );
-      }
-
-      this.logger.info('Getting provider', { 
-        requestId: context.requestId,
-        providerId,
-        queryParams: context.event.queryStringParameters
-      });
-
-      // Parse query parameters
-      const queryParams = context.event.queryStringParameters || {};
-      
-      const request: GetProviderRequest = {
-        id: providerId,
-        includeCertifications: queryParams.includeCertifications !== 'false' // Default to true
-      };
-
-      // Get provider from service
-      const providerService = this.serviceFactory.getProviderService();
-      const result = await providerService.getProvider(request);
-
-      this.logger.info('Provider retrieved successfully', { 
-        requestId: context.requestId,
-        providerId: result.provider.id,
-        providerName: result.provider.name,
-        certificationsCount: result.provider.certifications.length
-      });
-
-      return this.success(result, 'Provider retrieved successfully');
-
-    } catch (error: any) {
-      this.logger.error('Failed to get provider', error, { 
-        requestId: context.requestId,
-        providerId: context.event.pathParameters?.id
-      });
-
-      // Handle specific error types
-      if (error.message.includes('not found')) {
-        return this.error(
-          ERROR_CODES.NOT_FOUND,
-          error.message
-        );
-      }
-
-      return this.error(
-        ERROR_CODES.INTERNAL_ERROR,
-        'Failed to retrieve provider'
+    // Validate path parameters manually
+    if (!pathParams.id) {
+      return ErrorHandlingMiddleware.createErrorResponse(
+        ERROR_CODES.VALIDATION_ERROR,
+        'Provider ID is required'
       );
     }
+
+    if (!/^[a-zA-Z0-9_-]+$/.test(pathParams.id)) {
+      return ErrorHandlingMiddleware.createErrorResponse(
+        ERROR_CODES.VALIDATION_ERROR,
+        'Invalid provider ID format'
+      );
+    }
+
+    // Parse query parameters
+    const { data: queryParams } = ParsingMiddleware.parseQueryParams(context, {
+      includeCertifications: CommonParsing.booleanFlag
+    });
+
+    // Build request object
+    const request: GetProviderRequest = {
+      id: pathParams.id,
+      includeCertifications: queryParams?.includeCertifications !== false // Default to true
+    };
+
+    // Business logic only - delegate error handling to middleware
+    const { result, error } = await ErrorHandlingMiddleware.withErrorHandling(
+      async () => {
+        const providerService = this.serviceFactory.getProviderService();
+        return await providerService.getProvider(request);
+      },
+      {
+        requestId: context.requestId,
+        operation: ErrorContexts.Provider.GET,
+        additionalInfo: { providerId: request.id }
+      }
+    );
+
+    if (error) return error;
+
+    this.logger.info('Provider retrieved successfully', { 
+      requestId: context.requestId,
+      providerId: result!.provider.id,
+      providerName: result!.provider.name,
+      certificationsCount: result!.provider.certifications.length
+    });
+
+    return ErrorHandlingMiddleware.createSuccessResponse(result, 'Provider retrieved successfully');
   }
 
   /**
-   * Refresh provider cache
-   * POST /v1/providers/cache/refresh
+   * Refresh provider cache - now clean and focused
    */
   private async refreshCache(context: HandlerContext): Promise<ApiResponse> {
-    try {
-      this.logger.info('Refreshing provider cache', { 
-        requestId: context.requestId
-      });
+    // Business logic only - delegate error handling to middleware
+    const { error } = await ErrorHandlingMiddleware.withErrorHandling(
+      async () => {
+        const providerService = this.serviceFactory.getProviderService();
+        await providerService.refreshCache();
+      },
+      {
+        requestId: context.requestId,
+        operation: ErrorContexts.Provider.REFRESH_CACHE
+      }
+    );
 
-      // Refresh cache
-      const providerService = this.serviceFactory.getProviderService();
-      await providerService.refreshCache();
+    if (error) return error;
 
-      this.logger.info('Provider cache refreshed successfully', { 
-        requestId: context.requestId
-      });
+    this.logger.info('Provider cache refreshed successfully', { 
+      requestId: context.requestId
+    });
 
-      return this.success(
-        { message: 'Provider cache refreshed successfully' }, 
-        'Cache refreshed successfully'
-      );
-
-    } catch (error: any) {
-      this.logger.error('Failed to refresh cache', error, { 
-        requestId: context.requestId
-      });
-
-      return this.error(
-        ERROR_CODES.INTERNAL_ERROR,
-        'Failed to refresh provider cache'
-      );
-    }
-  }
-
-  /**
-   * Helper method to parse enum parameters safely
-   */
-  private parseEnumParam<T extends Record<string, string>>(
-    value: string | undefined, 
-    enumObj: T
-  ): T[keyof T] | undefined {
-    if (!value) return undefined;
-    
-    const upperValue = value.toUpperCase();
-    const enumValues = Object.values(enumObj) as string[];
-    
-    return enumValues.find(v => v.toUpperCase() === upperValue) as T[keyof T] | undefined;
+    return ErrorHandlingMiddleware.createSuccessResponse(
+      { message: 'Provider cache refreshed successfully' }, 
+      'Cache refreshed successfully'
+    );
   }
 }
 

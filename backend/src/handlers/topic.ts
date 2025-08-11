@@ -1,4 +1,5 @@
-// Topic handler for Study App V3 Backend
+// Refactored Topic handler using middleware pattern
+// Eliminates architecture violations: repetitive validation patterns similar to other handlers
 
 import { BaseHandler, RouteConfig } from '../shared/base-handler';
 import { HandlerContext, ApiResponse } from '../shared/types/api.types';
@@ -9,6 +10,14 @@ import {
   GetTopicsRequest,
   GetTopicRequest
 } from '../shared/types/topic.types';
+
+// Import new middleware
+import {
+  ParsingMiddleware,
+  ErrorHandlingMiddleware,
+  ErrorContexts,
+  CommonParsing
+} from '../shared/middleware';
 
 export class TopicHandler extends BaseHandler {
   private serviceFactory: ServiceFactory;
@@ -21,166 +30,120 @@ export class TopicHandler extends BaseHandler {
 
   protected setupRoutes(): void {
     this.routes = [
-      // Get all topics endpoint
       {
         method: 'GET',
         path: '/v1/topics',
         handler: this.getTopics.bind(this),
-        requireAuth: false, // Public endpoint for now
+        requireAuth: false,
       },
-      // Get single topic endpoint
       {
         method: 'GET',
         path: '/v1/topics/{id}',
         handler: this.getTopic.bind(this),
-        requireAuth: false, // Public endpoint for now
+        requireAuth: false,
       }
     ];
   }
 
   /**
-   * Get all topics with optional filtering
-   * GET /v1/topics?provider=aws&exam=clf-c02&category=cloud&search=security&level=foundational
+   * Get all topics with optional filtering - now clean and focused
    */
   private async getTopics(context: HandlerContext): Promise<ApiResponse> {
-    try {
-      this.logger.info('Getting all topics', { 
+    // Parse query parameters using middleware
+    const { data: queryParams, error: parseError } = ParsingMiddleware.parseQueryParams(context, {
+      provider: { type: 'string', decode: true },
+      exam: { type: 'string', decode: true },
+      category: { type: 'string', decode: true },
+      search: CommonParsing.search,
+      level: { type: 'string', decode: true }
+    });
+    if (parseError) return parseError;
+
+    // Build request object
+    const request: GetTopicsRequest = {
+      ...(queryParams.provider && { provider: queryParams.provider }),
+      ...(queryParams.exam && { exam: queryParams.exam }),
+      ...(queryParams.category && { category: queryParams.category }),
+      ...(queryParams.search && { search: queryParams.search }),
+      ...(queryParams.level && { level: queryParams.level })
+    };
+
+    // Business logic only - delegate error handling to middleware
+    const { result, error } = await ErrorHandlingMiddleware.withErrorHandling(
+      async () => {
+        const topicService = this.serviceFactory.getTopicService();
+        return await topicService.getTopics(request);
+      },
+      {
         requestId: context.requestId,
-        queryParams: context.event.queryStringParameters
-      });
-
-      // Parse query parameters
-      const queryParams = context.event.queryStringParameters || {};
-      
-      const request: GetTopicsRequest = {};
-      
-      // Only set properties if they have values
-      if (queryParams.provider) {
-        request.provider = decodeURIComponent(queryParams.provider);
+        operation: ErrorContexts.Topic.LIST,
+        additionalInfo: { filters: request }
       }
-      
-      if (queryParams.exam) {
-        request.exam = decodeURIComponent(queryParams.exam);
-      }
-      
-      if (queryParams.category) {
-        request.category = decodeURIComponent(queryParams.category);
-      }
+    );
 
-      if (queryParams.search) {
-        request.search = decodeURIComponent(queryParams.search);
-      }
+    if (error) return error;
 
-      if (queryParams.level) {
-        request.level = decodeURIComponent(queryParams.level);
-      }
+    this.logger.info('Topics retrieved successfully', { 
+      requestId: context.requestId,
+      total: result!.total,
+      filters: request
+    });
 
-      // Get topics from service
-      const topicService = this.serviceFactory.getTopicService();
-      const result = await topicService.getTopics(request);
-
-      this.logger.info('Topics retrieved successfully', { 
-        requestId: context.requestId,
-        total: result.total,
-        filters: {
-          provider: request.provider,
-          exam: request.exam,
-          category: request.category,
-          search: request.search,
-          level: request.level
-        }
-      });
-
-      return this.success(result, 'Topics retrieved successfully');
-
-    } catch (error: any) {
-      this.logger.error('Failed to get topics', error, { 
-        requestId: context.requestId,
-        queryParams: context.event.queryStringParameters
-      });
-
-      return this.error(
-        ERROR_CODES.INTERNAL_ERROR,
-        'Failed to retrieve topics'
-      );
-    }
+    return ErrorHandlingMiddleware.createSuccessResponse(result, 'Topics retrieved successfully');
   }
 
   /**
-   * Get single topic by ID with optional context
-   * GET /v1/topics/{id}?includeProvider=true&includeExam=true
+   * Get single topic by ID with optional context - now clean and focused
    */
   private async getTopic(context: HandlerContext): Promise<ApiResponse> {
-    try {
-      this.logger.info('Getting topic by ID', { 
-        requestId: context.requestId,
-        pathParams: context.event.pathParameters,
-        queryParams: context.event.queryStringParameters
-      });
+    // Parse path parameters using middleware
+    const { data: pathParams, error: parseError } = ParsingMiddleware.parsePathParams(context);
+    if (parseError) return parseError;
 
-      // Extract topic ID from path parameters
-      const topicId = context.event.pathParameters?.id;
-      
-      if (!topicId) {
-        this.logger.warn('Topic ID missing from path parameters', { 
-          requestId: context.requestId 
-        });
-        
-        return this.error(
-          ERROR_CODES.BAD_REQUEST,
-          'Topic ID is required'
-        );
-      }
-
-      // Parse query parameters
-      const queryParams = context.event.queryStringParameters || {};
-      
-      const request: GetTopicRequest = {
-        id: decodeURIComponent(topicId)
-      };
-      
-      // Set optional parameters
-      if (queryParams.includeProvider === 'true') {
-        request.includeProvider = true;
-      }
-      
-      if (queryParams.includeExam === 'true') {
-        request.includeExam = true;
-      }
-
-      // Get topic from service
-      const topicService = this.serviceFactory.getTopicService();
-      const result = await topicService.getTopic(request);
-
-      this.logger.info('Topic retrieved successfully', { 
-        requestId: context.requestId,
-        topicId: request.id,
-        includeProvider: request.includeProvider,
-        includeExam: request.includeExam
-      });
-
-      return this.success(result, 'Topic retrieved successfully');
-
-    } catch (error: any) {
-      this.logger.error('Failed to get topic', error, { 
-        requestId: context.requestId,
-        pathParams: context.event.pathParameters,
-        queryParams: context.event.queryStringParameters
-      });
-
-      // Handle topic not found specifically
-      if (error.message && error.message.includes('not found')) {
-        return this.error(
-          ERROR_CODES.NOT_FOUND,
-          error.message
-        );
-      }
-
-      return this.error(
-        ERROR_CODES.INTERNAL_ERROR,
-        'Failed to retrieve topic'
+    // Validate topic ID
+    if (!pathParams.id) {
+      return ErrorHandlingMiddleware.createErrorResponse(
+        ERROR_CODES.VALIDATION_ERROR,
+        'Topic ID is required'
       );
     }
+
+    // Parse query parameters
+    const { data: queryParams } = ParsingMiddleware.parseQueryParams(context, {
+      includeProvider: CommonParsing.booleanFlag,
+      includeExam: CommonParsing.booleanFlag
+    });
+
+    // Build request object
+    const request: GetTopicRequest = {
+      id: decodeURIComponent(pathParams.id),
+      ...(queryParams?.includeProvider && { includeProvider: queryParams.includeProvider }),
+      ...(queryParams?.includeExam && { includeExam: queryParams.includeExam })
+    };
+
+    // Business logic only - delegate error handling to middleware
+    const { result, error } = await ErrorHandlingMiddleware.withErrorHandling(
+      async () => {
+        const topicService = this.serviceFactory.getTopicService();
+        return await topicService.getTopic(request);
+      },
+      {
+        requestId: context.requestId,
+        operation: ErrorContexts.Topic.GET,
+        additionalInfo: { topicId: request.id }
+      }
+    );
+
+    if (error) return error;
+
+    this.logger.info('Topic retrieved successfully', { 
+      requestId: context.requestId,
+      topicId: request.id,
+      includeProvider: request.includeProvider,
+      includeExam: request.includeExam
+    });
+
+    return ErrorHandlingMiddleware.createSuccessResponse(result, 'Topic retrieved successfully');
   }
 }
 

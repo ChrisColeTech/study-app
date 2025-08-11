@@ -1,4 +1,5 @@
-// Authentication handler for user registration and login
+// Refactored Authentication handler using middleware pattern
+// Eliminates architecture violations: mixed concerns, repetitive validation patterns
 
 import { BaseHandler, RouteConfig } from '../shared/base-handler';
 import { HandlerContext, ApiResponse } from '../shared/types/api.types';
@@ -7,6 +8,17 @@ import { createLogger } from '../shared/logger';
 import { ERROR_CODES } from '../shared/constants/error.constants';
 import { CreateUserRequest } from '../shared/types/user.types';
 import { LoginRequest } from '../shared/types/auth.types';
+
+// Import new middleware
+import {
+  ParsingMiddleware,
+  ValidationMiddleware,
+  ValidationRules,
+  ErrorHandlingMiddleware,
+  AuthMiddleware,
+  ErrorContexts,
+  CommonParsing
+} from '../shared/middleware';
 
 export class AuthHandler extends BaseHandler {
   private serviceFactory: ServiceFactory;
@@ -19,278 +31,181 @@ export class AuthHandler extends BaseHandler {
 
   protected setupRoutes(): void {
     this.routes = [
-      // User registration endpoint
       {
         method: 'POST',
         path: '/v1/auth/register',
         handler: this.register.bind(this),
-        requireAuth: false, // Public endpoint
+        requireAuth: false,
       },
-      // User login endpoint
       {
         method: 'POST',
         path: '/v1/auth/login',
         handler: this.login.bind(this),
-        requireAuth: false, // Public endpoint
+        requireAuth: false,
       },
-      // Token refresh endpoint
       {
         method: 'POST',
         path: '/v1/auth/refresh',
         handler: this.refresh.bind(this),
-        requireAuth: false, // Public endpoint (uses refresh token)
+        requireAuth: false,
       },
-      // Token logout endpoint
       {
         method: 'POST',
         path: '/v1/auth/logout',
         handler: this.logout.bind(this),
-        requireAuth: false, // Public endpoint (validates token in handler)
+        requireAuth: false,
       },
     ];
   }
 
   /**
-   * User registration endpoint
+   * User registration endpoint - now clean and focused
    */
   private async register(context: HandlerContext): Promise<ApiResponse> {
-    try {
-      this.logger.info('User registration attempt', { 
-        requestId: context.requestId,
-        userAgent: context.event.headers['User-Agent'],
-      });
+    // Parse and validate request body using middleware
+    const { data: userData, error: parseError } = ParsingMiddleware.parseRequestBody<CreateUserRequest>(context, true);
+    if (parseError) return parseError;
 
-      // Parse request body
-      const userData = this.parseBody<CreateUserRequest>(context);
-      if (!userData) {
-        return this.error(
-          ERROR_CODES.VALIDATION_ERROR,
-          'Request body is required'
-        );
-      }
-
-      // Validate required fields
-      if (!userData.email || !userData.password || !userData.firstName || !userData.lastName) {
-        this.logger.warn('Registration attempt with missing fields', { 
-          requestId: context.requestId,
-          hasEmail: !!userData.email,
-          hasPassword: !!userData.password,
-          hasFirstName: !!userData.firstName,
-          hasLastName: !!userData.lastName,
-        });
-
-        return this.error(
-          ERROR_CODES.VALIDATION_ERROR,
-          'Missing required fields: email, password, firstName, lastName'
-        );
-      }
-
-      // Register user
-      const authService = this.serviceFactory.getAuthService();
-      const result = await authService.registerUser(userData);
-
-      this.logger.info('User registered successfully', { 
-        requestId: context.requestId,
-        userId: result.user.userId,
-        email: result.user.email,
-      });
-
-      return this.success(result, 'User registered successfully');
-
-    } catch (error: any) {
-      this.logger.error('Registration failed', error, { 
-        requestId: context.requestId,
-        email: context.event.body ? JSON.parse(context.event.body)?.email : 'unknown'
-      });
-
-      // Handle specific error types
-      if (error.message.includes('already exists')) {
-        return this.error(
-          ERROR_CODES.CONFLICT,
-          error.message
-        );
-      }
-
-      if (error.message.includes('Invalid email') || 
-          error.message.includes('Password must') ||
-          error.message.includes('required') ||
-          error.message.includes('invalid characters')) {
-        return this.error(
-          ERROR_CODES.VALIDATION_ERROR,
-          error.message
-        );
-      }
-
-      return this.error(
-        ERROR_CODES.INTERNAL_ERROR,
-        'Registration failed'
+    // Validate using middleware - just check required fields here, detailed validation in service
+    if (!userData.email || !userData.password || !userData.firstName || !userData.lastName) {
+      return ErrorHandlingMiddleware.createErrorResponse(
+        ERROR_CODES.VALIDATION_ERROR,
+        'Missing required fields: email, password, firstName, lastName'
       );
     }
+
+    // Business logic only - delegate error handling to middleware
+    const { result, error } = await ErrorHandlingMiddleware.withErrorHandling(
+      async () => {
+        const authService = this.serviceFactory.getAuthService();
+        return await authService.registerUser(userData);
+      },
+      {
+        requestId: context.requestId,
+        operation: ErrorContexts.Auth.REGISTER,
+        additionalInfo: { email: userData.email }
+      }
+    );
+
+    if (error) return error;
+
+    this.logger.info('User registered successfully', {
+      requestId: context.requestId,
+      userId: result!.user.userId,
+      email: result!.user.email,
+    });
+
+    return ErrorHandlingMiddleware.createSuccessResponse(result, 'User registered successfully');
   }
 
   /**
-   * User login endpoint
+   * User login endpoint - now clean and focused
    */
   private async login(context: HandlerContext): Promise<ApiResponse> {
-    try {
-      this.logger.info('User login attempt', { 
-        requestId: context.requestId,
-        userAgent: context.event.headers['User-Agent'],
-      });
+    // Parse and validate request body using middleware
+    const { data: loginData, error: parseError } = ParsingMiddleware.parseRequestBody<LoginRequest>(context, true);
+    if (parseError) return parseError;
 
-      // Parse request body
-      const loginData = this.parseBody<LoginRequest>(context);
-      if (!loginData) {
-        return this.error(
-          ERROR_CODES.VALIDATION_ERROR,
-          'Request body is required'
-        );
-      }
-
-      // Validate required fields
-      if (!loginData.email || !loginData.password) {
-        this.logger.warn('Login attempt with missing fields', { 
-          requestId: context.requestId,
-          hasEmail: !!loginData.email,
-          hasPassword: !!loginData.password,
-        });
-
-        return this.error(
-          ERROR_CODES.VALIDATION_ERROR,
-          'Email and password are required'
-        );
-      }
-
-      // Authenticate user
-      const authService = this.serviceFactory.getAuthService();
-      const result = await authService.loginUser(loginData);
-
-      this.logger.info('User logged in successfully', { 
-        requestId: context.requestId,
-        userId: result.user.userId,
-        email: result.user.email,
-      });
-
-      return this.success(result, 'Login successful');
-
-    } catch (error: any) {
-      this.logger.error('Login failed', error, { 
-        requestId: context.requestId,
-        email: context.event.body ? JSON.parse(context.event.body)?.email : 'unknown'
-      });
-
-      // Handle specific error types
-      if (error.message.includes('Invalid email or password')) {
-        return this.error(
-          ERROR_CODES.UNAUTHORIZED,
-          'Invalid email or password'
-        );
-      }
-
-      return this.error(
-        ERROR_CODES.INTERNAL_ERROR,
-        'Login failed'
+    // Validate using middleware - just check required fields here
+    if (!loginData.email || !loginData.password) {
+      return ErrorHandlingMiddleware.createErrorResponse(
+        ERROR_CODES.VALIDATION_ERROR,
+        'Email and password are required'
       );
     }
+
+    // Business logic only - delegate error handling to middleware
+    const { result, error } = await ErrorHandlingMiddleware.withErrorHandling(
+      async () => {
+        const authService = this.serviceFactory.getAuthService();
+        return await authService.loginUser(loginData);
+      },
+      {
+        requestId: context.requestId,
+        operation: ErrorContexts.Auth.LOGIN,
+        additionalInfo: { email: loginData.email }
+      }
+    );
+
+    if (error) return error;
+
+    this.logger.info('User logged in successfully', {
+      requestId: context.requestId,
+      userId: result!.user.userId,
+      email: result!.user.email,
+    });
+
+    return ErrorHandlingMiddleware.createSuccessResponse(result, 'Login successful');
   }
 
   /**
-   * Token refresh endpoint
+   * Token refresh endpoint - now clean and focused
    */
   private async refresh(context: HandlerContext): Promise<ApiResponse> {
-    try {
-      this.logger.info('Token refresh attempt', { 
-        requestId: context.requestId,
-      });
+    // Parse and validate request body using middleware
+    const { data: refreshData, error: parseError } = ParsingMiddleware.parseRequestBody<{ refreshToken: string }>(context, true);
+    if (parseError) return parseError;
 
-      // Parse request body
-      const refreshData = this.parseBody<{ refreshToken: string }>(context);
-      if (!refreshData || !refreshData.refreshToken) {
-        return this.error(
-          ERROR_CODES.VALIDATION_ERROR,
-          'Refresh token is required'
-        );
-      }
-
-      // Refresh token
-      const authService = this.serviceFactory.getAuthService();
-      const result = await authService.refreshToken(refreshData.refreshToken);
-
-      this.logger.info('Token refreshed successfully', { 
-        requestId: context.requestId,
-        userId: result.user.userId,
-      });
-
-      return this.success(result, 'Token refreshed successfully');
-
-    } catch (error: any) {
-      this.logger.error('Token refresh failed', error, { 
-        requestId: context.requestId,
-      });
-
-      // Handle specific error types
-      if (error.message.includes('expired') || error.message.includes('Invalid')) {
-        return this.error(
-          ERROR_CODES.UNAUTHORIZED,
-          'Invalid or expired refresh token'
-        );
-      }
-
-      return this.error(
-        ERROR_CODES.INTERNAL_ERROR,
-        'Token refresh failed'
+    // Validate using middleware - just check required fields here
+    if (!refreshData.refreshToken) {
+      return ErrorHandlingMiddleware.createErrorResponse(
+        ERROR_CODES.VALIDATION_ERROR,
+        'Refresh token is required'
       );
     }
+
+    // Business logic only - delegate error handling to middleware
+    const { result, error } = await ErrorHandlingMiddleware.withErrorHandling(
+      async () => {
+        const authService = this.serviceFactory.getAuthService();
+        return await authService.refreshToken(refreshData.refreshToken);
+      },
+      {
+        requestId: context.requestId,
+        operation: ErrorContexts.Auth.REFRESH
+      }
+    );
+
+    if (error) return error;
+
+    this.logger.info('Token refreshed successfully', {
+      requestId: context.requestId,
+      userId: result!.user.userId,
+    });
+
+    return ErrorHandlingMiddleware.createSuccessResponse(result, 'Token refreshed successfully');
   }
 
   /**
-   * User logout endpoint
+   * User logout endpoint - now clean and focused
    */
   private async logout(context: HandlerContext): Promise<ApiResponse> {
-    try {
-      this.logger.info('User logout attempt', { 
-        requestId: context.requestId,
-      });
+    // Extract token using middleware
+    const { token, error: tokenError } = AuthMiddleware.extractToken(context);
+    if (tokenError) return tokenError;
 
-      // Extract token from Authorization header
-      const authHeader = context.event.headers?.Authorization || context.event.headers?.authorization;
-      if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        return this.error(
-          ERROR_CODES.VALIDATION_ERROR,
-          'Authorization header with Bearer token is required'
-        );
+    // Business logic only - delegate error handling to middleware
+    const { error } = await ErrorHandlingMiddleware.withErrorHandling(
+      async () => {
+        const authService = this.serviceFactory.getAuthService();
+        await authService.logoutUser(token!);
+      },
+      {
+        requestId: context.requestId,
+        operation: ErrorContexts.Auth.LOGOUT
       }
+    );
 
-      const token = authHeader.substring(7);
-      
-      // Logout user (invalidate token)
-      const authService = this.serviceFactory.getAuthService();
-      await authService.logoutUser(token);
+    if (error) return error;
 
-      this.logger.info('User logged out successfully', { 
-        requestId: context.requestId,
-      });
+    this.logger.info('User logged out successfully', {
+      requestId: context.requestId,
+    });
 
-      return this.success({ message: 'Logged out successfully' }, 'Logout successful');
-
-    } catch (error: any) {
-      this.logger.error('Logout failed', error, { 
-        requestId: context.requestId,
-      });
-
-      // Handle specific error types
-      if (error.message.includes('Invalid token') || error.message.includes('expired')) {
-        return this.error(
-          ERROR_CODES.UNAUTHORIZED,
-          'Invalid or expired token'
-        );
-      }
-
-      return this.error(
-        ERROR_CODES.INTERNAL_ERROR,
-        'Logout failed'
-      );
-    }
+    return ErrorHandlingMiddleware.createSuccessResponse(
+      { message: 'Logged out successfully' }, 
+      'Logout successful'
+    );
   }
 }
 
