@@ -38,37 +38,37 @@ export class GoalsHandler extends BaseHandler {
         method: 'POST',
         path: '/v1/goals',
         handler: this.createGoal.bind(this),
-        requireAuth: true,
+        requireAuth: false,
       },
       {
         method: 'GET',
         path: '/v1/goals',
         handler: this.getGoals.bind(this),
-        requireAuth: true,
+        requireAuth: false,
       },
       {
         method: 'GET',
         path: '/v1/goals/stats',
         handler: this.getGoalStats.bind(this),
-        requireAuth: true,
+        requireAuth: false,
       },
       {
         method: 'GET',
         path: '/v1/goals/{id}',
         handler: this.getGoal.bind(this),
-        requireAuth: true,
+        requireAuth: false,
       },
       {
         method: 'PUT',
         path: '/v1/goals/{id}',
         handler: this.updateGoal.bind(this),
-        requireAuth: true,
+        requireAuth: false,
       },
       {
         method: 'DELETE',
         path: '/v1/goals/{id}',
         handler: this.deleteGoal.bind(this),
-        requireAuth: true,
+        requireAuth: false,
       }
     ];
   }
@@ -77,16 +77,19 @@ export class GoalsHandler extends BaseHandler {
    * Create a new goal
    */
   private async createGoal(context: HandlerContext): Promise<ApiResponse> {
-    // Authenticate user using middleware
-    const { authenticatedContext, error: authError } = await AuthMiddleware.authenticateRequest(
-      context, 
-      AuthConfigs.AUTHENTICATED
-    );
-    if (authError) return authError;
+    // No authentication required - userId will be provided in request until Phase 30
 
     // Parse and validate request body using middleware
-    const { data: requestBody, error: parseError } = ParsingMiddleware.parseRequestBody<CreateGoalRequest>(context, true);
+    const { data: requestBody, error: parseError } = ParsingMiddleware.parseRequestBody<CreateGoalRequest & { userId: string }>(context, true);
     if (parseError) return parseError;
+
+    // Validate userId is provided until Phase 30
+    if (!requestBody.userId) {
+      return ErrorHandlingMiddleware.createErrorResponse(
+        ERROR_CODES.VALIDATION_ERROR,
+        'userId is required until Phase 30 authentication is implemented'
+      );
+    }
 
     // Validate using helper method
     const validationError = this.validateCreateGoalRequest(requestBody);
@@ -96,12 +99,12 @@ export class GoalsHandler extends BaseHandler {
     const { result, error } = await ErrorHandlingMiddleware.withErrorHandling(
       async () => {
         const goalsService = this.serviceFactory.getGoalsService();
-        return await goalsService.createGoal(authenticatedContext!.userId, requestBody);
+        return await goalsService.createGoal(requestBody.userId, requestBody);
       },
       {
         requestId: context.requestId,
         operation: ErrorContexts.Goals.CREATE,
-        userId: authenticatedContext!.userId,
+        userId: requestBody.userId,
         additionalInfo: { 
           type: requestBody.type,
           targetType: requestBody.targetType,
@@ -114,7 +117,7 @@ export class GoalsHandler extends BaseHandler {
 
     this.logger.info('Goal created successfully', { 
       requestId: context.requestId,
-      userId: authenticatedContext!.userId,
+      userId: requestBody.userId,
       goalId: result!.goal.goalId,
       type: result!.goal.type,
       targetValue: result!.goal.targetValue
@@ -127,15 +130,11 @@ export class GoalsHandler extends BaseHandler {
    * Get goals with optional filtering
    */
   private async getGoals(context: HandlerContext): Promise<ApiResponse> {
-    // Authenticate user using middleware
-    const { authenticatedContext, error: authError } = await AuthMiddleware.authenticateRequest(
-      context, 
-      AuthConfigs.AUTHENTICATED
-    );
-    if (authError) return authError;
+    // No authentication required - userId will be provided as query param until Phase 30
 
     // Parse query parameters using middleware
     const { data: queryParams, error: parseError } = ParsingMiddleware.parseQueryParams(context, {
+      userId: { type: 'string', decode: true },
       status: { type: 'string', decode: true },
       type: { type: 'string', decode: true },
       priority: { type: 'string', decode: true },
@@ -150,6 +149,14 @@ export class GoalsHandler extends BaseHandler {
       offset: { type: 'number' }
     });
     if (parseError) return parseError;
+
+    // Validate userId is provided until Phase 30
+    if (!queryParams?.userId) {
+      return ErrorHandlingMiddleware.createErrorResponse(
+        ERROR_CODES.VALIDATION_ERROR,
+        'userId query parameter is required until Phase 30 authentication is implemented'
+      );
+    }
 
     // Build request object
     const request: GetGoalsRequest = {};
@@ -177,12 +184,12 @@ export class GoalsHandler extends BaseHandler {
     const { result, error } = await ErrorHandlingMiddleware.withErrorHandling(
       async () => {
         const goalsService = this.serviceFactory.getGoalsService();
-        return await goalsService.getGoals(authenticatedContext!.userId, request);
+        return await goalsService.getGoals(queryParams.userId, request);
       },
       {
         requestId: context.requestId,
         operation: ErrorContexts.Goals.LIST,
-        userId: authenticatedContext!.userId,
+        userId: queryParams.userId,
         additionalInfo: { filters: request }
       }
     );
@@ -191,7 +198,7 @@ export class GoalsHandler extends BaseHandler {
 
     this.logger.info('Goals retrieved successfully', { 
       requestId: context.requestId,
-      userId: authenticatedContext!.userId,
+      userId: queryParams.userId,
       total: result!.total,
       returned: result!.goals.length,
       filters: request
@@ -204,16 +211,25 @@ export class GoalsHandler extends BaseHandler {
    * Get a specific goal by ID
    */
   private async getGoal(context: HandlerContext): Promise<ApiResponse> {
-    // Authenticate user using middleware
-    const { authenticatedContext, error: authError } = await AuthMiddleware.authenticateRequest(
-      context, 
-      AuthConfigs.AUTHENTICATED
-    );
-    if (authError) return authError;
+    // No authentication required - userId will be provided as query param until Phase 30
 
     // Parse path parameters using middleware
     const { data: pathParams, error: parseError } = ParsingMiddleware.parsePathParams(context);
     if (parseError) return parseError;
+
+    // Parse query parameters using middleware
+    const { data: queryParams, error: queryParseError } = ParsingMiddleware.parseQueryParams(context, {
+      userId: { type: 'string', decode: true }
+    });
+    if (queryParseError) return queryParseError;
+
+    // Validate userId is provided until Phase 30
+    if (!queryParams?.userId) {
+      return ErrorHandlingMiddleware.createErrorResponse(
+        ERROR_CODES.VALIDATION_ERROR,
+        'userId query parameter is required until Phase 30 authentication is implemented'
+      );
+    }
 
     // Validate goal ID
     const goalValidationError = this.validateGoalId(pathParams.id);
@@ -223,12 +239,12 @@ export class GoalsHandler extends BaseHandler {
     const { result, error } = await ErrorHandlingMiddleware.withErrorHandling(
       async () => {
         const goalsService = this.serviceFactory.getGoalsService();
-        return await goalsService.getGoal(pathParams.id, authenticatedContext!.userId);
+        return await goalsService.getGoal(pathParams.id, queryParams.userId);
       },
       {
         requestId: context.requestId,
         operation: ErrorContexts.Goals.GET,
-        userId: authenticatedContext!.userId,
+        userId: queryParams.userId,
         additionalInfo: { goalId: pathParams.id }
       }
     );
@@ -237,7 +253,7 @@ export class GoalsHandler extends BaseHandler {
 
     this.logger.info('Goal retrieved successfully', { 
       requestId: context.requestId,
-      userId: authenticatedContext!.userId,
+      userId: queryParams.userId,
       goalId: result!.goal.goalId,
       type: result!.goal.type,
       status: result!.goal.status,
@@ -251,16 +267,25 @@ export class GoalsHandler extends BaseHandler {
    * Update an existing goal
    */
   private async updateGoal(context: HandlerContext): Promise<ApiResponse> {
-    // Authenticate user using middleware
-    const { authenticatedContext, error: authError } = await AuthMiddleware.authenticateRequest(
-      context, 
-      AuthConfigs.AUTHENTICATED
-    );
-    if (authError) return authError;
+    // No authentication required - userId will be provided as query param until Phase 30
 
     // Parse path parameters using middleware
     const { data: pathParams, error: parseError } = ParsingMiddleware.parsePathParams(context);
     if (parseError) return parseError;
+
+    // Parse query parameters using middleware
+    const { data: queryParams, error: queryParseError } = ParsingMiddleware.parseQueryParams(context, {
+      userId: { type: 'string', decode: true }
+    });
+    if (queryParseError) return queryParseError;
+
+    // Validate userId is provided until Phase 30
+    if (!queryParams?.userId) {
+      return ErrorHandlingMiddleware.createErrorResponse(
+        ERROR_CODES.VALIDATION_ERROR,
+        'userId query parameter is required until Phase 30 authentication is implemented'
+      );
+    }
 
     // Parse and validate request body using middleware
     const { data: requestBody, error: bodyParseError } = ParsingMiddleware.parseRequestBody<UpdateGoalRequest>(context, true);
@@ -277,12 +302,12 @@ export class GoalsHandler extends BaseHandler {
     const { result, error } = await ErrorHandlingMiddleware.withErrorHandling(
       async () => {
         const goalsService = this.serviceFactory.getGoalsService();
-        return await goalsService.updateGoal(pathParams.id, authenticatedContext!.userId, requestBody);
+        return await goalsService.updateGoal(pathParams.id, queryParams.userId, requestBody);
       },
       {
         requestId: context.requestId,
         operation: ErrorContexts.Goals.UPDATE,
-        userId: authenticatedContext!.userId,
+        userId: queryParams.userId,
         additionalInfo: { 
           goalId: pathParams.id,
           updates: Object.keys(requestBody)
@@ -294,7 +319,7 @@ export class GoalsHandler extends BaseHandler {
 
     this.logger.info('Goal updated successfully', { 
       requestId: context.requestId,
-      userId: authenticatedContext!.userId,
+      userId: queryParams.userId,
       goalId: result!.goal.goalId,
       status: result!.goal.status,
       progress: result!.goal.progressPercentage,
@@ -308,16 +333,25 @@ export class GoalsHandler extends BaseHandler {
    * Delete a goal
    */
   private async deleteGoal(context: HandlerContext): Promise<ApiResponse> {
-    // Authenticate user using middleware
-    const { authenticatedContext, error: authError } = await AuthMiddleware.authenticateRequest(
-      context, 
-      AuthConfigs.AUTHENTICATED
-    );
-    if (authError) return authError;
+    // No authentication required - userId will be provided as query param until Phase 30
 
     // Parse path parameters using middleware
     const { data: pathParams, error: parseError } = ParsingMiddleware.parsePathParams(context);
     if (parseError) return parseError;
+
+    // Parse query parameters using middleware
+    const { data: queryParams, error: queryParseError } = ParsingMiddleware.parseQueryParams(context, {
+      userId: { type: 'string', decode: true }
+    });
+    if (queryParseError) return queryParseError;
+
+    // Validate userId is provided until Phase 30
+    if (!queryParams?.userId) {
+      return ErrorHandlingMiddleware.createErrorResponse(
+        ERROR_CODES.VALIDATION_ERROR,
+        'userId query parameter is required until Phase 30 authentication is implemented'
+      );
+    }
 
     // Validate goal ID
     const goalValidationError = this.validateGoalId(pathParams.id);
@@ -327,12 +361,12 @@ export class GoalsHandler extends BaseHandler {
     const { result, error } = await ErrorHandlingMiddleware.withErrorHandling(
       async () => {
         const goalsService = this.serviceFactory.getGoalsService();
-        return await goalsService.deleteGoal(pathParams.id, authenticatedContext!.userId);
+        return await goalsService.deleteGoal(pathParams.id, queryParams.userId);
       },
       {
         requestId: context.requestId,
         operation: ErrorContexts.Goals.DELETE,
-        userId: authenticatedContext!.userId,
+        userId: queryParams.userId,
         additionalInfo: { goalId: pathParams.id }
       }
     );
@@ -341,7 +375,7 @@ export class GoalsHandler extends BaseHandler {
 
     this.logger.info('Goal deleted successfully', { 
       requestId: context.requestId,
-      userId: authenticatedContext!.userId,
+      userId: queryParams.userId,
       goalId: pathParams.id
     });
 
@@ -352,23 +386,32 @@ export class GoalsHandler extends BaseHandler {
    * Get goal statistics for user
    */
   private async getGoalStats(context: HandlerContext): Promise<ApiResponse> {
-    // Authenticate user using middleware
-    const { authenticatedContext, error: authError } = await AuthMiddleware.authenticateRequest(
-      context, 
-      AuthConfigs.AUTHENTICATED
-    );
-    if (authError) return authError;
+    // No authentication required - userId will be provided as query param until Phase 30
+
+    // Parse query parameters using middleware
+    const { data: queryParams, error: parseError } = ParsingMiddleware.parseQueryParams(context, {
+      userId: { type: 'string', decode: true }
+    });
+    if (parseError) return parseError;
+
+    // Validate userId is provided until Phase 30
+    if (!queryParams?.userId) {
+      return ErrorHandlingMiddleware.createErrorResponse(
+        ERROR_CODES.VALIDATION_ERROR,
+        'userId query parameter is required until Phase 30 authentication is implemented'
+      );
+    }
 
     // Business logic only - delegate error handling to middleware
     const { result, error } = await ErrorHandlingMiddleware.withErrorHandling(
       async () => {
         const goalsService = this.serviceFactory.getGoalsService();
-        return await goalsService.getGoalStats(authenticatedContext!.userId);
+        return await goalsService.getGoalStats(queryParams.userId);
       },
       {
         requestId: context.requestId,
         operation: ErrorContexts.Goals.STATS,
-        userId: authenticatedContext!.userId
+        userId: queryParams.userId
       }
     );
 
@@ -376,7 +419,7 @@ export class GoalsHandler extends BaseHandler {
 
     this.logger.info('Goal statistics retrieved successfully', { 
       requestId: context.requestId,
-      userId: authenticatedContext!.userId,
+      userId: queryParams.userId,
       totalGoals: result!.totalGoals,
       activeGoals: result!.activeGoals,
       completedGoals: result!.completedGoals,
