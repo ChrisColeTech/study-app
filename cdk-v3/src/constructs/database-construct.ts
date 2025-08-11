@@ -70,7 +70,7 @@ export class DatabaseConstruct extends Construct {
         type: cdk.aws_dynamodb.AttributeType.STRING,
       },
       sortKey: {
-        name: 'topicId',
+        name: 'progressKey',
         type: cdk.aws_dynamodb.AttributeType.STRING,
       },
       billingMode: cdk.aws_dynamodb.BillingMode.PAY_PER_REQUEST,
@@ -112,6 +112,16 @@ export class DatabaseConstruct extends Construct {
     new cdk.CfnOutput(scope, 'StudySessionsTableName', {
       value: this.studySessionsTable.tableName,
       description: 'Study Sessions DynamoDB table name',
+    });
+
+    new cdk.CfnOutput(scope, 'UserProgressTableName', {
+      value: this.userProgressTable.tableName,
+      description: 'User Progress DynamoDB table name',
+    });
+
+    new cdk.CfnOutput(scope, 'GoalsTableName', {
+      value: this.goalsTable.tableName,
+      description: 'Goals DynamoDB table name',
     });
   }
 }
