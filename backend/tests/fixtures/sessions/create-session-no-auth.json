@@ -1,0 +1,23 @@
+{
+  "description": "Invalid session creation request - missing authentication",
+  "method": "POST",
+  "path": "/v1/sessions",
+  "requiresAuth": false,
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "body": {
+    "examId": "saa-c03",
+    "providerId": "aws",
+    "sessionType": "practice",
+    "questionCount": 5
+  },
+  "expectedStatus": 401,
+  "expectedResponse": {
+    "success": false,
+    "error": {
+      "code": "UNAUTHORIZED",
+      "message": "Authentication required to create sessions"
+    }
+  }
+}

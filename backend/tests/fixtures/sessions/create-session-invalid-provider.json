@@ -1,0 +1,24 @@
+{
+  "description": "Invalid session creation request - non-existent provider",
+  "method": "POST",
+  "path": "/v1/sessions",
+  "requiresAuth": true,
+  "headers": {
+    "Content-Type": "application/json",
+    "Authorization": "Bearer {{jwt_token}}"
+  },
+  "body": {
+    "examId": "saa-c03",
+    "providerId": "invalid-provider",
+    "sessionType": "practice",
+    "questionCount": 5
+  },
+  "expectedStatus": 404,
+  "expectedResponse": {
+    "success": false,
+    "error": {
+      "code": "NOT_FOUND",
+      "message": "Invalid provider: invalid-provider"
+    }
+  }
+}

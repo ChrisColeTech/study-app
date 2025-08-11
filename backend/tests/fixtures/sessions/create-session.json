@@ -1,0 +1,48 @@
+{
+  "description": "Valid session creation request",
+  "method": "POST",
+  "path": "/v1/sessions",
+  "requiresAuth": true,
+  "headers": {
+    "Content-Type": "application/json",
+    "Authorization": "Bearer {{jwt_token}}"
+  },
+  "body": {
+    "examId": "saa-c03",
+    "providerId": "aws",
+    "sessionType": "practice",
+    "questionCount": 10,
+    "topics": ["ec2", "s3"],
+    "difficulty": "medium",
+    "timeLimit": 30
+  },
+  "expectedStatus": 200,
+  "expectedResponse": {
+    "success": true,
+    "data": {
+      "session": {
+        "sessionId": "{{uuid}}",
+        "userId": "{{user_id}}",
+        "examId": "saa-c03",
+        "providerId": "aws",
+        "startTime": "{{iso_date}}",
+        "status": "active",
+        "questions": "{{array}}",
+        "currentQuestionIndex": 0,
+        "totalQuestions": 10,
+        "correctAnswers": 0,
+        "createdAt": "{{iso_date}}",
+        "updatedAt": "{{iso_date}}"
+      },
+      "questions": "{{array}}"
+    },
+    "message": "Session created successfully"
+  },
+  "validation": {
+    "sessionId": "should be a valid UUID",
+    "totalQuestions": "should equal requested questionCount",
+    "questions": "should contain question data without correct answers",
+    "status": "should be 'active'",
+    "userId": "should match authenticated user"
+  }
+}

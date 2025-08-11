@@ -95,3 +95,12 @@ export interface SessionFilters {
   limit?: number;
   offset?: number;
 }
+
+export interface CreateSessionResponse {
+  session: StudySession;
+  questions: QuestionResponse[];
+}
+
+export interface ISessionService {
+  createSession(userId: string, request: CreateSessionRequest): Promise<CreateSessionResponse>;
+}

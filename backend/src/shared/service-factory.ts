@@ -11,11 +11,8 @@ import type { IProviderService } from '../services/provider.service';
 import type { IExamService } from '../services/exam.service';
 import type { ITopicService } from '../services/topic.service';
 import type { IQuestionService } from '../services/question.service';
-export type { IAuthService, IUserService, IProviderService, IExamService, ITopicService, IQuestionService };
-
-export interface ISessionService {
-  // Session service methods will be added in Phase 2
-}
+import type { ISessionService } from '../services/session.service';
+export type { IAuthService, IUserService, IProviderService, IExamService, ITopicService, IQuestionService, ISessionService };
 
 export interface IAnalyticsService {
   // Analytics service methods will be added in Phase 2
@@ -268,10 +265,14 @@ export class ServiceFactory {
    */
   public getSessionService(): ISessionService {
     if (!this._sessionService) {
-      // Will be implemented in Phase 2
-      throw new Error('SessionService not implemented yet - Phase 2');
+      const { SessionService } = require('../services/session.service');
+      this._sessionService = new SessionService(
+        this.getDynamoClient(),
+        this,
+        this.getConfig().tables.studySessions
+      );
     }
-    return this._sessionService;
+    return this._sessionService!;
   }
 
   /**

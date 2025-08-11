@@ -1,0 +1,24 @@
+{
+  "description": "Invalid session creation request - invalid session type",
+  "method": "POST",
+  "path": "/v1/sessions",
+  "requiresAuth": true,
+  "headers": {
+    "Content-Type": "application/json",
+    "Authorization": "Bearer {{jwt_token}}"
+  },
+  "body": {
+    "examId": "saa-c03",
+    "providerId": "aws",
+    "sessionType": "invalid-type",
+    "questionCount": 5
+  },
+  "expectedStatus": 400,
+  "expectedResponse": {
+    "success": false,
+    "error": {
+      "code": "VALIDATION_ERROR",
+      "message": "sessionType must be one of: practice, exam, review"
+    }
+  }
+}

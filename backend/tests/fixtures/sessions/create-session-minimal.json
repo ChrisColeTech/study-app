@@ -1,0 +1,43 @@
+{
+  "description": "Minimal valid session creation request - required fields only",
+  "method": "POST",
+  "path": "/v1/sessions",
+  "requiresAuth": true,
+  "headers": {
+    "Content-Type": "application/json",
+    "Authorization": "Bearer {{jwt_token}}"
+  },
+  "body": {
+    "examId": "az-900",
+    "providerId": "azure",
+    "sessionType": "exam"
+  },
+  "expectedStatus": 200,
+  "expectedResponse": {
+    "success": true,
+    "data": {
+      "session": {
+        "sessionId": "{{uuid}}",
+        "userId": "{{user_id}}",
+        "examId": "az-900",
+        "providerId": "azure",
+        "startTime": "{{iso_date}}",
+        "status": "active",
+        "questions": "{{array}}",
+        "currentQuestionIndex": 0,
+        "totalQuestions": "{{number}}",
+        "correctAnswers": 0,
+        "createdAt": "{{iso_date}}",
+        "updatedAt": "{{iso_date}}"
+      },
+      "questions": "{{array}}"
+    },
+    "message": "Session created successfully"
+  },
+  "validation": {
+    "sessionId": "should be a valid UUID",
+    "totalQuestions": "should be > 0",
+    "questions": "should contain question data",
+    "status": "should be 'active'"
+  }
+}

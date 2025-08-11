@@ -1,0 +1,24 @@
+{
+  "description": "Invalid session creation request - excessive question count",
+  "method": "POST",
+  "path": "/v1/sessions",
+  "requiresAuth": true,
+  "headers": {
+    "Content-Type": "application/json",
+    "Authorization": "Bearer {{jwt_token}}"
+  },
+  "body": {
+    "examId": "saa-c03",
+    "providerId": "aws",
+    "sessionType": "practice",
+    "questionCount": 300
+  },
+  "expectedStatus": 400,
+  "expectedResponse": {
+    "success": false,
+    "error": {
+      "code": "VALIDATION_ERROR",
+      "message": "questionCount must be a number between 1 and 200"
+    }
+  }
+}

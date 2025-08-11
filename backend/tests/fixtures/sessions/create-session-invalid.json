@@ -1,0 +1,21 @@
+{
+  "description": "Invalid session creation request - missing required fields",
+  "method": "POST",
+  "path": "/v1/sessions",
+  "requiresAuth": true,
+  "headers": {
+    "Content-Type": "application/json",
+    "Authorization": "Bearer {{jwt_token}}"
+  },
+  "body": {
+    "sessionType": "practice"
+  },
+  "expectedStatus": 400,
+  "expectedResponse": {
+    "success": false,
+    "error": {
+      "code": "VALIDATION_ERROR",
+      "message": "examId is required and must be a string"
+    }
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "description": "Invalid session creation request - non-existent exam",
+  "method": "POST",
+  "path": "/v1/sessions",
+  "requiresAuth": true,
+  "headers": {
+    "Content-Type": "application/json",
+    "Authorization": "Bearer {{jwt_token}}"
+  },
+  "body": {
+    "examId": "invalid-exam",
+    "providerId": "aws",
+    "sessionType": "practice",
+    "questionCount": 5
+  },
+  "expectedStatus": 404,
+  "expectedResponse": {
+    "success": false,
+    "error": {
+      "code": "NOT_FOUND",
+      "message": "Invalid exam: invalid-exam for provider aws"
+    }
+  }
+}
