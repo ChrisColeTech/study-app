@@ -378,5 +378,14 @@ export const ErrorContexts = {
   Topic: {
     LIST: 'topic-list',
     GET: 'topic-get'
+  },
+  
+  Goals: {
+    CREATE: 'goal-create',
+    LIST: 'goal-list',
+    GET: 'goal-get',
+    UPDATE: 'goal-update',
+    DELETE: 'goal-delete',
+    STATS: 'goal-stats'
   }
 };

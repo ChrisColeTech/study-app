@@ -12,7 +12,8 @@ import type { IExamService } from '../services/exam.service';
 import type { ITopicService } from '../services/topic.service';
 import type { IQuestionService } from '../services/question.service';
 import type { ISessionService } from '../services/session.service';
-export type { IAuthService, IUserService, IProviderService, IExamService, ITopicService, IQuestionService, ISessionService };
+import type { IGoalsService } from '../services/goals.service';
+export type { IAuthService, IUserService, IProviderService, IExamService, ITopicService, IQuestionService, ISessionService, IGoalsService };
 
 // Import repository interfaces
 import type { IUserRepository } from '../repositories/user.repository';
@@ -21,15 +22,12 @@ import type { IProviderRepository } from '../repositories/provider.repository';
 import type { IExamRepository } from '../repositories/exam.repository';
 import type { ITopicRepository } from '../repositories/topic.repository';
 import type { IQuestionRepository } from '../repositories/question.repository';
+import type { IGoalsRepository } from '../repositories/goals.repository';
 import type { IHealthRepository } from '../repositories/health.repository';
-export type { IUserRepository, ISessionRepository, IProviderRepository, IExamRepository, ITopicRepository, IQuestionRepository, IHealthRepository };
+export type { IUserRepository, ISessionRepository, IProviderRepository, IExamRepository, ITopicRepository, IQuestionRepository, IGoalsRepository, IHealthRepository };
 
 export interface IAnalyticsService {
   // Analytics service methods will be added in later phases
-}
-
-export interface IGoalsService {
-  // Goals service methods will be added in later phases
 }
 
 export interface IHealthService {
@@ -94,6 +92,7 @@ export class ServiceFactory {
   private _examRepository: IExamRepository | null = null;
   private _topicRepository: ITopicRepository | null = null;
   private _questionRepository: IQuestionRepository | null = null;
+  private _goalsRepository: IGoalsRepository | null = null;
   private _healthRepository: IHealthRepository | null = null;
 
   // Services (lazy initialized)
@@ -257,6 +256,17 @@ export class ServiceFactory {
   }
 
   /**
+   * Get Goals Repository
+   */
+  public getGoalsRepository(): IGoalsRepository {
+    if (!this._goalsRepository) {
+      const { GoalsRepository } = require('../repositories/goals.repository');
+      this._goalsRepository = new GoalsRepository(this.getDynamoClient(), this.getConfig());
+    }
+    return this._goalsRepository!;
+  }
+
+  /**
    * Get Health Repository
    */
   public getHealthRepository(): IHealthRepository {
@@ -379,10 +389,15 @@ export class ServiceFactory {
    */
   public getGoalsService(): IGoalsService {
     if (!this._goalsService) {
-      // Will be implemented in later phases
-      throw new Error('GoalsService not implemented yet - later phases');
+      const { GoalsService } = require('../services/goals.service');
+      this._goalsService = new GoalsService(
+        this.getGoalsRepository(),
+        this.getProviderService(),
+        this.getExamService(),
+        this.getTopicService()
+      );
     }
-    return this._goalsService;
+    return this._goalsService!;
   }
 
   /**
@@ -399,6 +414,7 @@ export class ServiceFactory {
     this._examRepository = null;
     this._topicRepository = null;
     this._questionRepository = null;
+    this._goalsRepository = null;
     this._healthRepository = null;
 
     // Reset services

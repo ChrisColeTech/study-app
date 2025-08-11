@@ -141,10 +141,22 @@ export class LambdaConstruct extends Construct {
     // Also grant access to question data for session creation
     props.questionDataBucket.grantRead(sessionFunction);
 
+    // Goals Lambda Function - Phase 18 implementation
+    const goalsFunction = new cdk.aws_lambda.Function(this, 'GoalsFunction', {
+      ...lambdaProps,
+      functionName: StackConfig.getResourceName('goals', props.environment),
+      description: 'Study App V3 Goals Lambda - Phase 18 Implementation',
+      code: cdk.aws_lambda.Code.fromAsset('../backend/dist/bundled'),
+      handler: 'goals.handler',
+    });
+    this.functions['goals'] = goalsFunction;
+
+    // Grant DynamoDB permissions to goals function
+    props.goalsTable.grantReadWriteData(goalsFunction);
+
     // Placeholder functions for future phases - minimal implementation
     const placeholderFunctionNames = [
-      'analytics',
-      'goals'
+      'analytics'
     ];
 
     placeholderFunctionNames.forEach(name => {
