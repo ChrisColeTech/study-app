@@ -6,6 +6,8 @@ import {
   Exam, 
   GetExamsRequest, 
   GetExamsResponse, 
+  GetExamRequest,
+  GetExamResponse,
   IExamService
 } from '../shared/types/exam.types';
 import { Provider } from '../shared/types/provider.types';
@@ -129,6 +131,83 @@ export class ExamService implements IExamService {
     } catch (error) {
       this.logger.error('Failed to get exams', error as Error);
       throw new Error('Failed to retrieve exams');
+    }
+  }
+
+  /**
+   * Get a specific exam by ID
+   */
+  async getExam(examId: string, request: GetExamRequest): Promise<GetExamResponse> {
+    this.logger.info('Getting exam by ID', { 
+      examId,
+      includeProvider: request.includeProvider
+    });
+
+    try {
+      // Check cache first for the specific exam
+      const cacheKey = `exam:${examId}`;
+      const cachedExam = this.getFromCache<{ exam: Exam; providerId: string }>(cacheKey);
+      
+      let exam: Exam | null = null;
+      let providerId: string | null = null;
+
+      if (cachedExam) {
+        this.logger.debug('Exam retrieved from cache', { examId });
+        exam = cachedExam.exam;
+        providerId = cachedExam.providerId;
+      } else {
+        // Search through all provider files for the exam
+        const examData = await this.findExamInProviders(examId);
+        if (examData) {
+          exam = examData.exam;
+          providerId = examData.providerId;
+          
+          // Cache the exam for future requests
+          this.setCache(cacheKey, { exam, providerId });
+        }
+      }
+
+      if (!exam || !providerId) {
+        this.logger.warn('Exam not found', { examId });
+        throw new Error('Exam not found');
+      }
+
+      const response: GetExamResponse = {
+        exam
+      };
+
+      // Include provider details if requested
+      if (request.includeProvider) {
+        const provider = await this.getProviderDetails(providerId);
+        if (provider) {
+          response.provider = {
+            id: provider.id,
+            name: provider.name,
+            fullName: provider.fullName,
+            description: provider.description,
+            website: provider.website,
+            category: provider.category
+          };
+        }
+      }
+
+      this.logger.info('Exam retrieved successfully', { 
+        examId,
+        examName: exam.examName,
+        providerId,
+        includeProvider: request.includeProvider
+      });
+
+      return response;
+
+    } catch (error) {
+      this.logger.error('Failed to get exam', error as Error, { examId });
+      
+      if ((error as Error).message === 'Exam not found') {
+        throw error; // Re-throw for 404 handling
+      }
+      
+      throw new Error('Failed to retrieve exam');
     }
   }
 
@@ -313,6 +392,168 @@ export class ExamService implements IExamService {
     };
 
     this.cache.set(key, entry);
+  }
+
+  /**
+   * Find a specific exam in provider files
+   */
+  private async findExamInProviders(examId: string): Promise<{ exam: Exam; providerId: string } | null> {
+    this.logger.debug('Searching for exam in providers', { examId });
+
+    try {
+      // List all provider files in S3
+      const listCommand = new ListObjectsV2Command({
+        Bucket: this.bucketName,
+        Prefix: this.PROVIDERS_PREFIX,
+        MaxKeys: 100
+      });
+
+      const listResponse = await this.s3Client.send(listCommand);
+      
+      if (!listResponse.Contents || listResponse.Contents.length === 0) {
+        this.logger.warn('No provider files found in S3');
+        return null;
+      }
+
+      // Search through each provider file
+      for (const item of listResponse.Contents) {
+        if (!item.Key || !item.Key.endsWith('.json')) continue;
+
+        try {
+          const providerId = item.Key.replace(this.PROVIDERS_PREFIX, '').replace('.json', '');
+          const exam = await this.findExamInProvider(examId, providerId);
+          
+          if (exam) {
+            return { exam, providerId };
+          }
+        } catch (error) {
+          this.logger.warn('Failed to search provider for exam', { 
+            key: item.Key, 
+            examId, 
+            error: (error as Error).message 
+          });
+          // Continue searching other providers
+        }
+      }
+
+      return null;
+
+    } catch (error) {
+      this.logger.error('Failed to search providers for exam', error as Error, { examId });
+      throw new Error('Failed to search for exam');
+    }
+  }
+
+  /**
+   * Find a specific exam within a provider
+   */
+  private async findExamInProvider(examId: string, providerId: string): Promise<Exam | null> {
+    this.logger.debug('Searching for exam in provider', { examId, providerId });
+
+    try {
+      const key = `${this.PROVIDERS_PREFIX}${providerId}.json`;
+      
+      const command = new GetObjectCommand({
+        Bucket: this.bucketName,
+        Key: key
+      });
+
+      const response = await this.s3Client.send(command);
+      
+      if (!response.Body) {
+        return null;
+      }
+
+      const content = await response.Body.transformToString();
+      const provider: Provider = JSON.parse(content);
+
+      // Validate that the provider has required fields
+      if (!provider.id || !provider.name || !provider.certifications) {
+        return null;
+      }
+
+      // Find the specific certification/exam
+      const certification = provider.certifications.find(cert => cert.id === examId);
+      
+      if (!certification) {
+        return null;
+      }
+
+      // Convert certification to exam
+      const exam: Exam = {
+        examId: certification.id,
+        examName: certification.name,
+        examCode: certification.code || certification.examCode || certification.id,
+        providerId: provider.id,
+        providerName: provider.name,
+        description: certification.description || '',
+        level: certification.level as 'foundational' | 'associate' | 'professional' | 'specialty' | 'expert',
+        duration: certification.duration,
+        questionCount: certification.questionCount || 0,
+        passingScore: certification.passingScore,
+        topics: certification.topics || [],
+        isActive: certification.status === 'active',
+        metadata: {
+          lastUpdated: new Date().toISOString(),
+          examUrl: provider.website,
+          cost: certification.cost ? `$${certification.cost}` : undefined,
+          validityPeriod: certification.validityPeriod,
+          retakePolicy: certification.retakePolicy,
+          languages: certification.languages
+        }
+      };
+
+      return exam;
+
+    } catch (error) {
+      this.logger.error('Failed to search provider for exam', error as Error, { examId, providerId });
+      return null;
+    }
+  }
+
+  /**
+   * Get provider details for including with exam response
+   */
+  private async getProviderDetails(providerId: string): Promise<{
+    id: string;
+    name: string;
+    fullName: string;
+    description: string;
+    website: string;
+    category: string;
+  } | null> {
+    this.logger.debug('Getting provider details', { providerId });
+
+    try {
+      const key = `${this.PROVIDERS_PREFIX}${providerId}.json`;
+      
+      const command = new GetObjectCommand({
+        Bucket: this.bucketName,
+        Key: key
+      });
+
+      const response = await this.s3Client.send(command);
+      
+      if (!response.Body) {
+        return null;
+      }
+
+      const content = await response.Body.transformToString();
+      const provider: Provider = JSON.parse(content);
+
+      return {
+        id: provider.id,
+        name: provider.name,
+        fullName: provider.fullName || provider.name,
+        description: provider.description,
+        website: provider.website,
+        category: provider.category
+      };
+
+    } catch (error) {
+      this.logger.error('Failed to get provider details', error as Error, { providerId });
+      return null;
+    }
   }
 
   /**

@@ -247,6 +247,116 @@ validate_pagination() {
     fi
 }
 
+# Validate single exam structure (for exam details endpoint)
+validate_single_exam_structure() {
+    local response_file=$1
+    local required_fields=("examId" "examName" "examCode" "providerId" "providerName" "description" "level" "questionCount" "topics" "isActive" "metadata")
+    
+    if ! command -v jq >/dev/null 2>&1; then
+        log_warn "jq not available, skipping detailed validation"
+        return 0
+    fi
+    
+    # Check if exam exists in response
+    if ! jq -e '.data.exam' "$response_file" >/dev/null 2>&1; then
+        log_error "Missing exam object in response"
+        return 1
+    fi
+    
+    # Check exam structure
+    local valid=true
+    for field in "${required_fields[@]}"; do
+        if ! jq -e ".data.exam | has(\"$field\")" "$response_file" >/dev/null 2>&1; then
+            log_error "Missing exam field: $field"
+            valid=false
+        fi
+    done
+    
+    if [[ "$valid" == "true" ]]; then
+        log_info "✅ Single exam structure validation passed"
+        return 0
+    else
+        log_error "❌ Single exam structure validation failed"
+        return 1
+    fi
+}
+
+# Validate exam ID matches expected
+validate_exam_id() {
+    local response_file=$1
+    local expected_id=$2
+    
+    if ! command -v jq >/dev/null 2>&1; then
+        log_warn "jq not available, skipping exam ID validation"
+        return 0
+    fi
+    
+    local actual_id=$(jq -r '.data.exam.examId' "$response_file" 2>/dev/null || echo "")
+    
+    if [[ "$actual_id" == "$expected_id" ]]; then
+        log_info "✅ Exam ID matches: $actual_id"
+        return 0
+    else
+        log_error "❌ Exam ID mismatch - Expected: $expected_id, Got: $actual_id"
+        return 1
+    fi
+}
+
+# Validate exam level matches expected
+validate_exam_level() {
+    local response_file=$1
+    local expected_level=$2
+    
+    if ! command -v jq >/dev/null 2>&1; then
+        log_warn "jq not available, skipping exam level validation"
+        return 0
+    fi
+    
+    local actual_level=$(jq -r '.data.exam.level' "$response_file" 2>/dev/null || echo "")
+    
+    if [[ "$actual_level" == "$expected_level" ]]; then
+        log_info "✅ Exam level matches: $actual_level"
+        return 0
+    else
+        log_error "❌ Exam level mismatch - Expected: $expected_level, Got: $actual_level"
+        return 1
+    fi
+}
+
+# Validate provider is included in response
+validate_provider_included() {
+    local response_file=$1
+    local required_provider_fields=("id" "name" "fullName" "description" "website" "category")
+    
+    if ! command -v jq >/dev/null 2>&1; then
+        log_warn "jq not available, skipping provider validation"
+        return 0
+    fi
+    
+    # Check if provider exists in response
+    if ! jq -e '.data.provider' "$response_file" >/dev/null 2>&1; then
+        log_error "Missing provider object in response"
+        return 1
+    fi
+    
+    # Check provider structure
+    local valid=true
+    for field in "${required_provider_fields[@]}"; do
+        if ! jq -e ".data.provider | has(\"$field\")" "$response_file" >/dev/null 2>&1; then
+            log_error "Missing provider field: $field"
+            valid=false
+        fi
+    done
+    
+    if [[ "$valid" == "true" ]]; then
+        log_info "✅ Provider inclusion validation passed"
+        return 0
+    else
+        log_error "❌ Provider inclusion validation failed"
+        return 1
+    fi
+}
+
 # Main test sequence
 main() {
     log_info "Starting Exam Endpoints Test Suite"
@@ -374,6 +484,69 @@ main() {
         test_results+=("✅ Invalid Offset Parameter (400)")
     else
         test_results+=("❌ Invalid Offset Parameter (400)")
+    fi
+    echo
+
+    # Phase 9: Exam Details Tests
+    
+    # Test 11: Get specific exam by ID (AWS Cloud Practitioner)
+    total_tests=$((total_tests + 1))
+    if test_endpoint "GET" "/v1/exams/aws-clf-c02" "" "Get AWS Cloud Practitioner Exam" 200; then
+        validate_response "$TEMP_DIR/get_aws_cloud_practitioner_exam_response.json" "data"
+        validate_single_exam_structure "$TEMP_DIR/get_aws_cloud_practitioner_exam_response.json"
+        validate_exam_id "$TEMP_DIR/get_aws_cloud_practitioner_exam_response.json" "aws-clf-c02"
+        passed_tests=$((passed_tests + 1))
+        test_results+=("✅ Get AWS Cloud Practitioner Exam")
+    else
+        test_results+=("❌ Get AWS Cloud Practitioner Exam")
+    fi
+    echo
+
+    # Test 12: Get exam with provider details
+    total_tests=$((total_tests + 1))
+    if test_endpoint "GET" "/v1/exams/azure-az-900" "includeProvider=true" "Get Azure Fundamentals with Provider" 200; then
+        validate_response "$TEMP_DIR/get_azure_fundamentals_with_provider_response.json" "data"
+        validate_single_exam_structure "$TEMP_DIR/get_azure_fundamentals_with_provider_response.json"
+        validate_provider_included "$TEMP_DIR/get_azure_fundamentals_with_provider_response.json"
+        validate_exam_id "$TEMP_DIR/get_azure_fundamentals_with_provider_response.json" "azure-az-900"
+        passed_tests=$((passed_tests + 1))
+        test_results+=("✅ Get Azure Fundamentals with Provider")
+    else
+        test_results+=("❌ Get Azure Fundamentals with Provider")
+    fi
+    echo
+
+    # Test 13: Get another exam (Cisco CCNA)
+    total_tests=$((total_tests + 1))
+    if test_endpoint "GET" "/v1/exams/cisco-ccna" "" "Get Cisco CCNA Exam" 200; then
+        validate_response "$TEMP_DIR/get_cisco_ccna_exam_response.json" "data"
+        validate_single_exam_structure "$TEMP_DIR/get_cisco_ccna_exam_response.json"
+        validate_exam_id "$TEMP_DIR/get_cisco_ccna_exam_response.json" "cisco-ccna"
+        validate_exam_level "$TEMP_DIR/get_cisco_ccna_exam_response.json" "associate"
+        passed_tests=$((passed_tests + 1))
+        test_results+=("✅ Get Cisco CCNA Exam")
+    else
+        test_results+=("❌ Get Cisco CCNA Exam")
+    fi
+    echo
+
+    # Test 14: Get non-existent exam (should return 404)
+    total_tests=$((total_tests + 1))
+    if test_endpoint "GET" "/v1/exams/non-existent-exam-id" "" "Get Non-existent Exam" 404; then
+        passed_tests=$((passed_tests + 1))
+        test_results+=("✅ Get Non-existent Exam (404)")
+    else
+        test_results+=("❌ Get Non-existent Exam (404)")
+    fi
+    echo
+
+    # Test 15: Get exam without ID (invalid path - should return 404)
+    total_tests=$((total_tests + 1))
+    if test_endpoint "GET" "/v1/exams/" "" "Get Exam Without ID" 404; then
+        passed_tests=$((passed_tests + 1))
+        test_results+=("✅ Get Exam Without ID (404)")
+    else
+        test_results+=("❌ Get Exam Without ID (404)")
     fi
     echo
 

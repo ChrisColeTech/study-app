@@ -1,0 +1,57 @@
+{
+  "description": "Test fixture for getting Cisco CCNA exam details (professional level)",
+  "test_case": "get_exam_cisco_ccna",
+  "request": {
+    "method": "GET",
+    "path": "/v1/exams/cisco-ccna",
+    "query_params": {}
+  },
+  "expected_response": {
+    "success": true,
+    "message": "Exam retrieved successfully",
+    "data": {
+      "exam": {
+        "examId": "cisco-ccna",
+        "examName": "CCNA",
+        "examCode": "200-301",
+        "providerId": "cisco",
+        "providerName": "Cisco",
+        "description": "The CCNA certification validates your ability to install, configure, operate, and troubleshoot medium-size routed and switched networks.",
+        "level": "associate",
+        "duration": 120,
+        "questionCount": 120,
+        "passingScore": 825,
+        "topics": [
+          "Network Fundamentals",
+          "Network Access", 
+          "IP Connectivity",
+          "IP Services",
+          "Security Fundamentals",
+          "Automation and Programmability"
+        ],
+        "isActive": true,
+        "metadata": {
+          "lastUpdated": "2025-08-11T00:00:00.000Z",
+          "examUrl": "https://www.cisco.com/c/en/us/training-events/training-certifications/certifications/associate/ccna.html",
+          "cost": "$300",
+          "validityPeriod": 36,
+          "retakePolicy": "5 calendar days for failed attempts",
+          "languages": ["English", "Japanese"]
+        }
+      }
+    }
+  },
+  "validation": {
+    "status_code": 200,
+    "required_fields": ["success", "message", "data"],
+    "data_structure": {
+      "exam": {
+        "required_fields": ["examId", "examName", "examCode", "providerId", "providerName", "description", "level", "questionCount", "topics", "isActive", "metadata"],
+        "specific_values": {
+          "level": "associate",
+          "providerId": "cisco"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "description": "Test fixture for getting exam without providing exam ID (validation error)",
+  "test_case": "get_exam_missing_id",
+  "request": {
+    "method": "GET",
+    "path": "/v1/exams/",
+    "query_params": {}
+  },
+  "expected_response": {
+    "success": false,
+    "message": "Exam ID is required",
+    "error": {
+      "code": "VALIDATION_ERROR",
+      "message": "Exam ID is required"
+    }
+  },
+  "validation": {
+    "status_code": 400,
+    "required_fields": ["success", "message", "error"],
+    "data_structure": {
+      "error": {
+        "required_fields": ["code", "message"],
+        "types": {
+          "code": "string",
+          "message": "string"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,64 @@
+{
+  "description": "Test fixture for getting AWS Cloud Practitioner exam details",
+  "test_case": "get_exam_aws_cloud_practitioner",
+  "request": {
+    "method": "GET",
+    "path": "/v1/exams/aws-clf-c02",
+    "query_params": {}
+  },
+  "expected_response": {
+    "success": true,
+    "message": "Exam retrieved successfully",
+    "data": {
+      "exam": {
+        "examId": "aws-clf-c02",
+        "examName": "Cloud Practitioner",
+        "examCode": "CLF-C02",
+        "providerId": "aws",
+        "providerName": "AWS",
+        "description": "The AWS Certified Cloud Practitioner validates foundational, high-level understanding of AWS Cloud, services, and terminology.",
+        "level": "foundational",
+        "duration": 90,
+        "questionCount": 65,
+        "passingScore": 700,
+        "topics": [
+          "Cloud Concepts",
+          "AWS Services",
+          "Security and Compliance",
+          "Billing and Pricing"
+        ],
+        "isActive": true,
+        "metadata": {
+          "lastUpdated": "2025-08-11T00:00:00.000Z",
+          "examUrl": "https://aws.amazon.com/certification/",
+          "cost": "$100",
+          "validityPeriod": 36,
+          "retakePolicy": "14 days waiting period after failed attempt",
+          "languages": ["English", "Japanese", "Korean", "Simplified Chinese"]
+        }
+      }
+    }
+  },
+  "validation": {
+    "status_code": 200,
+    "required_fields": ["success", "message", "data"],
+    "data_structure": {
+      "exam": {
+        "required_fields": ["examId", "examName", "examCode", "providerId", "providerName", "description", "level", "questionCount", "topics", "isActive", "metadata"],
+        "types": {
+          "examId": "string",
+          "examName": "string", 
+          "examCode": "string",
+          "providerId": "string",
+          "providerName": "string",
+          "description": "string",
+          "level": "string",
+          "questionCount": "number",
+          "topics": "array",
+          "isActive": "boolean",
+          "metadata": "object"
+        }
+      }
+    }
+  }
+}

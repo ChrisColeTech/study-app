@@ -1,0 +1,65 @@
+{
+  "description": "Test fixture for getting exam details with provider information included",
+  "test_case": "get_exam_with_provider_details",
+  "request": {
+    "method": "GET",
+    "path": "/v1/exams/azure-az-900",
+    "query_params": {
+      "includeProvider": "true"
+    }
+  },
+  "expected_response": {
+    "success": true,
+    "message": "Exam retrieved successfully",
+    "data": {
+      "exam": {
+        "examId": "azure-az-900",
+        "examName": "Azure Fundamentals",
+        "examCode": "AZ-900",
+        "providerId": "azure",
+        "providerName": "Azure",
+        "description": "Microsoft Azure Fundamentals exam validates foundational knowledge of cloud services and how those services are provided with Microsoft Azure.",
+        "level": "foundational",
+        "duration": 85,
+        "questionCount": 60,
+        "passingScore": 700,
+        "topics": [
+          "Cloud Concepts",
+          "Azure Services",
+          "Azure Workloads",
+          "Security and Privacy",
+          "Azure Pricing and Support"
+        ],
+        "isActive": true,
+        "metadata": {
+          "lastUpdated": "2025-08-11T00:00:00.000Z",
+          "examUrl": "https://docs.microsoft.com/en-us/learn/certifications/azure-fundamentals/",
+          "cost": "$99",
+          "validityPeriod": 36,
+          "retakePolicy": "24 hours waiting period after failed attempt",
+          "languages": ["English", "Japanese", "Chinese (Simplified)", "Korean", "Spanish", "German", "French"]
+        }
+      },
+      "provider": {
+        "id": "azure",
+        "name": "Azure",
+        "fullName": "Microsoft Azure",
+        "description": "Microsoft Azure is a cloud computing service created by Microsoft for building, testing, deploying, and managing applications and services through Microsoft-managed data centers.",
+        "website": "https://docs.microsoft.com/en-us/learn/certifications/azure-fundamentals/",
+        "category": "cloud"
+      }
+    }
+  },
+  "validation": {
+    "status_code": 200,
+    "required_fields": ["success", "message", "data"],
+    "data_structure": {
+      "exam": {
+        "required_fields": ["examId", "examName", "examCode", "providerId", "providerName", "description", "level", "questionCount", "topics", "isActive", "metadata"]
+      },
+      "provider": {
+        "required_fields": ["id", "name", "fullName", "description", "website", "category"]
+      }
+    }
+  }
+}

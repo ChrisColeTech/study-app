@@ -49,6 +49,23 @@ export interface GetExamsResponse {
   };
 }
 
+export interface GetExamRequest {
+  includeProvider?: boolean;
+}
+
+export interface GetExamResponse {
+  exam: Exam;
+  provider?: {
+    id: string;
+    name: string;
+    fullName: string;
+    description: string;
+    website: string;
+    category: string;
+  };
+}
+
 export interface IExamService {
   getExams(request: GetExamsRequest): Promise<GetExamsResponse>;
+  getExam(examId: string, request: GetExamRequest): Promise<GetExamResponse>;
 }

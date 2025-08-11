@@ -6,7 +6,7 @@ import { HandlerContext, ApiResponse } from '../shared/types/api.types';
 import { ServiceFactory } from '../shared/service-factory';
 import { createLogger } from '../shared/logger';
 import { ERROR_CODES } from '../shared/constants/error.constants';
-import { GetExamsRequest } from '../shared/types/exam.types';
+import { GetExamsRequest, GetExamRequest } from '../shared/types/exam.types';
 
 export class ExamHandler extends BaseHandler {
   private serviceFactory: ServiceFactory;
@@ -24,6 +24,13 @@ export class ExamHandler extends BaseHandler {
         method: 'GET',
         path: '/v1/exams',
         handler: this.getExams.bind(this),
+        requireAuth: false, // Public endpoint for now
+      },
+      // Get specific exam by ID endpoint
+      {
+        method: 'GET',
+        path: '/v1/exams/{id}',
+        handler: this.getExam.bind(this),
         requireAuth: false, // Public endpoint for now
       }
     ];
@@ -132,6 +139,75 @@ export class ExamHandler extends BaseHandler {
       return this.error(
         ERROR_CODES.INTERNAL_ERROR,
         'Failed to retrieve exams'
+      );
+    }
+  }
+
+  /**
+   * Get a specific exam by ID
+   * GET /v1/exams/{id}?includeProvider=true
+   */
+  private async getExam(context: HandlerContext): Promise<ApiResponse> {
+    try {
+      // Extract exam ID from path parameters
+      const examId = context.event.pathParameters?.id;
+      
+      if (!examId) {
+        this.logger.warn('Exam ID not provided', { requestId: context.requestId });
+        return this.error(
+          ERROR_CODES.VALIDATION_ERROR,
+          'Exam ID is required'
+        );
+      }
+
+      this.logger.info('Getting exam by ID', { 
+        requestId: context.requestId,
+        examId,
+        queryParams: context.event.queryStringParameters
+      });
+
+      // Parse query parameters
+      const queryParams = context.event.queryStringParameters || {};
+      
+      const request: GetExamRequest = {};
+      
+      // Include provider flag
+      if (queryParams.includeProvider === 'true') {
+        request.includeProvider = true;
+      }
+
+      // Get exam from service
+      const examService = this.serviceFactory.getExamService();
+      const result = await examService.getExam(examId, request);
+
+      this.logger.info('Exam retrieved successfully', { 
+        requestId: context.requestId,
+        examId,
+        examName: result.exam.examName,
+        providerId: result.exam.providerId,
+        includeProvider: request.includeProvider
+      });
+
+      return this.success(result, 'Exam retrieved successfully');
+
+    } catch (error: any) {
+      this.logger.error('Failed to get exam', error, { 
+        requestId: context.requestId,
+        examId: context.event.pathParameters?.id,
+        queryParams: context.event.queryStringParameters
+      });
+
+      // Check if it's a 'not found' error
+      if (error.message === 'Exam not found') {
+        return this.error(
+          ERROR_CODES.NOT_FOUND,
+          'Exam not found'
+        );
+      }
+
+      return this.error(
+        ERROR_CODES.INTERNAL_ERROR,
+        'Failed to retrieve exam'
       );
     }
   }
