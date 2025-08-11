@@ -1,0 +1,36 @@
+{
+  "description": "Test fixture for listing exams with multiple comprehensive filters",
+  "method": "GET",
+  "endpoint": "/v1/exams",
+  "queryParams": {
+    "category": "cloud",
+    "level": "associate",
+    "difficultyMin": "3",
+    "difficultyMax": "4",
+    "costMin": "100",
+    "costMax": "200",
+    "sortBy": "difficulty",
+    "sortOrder": "asc",
+    "limit": "10"
+  },
+  "expectedStatus": 200,
+  "expectedFields": [
+    "exams",
+    "total",
+    "pagination",
+    "filters",
+    "aggregations"
+  ],
+  "validation": {
+    "maxExams": 10,
+    "allExamsMatchFilters": {
+      "category": "cloud",
+      "level": "associate",
+      "minDifficulty": 3,
+      "maxDifficulty": 4,
+      "minCost": 100,
+      "maxCost": 200
+    },
+    "sortedByDifficulty": "ascending"
+  }
+}

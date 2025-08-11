@@ -1,0 +1,16 @@
+{
+  "description": "Test fixture for listing exams with invalid category filter (should return 400)",
+  "method": "GET",
+  "endpoint": "/v1/exams",
+  "queryParams": {
+    "category": "invalid_category"
+  },
+  "expectedStatus": 400,
+  "expectedFields": [
+    "error",
+    "message"
+  ],
+  "validation": {
+    "errorContains": "Invalid category"
+  }
+}

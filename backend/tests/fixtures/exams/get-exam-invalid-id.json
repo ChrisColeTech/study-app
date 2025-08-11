@@ -1,0 +1,14 @@
+{
+  "description": "Test fixture for getting exam with non-existent ID (should return 404)",
+  "method": "GET",
+  "endpoint": "/v1/exams/non-existent-exam-id",
+  "queryParams": {},
+  "expectedStatus": 404,
+  "expectedFields": [
+    "error",
+    "message"
+  ],
+  "validation": {
+    "errorContains": "not found"
+  }
+}

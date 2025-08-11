@@ -1,0 +1,26 @@
+{
+  "description": "Test fixture for listing exams filtered by provider (AWS)",
+  "method": "GET",
+  "endpoint": "/v1/exams",
+  "queryParams": {
+    "providerId": "aws"
+  },
+  "expectedStatus": 200,
+  "expectedFields": [
+    "exams",
+    "total",
+    "pagination",
+    "filters",
+    "aggregations"
+  ],
+  "validation": {
+    "minExams": 2,
+    "allExamsMatchProvider": "aws",
+    "requiredExamFields": [
+      "id",
+      "providerId",
+      "providerName",
+      "name"
+    ]
+  }
+}

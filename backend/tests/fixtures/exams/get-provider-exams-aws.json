@@ -1,0 +1,31 @@
+{
+  "description": "Test fixture for getting all AWS provider exams",
+  "method": "GET",
+  "endpoint": "/v1/providers/aws/exams",
+  "queryParams": {},
+  "expectedStatus": 200,
+  "expectedFields": [
+    "provider",
+    "exams",
+    "total",
+    "certificationPaths"
+  ],
+  "validation": {
+    "providerId": "aws",
+    "minExams": 2,
+    "allExamsFromProvider": "aws",
+    "requiredProviderFields": [
+      "id",
+      "name",
+      "fullName"
+    ],
+    "hasCertificationPaths": true,
+    "requiredExamFields": [
+      "id",
+      "providerId",
+      "name",
+      "level",
+      "metadata"
+    ]
+  }
+}

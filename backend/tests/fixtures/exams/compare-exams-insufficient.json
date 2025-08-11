@@ -1,0 +1,18 @@
+{
+  "description": "Test fixture for comparing with only one exam (should return 400)",
+  "method": "POST",
+  "endpoint": "/v1/exams/compare",
+  "body": {
+    "examIds": [
+      "aws-aws-clf-c02"
+    ]
+  },
+  "expectedStatus": 400,
+  "expectedFields": [
+    "error",
+    "message"
+  ],
+  "validation": {
+    "errorContains": "At least 2 exam"
+  }
+}

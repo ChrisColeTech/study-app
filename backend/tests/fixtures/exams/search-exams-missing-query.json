@@ -1,0 +1,14 @@
+{
+  "description": "Test fixture for exam search without query parameter (should return 400)",
+  "method": "GET",
+  "endpoint": "/v1/exams/search",
+  "queryParams": {},
+  "expectedStatus": 400,
+  "expectedFields": [
+    "error",
+    "message"
+  ],
+  "validation": {
+    "errorContains": "query parameter"
+  }
+}

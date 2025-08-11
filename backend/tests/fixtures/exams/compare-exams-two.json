@@ -1,0 +1,42 @@
+{
+  "description": "Test fixture for comparing two exams (minimum case)",
+  "method": "POST",
+  "endpoint": "/v1/exams/compare",
+  "body": {
+    "examIds": [
+      "aws-aws-clf-c02",
+      "aws-aws-saa-c03"
+    ]
+  },
+  "expectedStatus": 200,
+  "expectedFields": [
+    "comparison",
+    "metadata"
+  ],
+  "validation": {
+    "examCount": 2,
+    "requiredComparisonFields": [
+      "exams",
+      "comparisonMatrix",
+      "recommendations"
+    ],
+    "requiredMatrixFields": [
+      "difficulty",
+      "cost",
+      "duration",
+      "passRate",
+      "marketDemand",
+      "prerequisites",
+      "jobOpportunities"
+    ],
+    "requiredRecommendationFields": [
+      "bestOverall",
+      "easiest",
+      "mostAffordable",
+      "highestDemand",
+      "bestForBeginner",
+      "reasoning"
+    ],
+    "hasReasoningForAllExams": true
+  }
+}
