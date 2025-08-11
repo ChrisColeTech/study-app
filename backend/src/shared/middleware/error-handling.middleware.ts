@@ -153,6 +153,7 @@ export class ErrorHandlingMiddleware {
   ): ApiResponse {
     const errorResponse: any = {
       success: false,
+      message,
       error: {
         code,
         message

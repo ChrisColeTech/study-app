@@ -216,10 +216,10 @@ export class QuestionRepository implements IQuestionRepository {
   }
 
   /**
-   * Search questions by text content
+   * Search questions by text content with enhanced matching
    */
   async searchQuestions(query: string, provider?: string, exam?: string): Promise<Question[]> {
-    const searchTerms = query.toLowerCase().split(' ').filter(term => term.length > 0);
+    const searchTerms = query.toLowerCase().split(' ').filter(term => term.length >= 2); // Minimum 2 characters
     
     let questionsToSearch: Question[];
     
@@ -228,7 +228,9 @@ export class QuestionRepository implements IQuestionRepository {
     } else if (provider) {
       questionsToSearch = await this.findByProvider(provider);
     } else {
-      questionsToSearch = await this.getAllQuestions();
+      // When no provider specified, search across available data
+      // Start with available providers to avoid loading all data
+      questionsToSearch = await this.getSearchableQuestions();
     }
 
     return questionsToSearch.filter(question => {
@@ -236,11 +238,66 @@ export class QuestionRepository implements IQuestionRepository {
         question.questionText,
         ...(question.options || []),
         question.explanation || '',
-        ...(question.tags || [])
+        ...(question.tags || []),
+        question.topicId || ''
       ].join(' ').toLowerCase();
 
-      return searchTerms.every(term => searchableText.includes(term));
+      // Enhanced search: either all terms match or at least 60% of terms match for longer queries
+      const matchCount = searchTerms.filter(term => searchableText.includes(term)).length;
+      const requiredMatches = searchTerms.length <= 2 ? searchTerms.length : Math.ceil(searchTerms.length * 0.6);
+      
+      return matchCount >= requiredMatches;
     });
+  }
+
+  /**
+   * Get searchable questions efficiently (prioritize popular providers)
+   */
+  private async getSearchableQuestions(): Promise<Question[]> {
+    const cacheKey = 'searchable-questions';
+    
+    // Check cache first
+    const cached = this.getFromCache<Question[]>(cacheKey);
+    if (cached) {
+      this.logger.debug('Searchable questions retrieved from cache');
+      return cached;
+    }
+
+    try {
+      // Start with AWS questions (most popular), then expand if needed
+      const popularProviders = ['aws', 'azure', 'gcp', 'cisco', 'comptia'];
+      const allQuestions: Question[] = [];
+      
+      for (const provider of popularProviders) {
+        try {
+          const providerQuestions = await this.findByProvider(provider);
+          allQuestions.push(...providerQuestions);
+          
+          // If we have enough questions for search, stop here for performance
+          if (allQuestions.length >= 1000) {
+            break;
+          }
+        } catch (error) {
+          this.logger.warn(`Failed to load questions for provider: ${provider}`, {
+            error: (error as Error).message
+          });
+          // Continue with other providers
+        }
+      }
+
+      // Cache the results with shorter TTL for search data
+      this.setCache(cacheKey, allQuestions, 10 * 60 * 1000); // 10 minutes TTL
+      
+      this.logger.info('Searchable questions loaded', { 
+        totalQuestions: allQuestions.length,
+        providers: [...new Set(allQuestions.map(q => q.providerId))]
+      });
+
+      return allQuestions;
+    } catch (error) {
+      this.logger.error('Failed to load searchable questions', error as Error);
+      return [];
+    }
   }
 
   /**
@@ -517,11 +574,11 @@ export class QuestionRepository implements IQuestionRepository {
   /**
    * Store data in cache with TTL
    */
-  private setCache<T>(key: string, data: T): void {
+  private setCache<T>(key: string, data: T, customTtl?: number): void {
     this.cache.set(key, {
       data,
       timestamp: Date.now(),
-      ttl: this.CACHE_TTL
+      ttl: customTtl || this.CACHE_TTL
     });
   }
 }
