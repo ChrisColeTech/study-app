@@ -1,7 +1,7 @@
 // CrudHandler pattern for standard CRUD operations
 
 import { BaseHandler, RouteConfig } from './base-handler';
-import { HandlerContext, ApiResponse, PaginationParams } from './types/api.types';
+import { HandlerContext, ApiResponse, PaginationParams, ValidationError } from './types/api.types';
 import { ERROR_CODES } from './constants/error.constants';
 
 export interface CrudEntity {
@@ -323,7 +323,7 @@ export abstract class CrudHandler<T extends CrudEntity> extends BaseHandler {
    * Validate data for create operation
    * Override in concrete implementations
    */
-  protected async validateCreateData(data: any): Promise<{ isValid: boolean; errors?: any[] }> {
+  protected async validateCreateData(data: unknown): Promise<{ isValid: boolean; errors?: ValidationError[] }> {
     // Default implementation - always valid
     // Override in concrete implementations with actual validation
     return { isValid: true };
@@ -333,7 +333,7 @@ export abstract class CrudHandler<T extends CrudEntity> extends BaseHandler {
    * Validate data for update operation
    * Override in concrete implementations
    */
-  protected async validateUpdateData(data: any): Promise<{ isValid: boolean; errors?: any[] }> {
+  protected async validateUpdateData(data: unknown): Promise<{ isValid: boolean; errors?: ValidationError[] }> {
     // Default implementation - always valid
     // Override in concrete implementations with actual validation
     return { isValid: true };

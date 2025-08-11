@@ -12,15 +12,21 @@ export interface LogContext {
   userId?: string;
   sessionId?: string;
   functionName?: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
+
+export type LogError = 
+  | Error 
+  | { name?: string; message: string; stack?: string; [key: string]: unknown }
+  | string
+  | unknown;
 
 export interface LogEntry {
   level: keyof typeof LogLevel;
   message: string;
   context?: LogContext;
   timestamp: string;
-  error?: any;
+  error?: LogError;
   duration?: number;
 }
 
@@ -53,7 +59,7 @@ class Logger {
     this.log(LogLevel.WARN, message, context);
   }
 
-  public error(message: string, error?: any, context?: LogContext): void {
+  public error(message: string, error?: LogError, context?: LogContext): void {
     this.log(LogLevel.ERROR, message, context, error);
   }
 
@@ -63,14 +69,14 @@ class Logger {
 
   public timeEnd(label: string, message?: string): void {
     const startTime = this.context[`timer_${label}_start`];
-    if (startTime) {
+    if (typeof startTime === 'number') {
       const duration = Date.now() - startTime;
       this.info(message || `Timer ${label} completed`, { duration });
       delete this.context[`timer_${label}_start`];
     }
   }
 
-  private log(level: LogLevel, message: string, context?: LogContext, error?: any): void {
+  private log(level: LogLevel, message: string, context?: LogContext, error?: LogError): void {
     if (level < this.logLevel) {
       return;
     }
@@ -83,12 +89,19 @@ class Logger {
     };
 
     if (error) {
-      logEntry.error = {
-        name: error.name,
-        message: error.message,
-        stack: error.stack,
-        ...error,
-      };
+      if (error instanceof Error) {
+        logEntry.error = {
+          name: error.name,
+          message: error.message,
+          stack: error.stack,
+        };
+      } else if (typeof error === 'string') {
+        logEntry.error = { message: error };
+      } else if (error && typeof error === 'object' && 'message' in error) {
+        logEntry.error = error;
+      } else {
+        logEntry.error = { message: 'Unknown error', details: error };
+      }
     }
 
     const output = JSON.stringify(logEntry, null, 0);

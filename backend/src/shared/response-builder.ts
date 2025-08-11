@@ -1,7 +1,7 @@
 // API response builder utility
 
 import { APIGatewayProxyResult } from 'aws-lambda';
-import { ApiResponse, ApiSuccessResponse, ApiErrorResponse } from './types/api.types';
+import { ApiResponse, ApiSuccessResponse, ApiErrorResponse, ErrorDetails } from './types/api.types';
 import { HTTP_STATUS_CODES, COMMON_HEADERS } from './constants/api.constants';
 import { ERROR_CODES, ERROR_MESSAGES, ErrorCode } from './constants/error.constants';
 
@@ -55,7 +55,7 @@ export class ResponseBuilder {
     errorCode: ErrorCode | string,
     message?: string,
     statusCode: number = HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
-    details?: any,
+    details?: ErrorDetails,
     requestId?: string
   ): APIGatewayProxyResult {
     const errorMessage = message || ERROR_MESSAGES[errorCode as ErrorCode] || 'An error occurred';

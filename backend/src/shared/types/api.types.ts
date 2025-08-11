@@ -20,11 +20,13 @@ export interface ApiErrorResponse {
   error: {
     code: string;
     message: string;
-    details?: any;
+    details?: ErrorDetails;
   };
   timestamp: string;
   requestId?: string | undefined;
 }
+
+export type ErrorDetails = unknown;
 
 export type ApiResponse<T = any> = ApiSuccessResponse<T> | ApiErrorResponse;
 

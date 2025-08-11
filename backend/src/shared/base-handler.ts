@@ -6,7 +6,8 @@ import {
   RouteHandler, 
   HttpMethod, 
   ApiResponse,
-  LambdaHandler
+  LambdaHandler,
+  ErrorDetails
 } from './types/api.types';
 import { ResponseBuilder } from './response-builder';
 import { createLogger } from './logger';
@@ -145,7 +146,7 @@ export abstract class BaseHandler {
       }
     } catch (error) {
       const logger = createLogger({ requestId: context.requestId });
-      logger.warn('Failed to parse authentication token', error as Error);
+      logger.error('Failed to parse authentication token', error as Error);
       // Don't throw error, just leave as unauthenticated
     }
   }
@@ -213,7 +214,7 @@ export abstract class BaseHandler {
   /**
    * Helper method to create error responses
    */
-  protected error(code: string, message: string, details?: any): ApiResponse {
+  protected error(code: string, message: string, details?: ErrorDetails): ApiResponse {
     return {
       success: false,
       error: {
