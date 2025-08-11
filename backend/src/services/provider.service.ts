@@ -385,12 +385,9 @@ export class ProviderService implements IProviderService {
       }
 
       const response: GetCertificationRoadmapResponse = {
-        roadmaps: filteredRoadmaps
+        roadmaps: filteredRoadmaps,
+        personalizedRecommendations
       };
-      
-      if (personalizedRecommendations) {
-        response.personalizedRecommendations = personalizedRecommendations;
-      }
 
       this.logger.info('Certification roadmaps retrieved successfully', { 
         providerId: request.providerId,
@@ -442,12 +439,9 @@ export class ProviderService implements IProviderService {
 
       const response: GetStudyPathRecommendationsResponse = {
         recommendations,
+        alternativeProviders: alternativeProviders.length > 0 ? alternativeProviders : undefined,
         totalRecommendations: recommendations.length
       };
-      
-      if (alternativeProviders.length > 0) {
-        response.alternativeProviders = alternativeProviders;
-      }
 
       this.logger.info('Study path recommendations retrieved successfully', { 
         providerId: request.providerId,
@@ -896,7 +890,7 @@ export class ProviderService implements IProviderService {
     
     provider.certifications.forEach(cert => {
       cert.studyResources?.forEach((resource, index) => {
-        const providerResource: ProviderResource = {
+        resources.push({
           id: `${provider.id}-${cert.id}-resource-${index}`,
           title: resource.title,
           type: resource.type,
@@ -906,25 +900,18 @@ export class ProviderService implements IProviderService {
           url: resource.url,
           description: resource.description || '',
           isFree: resource.isFree,
+          cost: resource.isFree ? 0 : undefined,
           language: 'English', // Default language
           difficulty: cert.metadata?.difficultyLevel || 3,
+          rating: 4.2, // Default rating
+          reviewCount: 150,
           lastUpdated: new Date().toISOString(),
           tags: cert.topics || [],
           metadata: {
             publisher: resource.provider,
             format: 'online'
           }
-        };
-        
-        // Only set optional properties if they have values
-        if (!resource.isFree) {
-          providerResource.cost = 150; // Default cost for paid resources
-        }
-        
-        providerResource.rating = 4.2; // Default rating
-        providerResource.reviewCount = 150;
-        
-        resources.push(providerResource);
+        });
       });
     });
 
