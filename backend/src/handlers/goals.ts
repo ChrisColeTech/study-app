@@ -48,6 +48,12 @@ export class GoalsHandler extends BaseHandler {
       },
       {
         method: 'GET',
+        path: '/v1/goals/stats',
+        handler: this.getGoalStats.bind(this),
+        requireAuth: true,
+      },
+      {
+        method: 'GET',
         path: '/v1/goals/{id}',
         handler: this.getGoal.bind(this),
         requireAuth: true,
@@ -62,12 +68,6 @@ export class GoalsHandler extends BaseHandler {
         method: 'DELETE',
         path: '/v1/goals/{id}',
         handler: this.deleteGoal.bind(this),
-        requireAuth: true,
-      },
-      {
-        method: 'GET',
-        path: '/v1/goals/stats',
-        handler: this.getGoalStats.bind(this),
         requireAuth: true,
       }
     ];

@@ -25,7 +25,7 @@ export class GoalsRepository implements IGoalsRepository {
   constructor(dynamoClient: DynamoDBDocumentClient, config: ServiceConfig) {
     this.docClient = dynamoClient;
     this.tableName = config.tables.goals;
-    this.userIdIndexName = 'UserIdIndex'; // GSI for querying by userId
+    this.userIdIndexName = 'UserGoalsIndex'; // GSI for querying by userId
   }
 
   /**
