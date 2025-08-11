@@ -1,0 +1,20 @@
+{
+  "comment": "Update user preferences - Future implementation",
+  "studyReminders": true,
+  "emailNotifications": {
+    "goalDeadlines": true,
+    "streakReminders": false,
+    "weeklyProgress": true
+  },
+  "studySettings": {
+    "defaultSessionLength": 30,
+    "autoAdvanceQuestions": true,
+    "showTimerDuringStudy": true,
+    "pauseOnIncorrect": false
+  },
+  "displaySettings": {
+    "theme": "light",
+    "fontSize": "medium",
+    "showProgressBar": true
+  }
+}

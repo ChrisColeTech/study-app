@@ -1,0 +1,5 @@
+{
+  "comment": "Update session with invalid action - Phase 17 error testing",
+  "action": "invalid-action",
+  "status": "active"
+}

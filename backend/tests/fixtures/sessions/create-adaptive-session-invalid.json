@@ -1,0 +1,7 @@
+{
+  "comment": "Create adaptive session with invalid session type - Phase 22 error testing",
+  "examId": "aws-clf-c02", 
+  "providerId": "aws",
+  "sessionType": "invalid-type",
+  "questionCount": 20
+}

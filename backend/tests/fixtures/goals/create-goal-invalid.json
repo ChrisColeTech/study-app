@@ -1,0 +1,6 @@
+{
+  "comment": "Create goal with missing required fields - Phase 18 error testing",
+  "title": "",
+  "targetValue": -1,
+  "targetDate": "invalid-date"
+}

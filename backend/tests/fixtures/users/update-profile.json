@@ -1,0 +1,12 @@
+{
+  "comment": "Update user profile - Future implementation",
+  "firstName": "John",
+  "lastName": "Doe",
+  "email": "john.doe@example.com",
+  "timezone": "America/New_York",
+  "studyPreferences": {
+    "defaultQuestionCount": 20,
+    "preferredDifficulty": "medium",
+    "showExplanations": true
+  }
+}

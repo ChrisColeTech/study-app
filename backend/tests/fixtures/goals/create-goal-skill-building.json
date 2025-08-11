@@ -1,0 +1,11 @@
+{
+  "comment": "Create skill building goal - Phase 18 testing",
+  "title": "Master Cloud Security Fundamentals",
+  "description": "Build comprehensive understanding of cloud security across all providers",
+  "type": "skill_building",
+  "targetValue": 90,
+  "currentValue": 0,
+  "targetDate": "2025-10-31T00:00:00.000Z",
+  "topics": ["security", "compliance", "identity"],
+  "priority": "medium"
+}

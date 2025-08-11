@@ -1,0 +1,4 @@
+{
+  "comment": "Get exam with empty ID - error testing", 
+  "examId": ""
+}

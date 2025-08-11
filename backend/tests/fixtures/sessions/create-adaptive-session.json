@@ -1,0 +1,9 @@
+{
+  "comment": "Create adaptive session request - Phase 22 testing",
+  "examId": "aws-clf-c02",
+  "providerId": "aws",
+  "sessionType": "practice",
+  "questionCount": 20,
+  "topics": ["security", "compute", "storage"],
+  "timeLimit": 60
+}

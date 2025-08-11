@@ -1,0 +1,8 @@
+{
+  "comment": "Submit multiple choice answer - Phase 20 testing",
+  "questionId": "aws-clf-002",
+  "answer": ["B", "C"],
+  "timeSpent": 90,
+  "skipped": false,
+  "markedForReview": true
+}

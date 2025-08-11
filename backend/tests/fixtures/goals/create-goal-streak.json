@@ -1,0 +1,10 @@
+{
+  "comment": "Create streak maintenance goal - Phase 18 testing",
+  "title": "30-Day Study Streak",
+  "description": "Study consistently for 30 days without missing a day",
+  "type": "streak_maintenance",
+  "targetValue": 30,
+  "currentValue": 0,
+  "targetDate": "2025-09-15T00:00:00.000Z",
+  "priority": "low"
+}

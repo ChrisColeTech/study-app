@@ -1,0 +1,5 @@
+{
+  "comment": "Progress analytics with invalid timeframe - Phase 23 error testing",
+  "timeframe": "invalid-period",
+  "providerId": "aws"
+}

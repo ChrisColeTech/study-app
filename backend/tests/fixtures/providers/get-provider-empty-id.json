@@ -1,0 +1,4 @@
+{
+  "comment": "Get provider with empty ID - error testing",
+  "providerId": ""
+}

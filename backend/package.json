@@ -20,8 +20,12 @@
     "test:endpoints": "./scripts/test/test-all-endpoints.sh",
     "test:endpoints:auth": "./scripts/test/test-auth-endpoints.sh",
     "test:endpoints:providers": "./scripts/test/test-provider-endpoints.sh",
+    "test:endpoints:exams": "./scripts/test/test-exam-endpoints.sh",
+    "test:endpoints:topics": "./scripts/test/test-topic-endpoints.sh",
     "test:endpoints:sessions": "./scripts/test/test-session-endpoints.sh",
     "test:endpoints:questions": "./scripts/test/test-question-endpoints.sh",
+    "test:endpoints:analytics": "./scripts/test/test-analytics-endpoints.sh",
+    "test:endpoints:goals": "./scripts/test/test-goals-endpoints.sh",
     "test:endpoints:users": "./scripts/test/test-user-endpoints.sh",
     "local:start": "sam local start-api",
     "local:invoke": "sam local invoke"

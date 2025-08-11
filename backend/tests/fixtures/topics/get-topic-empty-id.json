@@ -1,0 +1,4 @@
+{
+  "comment": "Get topic with empty ID - error testing",
+  "topicId": ""
+}

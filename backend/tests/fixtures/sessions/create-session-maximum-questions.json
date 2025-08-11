@@ -1,0 +1,8 @@
+{
+  "comment": "Create session with maximum allowed questions - boundary testing",
+  "examId": "aws-clf-c02",
+  "providerId": "aws",
+  "sessionType": "practice",
+  "questionCount": 200,
+  "timeLimit": 300
+}

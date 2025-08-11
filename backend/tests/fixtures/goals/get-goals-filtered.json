@@ -1,0 +1,9 @@
+{
+  "comment": "Get goals with filtering - Phase 18 testing (query params)",
+  "status": "active",
+  "type": "exam_preparation", 
+  "providerId": "aws",
+  "priority": "high",
+  "limit": 10,
+  "offset": 0
+}

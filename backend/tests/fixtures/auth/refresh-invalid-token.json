@@ -1,0 +1,4 @@
+{
+  "comment": "Refresh with invalid token format - error testing",
+  "refreshToken": "invalid-token-format-12345"
+}

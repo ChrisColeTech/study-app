@@ -1,0 +1,8 @@
+{
+  "comment": "Submit answer marked for review only - Phase 20 testing",
+  "questionId": "aws-clf-004",
+  "answer": ["D"],
+  "timeSpent": 120,
+  "skipped": false,
+  "markedForReview": true
+}

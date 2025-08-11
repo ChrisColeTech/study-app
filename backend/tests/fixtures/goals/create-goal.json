@@ -1,0 +1,13 @@
+{
+  "comment": "Create new study goal - Phase 18 testing",
+  "title": "AWS Solutions Architect Certification",
+  "description": "Complete AWS SAA-C03 certification preparation",
+  "type": "exam_preparation",
+  "targetValue": 85,
+  "currentValue": 0,
+  "targetDate": "2025-12-01T00:00:00.000Z",
+  "providerId": "aws",
+  "examId": "aws-saa-c03",
+  "topics": ["compute", "storage", "networking", "security"],
+  "priority": "high"
+}

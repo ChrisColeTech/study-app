@@ -1,0 +1,9 @@
+{
+  "comment": "Performance analytics request - Phase 25 testing",
+  "timeframe": "quarter",
+  "providerId": "aws",
+  "topics": ["security", "compute", "storage", "networking"],
+  "startDate": "2025-05-01T00:00:00.000Z",
+  "endDate": "2025-08-01T00:00:00.000Z",
+  "includeCompetencyMatrix": true
+}

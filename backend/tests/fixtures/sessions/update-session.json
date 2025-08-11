@@ -1,0 +1,5 @@
+{
+  "comment": "Update session with pause action - Phase 17 testing",
+  "action": "pause",
+  "status": "paused"
+}

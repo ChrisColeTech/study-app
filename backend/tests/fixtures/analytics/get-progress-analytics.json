@@ -1,0 +1,9 @@
+{
+  "comment": "Progress analytics request - Phase 23 testing",
+  "timeframe": "month",
+  "providerId": "aws",
+  "examId": "aws-clf-c02",
+  "startDate": "2025-07-01T00:00:00.000Z",
+  "endDate": "2025-08-11T23:59:59.999Z",
+  "limit": 50
+}

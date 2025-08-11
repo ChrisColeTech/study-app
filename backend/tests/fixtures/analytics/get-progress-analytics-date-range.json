@@ -1,0 +1,8 @@
+{
+  "comment": "Progress analytics with custom date range - Phase 23 testing",
+  "startDate": "2025-06-01T00:00:00.000Z",
+  "endDate": "2025-08-11T23:59:59.999Z",
+  "providerId": "aws",
+  "examId": "aws-clf-c02",
+  "limit": 100
+}
