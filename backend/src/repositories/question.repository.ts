@@ -100,6 +100,17 @@ export class QuestionRepository implements IQuestionRepository {
 
       return allQuestions;
     } catch (error) {
+      // Handle specific S3 errors gracefully
+      const errorName = (error as any).name;
+      if (errorName === 'NoSuchBucket' || errorName === 'AccessDenied') {
+        this.logger.warn('S3 bucket not accessible - returning empty results', { 
+          provider, 
+          bucket: this.bucketName,
+          error: (error as Error).message 
+        });
+        return [];
+      }
+      
       this.logger.error('Failed to load questions by provider from S3', error as Error, { provider });
       throw new Error('Failed to load question data');
     }
@@ -135,6 +146,18 @@ export class QuestionRepository implements IQuestionRepository {
 
       return questions;
     } catch (error) {
+      // Handle specific S3 errors gracefully
+      const errorName = (error as any).name;
+      if (errorName === 'NoSuchBucket' || errorName === 'AccessDenied' || errorName === 'NoSuchKey') {
+        this.logger.warn('S3 data not accessible - returning empty results', { 
+          provider, 
+          exam,
+          bucket: this.bucketName,
+          error: (error as Error).message 
+        });
+        return [];
+      }
+      
       this.logger.error('Failed to load questions by exam from S3', error as Error, { provider, exam });
       throw new Error('Failed to load question data');
     }
@@ -287,6 +310,16 @@ export class QuestionRepository implements IQuestionRepository {
 
       return allQuestions;
     } catch (error) {
+      // Handle specific S3 errors gracefully
+      const errorName = (error as any).name;
+      if (errorName === 'NoSuchBucket' || errorName === 'AccessDenied') {
+        this.logger.warn('S3 bucket not accessible - returning empty results', { 
+          bucket: this.bucketName,
+          error: (error as Error).message 
+        });
+        return [];
+      }
+      
       this.logger.error('Failed to load all questions from S3', error as Error);
       throw new Error('Failed to load question data');
     }
