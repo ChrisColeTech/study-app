@@ -88,79 +88,10 @@ export class ApiGatewayConstruct extends Construct {
       }
     });
 
-    // Providers endpoints with special handling
-    const providersResource = v1.addResource('providers');
-    const providersLambda = props.lambdaFunctions.providers;
-    const providersIntegration = new cdk.aws_apigateway.LambdaIntegration(providersLambda, {
-      proxy: true,
-      allowTestInvoke: !config.isProduction,
-    });
-
-    // Provider endpoints
-    providersResource.addMethod('GET', providersIntegration);
-    providersResource.addMethod('POST', providersIntegration);
-
-    // Add {id} resource for individual provider operations
-    const providerIdResource = providersResource.addResource('{id}');
-    providerIdResource.addMethod('GET', providersIntegration);
-    providerIdResource.addMethod('PUT', providersIntegration);
-    providerIdResource.addMethod('DELETE', providersIntegration);
-
-    // Add provider sub-resources BEFORE {providerId} to avoid conflicts
-    const providerCacheResource = providersResource.addResource('cache');
-    const providerRefreshResource = providerCacheResource.addResource('refresh');
-    providerRefreshResource.addMethod('POST', providersIntegration);
-
-    const providerRecommendationsResource = providersResource.addResource('recommendations');
-    const personalizedRecommendationsResource = providerRecommendationsResource.addResource('personalized');
-    personalizedRecommendationsResource.addMethod('POST', providersIntegration);
-
-    // Provider-specific sub-resources after {providerId}
-    const providerIdRoadmapsResource = providerIdResource.addResource('roadmaps');
-    providerIdRoadmapsResource.addMethod('GET', providersIntegration);
-    
-    const providerIdRecommendationsResource = providerIdResource.addResource('recommendations');
-    const studyPathsResource = providerIdRecommendationsResource.addResource('study-paths');
-    studyPathsResource.addMethod('POST', providersIntegration);
-    
-    const providerIdResourcesResource = providerIdResource.addResource('resources');
-    providerIdResourcesResource.addMethod('GET', providersIntegration);
-
-    // Provider-specific exams endpoint (for exam service)
-    const providerExamsResource = providerIdResource.addResource('exams');
-    const examsLambda = props.lambdaFunctions.exams;
-    providerExamsResource.addMethod('GET', new cdk.aws_apigateway.LambdaIntegration(examsLambda, {
-      proxy: true,
-      allowTestInvoke: !config.isProduction,
-    }));
-
-    // Exams endpoints with special handling - Phase 8
-    const examsResource = v1.addResource('exams');
-    const examsIntegration = new cdk.aws_apigateway.LambdaIntegration(examsLambda, {
-      proxy: true,
-      allowTestInvoke: !config.isProduction,
-    });
-
-    // Main exams endpoints
-    examsResource.addMethod('GET', examsIntegration);
-
-    // Add exam sub-resources BEFORE {id} to avoid conflicts
-    const examSearchResource = examsResource.addResource('search');
-    examSearchResource.addMethod('GET', examsIntegration);
-
-    const examCompareResource = examsResource.addResource('compare');
-    examCompareResource.addMethod('POST', examsIntegration);
-
-    const examCacheResource = examsResource.addResource('cache');
-    const examRefreshResource = examCacheResource.addResource('refresh');
-    examRefreshResource.addMethod('POST', examsIntegration);
-
-    // Add {id} resource for individual exam operations AFTER specific sub-resources
-    const examIdResource = examsResource.addResource('{id}');
-    examIdResource.addMethod('GET', examsIntegration);
-
-    // Other endpoint configurations (simplified placeholders)
-    const placeholderConfigs = [
+    // Other endpoint configurations
+    const endpointConfigs = [
+      { resource: 'providers', methods: ['GET', 'POST'] }, // Added POST for cache refresh
+      { resource: 'exams', methods: ['GET'] },
       { resource: 'topics', methods: ['GET'] },
       { resource: 'questions', methods: ['GET', 'POST'] },
       { resource: 'sessions', methods: ['GET', 'POST', 'PUT', 'DELETE'] },
@@ -169,7 +100,7 @@ export class ApiGatewayConstruct extends Construct {
     ];
 
     // Create placeholder endpoints
-    placeholderConfigs.forEach(({ resource, methods }) => {
+    endpointConfigs.forEach(({ resource, methods }) => {
       const apiResource = v1.addResource(resource);
       const lambda = props.lambdaFunctions[resource];
       
@@ -179,6 +110,7 @@ export class ApiGatewayConstruct extends Construct {
           allowTestInvoke: !config.isProduction,
         });
 
+        // All endpoints are public for now - authorization in future phase
         apiResource.addMethod(method, integration);
       });
 
@@ -189,6 +121,16 @@ export class ApiGatewayConstruct extends Construct {
           proxy: true,
         }));
       });
+
+      // Special handling for providers - add cache/refresh sub-resource
+      if (resource === 'providers') {
+        const cacheResource = apiResource.addResource('cache');
+        const refreshResource = cacheResource.addResource('refresh');
+        refreshResource.addMethod('POST', new cdk.aws_apigateway.LambdaIntegration(lambda, {
+          proxy: true,
+          allowTestInvoke: !config.isProduction,
+        }));
+      }
     });
 
     // Output API URL
