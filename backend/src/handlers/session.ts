@@ -4,11 +4,11 @@
 import { BaseHandler, RouteConfig } from '../shared/base-handler';
 import { HandlerContext, ApiResponse } from '../shared/types/api.types';
 import { ServiceFactory } from '../shared/service-factory';
+import { SessionService } from '../services/session.service';
 import { createLogger } from '../shared/logger';
 import { ERROR_CODES } from '../shared/constants/error.constants';
 import { 
-  CreateSessionRequest,
-  ISessionService
+  CreateSessionRequest
 } from '../shared/types/session.types';
 
 export class SessionHandler extends BaseHandler {
@@ -326,7 +326,7 @@ export class SessionHandler extends BaseHandler {
       });
 
       // Get session through service
-      const sessionService: ISessionService = this.serviceFactory.getSessionService();
+      const sessionService: SessionService = this.serviceFactory.getSessionService() as SessionService;
       const result = await sessionService.getSession(sessionId, context.userId);
 
       this.logger.info('Session retrieved successfully', { 
