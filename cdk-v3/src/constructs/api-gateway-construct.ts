@@ -90,7 +90,7 @@ export class ApiGatewayConstruct extends Construct {
 
     // Other endpoint configurations
     const endpointConfigs = [
-      { resource: 'providers', methods: ['GET'] },
+      { resource: 'providers', methods: ['GET', 'POST'] }, // Added POST for cache refresh
       { resource: 'exams', methods: ['GET'] },
       { resource: 'topics', methods: ['GET'] },
       { resource: 'questions', methods: ['GET', 'POST'] },
@@ -121,6 +121,16 @@ export class ApiGatewayConstruct extends Construct {
           proxy: true,
         }));
       });
+
+      // Special handling for providers - add cache/refresh sub-resource
+      if (resource === 'providers') {
+        const cacheResource = apiResource.addResource('cache');
+        const refreshResource = cacheResource.addResource('refresh');
+        refreshResource.addMethod('POST', new cdk.aws_apigateway.LambdaIntegration(lambda, {
+          proxy: true,
+          allowTestInvoke: !config.isProduction,
+        }));
+      }
     });
 
     // Output API URL

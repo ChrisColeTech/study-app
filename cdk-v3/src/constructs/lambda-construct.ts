@@ -74,9 +74,21 @@ export class LambdaConstruct extends Construct {
     // Grant DynamoDB permissions to auth function
     props.usersTable.grantReadWriteData(authFunction);
 
+    // Provider Lambda Function - Phase 6 implementation
+    const providerFunction = new cdk.aws_lambda.Function(this, 'ProviderFunction', {
+      ...lambdaProps,
+      functionName: StackConfig.getResourceName('provider', props.environment),
+      description: 'Study App V3 Provider Lambda - Phase 6 Implementation',
+      code: cdk.aws_lambda.Code.fromAsset('../backend/dist/bundled'),
+      handler: 'provider.handler',
+    });
+    this.functions['providers'] = providerFunction;
+
+    // Grant S3 permissions to provider function
+    props.questionDataBucket.grantRead(providerFunction);
+
     // Placeholder functions for future phases - minimal implementation
     const placeholderFunctionNames = [
-      'providers', 
       'exams',
       'topics',
       'questions',
