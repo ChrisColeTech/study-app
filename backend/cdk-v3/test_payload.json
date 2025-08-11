@@ -1,1 +1,0 @@
-{"httpMethod":"POST","path":"/v1/auth/register","body":"{\"email\":\"test@example.com\",\"password\":\"Password123\",\"firstName\":\"Test\",\"lastName\":\"User\"}","headers":{"Content-Type":"application/json"}}
