@@ -49,8 +49,11 @@ export class ApiGatewayConstruct extends Construct {
 
     // Authorization will be implemented in a future phase
 
-    // Health endpoint (public - no authorization required)
-    const healthResource = this.restApi.root.addResource('health');
+    // API version 1 routes
+    const v1 = this.restApi.root.addResource('v1');
+
+    // Health endpoints under v1 for consistency
+    const healthResource = v1.addResource('health');
     healthResource.addMethod('GET', new cdk.aws_apigateway.LambdaIntegration(
       props.lambdaFunctions.health,
       {
@@ -66,9 +69,6 @@ export class ApiGatewayConstruct extends Construct {
         allowTestInvoke: !config.isProduction,
       })
     );
-
-    // API version 1 routes
-    const v1 = this.restApi.root.addResource('v1');
 
     // Auth endpoints with proper sub-paths
     const authResource = v1.addResource('auth');

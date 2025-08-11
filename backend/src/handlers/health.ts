@@ -20,14 +20,14 @@ export class HealthHandler extends BaseHandler {
       // Basic health check endpoint
       {
         method: 'GET',
-        path: '/health',
+        path: '/v1/health',
         handler: this.healthCheck.bind(this),
         requireAuth: false, // Public endpoint
       },
       // Detailed system status endpoint
       {
         method: 'GET',
-        path: '/health/status',
+        path: '/v1/health/status',
         handler: this.systemStatus.bind(this),
         requireAuth: false, // Public endpoint
       },
