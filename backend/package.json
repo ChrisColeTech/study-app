@@ -17,6 +17,12 @@
     "format": "prettier --write 'src/**/*.ts' 'tests/**/*.ts'",
     "package": "npm run build && npm run bundle",
     "bundle": "esbuild src/handlers/*.ts --bundle --platform=node --target=node18 --outdir=dist/bundled --external:aws-sdk",
+    "test:endpoints": "./scripts/test/test-all-endpoints.sh",
+    "test:endpoints:auth": "./scripts/test/test-auth-endpoints.sh",
+    "test:endpoints:providers": "./scripts/test/test-provider-endpoints.sh",
+    "test:endpoints:sessions": "./scripts/test/test-session-endpoints.sh",
+    "test:endpoints:questions": "./scripts/test/test-question-endpoints.sh",
+    "test:endpoints:users": "./scripts/test/test-user-endpoints.sh",
     "local:start": "sam local start-api",
     "local:invoke": "sam local invoke"
   },
