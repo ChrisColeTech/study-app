@@ -1,0 +1,13 @@
+{
+  "description": "Test fixture for question search with missing query - should fail",
+  "method": "POST",
+  "endpoint": "/v1/questions/search",
+  "requestBody": {
+    "provider": "aws"
+  },
+  "expectedStatus": 400,
+  "expectedError": {
+    "message": "Query is required and must be a string",
+    "code": "VALIDATION_ERROR"
+  }
+}

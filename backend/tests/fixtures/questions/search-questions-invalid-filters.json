@@ -1,0 +1,16 @@
+{
+  "description": "Test fixture for question search with invalid filters - should fail",
+  "method": "POST",
+  "endpoint": "/v1/questions/search",
+  "requestBody": {
+    "query": "AWS",
+    "difficulty": "invalid_difficulty",
+    "type": "invalid_type",
+    "sortBy": "invalid_sort"
+  },
+  "expectedStatus": 400,
+  "expectedError": {
+    "message": "Invalid difficulty. Valid options: beginner, intermediate, advanced, expert",
+    "code": "VALIDATION_ERROR"
+  }
+}

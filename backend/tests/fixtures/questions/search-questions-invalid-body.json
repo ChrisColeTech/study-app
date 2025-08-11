@@ -1,0 +1,12 @@
+{
+  "description": "Test fixture for question search with invalid JSON body - should fail",
+  "method": "POST",
+  "endpoint": "/v1/questions/search",
+  "requestBody": "{ invalid json",
+  "skipJsonParsing": true,
+  "expectedStatus": 400,
+  "expectedError": {
+    "message": "Invalid JSON in request body",
+    "code": "VALIDATION_ERROR"
+  }
+}

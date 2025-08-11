@@ -8,6 +8,11 @@ import {
   GetQuestionsResponse,
   GetQuestionRequest,
   GetQuestionResponse,
+  SearchQuestionsRequest,
+  SearchQuestionsResponse,
+  SearchQuestionResult,
+  SearchHighlights,
+  SearchSortOption,
   IQuestionService,
   QuestionDifficulty,
   QuestionType
@@ -174,6 +179,335 @@ export class QuestionService implements IQuestionService {
       }
       
       throw new Error(`Failed to retrieve question: ${request.questionId}`);
+    }
+  }
+
+  /**
+   * Search questions with full-text search and relevance scoring
+   * Phase 14: Question Search Feature
+   */
+  async searchQuestions(request: SearchQuestionsRequest): Promise<SearchQuestionsResponse> {
+    this.logger.info('Searching questions', { 
+      query: request.query,
+      provider: request.provider,
+      exam: request.exam,
+      topic: request.topic,
+      difficulty: request.difficulty,
+      type: request.type,
+      tags: request.tags,
+      sortBy: request.sortBy,
+      limit: request.limit,
+      offset: request.offset
+    });
+
+    const startTime = Date.now();
+
+    try {
+      // Get base questions based on provider/exam filters (same as getQuestions)
+      let allQuestions: Question[] = [];
+
+      if (request.provider && request.exam) {
+        allQuestions = await this.getQuestionsForProviderExam(request.provider, request.exam);
+      } else if (request.provider) {
+        allQuestions = await this.getQuestionsForProvider(request.provider);
+      } else {
+        allQuestions = await this.getAllQuestions();
+      }
+
+      // Apply basic filters first (topic, difficulty, type, tags)
+      let filteredQuestions = this.applySearchFilters(allQuestions, request);
+
+      // Apply full-text search with relevance scoring
+      const searchResults = this.performFullTextSearch(filteredQuestions, request.query, request.highlightMatches);
+
+      // Apply sorting
+      const sortedResults = this.applySorting(searchResults, request.sortBy || SearchSortOption.RELEVANCE);
+
+      // Apply pagination
+      const limit = request.limit || 20;
+      const offset = request.offset || 0;
+      const total = sortedResults.length;
+      const paginatedResults = sortedResults.slice(offset, offset + limit);
+
+      // Generate available filter options from original filtered questions (before search)
+      const filters = this.generateFilterOptions(filteredQuestions);
+
+      // Strip explanations if not requested
+      if (!request.includeExplanations) {
+        paginatedResults.forEach(result => {
+          delete result.explanation;
+          if (result.highlights) {
+            delete result.highlights.explanation;
+          }
+        });
+      }
+
+      // Strip metadata if not requested
+      if (!request.includeMetadata) {
+        paginatedResults.forEach(result => {
+          result.metadata = {};
+        });
+      }
+
+      const searchTime = Date.now() - startTime;
+
+      const response: SearchQuestionsResponse = {
+        questions: paginatedResults,
+        total,
+        query: request.query,
+        searchTime,
+        filters,
+        pagination: {
+          limit,
+          offset,
+          hasMore: offset + limit < total
+        }
+      };
+
+      this.logger.info('Questions searched successfully', { 
+        query: request.query,
+        total: response.total,
+        returned: paginatedResults.length,
+        searchTime: searchTime,
+        averageScore: paginatedResults.length > 0 
+          ? paginatedResults.reduce((sum, r) => sum + r.relevanceScore, 0) / paginatedResults.length 
+          : 0
+      });
+
+      return response;
+
+    } catch (error) {
+      this.logger.error('Failed to search questions', error as Error);
+      throw new Error('Failed to search questions');
+    }
+  }
+
+  /**
+   * Apply filters specific to search (excluding full-text search)
+   */
+  private applySearchFilters(questions: Question[], request: SearchQuestionsRequest): Question[] {
+    let filtered = questions;
+
+    // Filter by topic
+    if (request.topic) {
+      filtered = filtered.filter(q => q.topicId === request.topic);
+    }
+
+    // Filter by difficulty
+    if (request.difficulty) {
+      filtered = filtered.filter(q => q.difficulty === request.difficulty);
+    }
+
+    // Filter by type
+    if (request.type) {
+      filtered = filtered.filter(q => q.type === request.type);
+    }
+
+    // Filter by tags
+    if (request.tags && request.tags.length > 0) {
+      filtered = filtered.filter(q => 
+        q.tags && request.tags!.some(tag => q.tags!.includes(tag))
+      );
+    }
+
+    return filtered;
+  }
+
+  /**
+   * Perform full-text search with relevance scoring
+   */
+  private performFullTextSearch(questions: Question[], query: string, highlightMatches: boolean = false): SearchQuestionResult[] {
+    const searchTerms = this.tokenizeQuery(query);
+    const results: SearchQuestionResult[] = [];
+
+    for (const question of questions) {
+      const searchData = this.extractSearchableText(question);
+      const { score, highlights } = this.calculateRelevanceScore(searchData, searchTerms, highlightMatches);
+      
+      if (score > 0) {
+        const result: SearchQuestionResult = {
+          ...question,
+          relevanceScore: score
+        };
+        
+        if (highlightMatches && highlights) {
+          result.highlights = highlights;
+        }
+        
+        results.push(result);
+      }
+    }
+
+    return results;
+  }
+
+  /**
+   * Tokenize search query into individual terms
+   */
+  private tokenizeQuery(query: string): string[] {
+    return query
+      .toLowerCase()
+      .replace(/[^\w\s]/g, ' ') // Replace non-alphanumeric with spaces
+      .split(/\s+/)
+      .filter(term => term.length >= 2) // Minimum 2 characters
+      .slice(0, 10); // Limit to 10 terms for performance
+  }
+
+  /**
+   * Extract searchable text from a question
+   */
+  private extractSearchableText(question: Question): {
+    questionText: string;
+    options: string[];
+    explanation: string;
+    tags: string[];
+  } {
+    return {
+      questionText: question.questionText.toLowerCase(),
+      options: question.options.map(opt => opt.toLowerCase()),
+      explanation: (question.explanation || '').toLowerCase(),
+      tags: (question.tags || []).map(tag => tag.toLowerCase())
+    };
+  }
+
+  /**
+   * Calculate relevance score and generate highlights
+   */
+  private calculateRelevanceScore(
+    searchData: { questionText: string; options: string[]; explanation: string; tags: string[] },
+    searchTerms: string[],
+    generateHighlights: boolean
+  ): { score: number; highlights?: SearchHighlights } {
+    let totalScore = 0;
+    const highlights: SearchHighlights = {};
+
+    // Field weights for relevance scoring
+    const weights = {
+      questionText: 1.0,    // Highest weight for question text
+      options: 0.8,         // High weight for options
+      tags: 0.6,           // Medium weight for tags
+      explanation: 0.4      // Lower weight for explanations
+    };
+
+    // Track matches for each field
+    const fieldMatches: { [key: string]: string[] } = {
+      questionText: [],
+      options: [],
+      explanation: [],
+      tags: []
+    };
+
+    for (const term of searchTerms) {
+      // Question text matches
+      const questionMatches = this.findMatches(searchData.questionText, term);
+      if (questionMatches.length > 0) {
+        totalScore += questionMatches.length * weights.questionText;
+        fieldMatches.questionText.push(...questionMatches);
+      }
+
+      // Option matches
+      for (const option of searchData.options) {
+        const optionMatches = this.findMatches(option, term);
+        if (optionMatches.length > 0) {
+          totalScore += optionMatches.length * weights.options;
+          fieldMatches.options.push(...optionMatches);
+        }
+      }
+
+      // Tag matches (exact match gets bonus)
+      for (const tag of searchData.tags) {
+        if (tag === term) {
+          totalScore += 2.0 * weights.tags; // Exact tag match bonus
+          fieldMatches.tags.push(tag);
+        } else if (tag.includes(term)) {
+          totalScore += weights.tags;
+          fieldMatches.tags.push(tag);
+        }
+      }
+
+      // Explanation matches
+      const explanationMatches = this.findMatches(searchData.explanation, term);
+      if (explanationMatches.length > 0) {
+        totalScore += explanationMatches.length * weights.explanation;
+        fieldMatches.explanation.push(...explanationMatches);
+      }
+    }
+
+    // Normalize score to 0-1 range
+    const maxPossibleScore = searchTerms.length * 
+      (weights.questionText + weights.options + weights.tags + weights.explanation) * 2;
+    const normalizedScore = Math.min(totalScore / maxPossibleScore, 1.0);
+
+    // Generate highlights if requested
+    if (generateHighlights && normalizedScore > 0) {
+      if (fieldMatches.questionText.length > 0) {
+        highlights.questionText = [...new Set(fieldMatches.questionText)];
+      }
+      if (fieldMatches.options.length > 0) {
+        highlights.options = [...new Set(fieldMatches.options)];
+      }
+      if (fieldMatches.explanation.length > 0) {
+        highlights.explanation = [...new Set(fieldMatches.explanation)];
+      }
+      if (fieldMatches.tags.length > 0) {
+        highlights.tags = [...new Set(fieldMatches.tags)];
+      }
+    }
+
+    return { score: normalizedScore, highlights };
+  }
+
+  /**
+   * Find matches for a search term in text
+   */
+  private findMatches(text: string, term: string): string[] {
+    const matches: string[] = [];
+    const regex = new RegExp(`\\b\\w*${term}\\w*\\b`, 'gi');
+    let match;
+
+    while ((match = regex.exec(text)) !== null && matches.length < 5) {
+      matches.push(match[0]);
+    }
+
+    return matches;
+  }
+
+  /**
+   * Apply sorting to search results
+   */
+  private applySorting(results: SearchQuestionResult[], sortBy: SearchSortOption): SearchQuestionResult[] {
+    switch (sortBy) {
+      case SearchSortOption.RELEVANCE:
+        return results.sort((a, b) => b.relevanceScore - a.relevanceScore);
+      
+      case SearchSortOption.DIFFICULTY_ASC:
+        return results.sort((a, b) => {
+          const difficultyOrder = { beginner: 0, intermediate: 1, advanced: 2, expert: 3 };
+          return (difficultyOrder[a.difficulty] || 1) - (difficultyOrder[b.difficulty] || 1);
+        });
+      
+      case SearchSortOption.DIFFICULTY_DESC:
+        return results.sort((a, b) => {
+          const difficultyOrder = { beginner: 0, intermediate: 1, advanced: 2, expert: 3 };
+          return (difficultyOrder[b.difficulty] || 1) - (difficultyOrder[a.difficulty] || 1);
+        });
+      
+      case SearchSortOption.CREATED_ASC:
+        return results.sort((a, b) => {
+          const aTime = new Date(a.createdAt || '1970-01-01').getTime();
+          const bTime = new Date(b.createdAt || '1970-01-01').getTime();
+          return aTime - bTime;
+        });
+      
+      case SearchSortOption.CREATED_DESC:
+        return results.sort((a, b) => {
+          const aTime = new Date(a.createdAt || '1970-01-01').getTime();
+          const bTime = new Date(b.createdAt || '1970-01-01').getTime();
+          return bTime - aTime;
+        });
+      
+      default:
+        return results.sort((a, b) => b.relevanceScore - a.relevanceScore);
     }
   }
 

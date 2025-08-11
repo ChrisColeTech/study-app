@@ -1,0 +1,23 @@
+{
+  "description": "Test fixture for question search returning no results",
+  "method": "POST",
+  "endpoint": "/v1/questions/search",
+  "requestBody": {
+    "query": "nonexistent technology xyz123"
+  },
+  "expectedStatus": 200,
+  "expectedFields": [
+    "questions",
+    "total",
+    "query",
+    "searchTime",
+    "filters",
+    "pagination"
+  ],
+  "validation": {
+    "query": "nonexistent technology xyz123",
+    "total": 0,
+    "emptyResults": true,
+    "hasSearchTime": true
+  }
+}

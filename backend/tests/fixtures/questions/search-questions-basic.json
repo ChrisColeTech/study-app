@@ -1,0 +1,35 @@
+{
+  "description": "Test fixture for basic question search with query only",
+  "method": "POST",
+  "endpoint": "/v1/questions/search",
+  "requestBody": {
+    "query": "EC2 instance"
+  },
+  "expectedStatus": 200,
+  "expectedFields": [
+    "questions",
+    "total",
+    "query",
+    "searchTime",
+    "filters",
+    "pagination"
+  ],
+  "validation": {
+    "requiredQuestionFields": [
+      "questionId",
+      "providerId",
+      "examId",
+      "questionText",
+      "options",
+      "correctAnswer",
+      "difficulty",
+      "type",
+      "metadata",
+      "relevanceScore"
+    ],
+    "query": "EC2 instance",
+    "minRelevanceScore": 0,
+    "maxRelevanceScore": 1,
+    "hasSearchTime": true
+  }
+}

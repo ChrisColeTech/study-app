@@ -348,6 +348,229 @@ validate_single_question() {
     fi
 }
 
+# Test search endpoint with POST request
+test_search_endpoint() {
+    local query=$1
+    local extra_fields=$2
+    local description=$3
+    local expected_status=${4:-200}
+    
+    log_test "$description"
+    
+    # Build request body
+    local request_body="{\"query\": \"$query\""
+    if [[ -n "$extra_fields" ]]; then
+        # Remove the opening brace and add comma
+        extra_fields="${extra_fields#\{}"
+        request_body="$request_body, $extra_fields"
+    else
+        request_body="$request_body}"
+    fi
+    
+    # Handle case where query is empty (for error testing)
+    if [[ -z "$query" ]]; then
+        if [[ -n "$extra_fields" ]]; then
+            request_body="{$extra_fields}"
+        else
+            request_body="{}"
+        fi
+    fi
+    
+    local full_url="$BASE_URL/v1/questions/search"
+    echo "  URL: POST $full_url"
+    echo "  Body: $request_body"
+    
+    local curl_cmd="curl -s -w '%{http_code}' -X POST '$full_url' -H 'Content-Type: application/json' -d '$request_body'"
+    
+    local response=$(eval $curl_cmd)
+    local http_code="${response: -3}"
+    local body="${response%???}"
+    
+    echo "  HTTP Code: $http_code (expected: $expected_status)"
+    
+    # Pretty print JSON response if possible
+    if command -v jq >/dev/null 2>&1 && [[ -n "$body" ]]; then
+        echo "  Response:"
+        echo "$body" | jq . 2>/dev/null | sed 's/^/    /' || echo "    $body"
+    else
+        echo "  Response: $body"
+    fi
+    
+    # Save response for potential reuse
+    local test_name=$(echo "$description" | tr ' ' '_' | tr '[:upper:]' '[:lower:]')
+    echo "$body" > "$TEMP_DIR/${test_name}_response.json"
+    
+    # Check if status code matches expected
+    if [[ "$http_code" == "$expected_status" ]]; then
+        log_info "✅ Test passed"
+        return 0
+    else
+        log_error "❌ Test failed - Expected $expected_status, got $http_code"
+        return 1
+    fi
+}
+
+# Test search endpoint with raw body (for malformed JSON testing)
+test_search_endpoint_raw() {
+    local raw_body=$1
+    local description=$2
+    local expected_status=${3:-400}
+    
+    log_test "$description"
+    
+    local full_url="$BASE_URL/v1/questions/search"
+    echo "  URL: POST $full_url"
+    echo "  Body: $raw_body"
+    
+    local curl_cmd="curl -s -w '%{http_code}' -X POST '$full_url' -H 'Content-Type: application/json' -d '$raw_body'"
+    
+    local response=$(eval $curl_cmd)
+    local http_code="${response: -3}"
+    local body="${response%???}"
+    
+    echo "  HTTP Code: $http_code (expected: $expected_status)"
+    echo "  Response: $body"
+    
+    # Save response
+    local test_name=$(echo "$description" | tr ' ' '_' | tr '[:upper:]' '[:lower:]')
+    echo "$body" > "$TEMP_DIR/${test_name}_response.json"
+    
+    # Check if status code matches expected
+    if [[ "$http_code" == "$expected_status" ]]; then
+        log_info "✅ Test passed"
+        return 0
+    else
+        log_error "❌ Test failed - Expected $expected_status, got $http_code"
+        return 1
+    fi
+}
+
+# Validate search response structure
+validate_search_response() {
+    local response_file=$1
+    local expected_query=$2
+    
+    if ! command -v jq >/dev/null 2>&1; then
+        log_warn "jq not available, skipping search response validation"
+        return 0
+    fi
+    
+    local data=$(jq '.data' "$response_file" 2>/dev/null || echo "{}")
+    
+    if [[ "$data" == "{}" ]]; then
+        log_error "No data found in search response"
+        return 1
+    fi
+    
+    local valid=true
+    
+    # Check required fields
+    local required_fields=("questions" "total" "query" "searchTime" "filters" "pagination")
+    for field in "${required_fields[@]}"; do
+        if ! echo "$data" | jq -e "has(\"$field\")" >/dev/null 2>&1; then
+            log_error "Missing search response field: $field"
+            valid=false
+        fi
+    done
+    
+    # Validate query matches
+    local actual_query=$(echo "$data" | jq -r '.query' 2>/dev/null || echo "")
+    if [[ -n "$expected_query" && "$actual_query" != "$expected_query" ]]; then
+        log_error "Query mismatch: expected '$expected_query', got '$actual_query'"
+        valid=false
+    fi
+    
+    # Validate searchTime is a number
+    local search_time=$(echo "$data" | jq '.searchTime' 2>/dev/null || echo "null")
+    if [[ "$search_time" == "null" || "$search_time" == "0" ]]; then
+        log_error "Invalid searchTime: $search_time"
+        valid=false
+    fi
+    
+    # Validate questions have relevance scores
+    local questions_count=$(echo "$data" | jq '.questions | length' 2>/dev/null || echo "0")
+    if [[ "$questions_count" -gt "0" ]]; then
+        local has_relevance_score=$(echo "$data" | jq '.questions[0] | has("relevanceScore")' 2>/dev/null || echo "false")
+        if [[ "$has_relevance_score" != "true" ]]; then
+            log_error "Questions missing relevanceScore field"
+            valid=false
+        fi
+        
+        # Validate relevance score range (0-1)
+        local relevance_score=$(echo "$data" | jq '.questions[0].relevanceScore' 2>/dev/null || echo "-1")
+        if ! echo "$relevance_score >= 0 && $relevance_score <= 1" | bc -l >/dev/null 2>&1; then
+            log_error "Invalid relevance score: $relevance_score (should be 0-1)"
+            valid=false
+        fi
+    fi
+    
+    if [[ "$valid" == "true" ]]; then
+        log_info "✅ Search response validation passed (query: '$actual_query', results: $questions_count, searchTime: ${search_time}ms)"
+        return 0
+    else
+        log_error "❌ Search response validation failed"
+        return 1
+    fi
+}
+
+# Validate search highlights are present when requested
+validate_search_highlights() {
+    local response_file=$1
+    
+    if ! command -v jq >/dev/null 2>&1; then
+        log_warn "jq not available, skipping highlights validation"
+        return 0
+    fi
+    
+    local questions=$(jq '.data.questions' "$response_file" 2>/dev/null || echo "[]")
+    local questions_count=$(echo "$questions" | jq 'length' 2>/dev/null || echo "0")
+    
+    if [[ "$questions_count" == "0" ]]; then
+        log_warn "No questions found for highlights validation"
+        return 0
+    fi
+    
+    local has_highlights=$(echo "$questions" | jq '.[0] | has("highlights")' 2>/dev/null || echo "false")
+    
+    if [[ "$has_highlights" == "true" ]]; then
+        log_info "✅ Search highlights validation passed"
+        return 0
+    else
+        log_error "❌ Search highlights missing when expected"
+        return 1
+    fi
+}
+
+# Validate search pagination
+validate_search_pagination() {
+    local response_file=$1
+    local expected_limit=$2
+    local expected_offset=$3
+    
+    return $(validate_pagination "$response_file" "$expected_limit" "$expected_offset")
+}
+
+# Validate empty search results
+validate_search_empty_results() {
+    local response_file=$1
+    
+    if ! command -v jq >/dev/null 2>&1; then
+        log_warn "jq not available, skipping empty results validation"
+        return 0
+    fi
+    
+    local total=$(jq '.data.total' "$response_file" 2>/dev/null || echo "null")
+    local questions_count=$(jq '.data.questions | length' "$response_file" 2>/dev/null || echo "null")
+    
+    if [[ "$total" == "0" && "$questions_count" == "0" ]]; then
+        log_info "✅ Empty search results validation passed"
+        return 0
+    else
+        log_error "❌ Expected empty results but found total: $total, questions: $questions_count"
+        return 1
+    fi
+}
+
 # Test individual question endpoint with path parameter
 test_question_endpoint() {
     local question_id=$1
@@ -659,6 +882,99 @@ main() {
         test_results+=("✅ Invalid Question ID Format (400)")
     else
         test_results+=("❌ Invalid Question ID Format (400)")
+    fi
+    echo
+
+    # === Phase 14: Question Search Tests ===
+    log_info "=== Phase 14: Question Search Tests ==="
+    echo
+
+    # Test 20: Basic search endpoint
+    total_tests=$((total_tests + 1))
+    if test_search_endpoint "EC2 instance" "" "Basic Search Test" 200; then
+        validate_response "$TEMP_DIR/basic_search_test_response.json" "data"
+        validate_search_response "$TEMP_DIR/basic_search_test_response.json" "EC2 instance"
+        passed_tests=$((passed_tests + 1))
+        test_results+=("✅ Basic Search Test")
+    else
+        test_results+=("❌ Basic Search Test")
+    fi
+    echo
+
+    # Test 21: Search with filters
+    total_tests=$((total_tests + 1))
+    if test_search_endpoint "security group" '{"provider": "aws", "exam": "saa-c03", "difficulty": "intermediate", "includeExplanations": true, "highlightMatches": true}' "Search with Filters" 200; then
+        validate_response "$TEMP_DIR/search_with_filters_response.json" "data"
+        validate_search_response "$TEMP_DIR/search_with_filters_response.json" "security group"
+        validate_search_highlights "$TEMP_DIR/search_with_filters_response.json"
+        passed_tests=$((passed_tests + 1))
+        test_results+=("✅ Search with Filters")
+    else
+        test_results+=("❌ Search with Filters")
+    fi
+    echo
+
+    # Test 22: Search with pagination and sorting
+    total_tests=$((total_tests + 1))
+    if test_search_endpoint "AWS" '{"limit": 5, "offset": 10, "sortBy": "difficulty_desc"}' "Search with Pagination" 200; then
+        validate_response "$TEMP_DIR/search_with_pagination_response.json" "data"
+        validate_search_pagination "$TEMP_DIR/search_with_pagination_response.json" 5 10
+        passed_tests=$((passed_tests + 1))
+        test_results+=("✅ Search with Pagination")
+    else
+        test_results+=("❌ Search with Pagination")
+    fi
+    echo
+
+    # Test 23: Search with no results
+    total_tests=$((total_tests + 1))
+    if test_search_endpoint "nonexistent technology xyz123" "" "Search No Results" 200; then
+        validate_response "$TEMP_DIR/search_no_results_response.json" "data"
+        validate_search_empty_results "$TEMP_DIR/search_no_results_response.json"
+        passed_tests=$((passed_tests + 1))
+        test_results+=("✅ Search No Results")
+    else
+        test_results+=("❌ Search No Results")
+    fi
+    echo
+
+    # Test 24: Search missing query (should return 400)
+    total_tests=$((total_tests + 1))
+    if test_search_endpoint "" '{"provider": "aws"}' "Search Missing Query" 400; then
+        passed_tests=$((passed_tests + 1))
+        test_results+=("✅ Search Missing Query (400)")
+    else
+        test_results+=("❌ Search Missing Query (400)")
+    fi
+    echo
+
+    # Test 25: Search empty query (should return 400)
+    total_tests=$((total_tests + 1))
+    if test_search_endpoint "   " "" "Search Empty Query" 400; then
+        passed_tests=$((passed_tests + 1))
+        test_results+=("✅ Search Empty Query (400)")
+    else
+        test_results+=("❌ Search Empty Query (400)")
+    fi
+    echo
+
+    # Test 26: Search invalid JSON body (should return 400)
+    total_tests=$((total_tests + 1))
+    if test_search_endpoint_raw "{ invalid json" "Search Invalid JSON" 400; then
+        passed_tests=$((passed_tests + 1))
+        test_results+=("✅ Search Invalid JSON (400)")
+    else
+        test_results+=("❌ Search Invalid JSON (400)")
+    fi
+    echo
+
+    # Test 27: Search with invalid filters (should return 400)
+    total_tests=$((total_tests + 1))
+    if test_search_endpoint "AWS" '{"difficulty": "invalid_difficulty", "type": "invalid_type"}' "Search Invalid Filters" 400; then
+        passed_tests=$((passed_tests + 1))
+        test_results+=("✅ Search Invalid Filters (400)")
+    else
+        test_results+=("❌ Search Invalid Filters (400)")
     fi
     echo
 

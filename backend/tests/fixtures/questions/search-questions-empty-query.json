@@ -1,0 +1,13 @@
+{
+  "description": "Test fixture for question search with empty query - should fail",
+  "method": "POST",
+  "endpoint": "/v1/questions/search",
+  "requestBody": {
+    "query": "   "
+  },
+  "expectedStatus": 400,
+  "expectedError": {
+    "message": "Query cannot be empty",
+    "code": "VALIDATION_ERROR"
+  }
+}

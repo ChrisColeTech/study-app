@@ -1,0 +1,38 @@
+{
+  "description": "Test fixture for question search with pagination",
+  "method": "POST",
+  "endpoint": "/v1/questions/search",
+  "requestBody": {
+    "query": "AWS",
+    "limit": 5,
+    "offset": 10,
+    "sortBy": "difficulty_desc"
+  },
+  "expectedStatus": 200,
+  "expectedFields": [
+    "questions",
+    "total",
+    "query",
+    "searchTime",
+    "filters",
+    "pagination"
+  ],
+  "validation": {
+    "requiredQuestionFields": [
+      "questionId",
+      "providerId",
+      "examId",
+      "questionText",
+      "options",
+      "correctAnswer",
+      "difficulty",
+      "type",
+      "metadata",
+      "relevanceScore"
+    ],
+    "query": "AWS",
+    "maxResults": 5,
+    "paginationOffset": 10,
+    "sortedByDifficulty": true
+  }
+}

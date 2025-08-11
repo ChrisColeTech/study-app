@@ -9,6 +9,8 @@ import { ERROR_CODES } from '../shared/constants/error.constants';
 import { 
   GetQuestionsRequest,
   GetQuestionRequest,
+  SearchQuestionsRequest,
+  SearchSortOption,
   QuestionDifficulty,
   QuestionType 
 } from '../shared/types/question.types';
@@ -36,6 +38,13 @@ export class QuestionHandler extends BaseHandler {
         method: 'GET',
         path: '/v1/questions/{id}',
         handler: this.getQuestion.bind(this),
+        requireAuth: false, // Public endpoint for now
+      },
+      // Search questions endpoint (Phase 14)
+      {
+        method: 'POST',
+        path: '/v1/questions/search',
+        handler: this.searchQuestions.bind(this),
         requireAuth: false, // Public endpoint for now
       }
     ];
@@ -293,6 +302,221 @@ export class QuestionHandler extends BaseHandler {
       return this.error(
         ERROR_CODES.INTERNAL_ERROR,
         'Failed to retrieve question'
+      );
+    }
+  }
+
+  /**
+   * Search questions with full-text search and relevance scoring
+   * Phase 14: Question Search Feature
+   * POST /v1/questions/search
+   */
+  private async searchQuestions(context: HandlerContext): Promise<ApiResponse> {
+    try {
+      this.logger.info('Searching questions', { 
+        requestId: context.requestId,
+        hasBody: !!context.event.body
+      });
+
+      // Parse and validate request body
+      if (!context.event.body) {
+        return this.error(
+          ERROR_CODES.VALIDATION_ERROR,
+          'Request body is required for search'
+        );
+      }
+
+      let requestBody: any;
+      try {
+        requestBody = JSON.parse(context.event.body);
+      } catch (error) {
+        return this.error(
+          ERROR_CODES.VALIDATION_ERROR,
+          'Invalid JSON in request body'
+        );
+      }
+
+      // Validate required fields
+      if (!requestBody.query || typeof requestBody.query !== 'string') {
+        return this.error(
+          ERROR_CODES.VALIDATION_ERROR,
+          'Query is required and must be a string'
+        );
+      }
+
+      // Build search request
+      const request: SearchQuestionsRequest = {
+        query: requestBody.query.trim()
+      };
+
+      // Validate query length
+      if (request.query.length === 0) {
+        return this.error(
+          ERROR_CODES.VALIDATION_ERROR,
+          'Query cannot be empty'
+        );
+      }
+
+      if (request.query.length > 200) {
+        return this.error(
+          ERROR_CODES.VALIDATION_ERROR,
+          'Query too long. Maximum 200 characters'
+        );
+      }
+
+      // Optional filters
+      if (requestBody.provider) {
+        if (!/^[a-zA-Z0-9_-]+$/.test(requestBody.provider)) {
+          return this.error(
+            ERROR_CODES.VALIDATION_ERROR,
+            'Invalid provider format. Use alphanumeric characters, hyphens, and underscores only'
+          );
+        }
+        request.provider = requestBody.provider;
+      }
+
+      if (requestBody.exam) {
+        if (!/^[a-zA-Z0-9_-]+$/.test(requestBody.exam)) {
+          return this.error(
+            ERROR_CODES.VALIDATION_ERROR,
+            'Invalid exam format. Use alphanumeric characters, hyphens, and underscores only'
+          );
+        }
+        request.exam = requestBody.exam;
+      }
+
+      if (requestBody.topic) {
+        if (!/^[a-zA-Z0-9_-]+$/.test(requestBody.topic)) {
+          return this.error(
+            ERROR_CODES.VALIDATION_ERROR,
+            'Invalid topic format. Use alphanumeric characters, hyphens, and underscores only'
+          );
+        }
+        request.topic = requestBody.topic;
+      }
+
+      // Difficulty filter
+      if (requestBody.difficulty) {
+        const difficulty = this.parseEnumParam(requestBody.difficulty, QuestionDifficulty);
+        if (difficulty) {
+          request.difficulty = difficulty;
+        } else {
+          return this.error(
+            ERROR_CODES.VALIDATION_ERROR,
+            `Invalid difficulty. Valid options: ${Object.values(QuestionDifficulty).join(', ')}`
+          );
+        }
+      }
+
+      // Type filter
+      if (requestBody.type) {
+        const type = this.parseEnumParam(requestBody.type, QuestionType);
+        if (type) {
+          request.type = type;
+        } else {
+          return this.error(
+            ERROR_CODES.VALIDATION_ERROR,
+            `Invalid type. Valid options: ${Object.values(QuestionType).join(', ')}`
+          );
+        }
+      }
+
+      // Tags filter
+      if (requestBody.tags) {
+        if (Array.isArray(requestBody.tags)) {
+          request.tags = requestBody.tags.filter((tag: any) => 
+            typeof tag === 'string' && tag.trim().length > 0
+          );
+        } else {
+          return this.error(
+            ERROR_CODES.VALIDATION_ERROR,
+            'Tags must be an array of strings'
+          );
+        }
+      }
+
+      // Sort option
+      if (requestBody.sortBy) {
+        const sortBy = this.parseEnumParam(requestBody.sortBy, SearchSortOption);
+        if (sortBy) {
+          request.sortBy = sortBy;
+        } else {
+          return this.error(
+            ERROR_CODES.VALIDATION_ERROR,
+            `Invalid sortBy option. Valid options: ${Object.values(SearchSortOption).join(', ')}`
+          );
+        }
+      }
+
+      // Pagination parameters
+      if (requestBody.limit !== undefined) {
+        const limit = parseInt(requestBody.limit, 10);
+        if (isNaN(limit) || limit < 1 || limit > 100) {
+          return this.error(
+            ERROR_CODES.VALIDATION_ERROR,
+            'Limit must be a number between 1 and 100'
+          );
+        }
+        request.limit = limit;
+      }
+
+      if (requestBody.offset !== undefined) {
+        const offset = parseInt(requestBody.offset, 10);
+        if (isNaN(offset) || offset < 0) {
+          return this.error(
+            ERROR_CODES.VALIDATION_ERROR,
+            'Offset must be a non-negative number'
+          );
+        }
+        request.offset = offset;
+      }
+
+      // Include flags
+      request.includeExplanations = requestBody.includeExplanations === true;
+      request.includeMetadata = requestBody.includeMetadata === true;
+      request.highlightMatches = requestBody.highlightMatches === true;
+
+      // Perform search
+      const questionService = this.serviceFactory.getQuestionService();
+      const result = await questionService.searchQuestions(request);
+
+      this.logger.info('Questions searched successfully', { 
+        requestId: context.requestId,
+        query: result.query,
+        total: result.total,
+        returned: result.questions.length,
+        searchTime: result.searchTime,
+        averageScore: result.questions.length > 0 
+          ? result.questions.reduce((sum, q) => sum + q.relevanceScore, 0) / result.questions.length 
+          : 0
+      });
+
+      return this.success(result, 'Questions searched successfully');
+
+    } catch (error: any) {
+      this.logger.error('Failed to search questions', error, { 
+        requestId: context.requestId,
+        hasBody: !!context.event.body
+      });
+
+      // Handle specific error types
+      if (error.message.includes('not found') || error.message.includes('NoSuchKey')) {
+        return this.error(
+          ERROR_CODES.NOT_FOUND,
+          'No questions found matching the search criteria'
+        );
+      }
+
+      if (error.message.includes('Invalid') || error.message.includes('validation')) {
+        return this.error(
+          ERROR_CODES.VALIDATION_ERROR,
+          error.message
+        );
+      }
+
+      return this.error(
+        ERROR_CODES.INTERNAL_ERROR,
+        'Failed to search questions'
       );
     }
   }

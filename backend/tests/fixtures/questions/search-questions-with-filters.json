@@ -1,0 +1,50 @@
+{
+  "description": "Test fixture for question search with filters and options",
+  "method": "POST",
+  "endpoint": "/v1/questions/search",
+  "requestBody": {
+    "query": "security group",
+    "provider": "aws",
+    "exam": "saa-c03",
+    "difficulty": "intermediate",
+    "type": "multiple_choice",
+    "tags": ["security", "networking"],
+    "sortBy": "relevance",
+    "limit": 10,
+    "offset": 0,
+    "includeExplanations": true,
+    "includeMetadata": true,
+    "highlightMatches": true
+  },
+  "expectedStatus": 200,
+  "expectedFields": [
+    "questions",
+    "total",
+    "query",
+    "searchTime",
+    "filters",
+    "pagination"
+  ],
+  "validation": {
+    "requiredQuestionFields": [
+      "questionId",
+      "providerId",
+      "examId",
+      "questionText",
+      "options",
+      "correctAnswer",
+      "difficulty",
+      "type",
+      "explanation",
+      "metadata",
+      "relevanceScore",
+      "highlights"
+    ],
+    "query": "security group",
+    "hasExplanations": true,
+    "hasMetadata": true,
+    "hasHighlights": true,
+    "maxResults": 10,
+    "sortedByRelevance": true
+  }
+}

@@ -116,8 +116,66 @@ export interface GetQuestionResponse {
   question: Question;
 }
 
+// Request/Response types for Question Search (Phase 14)
+export interface SearchQuestionsRequest {
+  query: string;
+  provider?: string;
+  exam?: string;
+  topic?: string;
+  difficulty?: QuestionDifficulty;
+  type?: QuestionType;
+  tags?: string[];
+  limit?: number;
+  offset?: number;
+  sortBy?: SearchSortOption;
+  includeExplanations?: boolean;
+  includeMetadata?: boolean;
+  highlightMatches?: boolean;
+}
+
+export interface SearchQuestionsResponse {
+  questions: SearchQuestionResult[];
+  total: number;
+  query: string;
+  searchTime: number; // milliseconds
+  filters: {
+    providers: string[];
+    exams: string[];
+    topics: string[];
+    difficulties: QuestionDifficulty[];
+    types: QuestionType[];
+    tags: string[];
+  };
+  pagination?: {
+    limit: number;
+    offset: number;
+    hasMore: boolean;
+  };
+}
+
+export interface SearchQuestionResult extends Question {
+  relevanceScore: number; // 0-1 relevance score
+  highlights?: SearchHighlights; // Highlighted matching terms
+}
+
+export interface SearchHighlights {
+  questionText?: string[];
+  options?: string[];
+  explanation?: string[];
+  tags?: string[];
+}
+
+export enum SearchSortOption {
+  RELEVANCE = 'relevance',
+  DIFFICULTY_ASC = 'difficulty_asc',
+  DIFFICULTY_DESC = 'difficulty_desc',
+  CREATED_ASC = 'created_asc',
+  CREATED_DESC = 'created_desc'
+}
+
 // Service interface
 export interface IQuestionService {
   getQuestions(request: GetQuestionsRequest): Promise<GetQuestionsResponse>;
   getQuestion(request: GetQuestionRequest): Promise<GetQuestionResponse>;
+  searchQuestions(request: SearchQuestionsRequest): Promise<SearchQuestionsResponse>;
 }
