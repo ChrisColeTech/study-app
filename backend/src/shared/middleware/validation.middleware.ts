@@ -99,9 +99,9 @@ export class ValidationMiddleware {
   }
 
   /**
-   * Core validation logic
+   * Core validation logic - made public for flexible usage
    */
-  private static validateFields(
+  static validateFields(
     fields: Record<string, any>,
     schema: ValidationSchema,
     requestType: 'query' | 'body' | 'params'
@@ -342,5 +342,76 @@ export class ValidationRules {
    */
   static custom(validator: (value: any, context?: ValidationContext) => ValidationResult) {
     return validator;
+  }
+
+  /**
+   * Validate session type enum
+   */
+  static sessionType() {
+    return (value: string): ValidationResult => {
+      if (typeof value !== 'string') {
+        return { isValid: false, error: 'Must be a string' };
+      }
+
+      const validSessionTypes = ['practice', 'exam', 'review'];
+      if (!validSessionTypes.includes(value)) {
+        return { 
+          isValid: false, 
+          error: `sessionType must be one of: ${validSessionTypes.join(', ')}` 
+        };
+      }
+
+      return { isValid: true };
+    };
+  }
+
+  /**
+   * Validate session action enum  
+   */
+  static sessionAction() {
+    return (value: string): ValidationResult => {
+      if (typeof value !== 'string') {
+        return { isValid: false, error: 'Must be a string' };
+      }
+
+      const validActions = ['pause', 'resume', 'next', 'previous', 'answer', 'mark_for_review', 'complete'];
+      if (!validActions.includes(value)) {
+        return { 
+          isValid: false, 
+          error: `action must be one of: ${validActions.join(', ')}` 
+        };
+      }
+
+      return { isValid: true };
+    };
+  }
+
+  /**
+   * Validate ISO date string
+   */
+  static isoDate() {
+    return (value: string): ValidationResult => {
+      if (typeof value !== 'string') {
+        return { isValid: false, error: 'Must be a string' };
+      }
+
+      try {
+        const date = new Date(value);
+        
+        // Check if the date is valid and the string format matches ISO standard
+        const isValid = date instanceof Date && 
+               !isNaN(date.getTime()) && 
+               (!!value.match(/^\d{4}-\d{2}-\d{2}$/) || 
+                !!value.match(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{3})?Z?$/));
+        
+        if (!isValid) {
+          return { isValid: false, error: 'Must be a valid ISO date string (YYYY-MM-DD or YYYY-MM-DDTHH:mm:ss.sssZ)' };
+        }
+        
+        return { isValid: true };
+      } catch {
+        return { isValid: false, error: 'Invalid date format' };
+      }
+    };
   }
 }

@@ -34,6 +34,16 @@ export interface StudySession {
   score?: number;
   totalQuestions: number;
   correctAnswers: number;
+  // Phase 22: Adaptive session support
+  isAdaptive?: boolean;
+  adaptiveConfig?: {
+    difficultyDistribution: {
+      easy: number;
+      medium: number;
+      hard: number;
+    };
+    adjustmentAlgorithm: string;
+  };
   createdAt: string;
   updatedAt: string;
 }

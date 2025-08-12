@@ -89,7 +89,7 @@ export class TopicHandler extends BaseHandler {
       filters: request
     });
 
-    return ErrorHandlingMiddleware.createSuccessResponse(result, 'Topics retrieved successfully');
+    return this.buildSuccessResponse('Topics retrieved successfully', result);
   }
 
   /**
@@ -102,10 +102,7 @@ export class TopicHandler extends BaseHandler {
 
     // Validate topic ID
     if (!pathParams.id) {
-      return ErrorHandlingMiddleware.createErrorResponse(
-        ERROR_CODES.VALIDATION_ERROR,
-        'Topic ID is required'
-      );
+      return this.buildErrorResponse('Topic ID is required', 400, ERROR_CODES.VALIDATION_ERROR);
     }
 
     // Parse query parameters
@@ -143,7 +140,7 @@ export class TopicHandler extends BaseHandler {
       includeExam: request.includeExam
     });
 
-    return ErrorHandlingMiddleware.createSuccessResponse(result, 'Topic retrieved successfully');
+    return this.buildSuccessResponse('Topic retrieved successfully', result);
   }
 }
 

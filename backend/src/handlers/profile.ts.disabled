@@ -1,0 +1,302 @@
+// Profile handler for user profile management endpoints - Phase 26
+
+import { BaseHandler, RouteConfig } from '../shared/base-handler';
+import { HandlerContext, ApiResponse } from '../shared/types/api.types';
+import { ServiceFactory } from '../shared/service-factory';
+import { createLogger } from '../shared/logger';
+import { ERROR_CODES } from '../shared/constants/error.constants';
+import { 
+  UpdateProfileRequest,
+  DeleteProfileRequest,
+  UpdateAvatarRequest,
+  IProfileService
+} from '../shared/types/profile.types';
+
+// Import middleware
+import {
+  ParsingMiddleware,
+  ErrorHandlingMiddleware,
+  ErrorContexts
+} from '../shared/middleware';
+
+export class ProfileHandler extends BaseHandler {
+  private serviceFactory: ServiceFactory;
+  private logger = createLogger({ handler: 'ProfileHandler' });
+
+  constructor() {
+    super();
+    this.serviceFactory = ServiceFactory.getInstance();
+  }
+
+  protected setupRoutes(): void {
+    this.routes = [
+      {
+        method: 'GET',
+        path: '/v1/profile',
+        handler: this.getProfile.bind(this),
+        requireAuth: false, // Will be enabled in Phase 30 with authentication
+      },
+      {
+        method: 'PUT',
+        path: '/v1/profile',
+        handler: this.updateProfile.bind(this),
+        requireAuth: false,
+      },
+      {
+        method: 'DELETE',
+        path: '/v1/profile',
+        handler: this.deleteProfile.bind(this),
+        requireAuth: false,
+      },
+      {
+        method: 'GET',
+        path: '/v1/profile/statistics',
+        handler: this.getProfileStatistics.bind(this),
+        requireAuth: false,
+      },
+      {
+        method: 'PUT',
+        path: '/v1/profile/avatar',
+        handler: this.updateAvatar.bind(this),
+        requireAuth: false,
+      },
+      {
+        method: 'POST',
+        path: '/v1/profile/achievements/calculate',
+        handler: this.calculateAchievements.bind(this),
+        requireAuth: false,
+      }
+    ];
+  }
+
+  /**
+   * Get user profile - GET /v1/profile
+   */
+  private async getProfile(context: HandlerContext): Promise<ApiResponse> {
+    // For Phase 26, we'll use a mock userId since auth isn't implemented yet
+    const userId = context.event.headers['x-user-id'] || 'mock-user-123';
+
+    // Business logic - delegate to service
+    const { result, error } = await ErrorHandlingMiddleware.withErrorHandling(
+      async () => {
+        const profileService = this.serviceFactory.getProfileService();
+        return await profileService.getProfile(userId);
+      },
+      {
+        requestId: context.requestId,
+        operation: 'PROFILE_GET',
+        additionalInfo: { userId }
+      }
+    );
+
+    if (error) return error;
+
+    return this.buildSuccessResponse('Profile retrieved successfully', result, {
+      userId,
+      operation: 'getProfile'
+    });
+  }
+
+  /**
+   * Update user profile - PUT /v1/profile
+   */
+  private async updateProfile(context: HandlerContext): Promise<ApiResponse> {
+    // Parse request body
+    const { data: requestBody, error: parseError } = ParsingMiddleware.parseRequestBody<UpdateProfileRequest>(
+      context, 
+      {
+        firstName: { type: 'string', optional: true },
+        lastName: { type: 'string', optional: true },
+        displayName: { type: 'string', optional: true },
+        bio: { type: 'string', optional: true },
+        timezone: { type: 'string', optional: true },
+        language: { type: 'string', optional: true, enum: ['en', 'es', 'fr', 'de', 'zh', 'ja'] }
+      }
+    );
+    if (parseError) return parseError;
+
+    const userId = context.event.headers['x-user-id'] || 'mock-user-123';
+
+    // Business logic - delegate to service
+    const { result, error } = await ErrorHandlingMiddleware.withErrorHandling(
+      async () => {
+        const profileService = this.serviceFactory.getProfileService();
+        return await profileService.updateProfile(userId, requestBody);
+      },
+      {
+        requestId: context.requestId,
+        operation: 'PROFILE_UPDATE',
+        additionalInfo: { 
+          userId,
+          fields: Object.keys(requestBody)
+        }
+      }
+    );
+
+    if (error) return error;
+
+    return this.buildSuccessResponse('Profile updated successfully', result, {
+      userId,
+      operation: 'updateProfile',
+      updatedFields: Object.keys(requestBody)
+    });
+  }
+
+  /**
+   * Delete user profile - DELETE /v1/profile
+   */
+  private async deleteProfile(context: HandlerContext): Promise<ApiResponse> {
+    // Parse request body
+    const { data: requestBody, error: parseError } = ParsingMiddleware.parseRequestBody<DeleteProfileRequest>(
+      context, 
+      {
+        confirmEmail: { type: 'string', required: true },
+        reason: { type: 'string', optional: true }
+      }
+    );
+    if (parseError) return parseError;
+
+    const userId = context.event.headers['x-user-id'] || 'mock-user-123';
+
+    // Business logic - delegate to service
+    const { result, error } = await ErrorHandlingMiddleware.withErrorHandling(
+      async () => {
+        const profileService = this.serviceFactory.getProfileService();
+        return await profileService.deleteProfile(userId, requestBody);
+      },
+      {
+        requestId: context.requestId,
+        operation: 'PROFILE_DELETE',
+        additionalInfo: { 
+          userId,
+          hasReason: !!requestBody.reason
+        }
+      }
+    );
+
+    if (error) return error;
+
+    return this.buildSuccessResponse('Profile deleted successfully', result, {
+      userId,
+      operation: 'deleteProfile'
+    });
+  }
+
+  /**
+   * Get profile statistics - GET /v1/profile/statistics
+   */
+  private async getProfileStatistics(context: HandlerContext): Promise<ApiResponse> {
+    const userId = context.event.headers['x-user-id'] || 'mock-user-123';
+
+    // Business logic - delegate to service
+    const { result, error } = await ErrorHandlingMiddleware.withErrorHandling(
+      async () => {
+        const profileService = this.serviceFactory.getProfileService();
+        return await profileService.getStatistics(userId);
+      },
+      {
+        requestId: context.requestId,
+        operation: 'PROFILE_GET_STATISTICS',
+        additionalInfo: { userId }
+      }
+    );
+
+    if (error) return error;
+
+    return this.buildSuccessResponse('Profile statistics retrieved successfully', result, {
+      userId,
+      operation: 'getProfileStatistics'
+    });
+  }
+
+  /**
+   * Update profile avatar - PUT /v1/profile/avatar
+   */
+  private async updateAvatar(context: HandlerContext): Promise<ApiResponse> {
+    // Parse request body
+    const { data: requestBody, error: parseError } = ParsingMiddleware.parseRequestBody<UpdateAvatarRequest>(
+      context, 
+      {
+        imageData: { type: 'string', required: true },
+        imageType: { type: 'string', required: true, enum: ['jpeg', 'png', 'gif'] }
+      }
+    );
+    if (parseError) return parseError;
+
+    const userId = context.event.headers['x-user-id'] || 'mock-user-123';
+
+    // Validate image data format (basic check)
+    if (!requestBody.imageData.startsWith('data:image/') && !requestBody.imageData.match(/^[A-Za-z0-9+/=]+$/)) {
+      return this.buildErrorResponse(
+        'Invalid image data format',
+        400,
+        ERROR_CODES.VALIDATION_FAILED,
+        { field: 'imageData' }
+      );
+    }
+
+    // Business logic - delegate to service
+    const { result, error } = await ErrorHandlingMiddleware.withErrorHandling(
+      async () => {
+        const profileService = this.serviceFactory.getProfileService();
+        return await profileService.updateAvatar(userId, requestBody);
+      },
+      {
+        requestId: context.requestId,
+        operation: 'PROFILE_UPDATE_AVATAR',
+        additionalInfo: { 
+          userId,
+          imageType: requestBody.imageType
+        }
+      }
+    );
+
+    if (error) return error;
+
+    return this.buildSuccessResponse('Avatar updated successfully', result, {
+      userId,
+      operation: 'updateAvatar'
+    });
+  }
+
+  /**
+   * Calculate achievements - POST /v1/profile/achievements/calculate
+   */
+  private async calculateAchievements(context: HandlerContext): Promise<ApiResponse> {
+    const userId = context.event.headers['x-user-id'] || 'mock-user-123';
+
+    // Business logic - delegate to service
+    const { result, error } = await ErrorHandlingMiddleware.withErrorHandling(
+      async () => {
+        const profileService = this.serviceFactory.getProfileService();
+        const achievements = await profileService.calculateAchievements(userId);
+        return { 
+          newAchievements: achievements,
+          count: achievements.length 
+        };
+      },
+      {
+        requestId: context.requestId,
+        operation: 'PROFILE_CALCULATE_ACHIEVEMENTS',
+        additionalInfo: { userId }
+      }
+    );
+
+    if (error) return error;
+
+    const message = result.count > 0 
+      ? `${result.count} new achievement${result.count === 1 ? '' : 's'} unlocked!`
+      : 'No new achievements at this time';
+
+    return this.buildSuccessResponse(message, result, {
+      userId,
+      operation: 'calculateAchievements',
+      newAchievements: result.count
+    });
+  }
+}
+
+export const handler = async (event: any, context: any) => {
+  const profileHandler = new ProfileHandler();
+  return await profileHandler.handle(event, context);
+};

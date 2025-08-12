@@ -274,7 +274,11 @@ export class ServiceFactory {
   public getHealthRepository(): IHealthRepository {
     if (!this._healthRepository) {
       const { HealthRepository } = require('../repositories/health.repository');
-      this._healthRepository = new HealthRepository(this.getDynamoClient(), this.getS3Client(), this.getConfig());
+      // Health repository needs the raw DynamoDB client for DescribeTableCommand
+      const dynamoClient = new DynamoDBClient({
+        region: this.config.region,
+      });
+      this._healthRepository = new HealthRepository(dynamoClient, this.getS3Client(), this.getConfig());
     }
     return this._healthRepository!;
   }

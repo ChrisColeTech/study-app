@@ -1,39 +1,53 @@
 // Health repository for AWS service health checks
 
 import { DynamoDBClient, DescribeTableCommand } from '@aws-sdk/client-dynamodb';
-import { S3Client, HeadBucketCommand } from '@aws-sdk/client-s3';
+import { S3Client, HeadBucketCommand, ListObjectsV2Command } from '@aws-sdk/client-s3';
+import { LambdaClient, GetFunctionCommand } from '@aws-sdk/client-lambda';
+import { CloudWatchLogsClient, DescribeLogGroupsCommand } from '@aws-sdk/client-cloudwatch-logs';
 import { ServiceConfig } from '../shared/service-factory';
 import { createLogger } from '../shared/logger';
+import { 
+  ServiceDiagnostics,
+  DatabaseDiagnostics, 
+  StorageDiagnostics, 
+  LambdaDiagnostics, 
+  CloudWatchDiagnostics,
+  SystemResourceUsage,
+  PerformanceMetrics,
+  HealthTrend,
+  IHealthRepository,
+  IDetailedHealthRepository
+} from '../shared/types/health.types';
+import * as os from 'os';
+import * as dns from 'dns';
+import { promisify } from 'util';
 
-export interface HealthCheckResult {
-  service: string;
-  status: 'healthy' | 'unhealthy';
-  responseTime: number;
-  error?: string;
-}
+// Re-export interfaces for external use
+export type { IHealthRepository, IDetailedHealthRepository } from '../shared/types/health.types';
 
-export interface IHealthRepository {
-  checkDynamoDbHealth(): Promise<HealthCheckResult>;
-  checkS3Health(): Promise<HealthCheckResult>;
-  checkAllServices(): Promise<HealthCheckResult[]>;
-}
-
-export class HealthRepository implements IHealthRepository {
+export class HealthRepository implements IHealthRepository, IDetailedHealthRepository {
   private dynamoClient: DynamoDBClient;
   private s3Client: S3Client;
+  private lambdaClient: LambdaClient;
+  private cloudwatchClient: CloudWatchLogsClient;
   private config: ServiceConfig;
   private logger = createLogger({ component: 'HealthRepository' });
+  private dnsLookup = promisify(dns.lookup);
 
   constructor(dynamoClient: DynamoDBClient, s3Client: S3Client, config: ServiceConfig) {
     this.dynamoClient = dynamoClient;
     this.s3Client = s3Client;
     this.config = config;
+    
+    // Initialize additional clients for detailed diagnostics
+    this.lambdaClient = new LambdaClient({ region: this.config.region });
+    this.cloudwatchClient = new CloudWatchLogsClient({ region: this.config.region });
   }
 
   /**
    * Check DynamoDB health by describing the Users table
    */
-  async checkDynamoDbHealth(): Promise<HealthCheckResult> {
+  async checkDynamoDbHealth(): Promise<ServiceDiagnostics> {
     const startTime = Date.now();
     
     try {
@@ -51,7 +65,8 @@ export class HealthRepository implements IHealthRepository {
       return {
         service: 'dynamodb',
         status: 'healthy',
-        responseTime
+        responseTime,
+        lastChecked: new Date().toISOString()
       };
     } catch (error) {
       const responseTime = Date.now() - startTime;
@@ -66,7 +81,71 @@ export class HealthRepository implements IHealthRepository {
         service: 'dynamodb',
         status: 'unhealthy',
         responseTime,
+        lastChecked: new Date().toISOString(),
         error: errorMessage
+      };
+    }
+  }
+
+  /**
+   * Get detailed DynamoDB diagnostics
+   */
+  async getDetailedDynamoDbHealth(): Promise<DatabaseDiagnostics> {
+    const startTime = Date.now();
+    
+    try {
+      this.logger.debug('Getting detailed DynamoDB diagnostics');
+
+      const tableNames = [
+        this.config.tables.users,
+        this.config.tables.studySessions,
+        this.config.tables.userProgress,
+        this.config.tables.goals
+      ];
+
+      const tables = await Promise.allSettled(
+        tableNames.map(async (tableName) => {
+          const command = new DescribeTableCommand({ TableName: tableName });
+          const result = await this.dynamoClient.send(command);
+          const table = result.Table!;
+          
+          return {
+            name: tableName,
+            status: table.TableStatus || 'UNKNOWN',
+            itemCount: table.ItemCount || 0,
+            sizeBytes: table.TableSizeBytes || 0,
+            readCapacity: table.ProvisionedThroughput?.ReadCapacityUnits || 0,
+            writeCapacity: table.ProvisionedThroughput?.WriteCapacityUnits || 0
+          };
+        })
+      );
+
+      const responseTime = Date.now() - startTime;
+      const successfulTables = tables.filter(t => t.status === 'fulfilled');
+      const status = successfulTables.length === tableNames.length ? 'healthy' : 
+                   successfulTables.length > 0 ? 'degraded' : 'unhealthy';
+
+      return {
+        service: 'dynamodb',
+        status,
+        responseTime,
+        lastChecked: new Date().toISOString(),
+        details: {
+          region: this.config.region,
+          tables: tables.map(t => t.status === 'fulfilled' ? t.value : {
+            name: 'unknown',
+            status: 'ERROR'
+          })
+        }
+      };
+    } catch (error) {
+      const responseTime = Date.now() - startTime;
+      return {
+        service: 'dynamodb',
+        status: 'unhealthy',
+        responseTime,
+        lastChecked: new Date().toISOString(),
+        error: (error as Error).message
       };
     }
   }
@@ -74,7 +153,7 @@ export class HealthRepository implements IHealthRepository {
   /**
    * Check S3 health by checking bucket access
    */
-  async checkS3Health(): Promise<HealthCheckResult> {
+  async checkS3Health(): Promise<ServiceDiagnostics> {
     const startTime = Date.now();
     
     try {
@@ -92,7 +171,8 @@ export class HealthRepository implements IHealthRepository {
       return {
         service: 's3',
         status: 'healthy',
-        responseTime
+        responseTime,
+        lastChecked: new Date().toISOString()
       };
     } catch (error) {
       const responseTime = Date.now() - startTime;
@@ -107,6 +187,7 @@ export class HealthRepository implements IHealthRepository {
         service: 's3',
         status: 'unhealthy',
         responseTime,
+        lastChecked: new Date().toISOString(),
         error: errorMessage
       };
     }
@@ -115,7 +196,7 @@ export class HealthRepository implements IHealthRepository {
   /**
    * Check all AWS services health
    */
-  async checkAllServices(): Promise<HealthCheckResult[]> {
+  async checkAllServices(): Promise<ServiceDiagnostics[]> {
     this.logger.info('Running comprehensive health checks');
     
     // Run health checks in parallel for better performance
@@ -124,7 +205,7 @@ export class HealthRepository implements IHealthRepository {
       this.checkS3Health()
     ]);
 
-    const results: HealthCheckResult[] = [];
+    const results: ServiceDiagnostics[] = [];
 
     healthChecks.forEach((check, index) => {
       if (check.status === 'fulfilled') {
@@ -136,6 +217,7 @@ export class HealthRepository implements IHealthRepository {
           service: serviceName,
           status: 'unhealthy',
           responseTime: 0,
+          lastChecked: new Date().toISOString(),
           error: check.reason?.message || 'Health check failed'
         });
       }
@@ -151,5 +233,358 @@ export class HealthRepository implements IHealthRepository {
     });
 
     return results;
+  }
+
+  /**
+   * Get detailed S3 diagnostics
+   */
+  async getDetailedS3Health(): Promise<StorageDiagnostics> {
+    const startTime = Date.now();
+    
+    try {
+      this.logger.debug('Getting detailed S3 diagnostics');
+
+      const bucketNames = [
+        this.config.buckets.questionData,
+        this.config.buckets.assets
+      ];
+
+      const buckets = await Promise.allSettled(
+        bucketNames.map(async (bucketName) => {
+          if (!bucketName) return { name: 'undefined', status: 'NOT_CONFIGURED' };
+          
+          const headCommand = new HeadBucketCommand({ Bucket: bucketName });
+          await this.s3Client.send(headCommand);
+          
+          // Get bucket size (simplified - just count objects)
+          const listCommand = new ListObjectsV2Command({ 
+            Bucket: bucketName,
+            MaxKeys: 1000
+          });
+          const listResult = await this.s3Client.send(listCommand);
+          
+          return {
+            name: bucketName,
+            status: 'ACTIVE',
+            objectCount: listResult.KeyCount || 0,
+            sizeBytes: listResult.Contents?.reduce((sum, obj) => sum + (obj.Size || 0), 0) || 0,
+            region: this.config.region
+          };
+        })
+      );
+
+      const responseTime = Date.now() - startTime;
+      const successfulBuckets = buckets.filter(b => b.status === 'fulfilled');
+      const status = successfulBuckets.length === bucketNames.length ? 'healthy' : 
+                   successfulBuckets.length > 0 ? 'degraded' : 'unhealthy';
+
+      return {
+        service: 's3',
+        status,
+        responseTime,
+        lastChecked: new Date().toISOString(),
+        details: {
+          region: this.config.region,
+          buckets: buckets.map(b => b.status === 'fulfilled' ? b.value : {
+            name: 'unknown',
+            status: 'ERROR'
+          })
+        }
+      };
+    } catch (error) {
+      const responseTime = Date.now() - startTime;
+      return {
+        service: 's3',
+        status: 'unhealthy',
+        responseTime,
+        lastChecked: new Date().toISOString(),
+        error: (error as Error).message
+      };
+    }
+  }
+
+  /**
+   * Check Lambda health and get detailed diagnostics
+   */
+  async checkLambdaHealth(): Promise<LambdaDiagnostics> {
+    const startTime = Date.now();
+    
+    try {
+      const functionName = process.env.AWS_LAMBDA_FUNCTION_NAME;
+      if (!functionName) {
+        return {
+          service: 'lambda',
+          status: 'unhealthy',
+          responseTime: 0,
+          lastChecked: new Date().toISOString(),
+          error: 'Lambda function name not found in environment'
+        };
+      }
+
+      const command = new GetFunctionCommand({
+        FunctionName: functionName
+      });
+
+      const result = await this.lambdaClient.send(command);
+      const responseTime = Date.now() - startTime;
+
+      return {
+        service: 'lambda',
+        status: result.Configuration?.State === 'Active' ? 'healthy' : 'degraded',
+        responseTime,
+        lastChecked: new Date().toISOString(),
+        details: {
+          region: this.config.region,
+          functionName,
+          ...(result.Configuration?.Runtime && { runtime: result.Configuration.Runtime }),
+          ...(result.Configuration?.MemorySize && { memorySize: result.Configuration.MemorySize }),
+          ...(result.Configuration?.Timeout && { timeout: result.Configuration.Timeout }),
+          ...(result.Configuration?.CodeSize && { codeSize: result.Configuration.CodeSize }),
+          ...(result.Configuration?.LastModified && { lastModified: result.Configuration.LastModified }),
+          ...(result.Configuration?.State && { state: result.Configuration.State }),
+          environment: result.Configuration?.Environment?.Variables || {}
+        }
+      };
+    } catch (error) {
+      const responseTime = Date.now() - startTime;
+      return {
+        service: 'lambda',
+        status: 'unhealthy',
+        responseTime,
+        lastChecked: new Date().toISOString(),
+        error: (error as Error).message
+      };
+    }
+  }
+
+  /**
+   * Check CloudWatch health and get detailed diagnostics
+   */
+  async checkCloudWatchHealth(): Promise<CloudWatchDiagnostics> {
+    const startTime = Date.now();
+    
+    try {
+      const command = new DescribeLogGroupsCommand({
+        limit: 10
+      });
+
+      const result = await this.cloudwatchClient.send(command);
+      const responseTime = Date.now() - startTime;
+
+      const logGroups = result.logGroups?.map(lg => ({
+        name: lg.logGroupName || 'unknown',
+        ...(lg.retentionInDays && { retentionInDays: lg.retentionInDays }),
+        ...(lg.storedBytes && { sizeBytes: lg.storedBytes })
+      })) || [];
+
+      return {
+        service: 'cloudwatch',
+        status: 'healthy',
+        responseTime,
+        lastChecked: new Date().toISOString(),
+        details: {
+          region: this.config.region,
+          logGroups
+        }
+      };
+    } catch (error) {
+      const responseTime = Date.now() - startTime;
+      return {
+        service: 'cloudwatch',
+        status: 'unhealthy',
+        responseTime,
+        lastChecked: new Date().toISOString(),
+        error: (error as Error).message
+      };
+    }
+  }
+
+  /**
+   * Get system resource metrics
+   */
+  async getSystemMetrics(): Promise<SystemResourceUsage> {
+    const memoryUsage = process.memoryUsage();
+    
+    return {
+      cpu: {
+        usage: process.cpuUsage().user / 1000000, // Convert to seconds
+        loadAverage: os.loadavg()
+      },
+      memory: {
+        used: Math.round(memoryUsage.heapUsed / 1024 / 1024),
+        total: Math.round(memoryUsage.heapTotal / 1024 / 1024),
+        external: Math.round(memoryUsage.external / 1024 / 1024),
+        percentage: Math.round((memoryUsage.heapUsed / memoryUsage.heapTotal) * 100),
+        rss: Math.round(memoryUsage.rss / 1024 / 1024),
+        arrayBuffers: Math.round(memoryUsage.arrayBuffers / 1024 / 1024)
+      },
+      heap: {
+        used: Math.round(memoryUsage.heapUsed / 1024 / 1024),
+        total: Math.round(memoryUsage.heapTotal / 1024 / 1024),
+        limit: Math.round((process.env.AWS_LAMBDA_FUNCTION_MEMORY_SIZE ? 
+                          parseInt(process.env.AWS_LAMBDA_FUNCTION_MEMORY_SIZE) : 512)),
+        percentage: Math.round((memoryUsage.heapUsed / memoryUsage.heapTotal) * 100)
+      }
+    };
+  }
+
+  /**
+   * Test network connectivity
+   */
+  async testConnectivity(): Promise<{ internet: boolean; aws: boolean; dns: boolean }> {
+    const tests = await Promise.allSettled([
+      this.testDnsResolution(),
+      this.testAwsConnectivity(),
+      this.testInternetConnectivity()
+    ]);
+
+    return {
+      dns: tests[0].status === 'fulfilled' ? tests[0].value : false,
+      aws: tests[1].status === 'fulfilled' ? tests[1].value : false,
+      internet: tests[2].status === 'fulfilled' ? tests[2].value : false
+    };
+  }
+
+  /**
+   * Test DNS resolution
+   */
+  private async testDnsResolution(): Promise<boolean> {
+    try {
+      await this.dnsLookup('google.com');
+      return true;
+    } catch (error) {
+      this.logger.debug('DNS test failed', { error: (error as Error).message });
+      return false;
+    }
+  }
+
+  /**
+   * Test AWS connectivity
+   */
+  private async testAwsConnectivity(): Promise<boolean> {
+    try {
+      const command = new DescribeTableCommand({
+        TableName: this.config.tables.users
+      });
+      await this.dynamoClient.send(command);
+      return true;
+    } catch (error) {
+      this.logger.debug('AWS connectivity test failed', { error: (error as Error).message });
+      return false;
+    }
+  }
+
+  /**
+   * Test general internet connectivity
+   */
+  private async testInternetConnectivity(): Promise<boolean> {
+    try {
+      await this.dnsLookup('aws.amazon.com');
+      return true;
+    } catch (error) {
+      this.logger.debug('Internet connectivity test failed', { error: (error as Error).message });
+      return false;
+    }
+  }
+
+  /**
+   * Validate system configuration
+   */
+  async validateConfiguration(): Promise<{ valid: boolean; errors?: string[]; warnings?: string[] }> {
+    const errors: string[] = [];
+    const warnings: string[] = [];
+
+    // Check required environment variables
+    const requiredEnvVars = [
+      'AWS_REGION',
+      'USERS_TABLE_NAME',
+      'STUDY_SESSIONS_TABLE_NAME',
+      'USER_PROGRESS_TABLE_NAME',
+      'GOALS_TABLE_NAME',
+      'QUESTION_DATA_BUCKET_NAME'
+    ];
+
+    requiredEnvVars.forEach(envVar => {
+      if (!process.env[envVar]) {
+        errors.push(`Missing required environment variable: ${envVar}`);
+      }
+    });
+
+    // Check table names
+    Object.entries(this.config.tables).forEach(([key, value]) => {
+      if (!value) {
+        errors.push(`Table configuration missing: ${key}`);
+      }
+    });
+
+    // Check bucket names
+    Object.entries(this.config.buckets).forEach(([key, value]) => {
+      if (!value) {
+        warnings.push(`Bucket configuration missing: ${key}`);
+      }
+    });
+
+    // Check Lambda function environment
+    if (!process.env.AWS_LAMBDA_FUNCTION_NAME) {
+      warnings.push('Lambda function name not available in environment');
+    }
+
+    return {
+      valid: errors.length === 0,
+      ...(errors.length > 0 && { errors }),
+      ...(warnings.length > 0 && { warnings })
+    };
+  }
+
+  /**
+   * Get performance metrics for a service
+   */
+  async getPerformanceMetrics(service?: string): Promise<PerformanceMetrics> {
+    // This is a simplified implementation
+    // In a real system, you might collect metrics from CloudWatch or other monitoring systems
+    
+    const startTime = Date.now();
+    
+    try {
+      if (service === 'dynamodb' || !service) {
+        await this.checkDynamoDbHealth();
+      }
+      if (service === 's3' || !service) {
+        await this.checkS3Health();
+      }
+      
+      const responseTime = Date.now() - startTime;
+      
+      return {
+        responseTime,
+        throughput: 0, // Would be calculated from real metrics
+        errorRate: 0,
+        availability: 100,
+        totalRequests: 1,
+        successfulRequests: 1,
+        failedRequests: 0
+      };
+    } catch (error) {
+      const responseTime = Date.now() - startTime;
+      return {
+        responseTime,
+        throughput: 0,
+        errorRate: 100,
+        availability: 0,
+        totalRequests: 1,
+        successfulRequests: 0,
+        failedRequests: 1
+      };
+    }
+  }
+
+  /**
+   * Get health trends (simplified implementation)
+   */
+  async getHealthTrends(service?: string, hours = 24): Promise<any[]> {
+    // This would typically query CloudWatch metrics or a time-series database
+    // For now, return empty array as this is beyond the scope of this phase
+    this.logger.debug('Health trends requested', { service, hours });
+    return [];
   }
 }

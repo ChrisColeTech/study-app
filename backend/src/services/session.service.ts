@@ -107,6 +107,18 @@ export class SessionService implements ISessionService {
         currentQuestionIndex: 0,
         totalQuestions: sessionQuestions.length,
         correctAnswers: 0,
+        // Phase 22: Adaptive session configuration
+        ...(request.isAdaptive && {
+          isAdaptive: true,
+          adaptiveConfig: {
+            difficultyDistribution: {
+              easy: Math.round(requestedCount * 0.3),
+              medium: Math.round(requestedCount * 0.5),
+              hard: Math.round(requestedCount * 0.2)
+            },
+            adjustmentAlgorithm: 'difficulty-based'
+          }
+        }),
         createdAt: now,
         updatedAt: now
       };

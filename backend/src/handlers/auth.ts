@@ -68,10 +68,7 @@ export class AuthHandler extends BaseHandler {
 
     // Validate using middleware - just check required fields here, detailed validation in service
     if (!userData.email || !userData.password || !userData.firstName || !userData.lastName) {
-      return ErrorHandlingMiddleware.createErrorResponse(
-        ERROR_CODES.VALIDATION_ERROR,
-        'Missing required fields: email, password, firstName, lastName'
-      );
+      return this.buildErrorResponse('Missing required fields: email, password, firstName, lastName', 400, ERROR_CODES.VALIDATION_ERROR);
     }
 
     // Business logic only - delegate error handling to middleware
@@ -95,7 +92,7 @@ export class AuthHandler extends BaseHandler {
       email: result!.user.email,
     });
 
-    return ErrorHandlingMiddleware.createSuccessResponse(result, 'User registered successfully');
+    return this.buildSuccessResponse('User registered successfully', result);
   }
 
   /**
@@ -108,10 +105,7 @@ export class AuthHandler extends BaseHandler {
 
     // Validate using middleware - just check required fields here
     if (!loginData.email || !loginData.password) {
-      return ErrorHandlingMiddleware.createErrorResponse(
-        ERROR_CODES.VALIDATION_ERROR,
-        'Email and password are required'
-      );
+      return this.buildErrorResponse('Email and password are required', 400, ERROR_CODES.VALIDATION_ERROR);
     }
 
     // Business logic only - delegate error handling to middleware
@@ -135,7 +129,7 @@ export class AuthHandler extends BaseHandler {
       email: result!.user.email,
     });
 
-    return ErrorHandlingMiddleware.createSuccessResponse(result, 'Login successful');
+    return this.buildSuccessResponse('Login successful', result);
   }
 
   /**
@@ -148,10 +142,7 @@ export class AuthHandler extends BaseHandler {
 
     // Validate using middleware - just check required fields here
     if (!refreshData.refreshToken) {
-      return ErrorHandlingMiddleware.createErrorResponse(
-        ERROR_CODES.VALIDATION_ERROR,
-        'Refresh token is required'
-      );
+      return this.buildErrorResponse('Refresh token is required', 400, ERROR_CODES.VALIDATION_ERROR);
     }
 
     // Business logic only - delegate error handling to middleware
@@ -173,7 +164,7 @@ export class AuthHandler extends BaseHandler {
       userId: result!.user.userId,
     });
 
-    return ErrorHandlingMiddleware.createSuccessResponse(result, 'Token refreshed successfully');
+    return this.buildSuccessResponse('Token refreshed successfully', result);
   }
 
   /**
@@ -202,10 +193,7 @@ export class AuthHandler extends BaseHandler {
       requestId: context.requestId,
     });
 
-    return ErrorHandlingMiddleware.createSuccessResponse(
-      { message: 'Logged out successfully' }, 
-      'Logout successful'
-    );
+    return this.buildSuccessResponse('Logout successful', { message: 'Logged out successfully' });
   }
 }
 

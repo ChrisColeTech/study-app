@@ -18,14 +18,55 @@ import {
   ParsingMiddleware,
   ErrorHandlingMiddleware,
   ErrorContexts,
+  ValidationMiddleware,
   AuthMiddleware,
   AuthConfigs,
   AuthenticatedContext
 } from '../shared/middleware';
+import { GoalsValidationSchemas } from '../shared/middleware/validation-schemas';
 
 export class GoalsHandler extends BaseHandler {
   private serviceFactory: ServiceFactory;
   private logger = createLogger({ handler: 'GoalsHandler' });
+  // Helper methods for GoalsHandler standardization
+  private validateUserIdFromBody(requestBody: any): ApiResponse | null {
+    if (!requestBody.userId) {
+      return this.buildErrorResponse('userId is required until Phase 30 authentication is implemented', 400, ERROR_CODES.VALIDATION_ERROR);
+    }
+    return null;
+  }
+
+  private validateUserIdFromQuery(queryParams: any): ApiResponse | null {
+    if (!queryParams?.userId) {
+      return this.buildErrorResponse('userId query parameter is required until Phase 30 authentication is implemented', 400, ERROR_CODES.VALIDATION_ERROR);
+    }
+    return null;
+  }
+
+  private buildGetGoalsRequest(queryParams: any): GetGoalsRequest {
+    const request: GetGoalsRequest = {};
+    
+    if (queryParams?.status) {
+      request.status = queryParams.status.split(',').map((s: string) => s.trim()) as any[];
+    }
+    if (queryParams?.type) {
+      request.type = queryParams.type.split(',').map((t: string) => t.trim()) as any[];
+    }
+    if (queryParams?.priority) {
+      request.priority = queryParams.priority.split(',').map((p: string) => p.trim()) as any[];
+    }
+    if (queryParams?.examId) request.examId = queryParams.examId;
+    if (queryParams?.topicId) request.topicId = queryParams.topicId;
+    if (queryParams?.providerId) request.providerId = queryParams.providerId;
+    if (queryParams?.isArchived !== undefined) request.isArchived = queryParams.isArchived;
+    if (queryParams?.search) request.search = queryParams.search;
+    if (queryParams?.sortBy) request.sortBy = queryParams.sortBy as any;
+    if (queryParams?.sortOrder) request.sortOrder = queryParams.sortOrder as any;
+    if (queryParams?.limit) request.limit = Math.min(queryParams.limit, 100);
+    if (queryParams?.offset) request.offset = queryParams.offset;
+    
+    return request;
+  }
 
   constructor() {
     super();
@@ -77,23 +118,17 @@ export class GoalsHandler extends BaseHandler {
    * Create a new goal
    */
   private async createGoal(context: HandlerContext): Promise<ApiResponse> {
-    // No authentication required - userId will be provided in request until Phase 30
-
-    // Parse and validate request body using middleware
+// Parse and validate request body using middleware
     const { data: requestBody, error: parseError } = ParsingMiddleware.parseRequestBody<CreateGoalRequest & { userId: string }>(context, true);
     if (parseError) return parseError;
 
     // Validate userId is provided until Phase 30
-    if (!requestBody.userId) {
-      return ErrorHandlingMiddleware.createErrorResponse(
-        ERROR_CODES.VALIDATION_ERROR,
-        'userId is required until Phase 30 authentication is implemented'
-      );
-    }
+    const userIdValidation = this.validateUserIdFromBody(requestBody);
+    if (userIdValidation) return userIdValidation;
 
-    // Validate using helper method
-    const validationError = this.validateCreateGoalRequest(requestBody);
-    if (validationError) return validationError;
+    // Validate using comprehensive schema (replaces validateCreateGoalRequest)
+    const validationResult = ValidationMiddleware.validateRequestBody(context, GoalsValidationSchemas.createGoalRequest());
+    if (validationResult.error) return validationResult.error;
 
     // Business logic only - delegate error handling to middleware
     const { result, error } = await ErrorHandlingMiddleware.withErrorHandling(
@@ -123,16 +158,14 @@ export class GoalsHandler extends BaseHandler {
       targetValue: result!.goal.targetValue
     });
 
-    return ErrorHandlingMiddleware.createSuccessResponse(result, 'Goal created successfully');
+    return this.buildSuccessResponse('Goal created successfully', result);
   }
 
   /**
    * Get goals with optional filtering
    */
   private async getGoals(context: HandlerContext): Promise<ApiResponse> {
-    // No authentication required - userId will be provided as query param until Phase 30
-
-    // Parse query parameters using middleware
+// Parse query parameters using middleware
     const { data: queryParams, error: parseError } = ParsingMiddleware.parseQueryParams(context, {
       userId: { type: 'string', decode: true },
       status: { type: 'string', decode: true },
@@ -151,34 +184,11 @@ export class GoalsHandler extends BaseHandler {
     if (parseError) return parseError;
 
     // Validate userId is provided until Phase 30
-    if (!queryParams?.userId) {
-      return ErrorHandlingMiddleware.createErrorResponse(
-        ERROR_CODES.VALIDATION_ERROR,
-        'userId query parameter is required until Phase 30 authentication is implemented'
-      );
-    }
+    const userIdValidation = this.validateUserIdFromQuery(queryParams);
+    if (userIdValidation) return userIdValidation;
 
-    // Build request object
-    const request: GetGoalsRequest = {};
-    
-    if (queryParams?.status) {
-      request.status = queryParams.status.split(',').map((s: string) => s.trim()) as any[];
-    }
-    if (queryParams?.type) {
-      request.type = queryParams.type.split(',').map((t: string) => t.trim()) as any[];
-    }
-    if (queryParams?.priority) {
-      request.priority = queryParams.priority.split(',').map((p: string) => p.trim()) as any[];
-    }
-    if (queryParams?.examId) request.examId = queryParams.examId;
-    if (queryParams?.topicId) request.topicId = queryParams.topicId;
-    if (queryParams?.providerId) request.providerId = queryParams.providerId;
-    if (queryParams?.isArchived !== undefined) request.isArchived = queryParams.isArchived;
-    if (queryParams?.search) request.search = queryParams.search;
-    if (queryParams?.sortBy) request.sortBy = queryParams.sortBy as any;
-    if (queryParams?.sortOrder) request.sortOrder = queryParams.sortOrder as any;
-    if (queryParams?.limit) request.limit = Math.min(queryParams.limit, 100);
-    if (queryParams?.offset) request.offset = queryParams.offset;
+    // Build request object using helper method
+    const request = this.buildGetGoalsRequest(queryParams);
 
     // Business logic only - delegate error handling to middleware
     const { result, error } = await ErrorHandlingMiddleware.withErrorHandling(
@@ -204,16 +214,14 @@ export class GoalsHandler extends BaseHandler {
       filters: request
     });
 
-    return ErrorHandlingMiddleware.createSuccessResponse(result, 'Goals retrieved successfully');
+    return this.buildSuccessResponse('Goals retrieved successfully', result);
   }
 
   /**
    * Get a specific goal by ID
    */
   private async getGoal(context: HandlerContext): Promise<ApiResponse> {
-    // No authentication required - userId will be provided as query param until Phase 30
-
-    // Parse path parameters using middleware
+// Parse path parameters using middleware
     const { data: pathParams, error: parseError } = ParsingMiddleware.parsePathParams(context);
     if (parseError) return parseError;
 
@@ -224,16 +232,12 @@ export class GoalsHandler extends BaseHandler {
     if (queryParseError) return queryParseError;
 
     // Validate userId is provided until Phase 30
-    if (!queryParams?.userId) {
-      return ErrorHandlingMiddleware.createErrorResponse(
-        ERROR_CODES.VALIDATION_ERROR,
-        'userId query parameter is required until Phase 30 authentication is implemented'
-      );
-    }
+    const userIdValidation = this.validateUserIdFromQuery(queryParams);
+    if (userIdValidation) return userIdValidation;
 
-    // Validate goal ID
-    const goalValidationError = this.validateGoalId(pathParams.id);
-    if (goalValidationError) return goalValidationError;
+    // Validate goal ID using ValidationMiddleware (replaces validateGoalId)
+    const goalValidation = ValidationMiddleware.validateFields({ goalId: pathParams.id }, GoalsValidationSchemas.goalId(), 'params');
+    if (goalValidation) return goalValidation;
 
     // Business logic only - delegate error handling to middleware
     const { result, error } = await ErrorHandlingMiddleware.withErrorHandling(
@@ -260,16 +264,14 @@ export class GoalsHandler extends BaseHandler {
       progress: result!.goal.progressPercentage
     });
 
-    return ErrorHandlingMiddleware.createSuccessResponse(result, 'Goal retrieved successfully');
+    return this.buildSuccessResponse('Goal retrieved successfully', result);
   }
 
   /**
    * Update an existing goal
    */
   private async updateGoal(context: HandlerContext): Promise<ApiResponse> {
-    // No authentication required - userId will be provided as query param until Phase 30
-
-    // Parse path parameters using middleware
+// Parse path parameters using middleware
     const { data: pathParams, error: parseError } = ParsingMiddleware.parsePathParams(context);
     if (parseError) return parseError;
 
@@ -280,23 +282,19 @@ export class GoalsHandler extends BaseHandler {
     if (queryParseError) return queryParseError;
 
     // Validate userId is provided until Phase 30
-    if (!queryParams?.userId) {
-      return ErrorHandlingMiddleware.createErrorResponse(
-        ERROR_CODES.VALIDATION_ERROR,
-        'userId query parameter is required until Phase 30 authentication is implemented'
-      );
-    }
+    const userIdValidation = this.validateUserIdFromQuery(queryParams);
+    if (userIdValidation) return userIdValidation;
 
     // Parse and validate request body using middleware
     const { data: requestBody, error: bodyParseError } = ParsingMiddleware.parseRequestBody<UpdateGoalRequest>(context, true);
     if (bodyParseError) return bodyParseError;
 
-    // Validate goal ID and request body
-    const goalValidationError = this.validateGoalId(pathParams.id);
-    if (goalValidationError) return goalValidationError;
+    // Validate goal ID and request body using ValidationMiddleware
+    const goalValidation = ValidationMiddleware.validateFields({ goalId: pathParams.id }, GoalsValidationSchemas.goalId(), 'params');
+    if (goalValidation) return goalValidation;
 
-    const updateValidationError = this.validateUpdateGoalRequest(requestBody);
-    if (updateValidationError) return updateValidationError;
+    const updateValidation = ValidationMiddleware.validateFields(requestBody, GoalsValidationSchemas.updateGoalRequest(), 'body');
+    if (updateValidation) return updateValidation;
 
     // Business logic only - delegate error handling to middleware
     const { result, error } = await ErrorHandlingMiddleware.withErrorHandling(
@@ -326,16 +324,14 @@ export class GoalsHandler extends BaseHandler {
       updates: Object.keys(requestBody)
     });
 
-    return ErrorHandlingMiddleware.createSuccessResponse(result, 'Goal updated successfully');
+    return this.buildSuccessResponse('Goal updated successfully', result);
   }
 
   /**
    * Delete a goal
    */
   private async deleteGoal(context: HandlerContext): Promise<ApiResponse> {
-    // No authentication required - userId will be provided as query param until Phase 30
-
-    // Parse path parameters using middleware
+// Parse path parameters using middleware
     const { data: pathParams, error: parseError } = ParsingMiddleware.parsePathParams(context);
     if (parseError) return parseError;
 
@@ -346,16 +342,12 @@ export class GoalsHandler extends BaseHandler {
     if (queryParseError) return queryParseError;
 
     // Validate userId is provided until Phase 30
-    if (!queryParams?.userId) {
-      return ErrorHandlingMiddleware.createErrorResponse(
-        ERROR_CODES.VALIDATION_ERROR,
-        'userId query parameter is required until Phase 30 authentication is implemented'
-      );
-    }
+    const userIdValidation = this.validateUserIdFromQuery(queryParams);
+    if (userIdValidation) return userIdValidation;
 
-    // Validate goal ID
-    const goalValidationError = this.validateGoalId(pathParams.id);
-    if (goalValidationError) return goalValidationError;
+    // Validate goal ID using ValidationMiddleware (replaces validateGoalId)
+    const goalValidation = ValidationMiddleware.validateFields({ goalId: pathParams.id }, GoalsValidationSchemas.goalId(), 'params');
+    if (goalValidation) return goalValidation;
 
     // Business logic only - delegate error handling to middleware
     const { result, error } = await ErrorHandlingMiddleware.withErrorHandling(
@@ -379,28 +371,22 @@ export class GoalsHandler extends BaseHandler {
       goalId: pathParams.id
     });
 
-    return ErrorHandlingMiddleware.createSuccessResponse(result, 'Goal deleted successfully');
+    return this.buildSuccessResponse('Goal deleted successfully', result);
   }
 
   /**
    * Get goal statistics for user
    */
   private async getGoalStats(context: HandlerContext): Promise<ApiResponse> {
-    // No authentication required - userId will be provided as query param until Phase 30
-
-    // Parse query parameters using middleware
+// Parse query parameters using middleware
     const { data: queryParams, error: parseError } = ParsingMiddleware.parseQueryParams(context, {
       userId: { type: 'string', decode: true }
     });
     if (parseError) return parseError;
 
     // Validate userId is provided until Phase 30
-    if (!queryParams?.userId) {
-      return ErrorHandlingMiddleware.createErrorResponse(
-        ERROR_CODES.VALIDATION_ERROR,
-        'userId query parameter is required until Phase 30 authentication is implemented'
-      );
-    }
+    const userIdValidation = this.validateUserIdFromQuery(queryParams);
+    if (userIdValidation) return userIdValidation;
 
     // Business logic only - delegate error handling to middleware
     const { result, error } = await ErrorHandlingMiddleware.withErrorHandling(
@@ -426,217 +412,14 @@ export class GoalsHandler extends BaseHandler {
       completionRate: result!.completionRate
     });
 
-    return ErrorHandlingMiddleware.createSuccessResponse(result, 'Goal statistics retrieved successfully');
+    return this.buildSuccessResponse('Goal statistics retrieved successfully', result);
   }
 
-  /**
-   * Helper method to validate create goal request
-   */
-  private validateCreateGoalRequest(requestBody: any): ApiResponse | null {
-    // Check required fields
-    const requiredFields = ['title', 'type', 'priority', 'targetType', 'targetValue'];
-    for (const field of requiredFields) {
-      if (!requestBody[field]) {
-        return ErrorHandlingMiddleware.createErrorResponse(
-          ERROR_CODES.VALIDATION_ERROR,
-          `${field} is required`
-        );
-      }
-    }
 
-    // Validate field types and values
-    if (typeof requestBody.title !== 'string' || requestBody.title.trim().length === 0) {
-      return ErrorHandlingMiddleware.createErrorResponse(
-        ERROR_CODES.VALIDATION_ERROR,
-        'title must be a non-empty string'
-      );
-    }
 
-    if (requestBody.title.length > 200) {
-      return ErrorHandlingMiddleware.createErrorResponse(
-        ERROR_CODES.VALIDATION_ERROR,
-        'title must be 200 characters or less'
-      );
-    }
 
-    if (requestBody.description && requestBody.description.length > 1000) {
-      return ErrorHandlingMiddleware.createErrorResponse(
-        ERROR_CODES.VALIDATION_ERROR,
-        'description must be 1000 characters or less'
-      );
-    }
 
-    // Validate enum values
-    const validTypes = ['exam_preparation', 'topic_mastery', 'daily_practice', 'score_target', 'streak'];
-    if (!validTypes.includes(requestBody.type)) {
-      return ErrorHandlingMiddleware.createErrorResponse(
-        ERROR_CODES.VALIDATION_ERROR,
-        `type must be one of: ${validTypes.join(', ')}`
-      );
-    }
 
-    const validPriorities = ['low', 'medium', 'high'];
-    if (!validPriorities.includes(requestBody.priority)) {
-      return ErrorHandlingMiddleware.createErrorResponse(
-        ERROR_CODES.VALIDATION_ERROR,
-        `priority must be one of: ${validPriorities.join(', ')}`
-      );
-    }
-
-    const validTargetTypes = ['exam', 'topic', 'questions', 'score', 'days'];
-    if (!validTargetTypes.includes(requestBody.targetType)) {
-      return ErrorHandlingMiddleware.createErrorResponse(
-        ERROR_CODES.VALIDATION_ERROR,
-        `targetType must be one of: ${validTargetTypes.join(', ')}`
-      );
-    }
-
-    // Validate target value
-    if (typeof requestBody.targetValue !== 'number' || requestBody.targetValue <= 0) {
-      return ErrorHandlingMiddleware.createErrorResponse(
-        ERROR_CODES.VALIDATION_ERROR,
-        'targetValue must be a positive number'
-      );
-    }
-
-    // Validate deadline if provided
-    if (requestBody.deadline) {
-      const deadline = new Date(requestBody.deadline);
-      if (isNaN(deadline.getTime())) {
-        return ErrorHandlingMiddleware.createErrorResponse(
-          ERROR_CODES.VALIDATION_ERROR,
-          'deadline must be a valid ISO 8601 date'
-        );
-      }
-      if (deadline <= new Date()) {
-        return ErrorHandlingMiddleware.createErrorResponse(
-          ERROR_CODES.VALIDATION_ERROR,
-          'deadline must be in the future'
-        );
-      }
-    }
-
-    // Validate ID formats if provided
-    const idFields = ['examId', 'topicId', 'providerId'];
-    for (const field of idFields) {
-      if (requestBody[field] && (typeof requestBody[field] !== 'string' || requestBody[field].trim().length === 0)) {
-        return ErrorHandlingMiddleware.createErrorResponse(
-          ERROR_CODES.VALIDATION_ERROR,
-          `${field} must be a non-empty string`
-        );
-      }
-    }
-
-    return null; // No validation errors
-  }
-
-  /**
-   * Helper method to validate update goal request
-   */
-  private validateUpdateGoalRequest(requestBody: any): ApiResponse | null {
-    // Validate optional fields if provided
-    if (requestBody.title !== undefined) {
-      if (typeof requestBody.title !== 'string' || requestBody.title.trim().length === 0) {
-        return ErrorHandlingMiddleware.createErrorResponse(
-          ERROR_CODES.VALIDATION_ERROR,
-          'title must be a non-empty string'
-        );
-      }
-      if (requestBody.title.length > 200) {
-        return ErrorHandlingMiddleware.createErrorResponse(
-          ERROR_CODES.VALIDATION_ERROR,
-          'title must be 200 characters or less'
-        );
-      }
-    }
-
-    if (requestBody.description !== undefined && requestBody.description.length > 1000) {
-      return ErrorHandlingMiddleware.createErrorResponse(
-        ERROR_CODES.VALIDATION_ERROR,
-        'description must be 1000 characters or less'
-      );
-    }
-
-    // Validate enum values if provided
-    if (requestBody.priority !== undefined) {
-      const validPriorities = ['low', 'medium', 'high'];
-      if (!validPriorities.includes(requestBody.priority)) {
-        return ErrorHandlingMiddleware.createErrorResponse(
-          ERROR_CODES.VALIDATION_ERROR,
-          `priority must be one of: ${validPriorities.join(', ')}`
-        );
-      }
-    }
-
-    if (requestBody.status !== undefined) {
-      const validStatuses = ['active', 'completed', 'paused', 'abandoned'];
-      if (!validStatuses.includes(requestBody.status)) {
-        return ErrorHandlingMiddleware.createErrorResponse(
-          ERROR_CODES.VALIDATION_ERROR,
-          `status must be one of: ${validStatuses.join(', ')}`
-        );
-      }
-    }
-
-    // Validate numeric values if provided
-    if (requestBody.targetValue !== undefined) {
-      if (typeof requestBody.targetValue !== 'number' || requestBody.targetValue <= 0) {
-        return ErrorHandlingMiddleware.createErrorResponse(
-          ERROR_CODES.VALIDATION_ERROR,
-          'targetValue must be a positive number'
-        );
-      }
-    }
-
-    if (requestBody.currentValue !== undefined) {
-      if (typeof requestBody.currentValue !== 'number' || requestBody.currentValue < 0) {
-        return ErrorHandlingMiddleware.createErrorResponse(
-          ERROR_CODES.VALIDATION_ERROR,
-          'currentValue must be a non-negative number'
-        );
-      }
-    }
-
-    // Validate deadline if provided
-    if (requestBody.deadline !== undefined && requestBody.deadline) {
-      const deadline = new Date(requestBody.deadline);
-      if (isNaN(deadline.getTime())) {
-        return ErrorHandlingMiddleware.createErrorResponse(
-          ERROR_CODES.VALIDATION_ERROR,
-          'deadline must be a valid ISO 8601 date'
-        );
-      }
-      if (deadline <= new Date()) {
-        return ErrorHandlingMiddleware.createErrorResponse(
-          ERROR_CODES.VALIDATION_ERROR,
-          'deadline must be in the future'
-        );
-      }
-    }
-
-    return null; // No validation errors
-  }
-
-  /**
-   * Helper method to validate goal ID
-   */
-  private validateGoalId(goalId: string | undefined): ApiResponse | null {
-    if (!goalId) {
-      return ErrorHandlingMiddleware.createErrorResponse(
-        ERROR_CODES.VALIDATION_ERROR,
-        'Goal ID is required'
-      );
-    }
-
-    if (!/^[a-f0-9-]{36}$/.test(goalId)) {
-      return ErrorHandlingMiddleware.createErrorResponse(
-        ERROR_CODES.VALIDATION_ERROR,
-        'Invalid goal ID format'
-      );
-    }
-
-    return null;
-  }
 }
 
 // Export handler function for Lambda

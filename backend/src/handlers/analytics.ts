@@ -14,8 +14,10 @@ import {
 import {
   ParsingMiddleware,
   ErrorHandlingMiddleware,
-  ErrorContexts
+  ErrorContexts,
+  ValidationMiddleware
 } from '../shared/middleware';
+import { AnalyticsValidationSchemas } from '../shared/middleware/validation-schemas';
 
 export class AnalyticsHandler extends BaseHandler {
   private serviceFactory: ServiceFactory;
@@ -67,9 +69,9 @@ export class AnalyticsHandler extends BaseHandler {
     const { data: queryParams, error: parseError } = ParsingMiddleware.parseQueryParams(context);
     if (parseError) return parseError;
 
-    // Validate and build analytics request
-    const validationError = this.validateProgressAnalyticsRequest(queryParams);
-    if (validationError) return validationError;
+    // Validate and build analytics request using ValidationMiddleware (replaces validateProgressAnalyticsRequest)
+    const validationResult = ValidationMiddleware.validateFields(queryParams, AnalyticsValidationSchemas.progressAnalyticsRequest(), 'query');
+    if (validationResult) return validationResult;
 
     const analyticsRequest: ProgressAnalyticsRequest = {
       timeframe: queryParams.timeframe as 'week' | 'month' | 'quarter' | 'year' | 'all' || 'month',
@@ -129,10 +131,7 @@ export class AnalyticsHandler extends BaseHandler {
       topicCount: result!.data.competencyData.topicCompetencies.length
     });
 
-    return ErrorHandlingMiddleware.createSuccessResponse(
-      result, 
-      'Progress analytics retrieved successfully'
-    );
+    return this.buildSuccessResponse('Progress analytics retrieved successfully', result);
   }
 
   /**
@@ -158,7 +157,7 @@ export class AnalyticsHandler extends BaseHandler {
 
     if (error) return error;
 
-    return ErrorHandlingMiddleware.createSuccessResponse(result, 'Session analytics retrieved successfully');
+    return this.buildSuccessResponse('Session analytics retrieved successfully', result);
   }
 
   /**
@@ -184,7 +183,7 @@ export class AnalyticsHandler extends BaseHandler {
 
     if (error) return error;
 
-    return ErrorHandlingMiddleware.createSuccessResponse(result, 'Performance analytics retrieved successfully');
+    return this.buildSuccessResponse('Performance analytics retrieved successfully', result);
   }
 
   /**
@@ -226,174 +225,22 @@ export class AnalyticsHandler extends BaseHandler {
         status: healthData.status
       });
 
-      return ErrorHandlingMiddleware.createSuccessResponse(
-        healthData, 
-        'Analytics service is healthy'
-      );
+      return this.buildSuccessResponse('Analytics service is healthy', healthData);
 
     } catch (error) {
       this.logger.error('Analytics health check failed', error as Error, { 
         requestId: context.requestId 
       });
 
-      return ErrorHandlingMiddleware.createErrorResponse(
-        'SERVICE_UNAVAILABLE',
-        'Analytics service health check failed',
-        { error: (error as Error).message }
-      );
+      return this.buildErrorResponse('Analytics service health check failed', 503, 'SERVICE_UNAVAILABLE', { error: (error as Error).message });
     }
   }
 
-  /**
-   * Validate progress analytics request parameters
-   */
-  private validateProgressAnalyticsRequest(queryParams: any): ApiResponse | null {
-    // Validate timeframe
-    if (queryParams.timeframe) {
-      const validTimeframes = ['week', 'month', 'quarter', 'year', 'all'];
-      if (!validTimeframes.includes(queryParams.timeframe)) {
-        return ErrorHandlingMiddleware.createErrorResponse(
-          ERROR_CODES.VALIDATION_ERROR,
-          `timeframe must be one of: ${validTimeframes.join(', ')}`
-        );
-      }
-    }
 
-    // Validate date formats
-    if (queryParams.startDate) {
-      if (!this.isValidISODate(queryParams.startDate)) {
-        return ErrorHandlingMiddleware.createErrorResponse(
-          ERROR_CODES.VALIDATION_ERROR,
-          'startDate must be a valid ISO date string (YYYY-MM-DD or YYYY-MM-DDTHH:mm:ss.sssZ)'
-        );
-      }
-    }
 
-    if (queryParams.endDate) {
-      if (!this.isValidISODate(queryParams.endDate)) {
-        return ErrorHandlingMiddleware.createErrorResponse(
-          ERROR_CODES.VALIDATION_ERROR,
-          'endDate must be a valid ISO date string (YYYY-MM-DD or YYYY-MM-DDTHH:mm:ss.sssZ)'
-        );
-      }
-    }
 
-    // Validate date range
-    if (queryParams.startDate && queryParams.endDate) {
-      const startDate = new Date(queryParams.startDate);
-      const endDate = new Date(queryParams.endDate);
-      
-      if (startDate >= endDate) {
-        return ErrorHandlingMiddleware.createErrorResponse(
-          ERROR_CODES.VALIDATION_ERROR,
-          'startDate must be before endDate'
-        );
-      }
 
-      // Validate range is not too large (max 2 years)
-      const maxRangeMs = 2 * 365 * 24 * 60 * 60 * 1000; // 2 years
-      if (endDate.getTime() - startDate.getTime() > maxRangeMs) {
-        return ErrorHandlingMiddleware.createErrorResponse(
-          ERROR_CODES.VALIDATION_ERROR,
-          'Date range cannot exceed 2 years'
-        );
-      }
-    }
 
-    // Validate provider ID format
-    if (queryParams.providerId) {
-      if (typeof queryParams.providerId !== 'string' || !/^[a-zA-Z0-9_-]+$/.test(queryParams.providerId)) {
-        return ErrorHandlingMiddleware.createErrorResponse(
-          ERROR_CODES.VALIDATION_ERROR,
-          'Invalid providerId format. Use alphanumeric characters, hyphens, and underscores only'
-        );
-      }
-    }
-
-    // Validate exam ID format
-    if (queryParams.examId) {
-      if (typeof queryParams.examId !== 'string' || !/^[a-zA-Z0-9_-]+$/.test(queryParams.examId)) {
-        return ErrorHandlingMiddleware.createErrorResponse(
-          ERROR_CODES.VALIDATION_ERROR,
-          'Invalid examId format. Use alphanumeric characters, hyphens, and underscores only'
-        );
-      }
-    }
-
-    // Validate topics format
-    if (queryParams.topics) {
-      const topics = queryParams.topics.split(',');
-      if (topics.length > 20) {
-        return ErrorHandlingMiddleware.createErrorResponse(
-          ERROR_CODES.VALIDATION_ERROR,
-          'Maximum 20 topics allowed'
-        );
-      }
-
-      for (const topic of topics) {
-        if (!/^[a-zA-Z0-9_-]+$/.test(topic.trim())) {
-          return ErrorHandlingMiddleware.createErrorResponse(
-            ERROR_CODES.VALIDATION_ERROR,
-            'Invalid topic format. Use alphanumeric characters, hyphens, and underscores only'
-          );
-        }
-      }
-    }
-
-    // Validate pagination parameters
-    if (queryParams.limit) {
-      const limit = parseInt(queryParams.limit, 10);
-      if (isNaN(limit) || limit < 1 || limit > 1000) {
-        return ErrorHandlingMiddleware.createErrorResponse(
-          ERROR_CODES.VALIDATION_ERROR,
-          'limit must be a number between 1 and 1000'
-        );
-      }
-    }
-
-    if (queryParams.offset) {
-      const offset = parseInt(queryParams.offset, 10);
-      if (isNaN(offset) || offset < 0) {
-        return ErrorHandlingMiddleware.createErrorResponse(
-          ERROR_CODES.VALIDATION_ERROR,
-          'offset must be a non-negative number'
-        );
-      }
-    }
-
-    return null; // No validation errors
-  }
-
-  /**
-   * Helper method to validate ISO date strings
-   */
-  private isValidISODate(dateString: string): boolean {
-    try {
-      const date = new Date(dateString);
-      
-      // Check if the date is valid and the string format matches ISO standard
-      return date instanceof Date && 
-             !isNaN(date.getTime()) && 
-             (!!dateString.match(/^\d{4}-\d{2}-\d{2}$/) || 
-              !!dateString.match(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{3})?Z?$/));
-    } catch {
-      return false;
-    }
-  }
-
-  /**
-   * Helper method to create standard analytics error responses
-   */
-  private createAnalyticsError(code: string, message: string, details?: any): ApiResponse {
-    return ErrorHandlingMiddleware.createErrorResponse(code, message, details);
-  }
-
-  /**
-   * Helper method to create standard analytics success responses
-   */
-  private createAnalyticsSuccess<T>(data: T, message: string): ApiResponse<T> {
-    return ErrorHandlingMiddleware.createSuccessResponse(data, message);
-  }
 }
 
 // Export handler function for Lambda

@@ -13,10 +13,12 @@ export interface ApiSuccessResponse<T = any> {
   message?: string | undefined;
   timestamp: string;
   requestId?: string | undefined;
+  metadata?: Record<string, any>;
 }
 
 export interface ApiErrorResponse {
   success: false;
+  message?: string;
   error: {
     code: string;
     message: string;

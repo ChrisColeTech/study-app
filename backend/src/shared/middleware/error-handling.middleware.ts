@@ -62,13 +62,13 @@ export class ErrorHandlingMiddleware {
   ];
 
   /**
-   * Handle and format errors with consistent logging and response structure
+   * Process and classify errors with consistent logging - returns error info for BaseHandler
    */
-  static handleError(
+  static processError(
     error: Error | any,
     context: ErrorContext,
     customMappings: ErrorMapping[] = []
-  ): ApiResponse {
+  ): { code: string; message: string; statusCode: number } {
     const errorMessage = error?.message || 'Unknown error occurred';
     const allMappings = [...customMappings, ...this.DEFAULT_ERROR_MAPPINGS];
     
@@ -108,11 +108,29 @@ export class ErrorHandlingMiddleware {
       logger.warn(`${context.operation} client error`, logContext);
     }
 
-    return this.createErrorResponse(errorCode, responseMessage);
+    return { code: errorCode, message: responseMessage, statusCode };
   }
 
   /**
-   * Handle async operation with automatic error handling
+   * Handle async operation with automatic error processing - returns error info for BaseHandler
+   */
+  static async withErrorProcessing<T>(
+    operation: () => Promise<T>,
+    context: ErrorContext,
+    customMappings: ErrorMapping[] = []
+  ): Promise<{ result?: T; errorInfo?: { code: string; message: string; statusCode: number } }> {
+    try {
+      const result = await operation();
+      return { result };
+    } catch (error) {
+      const errorInfo = this.processError(error, context, customMappings);
+      return { errorInfo };
+    }
+  }
+
+  /**
+   * @deprecated Use withErrorProcessing() with BaseHandler methods instead
+   * TODO: Remove in Phase 0 when handlers are fixed
    */
   static async withErrorHandling<T>(
     operation: () => Promise<T>,
@@ -123,13 +141,15 @@ export class ErrorHandlingMiddleware {
       const result = await operation();
       return { result };
     } catch (error) {
-      const errorResponse = this.handleError(error, context, customMappings);
+      const errorInfo = this.processError(error, context, customMappings);
+      const errorResponse = this.createErrorResponse(errorInfo.code, errorInfo.message);
       return { error: errorResponse };
     }
   }
 
   /**
-   * Create standardized success response
+   * @deprecated Use BaseHandler.buildSuccessResponse() instead - violates BaseHandler pattern
+   * TODO: Remove in Phase 0 when handlers are fixed
    */
   static createSuccessResponse<T>(
     data: T,
@@ -144,7 +164,8 @@ export class ErrorHandlingMiddleware {
   }
 
   /**
-   * Create standardized error response
+   * @deprecated Use BaseHandler.buildErrorResponse() instead - violates BaseHandler pattern  
+   * TODO: Remove in Phase 0 when handlers are fixed
    */
   static createErrorResponse(
     code: string,
@@ -169,12 +190,12 @@ export class ErrorHandlingMiddleware {
   }
 
   /**
-   * Validate required fields and return error if missing
+   * Validate required fields and return error info for BaseHandler
    */
   static validateRequiredFields(
     fields: Record<string, any>,
     requiredFields: string[]
-  ): ApiResponse | null {
+  ): { code: string; message: string } | null {
     const missingFields = requiredFields.filter(field => 
       !fields[field] || 
       (typeof fields[field] === 'string' && fields[field].trim() === '')
@@ -185,41 +206,32 @@ export class ErrorHandlingMiddleware {
         ? `${missingFields[0]} is required`
         : `Missing required fields: ${missingFields.join(', ')}`;
         
-      return this.createErrorResponse(ERROR_CODES.VALIDATION_ERROR, message);
+      return { code: ERROR_CODES.VALIDATION_ERROR, message };
     }
 
     return null;
   }
 
   /**
-   * Handle authentication errors specifically
+   * Handle authentication errors specifically - returns error info for BaseHandler
    */
   static handleAuthError(
     error: Error | any,
     context: ErrorContext
-  ): ApiResponse {
+  ): { code: string; message: string } {
     const errorMessage = error?.message || 'Authentication failed';
     
     // Check for specific auth error types
     if (errorMessage.includes('expired')) {
-      return this.createErrorResponse(
-        ERROR_CODES.TOKEN_EXPIRED,
-        'Token expired'
-      );
+      return { code: ERROR_CODES.TOKEN_EXPIRED, message: 'Token expired' };
     }
     
     if (errorMessage.includes('Invalid token') || errorMessage.includes('malformed')) {
-      return this.createErrorResponse(
-        ERROR_CODES.TOKEN_INVALID,
-        'Invalid token'
-      );
+      return { code: ERROR_CODES.TOKEN_INVALID, message: 'Invalid token' };
     }
     
     if (errorMessage.includes('Missing') || errorMessage.includes('required')) {
-      return this.createErrorResponse(
-        ERROR_CODES.UNAUTHORIZED,
-        'Authentication required'
-      );
+      return { code: ERROR_CODES.UNAUTHORIZED, message: 'Authentication required' };
     }
 
     // Log auth error
@@ -230,20 +242,17 @@ export class ErrorHandlingMiddleware {
       ...(context.additionalInfo && { additionalInfo: context.additionalInfo })
     });
 
-    return this.createErrorResponse(
-      ERROR_CODES.UNAUTHORIZED,
-      'Authentication failed'
-    );
+    return { code: ERROR_CODES.UNAUTHORIZED, message: 'Authentication failed' };
   }
 
   /**
-   * Handle validation errors with field-specific details
+   * Handle validation errors with field-specific details - returns error info for BaseHandler
    */
   static handleValidationError(
     error: Error | any,
     context: ErrorContext,
     fieldErrors?: Record<string, string>
-  ): ApiResponse {
+  ): { code: string; message: string; details?: Record<string, string> } {
     const message = error?.message || 'Validation failed';
     
     logger.warn('Validation error', {
@@ -254,21 +263,21 @@ export class ErrorHandlingMiddleware {
       ...(context.additionalInfo && { additionalInfo: context.additionalInfo })
     });
 
-    return this.createErrorResponse(
-      ERROR_CODES.VALIDATION_ERROR,
+    return {
+      code: ERROR_CODES.VALIDATION_ERROR,
       message,
-      fieldErrors
-    );
+      ...(fieldErrors && { details: fieldErrors })
+    };
   }
 
   /**
-   * Handle service-specific errors (for business logic)
+   * Handle service-specific errors (for business logic) - returns error info for BaseHandler
    */
   static handleServiceError(
     error: Error | any,
     context: ErrorContext,
     serviceName: string
-  ): ApiResponse {
+  ): { code: string; message: string; statusCode: number } {
     const errorMessage = error?.message || `${serviceName} operation failed`;
     
     // Service-specific error mappings
@@ -295,17 +304,17 @@ export class ErrorHandlingMiddleware {
       }
     ];
 
-    return this.handleError(error, context, serviceMappings);
+    return this.processError(error, context, serviceMappings);
   }
 
   /**
-   * Handle database/repository errors
+   * Handle database/repository errors - returns error info for BaseHandler
    */
   static handleRepositoryError(
     error: Error | any,
     context: ErrorContext,
     repositoryName: string
-  ): ApiResponse {
+  ): { code: string; message: string; statusCode: number } {
     const errorMessage = error?.message || `${repositoryName} operation failed`;
     
     // Repository-specific error mappings
@@ -337,7 +346,7 @@ export class ErrorHandlingMiddleware {
       }
     ];
 
-    return this.handleError(error, context, repositoryMappings);
+    return this.processError(error, context, repositoryMappings);
   }
 }
 

@@ -21,9 +21,11 @@ import {
   ErrorHandlingMiddleware,
   ErrorContexts,
   CommonParsing,
+  ValidationMiddleware,
   AuthMiddleware,
   AuthConfigs
 } from '../shared/middleware';
+import { QuestionValidationSchemas } from '../shared/middleware/validation-schemas';
 
 export class QuestionHandler extends BaseHandler {
   private serviceFactory: ServiceFactory;
@@ -76,9 +78,9 @@ export class QuestionHandler extends BaseHandler {
     });
     if (parseError) return parseError;
 
-    // Validate enums if provided using helper method
-    const enumValidationError = this.validateEnumParams(queryParams);
-    if (enumValidationError) return enumValidationError;
+    // Validate enums if provided using ValidationMiddleware (replaces validateEnumParams)
+    const enumValidation = ValidationMiddleware.validateFields(queryParams, QuestionValidationSchemas.enumParams(), 'query');
+    if (enumValidation) return enumValidation;
 
     // Build request object
     const request: GetQuestionsRequest = {
@@ -117,7 +119,7 @@ export class QuestionHandler extends BaseHandler {
       filters: request
     });
 
-    return ErrorHandlingMiddleware.createSuccessResponse(result, 'Questions retrieved successfully');
+    return this.buildSuccessResponse('Questions retrieved successfully', result);
   }
 
   /**
@@ -128,20 +130,9 @@ export class QuestionHandler extends BaseHandler {
     const { data: pathParams, error: parseError } = ParsingMiddleware.parsePathParams(context);
     if (parseError) return parseError;
 
-    // Validate question ID
-    if (!pathParams.id) {
-      return ErrorHandlingMiddleware.createErrorResponse(
-        ERROR_CODES.VALIDATION_ERROR,
-        'Question ID is required'
-      );
-    }
-
-    if (!/^[a-zA-Z0-9_-]+$/.test(pathParams.id)) {
-      return ErrorHandlingMiddleware.createErrorResponse(
-        ERROR_CODES.VALIDATION_ERROR,
-        'Invalid question ID format. Use alphanumeric characters, hyphens, and underscores only'
-      );
-    }
+    // Validate question ID using ValidationMiddleware (replaces inline validation)
+    const questionIdValidation = ValidationMiddleware.validateFields({ questionId: pathParams.id }, QuestionValidationSchemas.questionId(), 'params');
+    if (questionIdValidation) return questionIdValidation;
 
     // Parse query parameters
     const { data: queryParams } = ParsingMiddleware.parseQueryParams(context, {
@@ -178,7 +169,7 @@ export class QuestionHandler extends BaseHandler {
       examId: result!.question.examId
     });
 
-    return ErrorHandlingMiddleware.createSuccessResponse(result, 'Question retrieved successfully');
+    return this.buildSuccessResponse('Question retrieved successfully', result);
   }
 
   /**
@@ -189,24 +180,13 @@ export class QuestionHandler extends BaseHandler {
     const { data: requestBody, error: parseError } = ParsingMiddleware.parseRequestBody<SearchQuestionsRequest>(context, true);
     if (parseError) return parseError;
 
-    // Validate required query field
-    if (!requestBody.query || typeof requestBody.query !== 'string' || requestBody.query.trim().length === 0) {
-      return ErrorHandlingMiddleware.createErrorResponse(
-        ERROR_CODES.VALIDATION_ERROR,
-        'Query is required and must be a non-empty string'
-      );
-    }
+    // Validate query field using ValidationMiddleware (replaces inline validation)
+    const queryValidation = ValidationMiddleware.validateFields(requestBody, QuestionValidationSchemas.searchQueryRequest(), 'body');
+    if (queryValidation) return queryValidation;
 
-    if (requestBody.query.length > 200) {
-      return ErrorHandlingMiddleware.createErrorResponse(
-        ERROR_CODES.VALIDATION_ERROR,
-        'Query too long. Maximum 200 characters'
-      );
-    }
-
-    // Validate optional fields using helper method
-    const validationError = this.validateSearchRequest(requestBody);
-    if (validationError) return validationError;
+    // Validate optional fields using ValidationMiddleware (replaces validateSearchRequest)
+    const searchValidation = ValidationMiddleware.validateFields(requestBody, QuestionValidationSchemas.searchRequest(), 'body');
+    if (searchValidation) return searchValidation;
 
     // Build search request
     const request: SearchQuestionsRequest = {
@@ -248,114 +228,12 @@ export class QuestionHandler extends BaseHandler {
       searchTime: result!.searchTime
     });
 
-    return ErrorHandlingMiddleware.createSuccessResponse(result, 'Questions searched successfully');
+    return this.buildSuccessResponse('Questions searched successfully', result);
   }
 
-  /**
-   * Helper method to validate enum parameters - extracted from massive validation blocks
-   */
-  private validateEnumParams(queryParams: any): ApiResponse | null {
-    if (queryParams.difficulty && !Object.values(QuestionDifficulty).includes(queryParams.difficulty as QuestionDifficulty)) {
-      return ErrorHandlingMiddleware.createErrorResponse(
-        ERROR_CODES.VALIDATION_ERROR,
-        `Invalid difficulty. Valid options: ${Object.values(QuestionDifficulty).join(', ')}`
-      );
-    }
 
-    if (queryParams.type && !Object.values(QuestionType).includes(queryParams.type as QuestionType)) {
-      return ErrorHandlingMiddleware.createErrorResponse(
-        ERROR_CODES.VALIDATION_ERROR,
-        `Invalid type. Valid options: ${Object.values(QuestionType).join(', ')}`
-      );
-    }
 
-    return null;
-  }
 
-  /**
-   * Helper method to validate search request - extracted from massive validation blocks
-   */
-  private validateSearchRequest(requestBody: any): ApiResponse | null {
-    // Validate provider format if provided
-    if (requestBody.provider && !/^[a-zA-Z0-9_-]+$/.test(requestBody.provider)) {
-      return ErrorHandlingMiddleware.createErrorResponse(
-        ERROR_CODES.VALIDATION_ERROR,
-        'Invalid provider format. Use alphanumeric characters, hyphens, and underscores only'
-      );
-    }
-
-    // Validate exam format if provided
-    if (requestBody.exam && !/^[a-zA-Z0-9_-]+$/.test(requestBody.exam)) {
-      return ErrorHandlingMiddleware.createErrorResponse(
-        ERROR_CODES.VALIDATION_ERROR,
-        'Invalid exam format. Use alphanumeric characters, hyphens, and underscores only'
-      );
-    }
-
-    // Validate difficulty enum
-    if (requestBody.difficulty && !Object.values(QuestionDifficulty).includes(requestBody.difficulty)) {
-      return ErrorHandlingMiddleware.createErrorResponse(
-        ERROR_CODES.VALIDATION_ERROR,
-        `Invalid difficulty. Valid options: ${Object.values(QuestionDifficulty).join(', ')}`
-      );
-    }
-
-    // Validate type enum
-    if (requestBody.type && !Object.values(QuestionType).includes(requestBody.type)) {
-      return ErrorHandlingMiddleware.createErrorResponse(
-        ERROR_CODES.VALIDATION_ERROR,
-        `Invalid type. Valid options: ${Object.values(QuestionType).join(', ')}`
-      );
-    }
-
-    // Validate sortBy enum
-    if (requestBody.sortBy && !Object.values(SearchSortOption).includes(requestBody.sortBy)) {
-      return ErrorHandlingMiddleware.createErrorResponse(
-        ERROR_CODES.VALIDATION_ERROR,
-        `Invalid sortBy option. Valid options: ${Object.values(SearchSortOption).join(', ')}`
-      );
-    }
-
-    // Validate tags array
-    if (requestBody.tags) {
-      if (!Array.isArray(requestBody.tags)) {
-        return ErrorHandlingMiddleware.createErrorResponse(
-          ERROR_CODES.VALIDATION_ERROR,
-          'Tags must be an array of strings'
-        );
-      }
-
-      const validTags = requestBody.tags.filter((tag: any) => 
-        typeof tag === 'string' && tag.trim().length > 0
-      );
-      requestBody.tags = validTags; // Clean the tags
-    }
-
-    // Validate limit and offset
-    if (requestBody.limit !== undefined) {
-      const limit = parseInt(requestBody.limit, 10);
-      if (isNaN(limit) || limit < 1 || limit > 100) {
-        return ErrorHandlingMiddleware.createErrorResponse(
-          ERROR_CODES.VALIDATION_ERROR,
-          'Limit must be a number between 1 and 100'
-        );
-      }
-      requestBody.limit = limit;
-    }
-
-    if (requestBody.offset !== undefined) {
-      const offset = parseInt(requestBody.offset, 10);
-      if (isNaN(offset) || offset < 0) {
-        return ErrorHandlingMiddleware.createErrorResponse(
-          ERROR_CODES.VALIDATION_ERROR,
-          'Offset must be a non-negative number'
-        );
-      }
-      requestBody.offset = offset;
-    }
-
-    return null;
-  }
 }
 
 // Export handler function for Lambda

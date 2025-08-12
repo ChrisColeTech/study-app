@@ -1,13 +1,24 @@
 // Health service implementation for system monitoring
 
 import { IHealthService } from '../shared/service-factory';
-import { IHealthRepository, HealthCheckResult } from '../repositories/health.repository';
+import { IHealthRepository } from '../repositories/health.repository';
+import { 
+  IDetailedHealthService,
+  IDetailedHealthRepository,
+  DetailedHealthCheckResult,
+  HealthCheckOptions,
+  SystemResourceUsage,
+  ServiceDiagnostics,
+  PerformanceMetrics,
+  HealthAlert,
+  HealthTrend
+} from '../shared/types/health.types';
 import { createLogger } from '../shared/logger';
 
 export class HealthService implements IHealthService {
   private logger = createLogger({ service: 'HealthService' });
 
-  constructor(private healthRepository: IHealthRepository) {}
+  constructor(private healthRepository: IHealthRepository & IDetailedHealthRepository) {}
 
   /**
    * Perform comprehensive health check
@@ -76,11 +87,22 @@ export class HealthService implements IHealthService {
   /**
    * Check database (DynamoDB) health
    */
-  public async checkDatabaseHealth(): Promise<HealthCheckResult> {
+  public async checkDatabaseHealth(): Promise<{
+    service: string;
+    status: 'healthy' | 'unhealthy';
+    responseTime: number;
+    error?: string;
+  }> {
     this.logger.debug('Checking database health via repository');
     
     try {
-      return await this.healthRepository.checkDynamoDbHealth();
+      const result = await this.healthRepository.checkDynamoDbHealth();
+      return {
+        service: result.service,
+        status: result.status === 'degraded' ? 'unhealthy' : result.status,
+        responseTime: result.responseTime,
+        ...(result.error && { error: result.error })
+      };
     } catch (error) {
       this.logger.error('Database health check failed', error as Error);
       return {
@@ -95,11 +117,22 @@ export class HealthService implements IHealthService {
   /**
    * Check storage (S3) health
    */
-  public async checkStorageHealth(): Promise<HealthCheckResult> {
+  public async checkStorageHealth(): Promise<{
+    service: string;
+    status: 'healthy' | 'unhealthy';
+    responseTime: number;
+    error?: string;
+  }> {
     this.logger.debug('Checking storage health via repository');
     
     try {
-      return await this.healthRepository.checkS3Health();
+      const result = await this.healthRepository.checkS3Health();
+      return {
+        service: result.service,
+        status: result.status === 'degraded' ? 'unhealthy' : result.status,
+        responseTime: result.responseTime,
+        ...(result.error && { error: result.error })
+      };
     } catch (error) {
       this.logger.error('Storage health check failed', error as Error);
       return {

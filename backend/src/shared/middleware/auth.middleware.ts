@@ -84,11 +84,13 @@ export class AuthMiddleware {
           tokenLength: token.length
         });
 
+        const errorInfo = ErrorHandlingMiddleware.handleAuthError(error, {
+          requestId: context.requestId,
+          operation: 'token-validation'
+        });
+        
         return {
-          error: ErrorHandlingMiddleware.handleAuthError(error, {
-            requestId: context.requestId,
-            operation: 'token-validation'
-          })
+          error: ErrorHandlingMiddleware.createErrorResponse(errorInfo.code, errorInfo.message)
         };
       }
 

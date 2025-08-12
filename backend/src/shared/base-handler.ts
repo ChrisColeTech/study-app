@@ -227,6 +227,49 @@ export abstract class BaseHandler {
   }
 
   /**
+   * Build standardized success response with metadata
+   */
+  protected buildSuccessResponse<T>(
+    message: string, 
+    data: T, 
+    metadata?: Record<string, any>
+  ): ApiResponse<T> {
+    const response: ApiResponse<T> = {
+      success: true,
+      message,
+      data,
+      timestamp: new Date().toISOString(),
+    };
+    
+    if (metadata) {
+      response.metadata = metadata;
+    }
+    
+    return response;
+  }
+
+  /**
+   * Build standardized error response with optional details
+   */
+  protected buildErrorResponse(
+    message: string,
+    statusCode: number,
+    errorCode: string,
+    details?: any
+  ): ApiResponse {
+    return {
+      success: false,
+      message,
+      error: {
+        code: errorCode,
+        message,
+        details,
+      },
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  /**
    * Extract path parameters from the request
    */
   protected getPathParameters(context: HandlerContext): Record<string, string> {

@@ -61,10 +61,7 @@ export class ExamHandler extends BaseHandler {
     if (queryParams.level) {
       const validLevels = ['foundational', 'associate', 'professional', 'specialty', 'expert'];
       if (!validLevels.includes(queryParams.level.toLowerCase())) {
-        return ErrorHandlingMiddleware.createErrorResponse(
-          ERROR_CODES.VALIDATION_ERROR,
-          `Invalid level. Valid options: ${validLevels.join(', ')}`
-        );
+        return this.buildErrorResponse(`Invalid level. Valid options: ${validLevels.join(', ')}`, 400, ERROR_CODES.VALIDATION_ERROR);
       }
     }
 
@@ -102,7 +99,7 @@ export class ExamHandler extends BaseHandler {
       pagination: result!.pagination
     });
 
-    return ErrorHandlingMiddleware.createSuccessResponse(result, 'Exams retrieved successfully');
+    return this.buildSuccessResponse('Exams retrieved successfully', result);
   }
 
   /**
@@ -115,10 +112,7 @@ export class ExamHandler extends BaseHandler {
 
     // Validate path parameters
     if (!pathParams.id) {
-      return ErrorHandlingMiddleware.createErrorResponse(
-        ERROR_CODES.VALIDATION_ERROR,
-        'Exam ID is required'
-      );
+      return this.buildErrorResponse('Exam ID is required', 400, ERROR_CODES.VALIDATION_ERROR);
     }
 
     // Parse query parameters
@@ -154,7 +148,7 @@ export class ExamHandler extends BaseHandler {
       includeProvider: request.includeProvider
     });
 
-    return ErrorHandlingMiddleware.createSuccessResponse(result, 'Exam retrieved successfully');
+    return this.buildSuccessResponse('Exam retrieved successfully', result);
   }
 }
 

@@ -71,17 +71,11 @@ export class ProviderHandler extends BaseHandler {
 
     // Validate enum values manually (simpler for now)
     if (queryParams.category && !Object.values(ProviderCategory).includes(queryParams.category as ProviderCategory)) {
-      return ErrorHandlingMiddleware.createErrorResponse(
-        ERROR_CODES.VALIDATION_ERROR,
-        `Invalid category. Valid options: ${Object.values(ProviderCategory).join(', ')}`
-      );
+      return this.buildErrorResponse(`Invalid category. Valid options: ${Object.values(ProviderCategory).join(', ')}`, 400, ERROR_CODES.VALIDATION_ERROR);
     }
 
     if (queryParams.status && !Object.values(ProviderStatus).includes(queryParams.status as ProviderStatus)) {
-      return ErrorHandlingMiddleware.createErrorResponse(
-        ERROR_CODES.VALIDATION_ERROR,
-        `Invalid status. Valid options: ${Object.values(ProviderStatus).join(', ')}`
-      );
+      return this.buildErrorResponse(`Invalid status. Valid options: ${Object.values(ProviderStatus).join(', ')}`, 400, ERROR_CODES.VALIDATION_ERROR);
     }
 
     // Build request object
@@ -114,7 +108,7 @@ export class ProviderHandler extends BaseHandler {
       filters: request
     });
 
-    return ErrorHandlingMiddleware.createSuccessResponse(result, 'Providers retrieved successfully');
+    return this.buildSuccessResponse('Providers retrieved successfully', result);
   }
 
   /**
@@ -127,17 +121,11 @@ export class ProviderHandler extends BaseHandler {
 
     // Validate path parameters manually
     if (!pathParams.id) {
-      return ErrorHandlingMiddleware.createErrorResponse(
-        ERROR_CODES.VALIDATION_ERROR,
-        'Provider ID is required'
-      );
+      return this.buildErrorResponse('Provider ID is required', 400, ERROR_CODES.VALIDATION_ERROR);
     }
 
     if (!/^[a-zA-Z0-9_-]+$/.test(pathParams.id)) {
-      return ErrorHandlingMiddleware.createErrorResponse(
-        ERROR_CODES.VALIDATION_ERROR,
-        'Invalid provider ID format'
-      );
+      return this.buildErrorResponse('Invalid provider ID format', 400, ERROR_CODES.VALIDATION_ERROR);
     }
 
     // Parse query parameters
@@ -173,7 +161,7 @@ export class ProviderHandler extends BaseHandler {
       certificationsCount: result!.provider.certifications.length
     });
 
-    return ErrorHandlingMiddleware.createSuccessResponse(result, 'Provider retrieved successfully');
+    return this.buildSuccessResponse('Provider retrieved successfully', result);
   }
 
   /**
@@ -198,10 +186,7 @@ export class ProviderHandler extends BaseHandler {
       requestId: context.requestId
     });
 
-    return ErrorHandlingMiddleware.createSuccessResponse(
-      { message: 'Provider cache refreshed successfully' }, 
-      'Cache refreshed successfully'
-    );
+    return this.buildSuccessResponse('Cache refreshed successfully', { message: 'Provider cache refreshed successfully' });
   }
 }
 
