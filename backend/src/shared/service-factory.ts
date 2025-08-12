@@ -31,8 +31,14 @@ import type { IAnalyticsRepository } from '../repositories/analytics.repository'
 export type { IUserRepository, ISessionRepository, IProviderRepository, IExamRepository, ITopicRepository, IQuestionRepository, IGoalsRepository, IHealthRepository, IAnalyticsRepository };
 
 // Import analytics service interface from types
-import type { IAnalyticsService } from '../shared/types/analytics.types';
-export type { IAnalyticsService };
+import type { 
+  IAnalyticsService,
+  IProgressAnalyzer,
+  ICompetencyAnalyzer,
+  IPerformanceAnalyzer,
+  IInsightGenerator
+} from '../shared/types/analytics.types';
+export type { IAnalyticsService, IProgressAnalyzer, ICompetencyAnalyzer, IPerformanceAnalyzer, IInsightGenerator };
 
 export interface IHealthService {
   checkHealth(): Promise<{
@@ -112,6 +118,10 @@ export class ServiceFactory {
   private _answerProcessor: IAnswerProcessorService | null = null;
   private _sessionAnalyzer: ISessionAnalyzerService | null = null;
   private _analyticsService: IAnalyticsService | null = null;
+  private _progressAnalyzer: IProgressAnalyzer | null = null;
+  private _competencyAnalyzer: ICompetencyAnalyzer | null = null;
+  private _performanceAnalyzer: IPerformanceAnalyzer | null = null;
+  private _insightGenerator: IInsightGenerator | null = null;
   private _goalsService: IGoalsService | null = null;
   private _healthService: IHealthService | null = null;
 
@@ -450,12 +460,65 @@ export class ServiceFactory {
       const { AnalyticsService } = require('../services/analytics.service');
       this._analyticsService = new AnalyticsService(
         this.getAnalyticsRepository(),
-        this.getProviderService(),
-        this.getExamService(),
-        this.getTopicService()
+        this.getProgressAnalyzer(),
+        this.getCompetencyAnalyzer(),
+        this.getPerformanceAnalyzer(),
+        this.getInsightGenerator()
       );
     }
     return this._analyticsService!;
+  }
+
+  /**
+   * Get Progress Analyzer Service
+   */
+  public getProgressAnalyzer(): IProgressAnalyzer {
+    if (!this._progressAnalyzer) {
+      const { ProgressAnalyzer } = require('../services/progress-analyzer.service');
+      this._progressAnalyzer = new ProgressAnalyzer(
+        this.getAnalyticsRepository()
+      );
+    }
+    return this._progressAnalyzer!;
+  }
+
+  /**
+   * Get Competency Analyzer Service
+   */
+  public getCompetencyAnalyzer(): ICompetencyAnalyzer {
+    if (!this._competencyAnalyzer) {
+      const { CompetencyAnalyzer } = require('../services/competency-analyzer.service');
+      this._competencyAnalyzer = new CompetencyAnalyzer(
+        this.getAnalyticsRepository()
+      );
+    }
+    return this._competencyAnalyzer!;
+  }
+
+  /**
+   * Get Performance Analyzer Service
+   */
+  public getPerformanceAnalyzer(): IPerformanceAnalyzer {
+    if (!this._performanceAnalyzer) {
+      const { PerformanceAnalyzer } = require('../services/performance-analyzer.service');
+      this._performanceAnalyzer = new PerformanceAnalyzer(
+        this.getAnalyticsRepository()
+      );
+    }
+    return this._performanceAnalyzer!;
+  }
+
+  /**
+   * Get Insight Generator Service
+   */
+  public getInsightGenerator(): IInsightGenerator {
+    if (!this._insightGenerator) {
+      const { InsightGenerator } = require('../services/insight-generator.service');
+      this._insightGenerator = new InsightGenerator(
+        this.getAnalyticsRepository()
+      );
+    }
+    return this._insightGenerator!;
   }
 
   /**
@@ -500,7 +563,14 @@ export class ServiceFactory {
     this._topicService = null;
     this._questionService = null;
     this._sessionService = null;
+    this._sessionOrchestrator = null;
+    this._answerProcessor = null;
+    this._sessionAnalyzer = null;
     this._analyticsService = null;
+    this._progressAnalyzer = null;
+    this._competencyAnalyzer = null;
+    this._performanceAnalyzer = null;
+    this._insightGenerator = null;
     this._goalsService = null;
     this._healthService = null;
   }

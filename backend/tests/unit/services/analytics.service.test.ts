@@ -1,8 +1,16 @@
 // Unit tests for Analytics Service - Phase 22 Implementation
 
 import { AnalyticsService } from '../../../src/services/analytics.service';
+import { ProgressAnalyzer } from '../../../src/services/progress-analyzer.service';
+import { CompetencyAnalyzer } from '../../../src/services/competency-analyzer.service';
+import { PerformanceAnalyzer } from '../../../src/services/performance-analyzer.service';
+import { InsightGenerator } from '../../../src/services/insight-generator.service';
 import {
   IAnalyticsRepository,
+  IProgressAnalyzer,
+  ICompetencyAnalyzer,
+  IPerformanceAnalyzer,
+  IInsightGenerator,
   SessionAnalyticsData,
   UserProgressData,
   ProgressAnalyticsRequest,
@@ -172,6 +180,27 @@ class MockAnalyticsRepository implements IAnalyticsRepository {
   async getAnalyticsSnapshot(userId?: string): Promise<any | null> {
     return null;
   }
+
+  async getSessionDetails(sessionId: string): Promise<any> {
+    return {
+      sessionId,
+      correctAnswers: 8,
+      totalAnswers: 10,
+      totalTime: 1200,
+      startTime: '2024-01-15T10:00:00Z'
+    };
+  }
+
+  async getPerformanceData(params: any): Promise<any> {
+    return {
+      sessions: this.mockSessions,
+      metrics: {
+        accuracy: 85,
+        speed: 120,
+        consistency: 0.8
+      }
+    };
+  }
 }
 
 // Mock services
@@ -182,14 +211,26 @@ const mockTopicService = {};
 describe('AnalyticsService', () => {
   let analyticsService: AnalyticsService;
   let mockRepository: MockAnalyticsRepository;
+  let progressAnalyzer: IProgressAnalyzer;
+  let competencyAnalyzer: ICompetencyAnalyzer;
+  let performanceAnalyzer: IPerformanceAnalyzer;
+  let insightGenerator: IInsightGenerator;
 
   beforeEach(() => {
     mockRepository = new MockAnalyticsRepository();
+    
+    // Create instances of decomposed services
+    progressAnalyzer = new ProgressAnalyzer(mockRepository);
+    competencyAnalyzer = new CompetencyAnalyzer(mockRepository);
+    performanceAnalyzer = new PerformanceAnalyzer(mockRepository);
+    insightGenerator = new InsightGenerator(mockRepository);
+    
     analyticsService = new AnalyticsService(
       mockRepository,
-      mockProviderService,
-      mockExamService,
-      mockTopicService
+      progressAnalyzer,
+      competencyAnalyzer,
+      performanceAnalyzer,
+      insightGenerator
     );
   });
 

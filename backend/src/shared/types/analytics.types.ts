@@ -306,6 +306,59 @@ export interface IAnalyticsService {
   getPerformanceAnalytics(params: any): Promise<any>;
 }
 
+// New decomposed service interfaces for Objective 6: AnalyticsService Decomposition
+
+/**
+ * Progress Analyzer Service - Handles progress calculations and historical data
+ * Responsible for: Progress overview, trends, historical performance tracking
+ */
+export interface IProgressAnalyzer {
+  calculateProgressOverview(userId?: string): Promise<ProgressOverview>;
+  generateProgressTrends(timeframe: string, userId?: string): Promise<ProgressTrends>;
+  getHistoricalPerformance(startDate: string, endDate: string, userId?: string): Promise<HistoricalPerformance[]>;
+}
+
+/**
+ * Competency Analyzer Service - Handles competency analysis across topics and providers
+ * Responsible for: Topic competencies, provider competencies, mastery progression
+ */
+export interface ICompetencyAnalyzer {
+  analyzeCompetencies(userId?: string): Promise<CompetencyAnalytics>;
+  calculateTopicCompetencies(sessions: any[], progressData: any[]): Promise<TopicCompetency[]>;
+  calculateProviderCompetencies(sessions: any[]): Promise<ProviderCompetency[]>;
+  analyzeStrengthsAndWeaknesses(topicCompetencies: TopicCompetency[]): StrengthsWeaknesses;
+  calculateMasteryProgression(topicCompetencies: TopicCompetency[], userId?: string): Promise<MasteryProgression>;
+}
+
+/**
+ * Performance Analyzer Service - Handles performance analytics and scoring
+ * Responsible for: Performance analytics, competency scoring, performance trends
+ */
+export interface IPerformanceAnalyzer {
+  getPerformanceAnalytics(params: any): Promise<any>;
+  calculateCompetencyScores(data: any): Promise<any>;
+  calculatePerformanceTrends(data: any): Promise<any>;
+  generatePerformanceInsights(data: any): any;
+  calculateDifficultyProgressTrend(timeframe: string, userId?: string): Promise<DifficultyTrendData[]>;
+  calculateCompetencyGrowthTrend(timeframe: string, userId?: string): Promise<CompetencyTrendData[]>;
+  calculateDifficultyBreakdown(session: any): any;
+  calculateTopicBreakdown(session: any): any;
+}
+
+/**
+ * Insight Generator Service - Handles insights and visualization data preparation
+ * Responsible for: Learning insights, visualization data, patterns, recommendations
+ */
+export interface IInsightGenerator {
+  generateLearningInsights(userId?: string): Promise<LearningInsights>;
+  prepareVisualizationData(analyticsData: any): Promise<VisualizationData>;
+  identifyLearningPatterns(sessions: any[]): LearningPattern[];
+  generateLearningRecommendations(sessions: any[], progressData: any[]): LearningRecommendation[];
+  identifyLearningMilestones(sessions: any[], progressData: any[]): LearningMilestone[];
+  detectLearningWarnings(sessions: any[], progressData: any[]): LearningWarning[];
+  generateSessionInsights(session: any): any;
+}
+
 // Repository interface for analytics data persistence
 export interface IAnalyticsRepository {
   getCompletedSessions(filters: SessionAnalyticsFilters): Promise<SessionAnalyticsData[]>;
