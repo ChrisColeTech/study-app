@@ -12,8 +12,11 @@ import type { IExamService } from '../services/exam.service';
 import type { ITopicService } from '../services/topic.service';
 import type { IQuestionService } from '../services/question.service';
 import type { ISessionService } from '../services/session.service';
+import type { ISessionOrchestrator as ISessionOrchestratorService } from '../services/session-orchestrator.service';
+import type { IAnswerProcessor as IAnswerProcessorService } from '../services/answer-processor.service';
+import type { ISessionAnalyzer as ISessionAnalyzerService } from '../services/session-analyzer.service';
 import type { IGoalsService } from '../services/goals.service';
-export type { IAuthService, IUserService, IProviderService, IExamService, ITopicService, IQuestionService, ISessionService, IGoalsService };
+export type { IAuthService, IUserService, IProviderService, IExamService, ITopicService, IQuestionService, ISessionService, IGoalsService, ISessionOrchestratorService, IAnswerProcessorService, ISessionAnalyzerService };
 
 // Import repository interfaces
 import type { IUserRepository } from '../repositories/user.repository';
@@ -105,6 +108,9 @@ export class ServiceFactory {
   private _topicService: ITopicService | null = null;
   private _questionService: IQuestionService | null = null;
   private _sessionService: ISessionService | null = null;
+  private _sessionOrchestrator: ISessionOrchestratorService | null = null;
+  private _answerProcessor: IAnswerProcessorService | null = null;
+  private _sessionAnalyzer: ISessionAnalyzerService | null = null;
   private _analyticsService: IAnalyticsService | null = null;
   private _goalsService: IGoalsService | null = null;
   private _healthService: IHealthService | null = null;
@@ -359,6 +365,8 @@ export class ServiceFactory {
       const { SessionService } = require('../services/session.service');
       this._sessionService = new SessionService(
         this.getSessionRepository(),
+        this.getSessionOrchestrator(),
+        this.getAnswerProcessor(),
         this.getProviderService(),
         this.getExamService(),
         this.getTopicService(),
@@ -366,6 +374,50 @@ export class ServiceFactory {
       );
     }
     return this._sessionService!;
+  }
+
+  /**
+   * Get Session Orchestrator Service
+   */
+  public getSessionOrchestrator(): ISessionOrchestratorService {
+    if (!this._sessionOrchestrator) {
+      const { SessionOrchestrator } = require('../services/session-orchestrator.service');
+      this._sessionOrchestrator = new SessionOrchestrator(
+        this.getProviderService(),
+        this.getExamService(),
+        this.getTopicService(),
+        this.getQuestionService()
+      );
+    }
+    return this._sessionOrchestrator!;
+  }
+
+  /**
+   * Get Answer Processor Service
+   */
+  public getAnswerProcessor(): IAnswerProcessorService {
+    if (!this._answerProcessor) {
+      const { AnswerProcessor } = require('../services/answer-processor.service');
+      this._answerProcessor = new AnswerProcessor(
+        this.getSessionRepository(),
+        this.getSessionOrchestrator(),
+        this.getSessionAnalyzer(),
+        this.getTopicService(),
+        this.getQuestionService()
+      );
+    }
+    return this._answerProcessor!;
+  }
+
+  /**
+   * Get Session Analyzer Service
+   */
+  public getSessionAnalyzer(): ISessionAnalyzerService {
+    if (!this._sessionAnalyzer) {
+      const { SessionAnalyzer } = require('../services/session-analyzer.service');
+      this._sessionAnalyzer = new SessionAnalyzer();
+    }
+    return this._sessionAnalyzer!;
   }
 
   /**

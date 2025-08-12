@@ -1,6 +1,6 @@
 // Study session specific types
 
-import { StudySession, SessionQuestion } from './domain.types';
+import { StudySession, SessionQuestion, Question } from './domain.types';
 
 export interface CreateSessionRequest {
   examId: string;
@@ -249,4 +249,51 @@ export interface ISessionService {
   deleteSession(sessionId: string): Promise<{ success: boolean; message: string }>;
   submitAnswer(sessionId: string, request: SubmitAnswerRequest): Promise<SubmitAnswerResponse>;
   completeSession(sessionId: string): Promise<CompleteSessionResponse>;
+}
+
+// New decomposed service interfaces for Phase 5: SessionService Decomposition
+
+/**
+ * Session Orchestrator Service - Handles question coordination and session configuration
+ * Responsible for: Question selection, adaptive algorithms, session progress calculation
+ */
+export interface ISessionOrchestrator {
+  getQuestionsForSession(request: CreateSessionRequest): Promise<Question[]>;
+  getSessionQuestionsWithDetails(session: StudySession): Promise<QuestionResponse[]>;
+  selectSessionQuestions(questions: Question[], count: number): Question[];
+  selectAdaptiveQuestions(questions: Question[], count: number): Question[];
+  calculateSessionProgress(session: StudySession): SessionProgress;
+}
+
+/**
+ * Answer Processor Service - Handles answer submission and session completion
+ * Responsible for: Answer evaluation, scoring, session completion logic
+ */
+export interface IAnswerProcessor {
+  submitAnswer(sessionId: string, request: SubmitAnswerRequest): Promise<SubmitAnswerResponse>;
+  completeSession(sessionId: string): Promise<CompleteSessionResponse>;
+}
+
+/**
+ * Session Analyzer Service - Handles results analysis and performance calculations
+ * Responsible for: Analytics computation, performance metrics, study recommendations
+ */
+export interface ISessionAnalyzer {
+  generateDetailedResults(
+    session: StudySession,
+    questionDetails: Question[],
+    completedAt: string,
+    sessionDuration: number
+  ): Promise<DetailedSessionResults>;
+  calculateTopicPerformance(
+    session: StudySession,
+    questionDetails: Question[]
+  ): Promise<TopicPerformanceBreakdown[]>;
+  analyzeSessionResults(
+    session: StudySession
+  ): Promise<DetailedSessionResults>;
+  generateStudyRecommendations(
+    session: StudySession,
+    detailedResults: DetailedSessionResults
+  ): Promise<StudyRecommendations>;
 }
