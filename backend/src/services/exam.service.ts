@@ -32,14 +32,15 @@ export class ExamService extends BaseService implements IExamService {
 
     try {
       // Get all exams from repository
-      const allExams = await this.examRepository.findAll();
+      const allExamsResult = await this.examRepository.findAll();
+      const allExams = allExamsResult.items;
 
       // Apply filters
       let filteredExams = allExams;
 
       // Filter by provider
       if (request.provider) {
-        filteredExams = filteredExams.filter(e => 
+        filteredExams = filteredExams.filter((e: any) => 
           e.providerId.toLowerCase() === request.provider!.toLowerCase()
         );
       }
@@ -53,7 +54,7 @@ export class ExamService extends BaseService implements IExamService {
       if (request.level) {
         if (request.category) {
           // If already filtered by category, apply level filter to those results
-          filteredExams = filteredExams.filter(e => 
+          filteredExams = filteredExams.filter((e: any) => 
             e.level.toLowerCase() === request.level!.toLowerCase()
           );
         } else {
@@ -63,23 +64,23 @@ export class ExamService extends BaseService implements IExamService {
 
       // Filter out inactive exams unless explicitly requested
       if (!request.includeInactive) {
-        filteredExams = filteredExams.filter(e => e.isActive);
+        filteredExams = filteredExams.filter((e: any) => e.isActive);
       }
 
       // Apply search filter
       if (request.search) {
         const searchLower = request.search.toLowerCase();
-        filteredExams = filteredExams.filter(e => 
+        filteredExams = filteredExams.filter((e: any) => 
           e.examName.toLowerCase().includes(searchLower) ||
           e.examCode.toLowerCase().includes(searchLower) ||
           e.description.toLowerCase().includes(searchLower) ||
           e.providerName.toLowerCase().includes(searchLower) ||
-          (e.topics && e.topics.some(topic => topic.toLowerCase().includes(searchLower)))
+          (e.topics && e.topics.some((topic: any) => topic.toLowerCase().includes(searchLower)))
         );
       }
 
       // Sort by provider name, then by level, then by exam name
-      filteredExams.sort((a, b) => {
+      filteredExams.sort((a: any, b: any) => {
         const providerCompare = a.providerName.localeCompare(b.providerName);
         if (providerCompare !== 0) return providerCompare;
         
@@ -97,9 +98,9 @@ export class ExamService extends BaseService implements IExamService {
       const hasMore = offset + limit < filteredExams.length;
 
       // Get available filter options from all exams
-      const availableProviders = [...new Set(allExams.map(e => e.providerId))];
-      const availableCategories = [...new Set(allExams.map(e => this.getCategoryFromProvider(e.providerId)))].filter(Boolean);
-      const availableLevels = [...new Set(allExams.map(e => e.level))];
+      const availableProviders = [...new Set(allExams.map((e: any) => e.providerId))];
+      const availableCategories = [...new Set(allExams.map((e: any) => this.getCategoryFromProvider(e.providerId)))].filter(Boolean);
+      const availableLevels = [...new Set(allExams.map((e: any) => e.level))];
 
       const response: GetExamsResponse = {
         exams: paginatedExams,

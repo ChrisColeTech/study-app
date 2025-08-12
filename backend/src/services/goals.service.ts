@@ -147,7 +147,7 @@ export class GoalsService extends BaseService implements IGoalsService {
       this.logger.info('Goals retrieved successfully', { 
         userId,
         total: result.total,
-        returned: result.goals.length,
+        returned: result.items.length,
         filters
       });
 

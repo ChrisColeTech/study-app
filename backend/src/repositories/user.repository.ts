@@ -7,7 +7,7 @@ import { DynamoDBBaseRepository } from './base.repository';
 import { IStandardCrudRepository } from '../shared/types/repository.types';
 import { v4 as uuidv4 } from 'uuid';
 
-export interface IUserRepository extends IStandardCrudRepository<User, CreateUserRequest, UpdateUserRequest> {
+export interface IUserRepository extends Omit<IStandardCrudRepository<User, CreateUserRequest, UpdateUserRequest>, 'create'> {
   /**
    * Create a new user with password hash
    * @param userData - User creation data

@@ -369,8 +369,19 @@ export abstract class BaseHandler {
       additionalInfo?: Record<string, any>;
     }
   ): Promise<{ result?: T; error?: ApiResponse }> {
-    const { result, error } = await ErrorHandlingMiddleware.withErrorHandling(serviceLogic, errorContext);
-    if (error) return { error };
+    // Use the optimized withErrorProcessing method for better performance and consistency
+    const { result, errorInfo } = await ErrorHandlingMiddleware.withErrorProcessing(serviceLogic, errorContext);
+    
+    if (errorInfo) {
+      // Use BaseHandler's standardized error response builder
+      const errorResponse = this.buildErrorResponse(
+        errorInfo.message,
+        errorInfo.statusCode,
+        errorInfo.code
+      );
+      return { error: errorResponse };
+    }
+    
     if (result === undefined) return {};
     return { result };
   }

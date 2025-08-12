@@ -4,7 +4,7 @@ import { S3Client, GetObjectCommand, ListObjectsV2Command } from '@aws-sdk/clien
 import { Provider } from '../shared/types/provider.types';
 import { ServiceConfig } from '../shared/service-factory';
 import { S3BaseRepository } from './base.repository';
-import { IListRepository } from '../shared/types/repository.types';
+import { IListRepository, StandardQueryResult } from '../shared/types/repository.types';
 
 interface CacheEntry<T> {
   data: T;
@@ -19,7 +19,7 @@ export interface IProviderRepository extends IListRepository<Provider, any> {
    * @returns Promise<Provider[]> - All providers
    * @throws RepositoryError
    */
-  findAll(filters?: any): Promise<Provider[]>;
+  findAll(filters?: any): Promise<StandardQueryResult<Provider>>;
 
   /**
    * Find provider by ID
@@ -103,25 +103,35 @@ export class ProviderRepository extends S3BaseRepository implements IProviderRep
   /**
    * Find all providers
    */
-  async findAll(): Promise<Provider[]> {
+  async findAll(filters?: any): Promise<StandardQueryResult<Provider>> {
     return this.executeWithErrorHandling('findAll', async () => {
       const cacheKey = 'all-providers';
       
       // Check cache first
       const cachedProviders = this.getFromCache<Provider[]>(cacheKey);
+      let providers: Provider[];
+      
       if (cachedProviders) {
         this.logger.debug('Providers retrieved from cache', { count: cachedProviders.length });
-        return cachedProviders;
+        providers = cachedProviders;
+      } else {
+        // Load from S3
+        providers = await this.loadProvidersFromS3();
+        
+        // Cache results
+        this.setCache(cacheKey, providers);
+        this.logger.info('Providers loaded from S3', { count: providers.length });
       }
 
-      // Load from S3
-      const providers = await this.loadProvidersFromS3();
-      
-      // Cache results
-      this.setCache(cacheKey, providers);
-
-      this.logger.info('Providers loaded from S3', { count: providers.length });
-      return providers;
+      // Return standardized result format
+      return {
+        items: providers,
+        total: providers.length,
+        limit: filters?.limit || this.config.query?.defaultLimit || 20,
+        offset: filters?.offset || 0,
+        hasMore: false, // All providers loaded in one call
+        executionTimeMs: 0 // Will be set by executeWithErrorHandling
+      };
     });
   }
 
@@ -142,8 +152,8 @@ export class ProviderRepository extends S3BaseRepository implements IProviderRep
       }
 
       // Get all providers and find by ID
-      const allProviders = await this.findAll();
-      const provider = allProviders.find(p => p.id === providerId) || null;
+      const allProvidersResult = await this.findAll();
+      const provider = allProvidersResult.items.find((p: any) => p.id === providerId) || null;
       
       // Cache individual provider
       if (provider) {
@@ -174,8 +184,8 @@ export class ProviderRepository extends S3BaseRepository implements IProviderRep
       }
 
       // Get all providers and filter by category
-      const allProviders = await this.findAll();
-      const filteredProviders = allProviders.filter(p => p.category === category);
+      const allProvidersResult = await this.findAll();
+      const filteredProviders = allProvidersResult.items.filter((p: any) => p.category === category);
       
       // Cache filtered results
       this.setCache(cacheKey, filteredProviders);
@@ -202,8 +212,8 @@ export class ProviderRepository extends S3BaseRepository implements IProviderRep
       }
 
       // Get all providers and filter by status
-      const allProviders = await this.findAll();
-      const filteredProviders = allProviders.filter(p => p.status === status);
+      const allProvidersResult = await this.findAll();
+      const filteredProviders = allProvidersResult.items.filter((p: any) => p.status === status);
       
       // Cache filtered results
       this.setCache(cacheKey, filteredProviders);

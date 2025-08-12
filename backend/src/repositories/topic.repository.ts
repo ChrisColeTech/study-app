@@ -4,7 +4,7 @@ import { S3Client, GetObjectCommand, ListObjectsV2Command } from '@aws-sdk/clien
 import { Topic } from '../shared/types/topic.types';
 import { ServiceConfig } from '../shared/service-factory';
 import { S3BaseRepository } from './base.repository';
-import { IListRepository } from '../shared/types/repository.types';
+import { IListRepository, StandardQueryResult } from '../shared/types/repository.types';
 import { createLogger } from '../shared/logger';
 
 interface CacheEntry<T> {
@@ -355,7 +355,7 @@ export interface ITopicRepository extends IListRepository<Topic, any> {
    * @returns Promise<Topic[]> - All topics
    * @throws RepositoryError
    */
-  findAll(filters?: any): Promise<Topic[]>;
+  findAll(filters?: any): Promise<StandardQueryResult<Topic>>;
 
   /**
    * Find topic by ID
@@ -419,7 +419,7 @@ export class TopicRepository extends S3BaseRepository implements ITopicRepositor
   /**
    * Get all topics from S3 (extracted from question files)
    */
-  async findAll(): Promise<Topic[]> {
+  async findAll(filters?: any): Promise<StandardQueryResult<Topic>> {
     return this.executeWithErrorHandling('findAll', async () => {
       const cacheKey = this.cacheManager.generateCacheKey('all');
       
@@ -427,7 +427,14 @@ export class TopicRepository extends S3BaseRepository implements ITopicRepositor
       const cached = this.cacheManager.getFromCache<Topic[]>(cacheKey);
       if (cached) {
         this.logger.debug('Topics retrieved from cache');
-        return cached;
+        return {
+          items: cached,
+          total: cached.length,
+          limit: filters?.limit || this.config.query?.defaultLimit || 20,
+          offset: filters?.offset || 0,
+          hasMore: false,
+          executionTimeMs: 0
+        };
       }
 
       this.logger.info('Loading all topics from S3', { bucket: this.bucketName });
@@ -478,7 +485,15 @@ export class TopicRepository extends S3BaseRepository implements ITopicRepositor
         totalTopics: allTopics.length
       });
 
-      return allTopics;
+      // Return standardized result format
+      return {
+        items: allTopics,
+        total: allTopics.length,
+        limit: filters?.limit || this.config.query?.defaultLimit || 20,
+        offset: filters?.offset || 0,
+        hasMore: false, // All topics loaded in one call
+        executionTimeMs: 0 // Will be set by executeWithErrorHandling
+      };
     });
   }
 
@@ -499,8 +514,8 @@ export class TopicRepository extends S3BaseRepository implements ITopicRepositor
       }
 
       // Load all topics and find the specific one
-      const allTopics = await this.findAll();
-      const topic = allTopics.find(t => t.id === topicId);
+      const allTopicsResult = await this.findAll();
+      const topic = allTopicsResult.items.find((t: any) => t.id === topicId);
 
       if (topic) {
         // Cache the result
@@ -530,8 +545,8 @@ export class TopicRepository extends S3BaseRepository implements ITopicRepositor
         return cached;
       }
 
-      const allTopics = await this.findAll();
-      const examTopics = allTopics.filter(topic => topic.examId === examId);
+      const allTopicsResult = await this.findAll();
+      const examTopics = allTopicsResult.items.filter((topic: any) => topic.examId === examId);
 
       // Cache the results
       this.cacheManager.setCache(cacheKey, examTopics);

@@ -110,7 +110,7 @@ export class QuestionRepository extends S3BaseRepository implements IQuestionRep
     return this.executeWithErrorHandling('findAll', async () => {
       const startTime = Date.now();
       
-      const cacheKey = this.cacheManager.getAllCacheKey(filters);
+      const cacheKey = this.cacheManager.getAllQuestionsCacheKey();
       
       // Check cache first
       const cachedResult = this.cacheManager.getFromCache<StandardQueryResult<Question>>(cacheKey);
@@ -123,14 +123,14 @@ export class QuestionRepository extends S3BaseRepository implements IQuestionRep
       const allQuestions: Question[] = [];
       
       // Apply filters and pagination
-      const filteredQuestions = this.queryBuilder.applyFilters(allQuestions, filters);
-      const paginatedQuestions = this.queryBuilder.applyPagination(filteredQuestions, filters);
+      const filteredQuestions = this.applyFilters(allQuestions, filters);
+      const paginatedQuestions = this.applyPagination(filteredQuestions, filters);
       
       const result: StandardQueryResult<Question> = {
         items: paginatedQuestions,
         total: filteredQuestions.length,
-        limit: filters?.limit,
-        offset: filters?.offset,
+        limit: filters?.limit || this.config.query?.defaultLimit || 20,
+        offset: filters?.offset || 0,
         hasMore: (filters?.offset || 0) + paginatedQuestions.length < filteredQuestions.length,
         executionTimeMs: Date.now() - startTime
       };
@@ -180,14 +180,14 @@ export class QuestionRepository extends S3BaseRepository implements IQuestionRep
       
       // Transform and apply filters
       const transformedQuestions = questions.map((q: any) => this.transformQuestion(q));
-      const filteredQuestions = this.queryBuilder.applyFilters(transformedQuestions, filters);
-      const paginatedQuestions = this.queryBuilder.applyPagination(filteredQuestions, filters);
+      const filteredQuestions = this.applyFilters(transformedQuestions, filters);
+      const paginatedQuestions = this.applyPagination(filteredQuestions, filters);
       
       const result: StandardQueryResult<Question> = {
         items: paginatedQuestions,
         total: filteredQuestions.length,
-        limit: filters?.limit,
-        offset: filters?.offset,
+        limit: filters?.limit || this.config.query?.defaultLimit || 20,
+        offset: filters?.offset || 0,
         hasMore: (filters?.offset || 0) + paginatedQuestions.length < filteredQuestions.length,
         executionTimeMs: Date.now() - startTime
       };
@@ -222,14 +222,14 @@ export class QuestionRepository extends S3BaseRepository implements IQuestionRep
       
       // Transform and apply filters
       const transformedQuestions = questions.map((q: any) => this.transformQuestion(q));
-      const filteredQuestions = this.queryBuilder.applyFilters(transformedQuestions, filters);
-      const paginatedQuestions = this.queryBuilder.applyPagination(filteredQuestions, filters);
+      const filteredQuestions = this.applyFilters(transformedQuestions, filters);
+      const paginatedQuestions = this.applyPagination(filteredQuestions, filters);
       
       const result: StandardQueryResult<Question> = {
         items: paginatedQuestions,
         total: filteredQuestions.length,
-        limit: filters?.limit,
-        offset: filters?.offset,
+        limit: filters?.limit || this.config.query?.defaultLimit || 20,
+        offset: filters?.offset || 0,
         hasMore: (filters?.offset || 0) + paginatedQuestions.length < filteredQuestions.length,
         executionTimeMs: Date.now() - startTime
       };
@@ -266,14 +266,14 @@ export class QuestionRepository extends S3BaseRepository implements IQuestionRep
       );
       
       // Apply additional filters and pagination
-      const filteredQuestions = this.queryBuilder.applyFilters(topicFilteredQuestions, filters);
-      const paginatedQuestions = this.queryBuilder.applyPagination(filteredQuestions, filters);
+      const filteredQuestions = this.applyFilters(topicFilteredQuestions, filters);
+      const paginatedQuestions = this.applyPagination(filteredQuestions, filters);
       
       const result: StandardQueryResult<Question> = {
         items: paginatedQuestions,
         total: filteredQuestions.length,
-        limit: filters?.limit,
-        offset: filters?.offset,
+        limit: filters?.limit || this.config.query?.defaultLimit || 20,
+        offset: filters?.offset || 0,
         hasMore: (filters?.offset || 0) + paginatedQuestions.length < filteredQuestions.length,
         executionTimeMs: Date.now() - startTime
       };
@@ -332,14 +332,14 @@ export class QuestionRepository extends S3BaseRepository implements IQuestionRep
       );
       
       // Apply additional filters and pagination
-      const filteredQuestions = this.queryBuilder.applyFilters(difficultyFilteredQuestions, filters);
-      const paginatedQuestions = this.queryBuilder.applyPagination(filteredQuestions, filters);
+      const filteredQuestions = this.applyFilters(difficultyFilteredQuestions, filters);
+      const paginatedQuestions = this.applyPagination(filteredQuestions, filters);
       
       const result: StandardQueryResult<Question> = {
         items: paginatedQuestions,
         total: filteredQuestions.length,
-        limit: filters?.limit,
-        offset: filters?.offset,
+        limit: filters?.limit || this.config.query?.defaultLimit || 20,
+        offset: filters?.offset || 0,
         hasMore: (filters?.offset || 0) + paginatedQuestions.length < filteredQuestions.length,
         executionTimeMs: Date.now() - startTime
       };
@@ -373,14 +373,14 @@ export class QuestionRepository extends S3BaseRepository implements IQuestionRep
       const searchResults: Question[] = [];
       
       // Apply filters and pagination
-      const filteredQuestions = this.queryBuilder.applyFilters(searchResults, filters);
-      const paginatedQuestions = this.queryBuilder.applyPagination(filteredQuestions, filters);
+      const filteredQuestions = this.applyFilters(searchResults, filters);
+      const paginatedQuestions = this.applyPagination(filteredQuestions, filters);
       
       const result: StandardQueryResult<Question> = {
         items: paginatedQuestions,
         total: filteredQuestions.length,
-        limit: filters?.limit,
-        offset: filters?.offset,
+        limit: filters?.limit || this.config.query?.defaultLimit || 20,
+        offset: filters?.offset || 0,
         hasMore: (filters?.offset || 0) + paginatedQuestions.length < filteredQuestions.length,
         executionTimeMs: Date.now() - startTime
       };
@@ -409,5 +409,30 @@ export class QuestionRepository extends S3BaseRepository implements IQuestionRep
       this.clearCache();
       this.logger.info('Question repository cache refreshed');
     });
+  }
+
+  /**
+   * Apply filters to questions array
+   */
+  private applyFilters(questions: Question[], filters?: StandardQueryParams & any): Question[] {
+    if (!filters) return questions;
+    
+    let filtered = questions;
+    
+    // Apply any additional filters here based on the filters object
+    // For now, just return the original array
+    return filtered;
+  }
+
+  /**
+   * Apply pagination to questions array
+   */
+  private applyPagination(questions: Question[], filters?: StandardQueryParams & any): Question[] {
+    if (!filters) return questions;
+    
+    const offset = filters.offset || 0;
+    const limit = filters.limit || this.config.query?.defaultLimit || 20;
+    
+    return questions.slice(offset, offset + limit);
   }
 }

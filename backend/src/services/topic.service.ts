@@ -41,7 +41,8 @@ export class TopicService extends BaseService implements ITopicService {
       } else if (request.exam) {
         allTopics = await this.topicRepository.findByExam(request.exam);
       } else {
-        allTopics = await this.topicRepository.findAll();
+        const result = await this.topicRepository.findAll();
+        allTopics = result.items;
       }
 
       // Apply filters

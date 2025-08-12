@@ -58,7 +58,28 @@ export class ProfileRepository extends DynamoDBBaseRepository implements IProfil
         displayName: result.Item.displayName || `${result.Item.firstName} ${result.Item.lastName}`,
         avatarUrl: result.Item.avatarUrl,
         bio: result.Item.bio,
-        preferences: result.Item.preferences || {},
+        language: result.Item.language || 'en',
+        studyPreferences: result.Item.studyPreferences || {
+          defaultSessionLength: 30,
+          questionsPerSession: 20,
+          difficulty: 'adaptive',
+          studyReminders: {
+            enabled: false,
+            frequency: 'daily'
+          },
+          notifications: {
+            goalMilestones: true,
+            weeklyProgress: true,
+            achievements: true,
+            studyStreaks: true
+          },
+          uiPreferences: {
+            theme: 'auto',
+            compactMode: false,
+            showExplanations: true,
+            autoAdvance: false
+          }
+        },
         statistics: result.Item.statistics || {
           totalSessions: 0,
           correctAnswers: 0,
@@ -72,11 +93,8 @@ export class ProfileRepository extends DynamoDBBaseRepository implements IProfil
           providerProgress: {}
         },
         achievements: result.Item.achievements || [],
-        socialProfile: result.Item.socialProfile,
-        settings: result.Item.settings || {},
-        metadata: result.Item.metadata || {},
-        createdAt: result.Item.createdAt,
-        updatedAt: result.Item.updatedAt
+        createdAt: result.Item.createdAt || new Date().toISOString(),
+        updatedAt: result.Item.updatedAt || new Date().toISOString()
       };
 
       this.logger.debug('Profile found', { userId, profileExists: true });
@@ -163,20 +181,29 @@ export class ProfileRepository extends DynamoDBBaseRepository implements IProfil
     }, { userId, updateFields: Object.keys(updates) });
   }
 
-  async delete(userId: string): Promise<void> {
+  async delete(userId: string): Promise<boolean> {
     return this.executeWithErrorHandling('delete', async () => {
       this.validateRequired({ userId }, 'delete');
       this.logger.debug('Deleting user profile', { userId });
 
-      const command = new DeleteCommand({
-        TableName: this.tableName,
-        Key: { userId },
-        ConditionExpression: 'attribute_exists(userId)'
-      });
+      try {
+        const command = new DeleteCommand({
+          TableName: this.tableName,
+          Key: { userId },
+          ConditionExpression: 'attribute_exists(userId)'
+        });
 
-      await this.dynamoClient.send(command);
-      
-      this.logger.info('Profile deleted successfully', { userId });
+        await this.dynamoClient.send(command);
+        
+        this.logger.info('Profile deleted successfully', { userId });
+        return true;
+      } catch (error: any) {
+        if (error.name === 'ConditionalCheckFailedException') {
+          this.logger.debug('Profile not found for deletion', { userId });
+          return false;
+        }
+        throw error;
+      }
     }, { userId });
   }
 
@@ -224,11 +251,10 @@ export class ProfileRepository extends DynamoDBBaseRepository implements IProfil
     return this.executeWithErrorHandling('addAchievement', async () => {
       this.validateRequired({ 
         userId, 
-        achievementId: achievement.id,
-        achievementName: achievement.name
+        achievementId: achievement.achievementId
       }, 'addAchievement');
       
-      this.logger.debug('Adding achievement to profile', { userId, achievementId: achievement.id });
+      this.logger.debug('Adding achievement to profile', { userId, achievementId: achievement.achievementId });
 
       const command = new UpdateCommand({
         TableName: this.tableName,
@@ -248,8 +274,18 @@ export class ProfileRepository extends DynamoDBBaseRepository implements IProfil
 
       await this.dynamoClient.send(command);
       
-      this.logger.info('Achievement added successfully', { userId, achievementId: achievement.id });
-    }, { userId, achievementId: achievement.id });
+      this.logger.info('Achievement added successfully', { userId, achievementId: achievement.achievementId });
+    }, { userId, achievementId: achievement.achievementId });
+  }
+
+  // Required by IStandardCrudRepository
+  async findById(id: string): Promise<UserProfile | null> {
+    return this.findByUserId(id);
+  }
+
+  async exists(id: string): Promise<boolean> {
+    const profile = await this.findByUserId(id);
+    return profile !== null;
   }
 }
 

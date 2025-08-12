@@ -46,10 +46,12 @@ export class QuestionService extends BaseService implements IQuestionService {
 
         if (request.provider && request.exam) {
           // Load questions for specific provider/exam
-          allQuestions = await this.questionRepository.findByExam(request.provider, request.exam);
+          const result = await this.questionRepository.findByExam(request.provider, request.exam);
+          allQuestions = result.items;
         } else if (request.provider) {
           // Load questions for all exams in provider
-          allQuestions = await this.questionRepository.findByProvider(request.provider);
+          const result = await this.questionRepository.findByProvider(request.provider);
+          allQuestions = result.items;
         } else {
           // No provider specified - return empty array for now since we have no data loaded
           // This allows the endpoint to work correctly and return proper empty response
@@ -140,18 +142,23 @@ export class QuestionService extends BaseService implements IQuestionService {
         
         if (request.provider && request.exam) {
           // Use repository search method for better performance
-          searchResults = await this.questionRepository.searchQuestions(
+          const result = await this.questionRepository.searchQuestions(
             request.query, 
+            undefined,
             request.provider, 
             request.exam
           );
+          searchResults = result.items;
         } else if (request.provider) {
-          searchResults = await this.questionRepository.searchQuestions(
+          const result = await this.questionRepository.searchQuestions(
             request.query, 
+            undefined,
             request.provider
           );
+          searchResults = result.items;
         } else {
-          searchResults = await this.questionRepository.searchQuestions(request.query);
+          const result = await this.questionRepository.searchQuestions(request.query);
+          searchResults = result.items;
         }
 
         // Delegate search processing to QuestionAnalyzer
@@ -190,7 +197,7 @@ export class QuestionService extends BaseService implements IQuestionService {
   async refreshCache(): Promise<void> {
     return this.executeWithErrorHandling(
       async () => {
-        this.questionRepository.clearCache();
+        this.questionRepository.clearCache?.();
         
         this.logSuccess('Question cache refreshed successfully', {});
       },

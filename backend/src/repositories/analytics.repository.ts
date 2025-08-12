@@ -124,7 +124,7 @@ export class AnalyticsRepository extends DynamoDBBaseRepository implements IAnal
    * Get completed sessions with analytics data
    * Delegates to AnalyticsSessionManager for pure data access
    */
-  async getCompletedSessions(filters: SessionAnalyticsFilters): Promise<SessionAnalyticsData[]> {
+  async getCompletedSessions(filters: SessionAnalyticsFilters & StandardQueryParams): Promise<StandardQueryResult<SessionAnalyticsData>> {
     return this.executeWithErrorHandling('getCompletedSessions', async () => {
       this.logger.info('Delegating getCompletedSessions to AnalyticsSessionManager', { filters });
       
@@ -135,7 +135,15 @@ export class AnalyticsRepository extends DynamoDBBaseRepository implements IAnal
         this.dataTransformer.transformSessionToAnalyticsData(session as unknown as StudySession)
       );
 
-      return analyticsData;
+      // Return standardized result format
+      return {
+        items: analyticsData,
+        total: analyticsData.length,
+        limit: filters.limit || this.config.query?.defaultLimit || 20,
+        offset: filters.offset || 0,
+        hasMore: false, // Will be calculated properly when pagination is implemented
+        executionTimeMs: 0 // Will be set by executeWithErrorHandling
+      };
     }, { filters });
   }
 
@@ -143,35 +151,68 @@ export class AnalyticsRepository extends DynamoDBBaseRepository implements IAnal
    * Get user progress data from UserProgress table
    * Delegates to AnalyticsSessionManager for pure data access
    */
-  async getUserProgressData(userId?: string): Promise<UserProgressData[]> {
+  async getUserProgressData(filters?: StandardQueryParams & { userId?: string }): Promise<StandardQueryResult<UserProgressData>> {
     return this.executeWithErrorHandling('getUserProgressData', async () => {
-      this.logger.info('Delegating getUserProgressData to AnalyticsSessionManager', { ...(userId && { userId }) });
-      return this.sessionManager.getUserProgressData(userId);
-    }, { ...(userId && { userId }) });
+      this.logger.info('Delegating getUserProgressData to AnalyticsSessionManager', { filters });
+      
+      const progressData = await this.sessionManager.getUserProgressData(filters?.userId);
+      
+      // Return standardized result format
+      return {
+        items: progressData,
+        total: progressData.length,
+        limit: filters?.limit || this.config.query?.defaultLimit || 20,
+        offset: filters?.offset || 0,
+        hasMore: false, // Will be calculated properly when pagination is implemented
+        executionTimeMs: 0 // Will be set by executeWithErrorHandling
+      };
+    }, { filters });
   }
 
   /**
    * Get topic performance history (calculated from sessions)
    * Delegates to AnalyticsCalculator for analytical computations
    */
-  async getTopicPerformanceHistory(topicIds: string[], userId?: string): Promise<TopicPerformanceHistory[]> {
+  async getTopicPerformanceHistory(topicIds: string[], filters?: StandardQueryParams & { userId?: string }): Promise<StandardQueryResult<TopicPerformanceHistory>> {
     return this.executeWithErrorHandling('getTopicPerformanceHistory', async () => {
       this.validateRequired({ topicIds }, 'getTopicPerformanceHistory');
-      this.logger.info('Delegating getTopicPerformanceHistory to AnalyticsCalculator', { topicIds, ...(userId && { userId }) });
-      return this.calculator.getTopicPerformanceHistory(topicIds, userId);
-    }, { topicIds, ...(userId && { userId }) });
+      this.logger.info('Delegating getTopicPerformanceHistory to AnalyticsCalculator', { topicIds, filters });
+      
+      const performanceHistory = await this.calculator.getTopicPerformanceHistory(topicIds, filters?.userId);
+      
+      // Return standardized result format
+      return {
+        items: performanceHistory,
+        total: performanceHistory.length,
+        limit: filters?.limit || this.config.query?.defaultLimit || 20,
+        offset: filters?.offset || 0,
+        hasMore: false, // Will be calculated properly when pagination is implemented
+        executionTimeMs: 0 // Will be set by executeWithErrorHandling
+      };
+    }, { topicIds, filters });
   }
 
   /**
    * Calculate trend data for a specific metric over time
    * Delegates to AnalyticsCalculator for analytical computations
    */
-  async calculateTrendData(metric: string, timeframe: string, userId?: string): Promise<TrendData[]> {
+  async calculateTrendData(metric: string, timeframe: string, filters?: StandardQueryParams & { userId?: string }): Promise<StandardQueryResult<TrendData>> {
     return this.executeWithErrorHandling('calculateTrendData', async () => {
       this.validateRequired({ metric, timeframe }, 'calculateTrendData');
-      this.logger.info('Delegating calculateTrendData to AnalyticsCalculator', { metric, timeframe, ...(userId && { userId }) });
-      return this.calculator.calculateTrendData(metric, timeframe, userId);
-    }, { metric, timeframe, ...(userId && { userId }) });
+      this.logger.info('Delegating calculateTrendData to AnalyticsCalculator', { metric, timeframe, filters });
+      
+      const trendData = await this.calculator.calculateTrendData(metric, timeframe, filters?.userId);
+      
+      // Return standardized result format
+      return {
+        items: trendData,
+        total: trendData.length,
+        limit: filters?.limit || this.config.query?.defaultLimit || 20,
+        offset: filters?.offset || 0,
+        hasMore: false, // Will be calculated properly when pagination is implemented
+        executionTimeMs: 0 // Will be set by executeWithErrorHandling
+      };
+    }, { metric, timeframe, filters });
   }
 
   /**

@@ -69,13 +69,13 @@ export class HealthRepository extends BaseRepository implements IHealthRepositor
   protected async performHealthCheck(): Promise<void> {
     // Test DynamoDB connectivity
     const describeCommand = new DescribeTableCommand({
-      TableName: this.serviceConfig.tables.users
+      TableName: this.config.tables.users
     });
     await this.dynamoClient.send(describeCommand);
 
     // Test S3 connectivity
     const headBucketCommand = new HeadBucketCommand({
-      Bucket: this.serviceConfig.s3.bucketName
+      Bucket: this.config.s3.bucketName
     });
     await this.s3Client.send(headBucketCommand);
   }
@@ -112,7 +112,7 @@ export class HealthRepository extends BaseRepository implements IHealthRepositor
     try {
       const startTime = Date.now();
       const headBucketCommand = new HeadBucketCommand({
-        Bucket: this.serviceConfig.s3.bucketName
+        Bucket: this.config.s3.bucketName
       });
       await this.s3Client.send(headBucketCommand);
       dependencies.push({
@@ -140,7 +140,7 @@ export class HealthRepository extends BaseRepository implements IHealthRepositor
     return this.executeWithErrorHandling('checkDynamoDbHealth', async () => {
       const startTime = Date.now();
       
-      this.logger.debug('Checking DynamoDB health', { tableName: this.serviceConfig.tables.users });
+      this.logger.debug('Checking DynamoDB health', { tableName: this.config.tables.users });
 
       const command = new DescribeTableCommand({
         TableName: this.config.tables.users
@@ -170,10 +170,10 @@ export class HealthRepository extends BaseRepository implements IHealthRepositor
       this.logger.debug('Getting detailed DynamoDB diagnostics');
 
       const tableNames = [
-        this.serviceConfig.tables.users,
-        this.serviceConfig.tables.studySessions,
-        this.serviceConfig.tables.userProgress,
-        this.serviceConfig.tables.goals
+        this.config.tables.users,
+        this.config.tables.studySessions,
+        this.config.tables.userProgress,
+        this.config.tables.goals
       ];
 
       const tables = await Promise.allSettled(
@@ -204,7 +204,7 @@ export class HealthRepository extends BaseRepository implements IHealthRepositor
         responseTime,
         lastChecked: new Date().toISOString(),
         details: {
-          region: this.config.region,
+          region: this.serviceConfig.region,
           tables: tables.map(t => t.status === 'fulfilled' ? t.value : {
             name: 'unknown',
             status: 'ERROR'
@@ -221,10 +221,10 @@ export class HealthRepository extends BaseRepository implements IHealthRepositor
     return this.executeWithErrorHandling('checkS3Health', async () => {
       const startTime = Date.now();
       
-      this.logger.debug('Checking S3 health', { bucketName: this.serviceConfig.s3.bucketName });
+      this.logger.debug('Checking S3 health', { bucketName: this.config.s3.bucketName });
 
       const command = new HeadBucketCommand({
-        Bucket: this.serviceConfig.s3.bucketName
+        Bucket: this.config.s3.bucketName
       });
 
       await this.s3Client.send(command);
@@ -334,7 +334,7 @@ export class HealthRepository extends BaseRepository implements IHealthRepositor
         responseTime,
         lastChecked: new Date().toISOString(),
         details: {
-          region: this.config.region,
+          region: this.serviceConfig.region,
           buckets: buckets.map(b => b.status === 'fulfilled' ? b.value : {
             name: 'unknown',
             status: 'ERROR'

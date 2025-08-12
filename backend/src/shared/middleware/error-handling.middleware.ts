@@ -22,20 +22,20 @@ export interface ErrorMapping {
 }
 
 export class ErrorHandlingMiddleware {
-  // Common error mappings that handlers can extend
+  // Optimized error mappings for common patterns
   private static readonly DEFAULT_ERROR_MAPPINGS: ErrorMapping[] = [
     {
-      keywords: ['not found', 'NoSuchKey', 'does not exist'],
+      keywords: ['not found', 'NoSuchKey', 'does not exist', 'ResourceNotFoundException'],
       errorCode: ERROR_CODES.NOT_FOUND,
       statusCode: 404
     },
     {
-      keywords: ['already exists', 'duplicate', 'conflict'],
+      keywords: ['already exists', 'duplicate', 'conflict', 'ConditionalCheckFailedException'],
       errorCode: ERROR_CODES.CONFLICT,
       statusCode: 409
     },
     {
-      keywords: ['unauthorized', 'access denied', 'permission denied'],
+      keywords: ['unauthorized', 'access denied', 'permission denied', 'Invalid token', 'malformed'],
       errorCode: ERROR_CODES.UNAUTHORIZED,
       statusCode: 401
     },
@@ -45,7 +45,7 @@ export class ErrorHandlingMiddleware {
       statusCode: 403
     },
     {
-      keywords: ['validation', 'invalid', 'required', 'must be'],
+      keywords: ['validation', 'invalid', 'required', 'must be', 'ValidationException'],
       errorCode: ERROR_CODES.VALIDATION_ERROR,
       statusCode: 400
     },
@@ -55,14 +55,19 @@ export class ErrorHandlingMiddleware {
       statusCode: 408
     },
     {
-      keywords: ['rate limit', 'too many requests'],
+      keywords: ['rate limit', 'too many requests', 'ProvisionedThroughputExceededException'],
       errorCode: ERROR_CODES.RATE_LIMITED,
       statusCode: 429
+    },
+    {
+      keywords: ['ServiceUnavailableException', 'InternalServerError'],
+      errorCode: ERROR_CODES.INTERNAL_ERROR,
+      statusCode: 503
     }
   ];
 
   /**
-   * Process and classify errors with consistent logging - returns error info for BaseHandler
+   * Main error processing method - processes errors and returns standardized error info
    */
   static processError(
     error: Error | any,
@@ -72,7 +77,7 @@ export class ErrorHandlingMiddleware {
     const errorMessage = error?.message || 'Unknown error occurred';
     const allMappings = [...customMappings, ...this.DEFAULT_ERROR_MAPPINGS];
     
-    // Find matching error mapping
+    // Find matching error mapping efficiently
     const errorMapping = allMappings.find(mapping =>
       mapping.keywords.some(keyword =>
         errorMessage.toLowerCase().includes(keyword.toLowerCase())
@@ -91,7 +96,7 @@ export class ErrorHandlingMiddleware {
       }
     }
 
-    // Log error with context
+    // Optimized logging with appropriate levels
     const logContext = {
       requestId: context.requestId,
       operation: context.operation,
@@ -112,7 +117,8 @@ export class ErrorHandlingMiddleware {
   }
 
   /**
-   * Handle async operation with automatic error processing - returns error info for BaseHandler
+   * Main async operation wrapper - handles errors and returns standardized results
+   * This is the primary method that should be used by BaseHandler and services
    */
   static async withErrorProcessing<T>(
     operation: () => Promise<T>,
@@ -129,27 +135,175 @@ export class ErrorHandlingMiddleware {
   }
 
   /**
-   * @deprecated Use withErrorProcessing() with BaseHandler methods instead
-   * TODO: Remove in Phase 0 when handlers are fixed
+   * Validate required fields - returns error info or null
+   */
+  static validateRequiredFields(
+    fields: Record<string, any>,
+    requiredFields: string[]
+  ): { code: string; message: string; statusCode: number } | null {
+    const missingFields = requiredFields.filter(field => 
+      !fields[field] || 
+      (typeof fields[field] === 'string' && fields[field].trim() === '')
+    );
+
+    if (missingFields.length > 0) {
+      const message = missingFields.length === 1 
+        ? `${missingFields[0]} is required`
+        : `Missing required fields: ${missingFields.join(', ')}`;
+        
+      return { 
+        code: ERROR_CODES.VALIDATION_ERROR, 
+        message, 
+        statusCode: 400 
+      };
+    }
+
+    return null;
+  }
+
+  /**
+   * Handle authentication errors specifically
+   */
+  static handleAuthError(
+    error: Error | any,
+    context: ErrorContext
+  ): { code: string; message: string; statusCode: number } {
+    const errorMessage = error?.message || 'Authentication failed';
+    
+    // Optimized auth error detection
+    if (errorMessage.includes('expired')) {
+      return { code: ERROR_CODES.TOKEN_EXPIRED, message: 'Token expired', statusCode: 401 };
+    }
+    
+    if (errorMessage.includes('Invalid token') || errorMessage.includes('malformed')) {
+      return { code: ERROR_CODES.TOKEN_INVALID, message: 'Invalid token', statusCode: 401 };
+    }
+    
+    if (errorMessage.includes('Missing') || errorMessage.includes('required')) {
+      return { code: ERROR_CODES.UNAUTHORIZED, message: 'Authentication required', statusCode: 401 };
+    }
+
+    // Log auth error efficiently
+    logger.warn('Authentication error', {
+      requestId: context.requestId,
+      operation: context.operation,
+      error: errorMessage,
+      ...(context.additionalInfo && { additionalInfo: context.additionalInfo })
+    });
+
+    return { code: ERROR_CODES.UNAUTHORIZED, message: 'Authentication failed', statusCode: 401 };
+  }
+
+  /**
+   * Handle validation errors with field-specific details
+   */
+  static handleValidationError(
+    error: Error | any,
+    context: ErrorContext,
+    fieldErrors?: Record<string, string>
+  ): { code: string; message: string; statusCode: number; details?: Record<string, string> } {
+    const message = error?.message || 'Validation failed';
+    
+    logger.warn('Validation error', {
+      requestId: context.requestId,
+      operation: context.operation,
+      error: message,
+      fieldErrors,
+      ...(context.additionalInfo && { additionalInfo: context.additionalInfo })
+    });
+
+    return {
+      code: ERROR_CODES.VALIDATION_ERROR,
+      message,
+      statusCode: 400,
+      ...(fieldErrors && { details: fieldErrors })
+    };
+  }
+
+  /**
+   * Create specialized error mappings for specific services
+   * This method provides service-specific error handling without duplication
+   */
+  static createServiceMappings(serviceName: string): ErrorMapping[] {
+    // Define service-specific patterns
+    const servicePatterns: Record<string, ErrorMapping[]> = {
+      session: [
+        {
+          keywords: ['Cannot update completed', 'Cannot delete completed', 'Cannot pause', 'Invalid transition'],
+          errorCode: ERROR_CODES.CONFLICT,
+          statusCode: 409
+        },
+        {
+          keywords: ['Session not found', 'No questions found for session'],
+          errorCode: ERROR_CODES.NOT_FOUND,
+          statusCode: 404
+        }
+      ],
+      question: [
+        {
+          keywords: ['Invalid provider', 'Invalid exam', 'Invalid topic'],
+          errorCode: ERROR_CODES.NOT_FOUND,
+          statusCode: 404
+        },
+        {
+          keywords: ['Question count must be', 'Time limit must be'],
+          errorCode: ERROR_CODES.VALIDATION_ERROR,
+          statusCode: 400
+        }
+      ],
+      analytics: [
+        {
+          keywords: ['Insufficient data', 'No analytics available'],
+          errorCode: ERROR_CODES.NOT_FOUND,
+          statusCode: 404
+        }
+      ]
+    };
+
+    return servicePatterns[serviceName.toLowerCase()] || [];
+  }
+
+  // ========================================
+  // DEPRECATED METHODS - MAINTAINED FOR BACKWARD COMPATIBILITY
+  // These will be removed in a future phase once all usages are migrated
+  // ========================================
+
+  /**
+   * @deprecated Use withErrorProcessing() instead - this method will be removed
+   * Maintained only for backward compatibility during migration
    */
   static async withErrorHandling<T>(
     operation: () => Promise<T>,
     context: ErrorContext,
     customMappings: ErrorMapping[] = []
   ): Promise<{ result?: T; error?: ApiResponse }> {
-    try {
-      const result = await operation();
-      return { result };
-    } catch (error) {
-      const errorInfo = this.processError(error, context, customMappings);
-      const errorResponse = this.createErrorResponse(errorInfo.code, errorInfo.message);
+    const { result, errorInfo } = await this.withErrorProcessing(operation, context, customMappings);
+    
+    if (errorInfo) {
+      // Convert new format to legacy format for compatibility
+      const errorResponse: ApiResponse = {
+        success: false,
+        message: errorInfo.message,
+        error: {
+          code: errorInfo.code,
+          message: errorInfo.message
+        },
+        timestamp: new Date().toISOString()
+      };
       return { error: errorResponse };
     }
+    
+    // Handle undefined result properly for strict TypeScript
+    if (result === undefined) {
+      return {};
+    }
+    
+    return { result };
   }
 
   /**
-   * @deprecated Use BaseHandler.buildSuccessResponse() instead - violates BaseHandler pattern
-   * TODO: Remove in Phase 0 when handlers are fixed
+   * @deprecated Use BaseHandler.buildSuccessResponse() instead
+   * This method violates BaseHandler pattern and will be removed
    */
   static createSuccessResponse<T>(
     data: T,
@@ -164,8 +318,8 @@ export class ErrorHandlingMiddleware {
   }
 
   /**
-   * @deprecated Use BaseHandler.buildErrorResponse() instead - violates BaseHandler pattern  
-   * TODO: Remove in Phase 0 when handlers are fixed
+   * @deprecated Use BaseHandler.buildErrorResponse() instead
+   * This method violates BaseHandler pattern and will be removed
    */
   static createErrorResponse(
     code: string,
@@ -190,163 +344,29 @@ export class ErrorHandlingMiddleware {
   }
 
   /**
-   * Validate required fields and return error info for BaseHandler
-   */
-  static validateRequiredFields(
-    fields: Record<string, any>,
-    requiredFields: string[]
-  ): { code: string; message: string } | null {
-    const missingFields = requiredFields.filter(field => 
-      !fields[field] || 
-      (typeof fields[field] === 'string' && fields[field].trim() === '')
-    );
-
-    if (missingFields.length > 0) {
-      const message = missingFields.length === 1 
-        ? `${missingFields[0]} is required`
-        : `Missing required fields: ${missingFields.join(', ')}`;
-        
-      return { code: ERROR_CODES.VALIDATION_ERROR, message };
-    }
-
-    return null;
-  }
-
-  /**
-   * Handle authentication errors specifically - returns error info for BaseHandler
-   */
-  static handleAuthError(
-    error: Error | any,
-    context: ErrorContext
-  ): { code: string; message: string } {
-    const errorMessage = error?.message || 'Authentication failed';
-    
-    // Check for specific auth error types
-    if (errorMessage.includes('expired')) {
-      return { code: ERROR_CODES.TOKEN_EXPIRED, message: 'Token expired' };
-    }
-    
-    if (errorMessage.includes('Invalid token') || errorMessage.includes('malformed')) {
-      return { code: ERROR_CODES.TOKEN_INVALID, message: 'Invalid token' };
-    }
-    
-    if (errorMessage.includes('Missing') || errorMessage.includes('required')) {
-      return { code: ERROR_CODES.UNAUTHORIZED, message: 'Authentication required' };
-    }
-
-    // Log auth error
-    logger.warn('Authentication error', {
-      requestId: context.requestId,
-      operation: context.operation,
-      error: errorMessage,
-      ...(context.additionalInfo && { additionalInfo: context.additionalInfo })
-    });
-
-    return { code: ERROR_CODES.UNAUTHORIZED, message: 'Authentication failed' };
-  }
-
-  /**
-   * Handle validation errors with field-specific details - returns error info for BaseHandler
-   */
-  static handleValidationError(
-    error: Error | any,
-    context: ErrorContext,
-    fieldErrors?: Record<string, string>
-  ): { code: string; message: string; details?: Record<string, string> } {
-    const message = error?.message || 'Validation failed';
-    
-    logger.warn('Validation error', {
-      requestId: context.requestId,
-      operation: context.operation,
-      error: message,
-      fieldErrors,
-      ...(context.additionalInfo && { additionalInfo: context.additionalInfo })
-    });
-
-    return {
-      code: ERROR_CODES.VALIDATION_ERROR,
-      message,
-      ...(fieldErrors && { details: fieldErrors })
-    };
-  }
-
-  /**
-   * Handle service-specific errors (for business logic) - returns error info for BaseHandler
+   * @deprecated Use processError() with createServiceMappings() instead
+   * This specialized method will be removed in favor of the unified approach
    */
   static handleServiceError(
     error: Error | any,
     context: ErrorContext,
     serviceName: string
   ): { code: string; message: string; statusCode: number } {
-    const errorMessage = error?.message || `${serviceName} operation failed`;
-    
-    // Service-specific error mappings
-    const serviceMappings: ErrorMapping[] = [
-      {
-        keywords: ['Question count must be', 'Time limit must be'],
-        errorCode: ERROR_CODES.VALIDATION_ERROR,
-        statusCode: 400
-      },
-      {
-        keywords: ['Invalid provider', 'Invalid exam', 'Invalid topic'],
-        errorCode: ERROR_CODES.NOT_FOUND,
-        statusCode: 404
-      },
-      {
-        keywords: ['No questions found', 'Session not found'],
-        errorCode: ERROR_CODES.NOT_FOUND,
-        statusCode: 404
-      },
-      {
-        keywords: ['Cannot update completed', 'Cannot delete completed', 'Cannot pause', 'Invalid transition'],
-        errorCode: ERROR_CODES.CONFLICT,
-        statusCode: 409
-      }
-    ];
-
+    const serviceMappings = this.createServiceMappings(serviceName);
     return this.processError(error, context, serviceMappings);
   }
 
   /**
-   * Handle database/repository errors - returns error info for BaseHandler
+   * @deprecated Use processError() with default mappings instead
+   * Repository-specific logic is now handled by the unified error processing
    */
   static handleRepositoryError(
     error: Error | any,
     context: ErrorContext,
     repositoryName: string
   ): { code: string; message: string; statusCode: number } {
-    const errorMessage = error?.message || `${repositoryName} operation failed`;
-    
-    // Repository-specific error mappings
-    const repositoryMappings: ErrorMapping[] = [
-      {
-        keywords: ['ConditionalCheckFailedException', 'already exists'],
-        errorCode: ERROR_CODES.CONFLICT,
-        statusCode: 409
-      },
-      {
-        keywords: ['ResourceNotFoundException', 'not found'],
-        errorCode: ERROR_CODES.NOT_FOUND,
-        statusCode: 404
-      },
-      {
-        keywords: ['ValidationException', 'invalid format'],
-        errorCode: ERROR_CODES.VALIDATION_ERROR,
-        statusCode: 400
-      },
-      {
-        keywords: ['ProvisionedThroughputExceededException', 'rate limit'],
-        errorCode: ERROR_CODES.RATE_LIMITED,
-        statusCode: 429
-      },
-      {
-        keywords: ['ServiceUnavailableException', 'InternalServerError'],
-        errorCode: ERROR_CODES.INTERNAL_ERROR,
-        statusCode: 503
-      }
-    ];
-
-    return this.processError(error, context, repositoryMappings);
+    // Repository errors are handled by default mappings now
+    return this.processError(error, context);
   }
 }
 

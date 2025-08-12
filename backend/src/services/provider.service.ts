@@ -38,7 +38,8 @@ export class ProviderService extends BaseService implements IProviderService {
 
     try {
       // Get all providers from repository
-      const allProviders = await this.providerRepository.findAll();
+      const allProvidersResult = await this.providerRepository.findAll();
+      const allProviders = allProvidersResult.items;
 
       // Apply filters using dedicated filter class
       const { filtered, total } = ProviderFilter.applyFilters(allProviders, request);
