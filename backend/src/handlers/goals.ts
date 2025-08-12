@@ -30,7 +30,7 @@ export class GoalsHandler extends BaseHandler {
   private logger = createLogger({ handler: 'GoalsHandler' });
   // Helper methods for GoalsHandler standardization
   private validateUserIdFromBody(requestBody: any): ApiResponse | null {
-    if (!requestBody.userId) {
+    if (!requestBody!.userId) {
       return this.buildErrorResponse('userId is required until Phase 30 authentication is implemented', 400, ERROR_CODES.VALIDATION_ERROR);
     }
     return null;
@@ -119,11 +119,11 @@ export class GoalsHandler extends BaseHandler {
    */
   private async createGoal(context: HandlerContext): Promise<ApiResponse> {
 // Parse and validate request body using middleware
-    const { data: requestBody, error: parseError } = ParsingMiddleware.parseRequestBody<CreateGoalRequest & { userId: string }>(context, true);
+    const { data: requestBody, error: parseError } = await this.parseRequestBodyOrError<CreateGoalRequest & { userId: string }>(context, true);
     if (parseError) return parseError;
 
     // Validate userId is provided until Phase 30
-    const userIdValidation = this.validateUserIdFromBody(requestBody);
+    const userIdValidation = this.validateUserIdFromBody(requestBody!);
     if (userIdValidation) return userIdValidation;
 
     // Validate using comprehensive schema (replaces validateCreateGoalRequest)
@@ -131,19 +131,19 @@ export class GoalsHandler extends BaseHandler {
     if (validationResult.error) return validationResult.error;
 
     // Business logic only - delegate error handling to middleware
-    const { result, error } = await ErrorHandlingMiddleware.withErrorHandling(
+    const { result, error } = await this.executeServiceOrError(
       async () => {
         const goalsService = this.serviceFactory.getGoalsService();
-        return await goalsService.createGoal(requestBody.userId, requestBody);
+        return await goalsService.createGoal(requestBody!.userId, requestBody!);
       },
       {
         requestId: context.requestId,
         operation: ErrorContexts.Goals.CREATE,
-        userId: requestBody.userId,
+        userId: requestBody!.userId,
         additionalInfo: { 
-          type: requestBody.type,
-          targetType: requestBody.targetType,
-          targetValue: requestBody.targetValue
+          type: requestBody!.type,
+          targetType: requestBody!.targetType,
+          targetValue: requestBody!.targetValue
         }
       }
     );
@@ -152,7 +152,7 @@ export class GoalsHandler extends BaseHandler {
 
     this.logger.info('Goal created successfully', { 
       requestId: context.requestId,
-      userId: requestBody.userId,
+      userId: requestBody!.userId,
       goalId: result!.goal.goalId,
       type: result!.goal.type,
       targetValue: result!.goal.targetValue
@@ -166,7 +166,7 @@ export class GoalsHandler extends BaseHandler {
    */
   private async getGoals(context: HandlerContext): Promise<ApiResponse> {
 // Parse query parameters using middleware
-    const { data: queryParams, error: parseError } = ParsingMiddleware.parseQueryParams(context, {
+    const { data: queryParams, error: parseError } = await this.parseQueryParamsOrError(context, {
       userId: { type: 'string', decode: true },
       status: { type: 'string', decode: true },
       type: { type: 'string', decode: true },
@@ -191,7 +191,7 @@ export class GoalsHandler extends BaseHandler {
     const request = this.buildGetGoalsRequest(queryParams);
 
     // Business logic only - delegate error handling to middleware
-    const { result, error } = await ErrorHandlingMiddleware.withErrorHandling(
+    const { result, error } = await this.executeServiceOrError(
       async () => {
         const goalsService = this.serviceFactory.getGoalsService();
         return await goalsService.getGoals(queryParams.userId, request);
@@ -222,7 +222,7 @@ export class GoalsHandler extends BaseHandler {
    */
   private async getGoal(context: HandlerContext): Promise<ApiResponse> {
 // Parse path parameters using middleware
-    const { data: pathParams, error: parseError } = ParsingMiddleware.parsePathParams(context);
+    const { data: pathParams, error: parseError } = await this.parsePathParamsOrError(context);
     if (parseError) return parseError;
 
     // Parse query parameters using middleware
@@ -240,7 +240,7 @@ export class GoalsHandler extends BaseHandler {
     if (goalValidation) return goalValidation;
 
     // Business logic only - delegate error handling to middleware
-    const { result, error } = await ErrorHandlingMiddleware.withErrorHandling(
+    const { result, error } = await this.executeServiceOrError(
       async () => {
         const goalsService = this.serviceFactory.getGoalsService();
         return await goalsService.getGoal(pathParams.id, queryParams.userId);
@@ -272,7 +272,7 @@ export class GoalsHandler extends BaseHandler {
    */
   private async updateGoal(context: HandlerContext): Promise<ApiResponse> {
 // Parse path parameters using middleware
-    const { data: pathParams, error: parseError } = ParsingMiddleware.parsePathParams(context);
+    const { data: pathParams, error: parseError } = await this.parsePathParamsOrError(context);
     if (parseError) return parseError;
 
     // Parse query parameters using middleware
@@ -297,10 +297,10 @@ export class GoalsHandler extends BaseHandler {
     if (updateValidation) return updateValidation;
 
     // Business logic only - delegate error handling to middleware
-    const { result, error } = await ErrorHandlingMiddleware.withErrorHandling(
+    const { result, error } = await this.executeServiceOrError(
       async () => {
         const goalsService = this.serviceFactory.getGoalsService();
-        return await goalsService.updateGoal(pathParams.id, queryParams.userId, requestBody);
+        return await goalsService.updateGoal(pathParams.id, queryParams.userId, requestBody!);
       },
       {
         requestId: context.requestId,
@@ -308,7 +308,7 @@ export class GoalsHandler extends BaseHandler {
         userId: queryParams.userId,
         additionalInfo: { 
           goalId: pathParams.id,
-          updates: Object.keys(requestBody)
+          updates: Object.keys(requestBody!)
         }
       }
     );
@@ -321,7 +321,7 @@ export class GoalsHandler extends BaseHandler {
       goalId: result!.goal.goalId,
       status: result!.goal.status,
       progress: result!.goal.progressPercentage,
-      updates: Object.keys(requestBody)
+      updates: Object.keys(requestBody!)
     });
 
     return this.buildSuccessResponse('Goal updated successfully', result);
@@ -332,7 +332,7 @@ export class GoalsHandler extends BaseHandler {
    */
   private async deleteGoal(context: HandlerContext): Promise<ApiResponse> {
 // Parse path parameters using middleware
-    const { data: pathParams, error: parseError } = ParsingMiddleware.parsePathParams(context);
+    const { data: pathParams, error: parseError } = await this.parsePathParamsOrError(context);
     if (parseError) return parseError;
 
     // Parse query parameters using middleware
@@ -350,7 +350,7 @@ export class GoalsHandler extends BaseHandler {
     if (goalValidation) return goalValidation;
 
     // Business logic only - delegate error handling to middleware
-    const { result, error } = await ErrorHandlingMiddleware.withErrorHandling(
+    const { result, error } = await this.executeServiceOrError(
       async () => {
         const goalsService = this.serviceFactory.getGoalsService();
         return await goalsService.deleteGoal(pathParams.id, queryParams.userId);
@@ -379,7 +379,7 @@ export class GoalsHandler extends BaseHandler {
    */
   private async getGoalStats(context: HandlerContext): Promise<ApiResponse> {
 // Parse query parameters using middleware
-    const { data: queryParams, error: parseError } = ParsingMiddleware.parseQueryParams(context, {
+    const { data: queryParams, error: parseError } = await this.parseQueryParamsOrError(context, {
       userId: { type: 'string', decode: true }
     });
     if (parseError) return parseError;
@@ -389,7 +389,7 @@ export class GoalsHandler extends BaseHandler {
     if (userIdValidation) return userIdValidation;
 
     // Business logic only - delegate error handling to middleware
-    const { result, error } = await ErrorHandlingMiddleware.withErrorHandling(
+    const { result, error } = await this.executeServiceOrError(
       async () => {
         const goalsService = this.serviceFactory.getGoalsService();
         return await goalsService.getGoalStats(queryParams.userId);

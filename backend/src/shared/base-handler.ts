@@ -12,6 +12,7 @@ import {
 import { ResponseBuilder } from './response-builder';
 import { createLogger } from './logger';
 import { HTTP_STATUS_CODES } from './constants/api.constants';
+import { ParsingMiddleware, ErrorHandlingMiddleware, ValidationMiddleware, ValidationSchema } from './middleware';
 
 export interface RouteConfig {
   method: HttpMethod;
@@ -310,5 +311,67 @@ export abstract class BaseHandler {
     } catch (error) {
       throw new Error('Invalid JSON in request body');
     }
+  }
+
+  // ===================================
+  // DRY ELIMINATION HELPER METHODS
+  // ===================================
+
+  /**
+   * Helper to parse request body with error handling
+   * Eliminates: const { data: X, error: parseError } = ParsingMiddleware.parseRequestBody(...); if (parseError) return parseError;
+   */
+  protected async parseRequestBodyOrError<T>(context: HandlerContext, required: boolean = true): Promise<{ data?: T; error?: ApiResponse }> {
+    const { data, error: parseError } = ParsingMiddleware.parseRequestBody<T>(context, required);
+    if (parseError) return { error: parseError };
+    return { data };
+  }
+
+  /**
+   * Helper to parse path parameters with error handling  
+   * Eliminates: const { data: pathParams, error: parseError } = ParsingMiddleware.parsePathParams(...); if (parseError) return parseError;
+   */
+  protected async parsePathParamsOrError(context: HandlerContext): Promise<{ data?: any; error?: ApiResponse }> {
+    const { data, error: parseError } = ParsingMiddleware.parsePathParams(context);
+    if (parseError) return { error: parseError };
+    return { data };
+  }
+
+  /**
+   * Helper to parse query parameters with error handling
+   * Eliminates: const { data: queryParams, error: parseError } = ParsingMiddleware.parseQueryParams(...); if (parseError) return parseError;
+   */
+  protected async parseQueryParamsOrError(context: HandlerContext, schema?: any): Promise<{ data?: any; error?: ApiResponse }> {
+    const { data, error: parseError } = ParsingMiddleware.parseQueryParams(context, schema);
+    if (parseError) return { error: parseError };
+    return { data };
+  }
+
+  /**
+   * Helper to validate request with error handling
+   * Eliminates: if (validationResult.error) return validationResult.error;
+   */
+  protected validateOrError(context: HandlerContext, schema: ValidationSchema): ApiResponse | null {
+    const validationResult = ValidationMiddleware.validateRequestBody(context, schema);
+    return validationResult.error || null;
+  }
+
+  /**
+   * Helper to execute service logic with error handling
+   * Eliminates repetitive ErrorHandlingMiddleware.withErrorHandling boilerplate
+   */
+  protected async executeServiceOrError<T>(
+    serviceLogic: () => Promise<T>,
+    errorContext: {
+      requestId: string;
+      operation: string;
+      userId?: string;
+      additionalInfo?: Record<string, any>;
+    }
+  ): Promise<{ result?: T; error?: ApiResponse }> {
+    const { result, error } = await ErrorHandlingMiddleware.withErrorHandling(serviceLogic, errorContext);
+    if (error) return { error };
+    if (result === undefined) return {};
+    return { result };
   }
 }

@@ -62,25 +62,25 @@ export class AuthHandler extends BaseHandler {
    * User registration endpoint - now clean and focused
    */
   private async register(context: HandlerContext): Promise<ApiResponse> {
-    // Parse and validate request body using middleware
-    const { data: userData, error: parseError } = ParsingMiddleware.parseRequestBody<CreateUserRequest>(context, true);
+    // Parse request body using helper method
+    const { data: userData, error: parseError } = await this.parseRequestBodyOrError<CreateUserRequest>(context, true);
     if (parseError) return parseError;
 
     // Validate using middleware - just check required fields here, detailed validation in service
-    if (!userData.email || !userData.password || !userData.firstName || !userData.lastName) {
+    if (!userData!.email || !userData!.password || !userData!.firstName || !userData!.lastName) {
       return this.buildErrorResponse('Missing required fields: email, password, firstName, lastName', 400, ERROR_CODES.VALIDATION_ERROR);
     }
 
-    // Business logic only - delegate error handling to middleware
-    const { result, error } = await ErrorHandlingMiddleware.withErrorHandling(
+    // Execute service logic using helper method
+    const { result, error } = await this.executeServiceOrError(
       async () => {
         const authService = this.serviceFactory.getAuthService();
-        return await authService.registerUser(userData);
+        return await authService.registerUser(userData!);
       },
       {
         requestId: context.requestId,
         operation: ErrorContexts.Auth.REGISTER,
-        additionalInfo: { email: userData.email }
+        additionalInfo: { email: userData!.email }
       }
     );
 
@@ -99,25 +99,25 @@ export class AuthHandler extends BaseHandler {
    * User login endpoint - now clean and focused
    */
   private async login(context: HandlerContext): Promise<ApiResponse> {
-    // Parse and validate request body using middleware
-    const { data: loginData, error: parseError } = ParsingMiddleware.parseRequestBody<LoginRequest>(context, true);
+    // Parse request body using helper method
+    const { data: loginData, error: parseError } = await this.parseRequestBodyOrError<LoginRequest>(context, true);
     if (parseError) return parseError;
 
     // Validate using middleware - just check required fields here
-    if (!loginData.email || !loginData.password) {
+    if (!loginData!.email || !loginData!.password) {
       return this.buildErrorResponse('Email and password are required', 400, ERROR_CODES.VALIDATION_ERROR);
     }
 
-    // Business logic only - delegate error handling to middleware
-    const { result, error } = await ErrorHandlingMiddleware.withErrorHandling(
+    // Execute service logic using helper method
+    const { result, error } = await this.executeServiceOrError(
       async () => {
         const authService = this.serviceFactory.getAuthService();
-        return await authService.loginUser(loginData);
+        return await authService.loginUser(loginData!);
       },
       {
         requestId: context.requestId,
         operation: ErrorContexts.Auth.LOGIN,
-        additionalInfo: { email: loginData.email }
+        additionalInfo: { email: loginData!.email }
       }
     );
 
@@ -136,20 +136,20 @@ export class AuthHandler extends BaseHandler {
    * Token refresh endpoint - now clean and focused
    */
   private async refresh(context: HandlerContext): Promise<ApiResponse> {
-    // Parse and validate request body using middleware
-    const { data: refreshData, error: parseError } = ParsingMiddleware.parseRequestBody<{ refreshToken: string }>(context, true);
+    // Parse request body using helper method
+    const { data: refreshData, error: parseError } = await this.parseRequestBodyOrError<{ refreshToken: string }>(context, true);
     if (parseError) return parseError;
 
     // Validate using middleware - just check required fields here
-    if (!refreshData.refreshToken) {
+    if (!refreshData!.refreshToken) {
       return this.buildErrorResponse('Refresh token is required', 400, ERROR_CODES.VALIDATION_ERROR);
     }
 
-    // Business logic only - delegate error handling to middleware
-    const { result, error } = await ErrorHandlingMiddleware.withErrorHandling(
+    // Execute service logic using helper method
+    const { result, error } = await this.executeServiceOrError(
       async () => {
         const authService = this.serviceFactory.getAuthService();
-        return await authService.refreshToken(refreshData.refreshToken);
+        return await authService.refreshToken(refreshData!.refreshToken);
       },
       {
         requestId: context.requestId,
@@ -175,8 +175,8 @@ export class AuthHandler extends BaseHandler {
     const { token, error: tokenError } = AuthMiddleware.extractToken(context);
     if (tokenError) return tokenError;
 
-    // Business logic only - delegate error handling to middleware
-    const { error } = await ErrorHandlingMiddleware.withErrorHandling(
+    // Execute service logic using helper method
+    const { error } = await this.executeServiceOrError(
       async () => {
         const authService = this.serviceFactory.getAuthService();
         await authService.logoutUser(token!);

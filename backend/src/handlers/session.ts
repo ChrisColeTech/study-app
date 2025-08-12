@@ -155,7 +155,7 @@ export class SessionHandler extends BaseHandler {
     // No authentication required - sessions work independently (auth association in Phase 30)
 
     // Parse and validate request body using middleware
-    const { data: requestBody, error: parseError } = ParsingMiddleware.parseRequestBody<CreateSessionRequest>(context, true);
+    const { data: requestBody, error: parseError } = await this.parseRequestBodyOrError<CreateSessionRequest>(context, true);
     if (parseError) return parseError;
 
     // Validate using comprehensive schema (replaces validateCreateSessionRequest)
@@ -163,18 +163,18 @@ export class SessionHandler extends BaseHandler {
     if (validationResult.error) return validationResult.error;
 
     // Business logic only - delegate error handling to middleware
-    const { result, error } = await ErrorHandlingMiddleware.withErrorHandling(
+    const { result, error } = await this.executeServiceOrError(
       async () => {
         const sessionService = this.serviceFactory.getSessionService();
-        return await sessionService.createSession(requestBody);
+        return await sessionService.createSession(requestBody!);
       },
       {
         requestId: context.requestId,
         operation: ErrorContexts.Session.CREATE,
         additionalInfo: { 
-          examId: requestBody.examId,
-          providerId: requestBody.providerId,
-          sessionType: requestBody.sessionType
+          examId: requestBody!.examId,
+          providerId: requestBody!.providerId,
+          sessionType: requestBody!.sessionType
         }
       }
     );
@@ -199,7 +199,7 @@ export class SessionHandler extends BaseHandler {
     // No authentication required - sessions work independently (auth association in Phase 30)
 
     // Parse path parameters using middleware
-    const { data: pathParams, error: parseError } = ParsingMiddleware.parsePathParams(context);
+    const { data: pathParams, error: parseError } = await this.parsePathParamsOrError(context);
     if (parseError) return parseError;
 
     // Validate session ID using standardized helper
@@ -207,7 +207,7 @@ export class SessionHandler extends BaseHandler {
     if (sessionIdValidation) return sessionIdValidation;
 
     // Business logic only - delegate error handling to middleware
-    const { result, error } = await ErrorHandlingMiddleware.withErrorHandling(
+    const { result, error } = await this.executeServiceOrError(
       async () => {
         const sessionService = this.serviceFactory.getSessionService();
         return await sessionService.getSession(pathParams.id);
@@ -240,7 +240,7 @@ export class SessionHandler extends BaseHandler {
     // No authentication required - sessions work independently (auth association in Phase 30)
 
     // Parse path parameters using middleware
-    const { data: pathParams, error: parseError } = ParsingMiddleware.parsePathParams(context);
+    const { data: pathParams, error: parseError } = await this.parsePathParamsOrError(context);
     if (parseError) return parseError;
 
     // Parse and validate request body using middleware
@@ -256,17 +256,17 @@ export class SessionHandler extends BaseHandler {
     if (updateValidation) return updateValidation;
 
     // Business logic only - delegate error handling to middleware
-    const { result, error } = await ErrorHandlingMiddleware.withErrorHandling(
+    const { result, error } = await this.executeServiceOrError(
       async () => {
         const sessionService = this.serviceFactory.getSessionService();
-        return await sessionService.updateSession(pathParams.id, requestBody);
+        return await sessionService.updateSession(pathParams.id, requestBody!);
       },
       {
         requestId: context.requestId,
         operation: ErrorContexts.Session.UPDATE,
         additionalInfo: { 
           sessionId: pathParams.id,
-          action: requestBody.action
+          action: requestBody!.action
         }
       }
     );
@@ -278,7 +278,7 @@ export class SessionHandler extends BaseHandler {
       sessionId: result!.session.sessionId,
       status: result!.session.status,
       currentQuestion: result!.progress.currentQuestion,
-      action: requestBody.action
+      action: requestBody!.action
     });
 
     return this.buildSuccessResponse('Session updated successfully', result);
@@ -291,7 +291,7 @@ export class SessionHandler extends BaseHandler {
     // No authentication required - sessions work independently (auth association in Phase 30)
 
     // Parse path parameters using middleware
-    const { data: pathParams, error: parseError } = ParsingMiddleware.parsePathParams(context);
+    const { data: pathParams, error: parseError } = await this.parsePathParamsOrError(context);
     if (parseError) return parseError;
 
     // Validate session ID using standardized helper
@@ -299,7 +299,7 @@ export class SessionHandler extends BaseHandler {
     if (sessionIdValidation) return sessionIdValidation;
 
     // Business logic only - delegate error handling to middleware
-    const { result, error } = await ErrorHandlingMiddleware.withErrorHandling(
+    const { result, error } = await this.executeServiceOrError(
       async () => {
         const sessionService = this.serviceFactory.getSessionService();
         return await sessionService.deleteSession(pathParams.id);
@@ -308,8 +308,7 @@ export class SessionHandler extends BaseHandler {
         requestId: context.requestId,
         operation: ErrorContexts.Session.DELETE,
         additionalInfo: { sessionId: pathParams.id }
-      },
-      SessionHandler.SESSION_ERROR_MAPPINGS.DELETE
+      }
     );
 
     if (error) return error;
@@ -329,7 +328,7 @@ export class SessionHandler extends BaseHandler {
     // No authentication required - sessions work independently (auth association in Phase 30)
 
     // Parse path parameters using middleware
-    const { data: pathParams, error: parseError } = ParsingMiddleware.parsePathParams(context);
+    const { data: pathParams, error: parseError } = await this.parsePathParamsOrError(context);
     if (parseError) return parseError;
 
     // Parse and validate request body using middleware
@@ -345,20 +344,19 @@ export class SessionHandler extends BaseHandler {
     if (answerValidation) return answerValidation;
 
     // Business logic only - delegate error handling to middleware
-    const { result, error } = await ErrorHandlingMiddleware.withErrorHandling(
+    const { result, error } = await this.executeServiceOrError(
       async () => {
         const sessionService = this.serviceFactory.getSessionService();
-        return await sessionService.submitAnswer(pathParams.id, requestBody);
+        return await sessionService.submitAnswer(pathParams.id, requestBody!);
       },
       {
         requestId: context.requestId,
         operation: 'SESSION_SUBMIT_ANSWER',
         additionalInfo: { 
           sessionId: pathParams.id,
-          questionId: requestBody.questionId
+          questionId: requestBody!.questionId
         }
-      },
-      SessionHandler.SESSION_ERROR_MAPPINGS.SUBMIT_ANSWER
+      }
     );
 
     if (error) return error;
@@ -366,7 +364,7 @@ export class SessionHandler extends BaseHandler {
     this.logger.info('Answer submitted successfully', { 
       requestId: context.requestId,
       sessionId: pathParams.id,
-      questionId: requestBody.questionId,
+      questionId: requestBody!.questionId,
       isCorrect: result!.feedback.isCorrect,
       score: result!.feedback.score,
       sessionStatus: result!.session.status
@@ -382,7 +380,7 @@ export class SessionHandler extends BaseHandler {
     // No authentication required - sessions work independently (auth association in Phase 30)
 
     // Parse path parameters using middleware
-    const { data: pathParams, error: parseError } = ParsingMiddleware.parsePathParams(context);
+    const { data: pathParams, error: parseError } = await this.parsePathParamsOrError(context);
     if (parseError) return parseError;
 
     // Validate session ID using standardized helper
@@ -390,7 +388,7 @@ export class SessionHandler extends BaseHandler {
     if (sessionIdValidation) return sessionIdValidation;
 
     // Business logic only - delegate error handling to middleware
-    const { result, error } = await ErrorHandlingMiddleware.withErrorHandling(
+    const { result, error } = await this.executeServiceOrError(
       async () => {
         const sessionService = this.serviceFactory.getSessionService();
         return await sessionService.completeSession(pathParams.id);
@@ -399,8 +397,7 @@ export class SessionHandler extends BaseHandler {
         requestId: context.requestId,
         operation: 'SESSION_COMPLETE',
         additionalInfo: { sessionId: pathParams.id }
-      },
-      SessionHandler.SESSION_ERROR_MAPPINGS.COMPLETE
+      }
     );
 
     if (error) return error;
@@ -423,7 +420,7 @@ export class SessionHandler extends BaseHandler {
    */
   private async createAdaptiveSession(context: HandlerContext): Promise<ApiResponse> {
     // Parse and validate request body using middleware
-    const { data: requestBody, error: parseError } = ParsingMiddleware.parseRequestBody<CreateSessionRequest>(context, true);
+    const { data: requestBody, error: parseError } = await this.parseRequestBodyOrError<CreateSessionRequest>(context, true);
     if (parseError) return parseError;
 
     // Use same validation as createSession (now using schema)

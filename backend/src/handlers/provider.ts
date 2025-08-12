@@ -61,7 +61,7 @@ export class ProviderHandler extends BaseHandler {
    */
   private async getProviders(context: HandlerContext): Promise<ApiResponse> {
     // Parse query parameters using middleware with specific config
-    const { data: queryParams, error: parseError } = ParsingMiddleware.parseQueryParams(context, {
+    const { data: queryParams, error: parseError } = await this.parseQueryParamsOrError(context, {
       category: { type: 'string', decode: true },
       status: { type: 'string', decode: true },
       search: CommonParsing.search,
@@ -87,7 +87,7 @@ export class ProviderHandler extends BaseHandler {
     };
 
     // Business logic only - delegate error handling to middleware
-    const { result, error } = await ErrorHandlingMiddleware.withErrorHandling(
+    const { result, error } = await this.executeServiceOrError(
       async () => {
         const providerService = this.serviceFactory.getProviderService();
         return await providerService.getProviders(request);
@@ -116,7 +116,7 @@ export class ProviderHandler extends BaseHandler {
    */
   private async getProvider(context: HandlerContext): Promise<ApiResponse> {
     // Parse path parameters using middleware
-    const { data: pathParams, error: parseError } = ParsingMiddleware.parsePathParams(context);
+    const { data: pathParams, error: parseError } = await this.parsePathParamsOrError(context);
     if (parseError) return parseError;
 
     // Validate path parameters manually
@@ -140,7 +140,7 @@ export class ProviderHandler extends BaseHandler {
     };
 
     // Business logic only - delegate error handling to middleware
-    const { result, error } = await ErrorHandlingMiddleware.withErrorHandling(
+    const { result, error } = await this.executeServiceOrError(
       async () => {
         const providerService = this.serviceFactory.getProviderService();
         return await providerService.getProvider(request);
@@ -169,7 +169,7 @@ export class ProviderHandler extends BaseHandler {
    */
   private async refreshCache(context: HandlerContext): Promise<ApiResponse> {
     // Business logic only - delegate error handling to middleware
-    const { error } = await ErrorHandlingMiddleware.withErrorHandling(
+    const { error } = await this.executeServiceOrError(
       async () => {
         const providerService = this.serviceFactory.getProviderService();
         await providerService.refreshCache();

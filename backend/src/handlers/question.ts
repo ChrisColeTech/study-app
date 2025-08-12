@@ -64,7 +64,7 @@ export class QuestionHandler extends BaseHandler {
    */
   private async getQuestions(context: HandlerContext): Promise<ApiResponse> {
     // Parse query parameters using middleware
-    const { data: queryParams, error: parseError } = ParsingMiddleware.parseQueryParams(context, {
+    const { data: queryParams, error: parseError } = await this.parseQueryParamsOrError(context, {
       provider: CommonParsing.alphanumericId,
       exam: CommonParsing.alphanumericId,
       topic: CommonParsing.alphanumericId,
@@ -98,7 +98,7 @@ export class QuestionHandler extends BaseHandler {
     };
 
     // Business logic only - delegate error handling to middleware
-    const { result, error } = await ErrorHandlingMiddleware.withErrorHandling(
+    const { result, error } = await this.executeServiceOrError(
       async () => {
         const questionService = this.serviceFactory.getQuestionService();
         return await questionService.getQuestions(request);
@@ -127,7 +127,7 @@ export class QuestionHandler extends BaseHandler {
    */
   private async getQuestion(context: HandlerContext): Promise<ApiResponse> {
     // Parse path parameters using middleware
-    const { data: pathParams, error: parseError } = ParsingMiddleware.parsePathParams(context);
+    const { data: pathParams, error: parseError } = await this.parsePathParamsOrError(context);
     if (parseError) return parseError;
 
     // Validate question ID using ValidationMiddleware (replaces inline validation)
@@ -148,7 +148,7 @@ export class QuestionHandler extends BaseHandler {
     };
 
     // Business logic only - delegate error handling to middleware
-    const { result, error } = await ErrorHandlingMiddleware.withErrorHandling(
+    const { result, error } = await this.executeServiceOrError(
       async () => {
         const questionService = this.serviceFactory.getQuestionService();
         return await questionService.getQuestion(request);
@@ -177,36 +177,36 @@ export class QuestionHandler extends BaseHandler {
    */
   private async searchQuestions(context: HandlerContext): Promise<ApiResponse> {
     // Parse and validate request body using middleware
-    const { data: requestBody, error: parseError } = ParsingMiddleware.parseRequestBody<SearchQuestionsRequest>(context, true);
+    const { data: requestBody, error: parseError } = await this.parseRequestBodyOrError<SearchQuestionsRequest>(context, true);
     if (parseError) return parseError;
 
     // Validate query field using ValidationMiddleware (replaces inline validation)
-    const queryValidation = ValidationMiddleware.validateFields(requestBody, QuestionValidationSchemas.searchQueryRequest(), 'body');
+    const queryValidation = ValidationMiddleware.validateFields(requestBody!, QuestionValidationSchemas.searchQueryRequest(), 'body');
     if (queryValidation) return queryValidation;
 
     // Validate optional fields using ValidationMiddleware (replaces validateSearchRequest)
-    const searchValidation = ValidationMiddleware.validateFields(requestBody, QuestionValidationSchemas.searchRequest(), 'body');
+    const searchValidation = ValidationMiddleware.validateFields(requestBody!, QuestionValidationSchemas.searchRequest(), 'body');
     if (searchValidation) return searchValidation;
 
     // Build search request
     const request: SearchQuestionsRequest = {
-      query: requestBody.query.trim(),
-      ...(requestBody.provider && { provider: requestBody.provider }),
-      ...(requestBody.exam && { exam: requestBody.exam }),
-      ...(requestBody.topic && { topic: requestBody.topic }),
-      ...(requestBody.difficulty && { difficulty: requestBody.difficulty }),
-      ...(requestBody.type && { type: requestBody.type }),
-      ...(requestBody.tags && { tags: requestBody.tags }),
-      ...(requestBody.sortBy && { sortBy: requestBody.sortBy }),
-      ...(requestBody.limit && { limit: requestBody.limit }),
-      ...(requestBody.offset && { offset: requestBody.offset }),
-      includeExplanations: requestBody.includeExplanations === true,
-      includeMetadata: requestBody.includeMetadata === true,
-      highlightMatches: requestBody.highlightMatches === true
+      query: requestBody!.query.trim(),
+      ...(requestBody!.provider && { provider: requestBody!.provider }),
+      ...(requestBody!.exam && { exam: requestBody!.exam }),
+      ...(requestBody!.topic && { topic: requestBody!.topic }),
+      ...(requestBody!.difficulty && { difficulty: requestBody!.difficulty }),
+      ...(requestBody!.type && { type: requestBody!.type }),
+      ...(requestBody!.tags && { tags: requestBody!.tags }),
+      ...(requestBody!.sortBy && { sortBy: requestBody!.sortBy }),
+      ...(requestBody!.limit && { limit: requestBody!.limit }),
+      ...(requestBody!.offset && { offset: requestBody!.offset }),
+      includeExplanations: requestBody!.includeExplanations === true,
+      includeMetadata: requestBody!.includeMetadata === true,
+      highlightMatches: requestBody!.highlightMatches === true
     };
 
     // Business logic only - delegate error handling to middleware
-    const { result, error } = await ErrorHandlingMiddleware.withErrorHandling(
+    const { result, error } = await this.executeServiceOrError(
       async () => {
         const questionService = this.serviceFactory.getQuestionService();
         return await questionService.searchQuestions(request);

@@ -47,7 +47,7 @@ export class ExamHandler extends BaseHandler {
    */
   private async getExams(context: HandlerContext): Promise<ApiResponse> {
     // Parse query parameters using middleware
-    const { data: queryParams, error: parseError } = ParsingMiddleware.parseQueryParams(context, {
+    const { data: queryParams, error: parseError } = await this.parseQueryParamsOrError(context, {
       provider: { type: 'string', decode: true },
       category: { type: 'string', decode: true },
       level: { type: 'string', decode: true },
@@ -77,7 +77,7 @@ export class ExamHandler extends BaseHandler {
     };
 
     // Business logic only - delegate error handling to middleware
-    const { result, error } = await ErrorHandlingMiddleware.withErrorHandling(
+    const { result, error } = await this.executeServiceOrError(
       async () => {
         const examService = this.serviceFactory.getExamService();
         return await examService.getExams(request);
@@ -107,7 +107,7 @@ export class ExamHandler extends BaseHandler {
    */
   private async getExam(context: HandlerContext): Promise<ApiResponse> {
     // Parse path parameters using middleware
-    const { data: pathParams, error: parseError } = ParsingMiddleware.parsePathParams(context);
+    const { data: pathParams, error: parseError } = await this.parsePathParamsOrError(context);
     if (parseError) return parseError;
 
     // Validate path parameters
@@ -126,7 +126,7 @@ export class ExamHandler extends BaseHandler {
     };
 
     // Business logic only - delegate error handling to middleware
-    const { result, error } = await ErrorHandlingMiddleware.withErrorHandling(
+    const { result, error } = await this.executeServiceOrError(
       async () => {
         const examService = this.serviceFactory.getExamService();
         return await examService.getExam(pathParams.id, request);

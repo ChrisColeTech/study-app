@@ -50,7 +50,7 @@ export class TopicHandler extends BaseHandler {
    */
   private async getTopics(context: HandlerContext): Promise<ApiResponse> {
     // Parse query parameters using middleware
-    const { data: queryParams, error: parseError } = ParsingMiddleware.parseQueryParams(context, {
+    const { data: queryParams, error: parseError } = await this.parseQueryParamsOrError(context, {
       provider: { type: 'string', decode: true },
       exam: { type: 'string', decode: true },
       category: { type: 'string', decode: true },
@@ -69,7 +69,7 @@ export class TopicHandler extends BaseHandler {
     };
 
     // Business logic only - delegate error handling to middleware
-    const { result, error } = await ErrorHandlingMiddleware.withErrorHandling(
+    const { result, error } = await this.executeServiceOrError(
       async () => {
         const topicService = this.serviceFactory.getTopicService();
         return await topicService.getTopics(request);
@@ -97,7 +97,7 @@ export class TopicHandler extends BaseHandler {
    */
   private async getTopic(context: HandlerContext): Promise<ApiResponse> {
     // Parse path parameters using middleware
-    const { data: pathParams, error: parseError } = ParsingMiddleware.parsePathParams(context);
+    const { data: pathParams, error: parseError } = await this.parsePathParamsOrError(context);
     if (parseError) return parseError;
 
     // Validate topic ID
@@ -119,7 +119,7 @@ export class TopicHandler extends BaseHandler {
     };
 
     // Business logic only - delegate error handling to middleware
-    const { result, error } = await ErrorHandlingMiddleware.withErrorHandling(
+    const { result, error } = await this.executeServiceOrError(
       async () => {
         const topicService = this.serviceFactory.getTopicService();
         return await topicService.getTopic(request);

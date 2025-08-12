@@ -66,7 +66,7 @@ export class AnalyticsHandler extends BaseHandler {
     this.logger.info('Getting progress analytics', { requestId: context.requestId });
 
     // Parse query parameters for filters
-    const { data: queryParams, error: parseError } = ParsingMiddleware.parseQueryParams(context);
+    const { data: queryParams, error: parseError } = await this.parseQueryParamsOrError(context);
     if (parseError) return parseError;
 
     // Validate and build analytics request using ValidationMiddleware (replaces validateProgressAnalyticsRequest)
@@ -85,7 +85,7 @@ export class AnalyticsHandler extends BaseHandler {
     };
 
     // Business logic - delegate error handling to middleware
-    const { result, error } = await ErrorHandlingMiddleware.withErrorHandling(
+    const { result, error } = await this.executeServiceOrError(
       async () => {
         const analyticsService = this.serviceFactory.getAnalyticsService();
         return await analyticsService.getProgressAnalytics(analyticsRequest);
@@ -99,25 +99,7 @@ export class AnalyticsHandler extends BaseHandler {
           examId: analyticsRequest.examId,
           topicCount: analyticsRequest.topics?.length || 0
         }
-      },
-      // Custom error mappings for analytics-specific errors
-      [
-        {
-          keywords: ['No analytics data available'],
-          errorCode: 'NO_DATA',
-          statusCode: 404
-        },
-        {
-          keywords: ['Invalid timeframe'],
-          errorCode: 'VALIDATION_ERROR',
-          statusCode: 400
-        },
-        {
-          keywords: ['Analytics calculation failed'],
-          errorCode: 'CALCULATION_ERROR',
-          statusCode: 500
-        }
-      ]
+      }
     );
 
     if (error) return error;
@@ -139,11 +121,11 @@ export class AnalyticsHandler extends BaseHandler {
    */
   private async getSessionAnalytics(context: HandlerContext): Promise<ApiResponse> {
     // Parse path parameters
-    const { data: pathParams, error: parseError } = ParsingMiddleware.parsePathParams(context);
+    const { data: pathParams, error: parseError } = await this.parsePathParamsOrError(context);
     if (parseError) return parseError;
 
     // Business logic - delegate to service
-    const { result, error } = await ErrorHandlingMiddleware.withErrorHandling(
+    const { result, error } = await this.executeServiceOrError(
       async () => {
         const analyticsService = this.serviceFactory.getAnalyticsService();
         return await analyticsService.getSessionAnalytics(pathParams.id);
@@ -165,11 +147,11 @@ export class AnalyticsHandler extends BaseHandler {
    */
   private async getPerformanceAnalytics(context: HandlerContext): Promise<ApiResponse> {
     // Parse query parameters
-    const { data: queryParams, error: parseError } = ParsingMiddleware.parseQueryParams(context);
+    const { data: queryParams, error: parseError } = await this.parseQueryParamsOrError(context);
     if (parseError) return parseError;
 
     // Business logic - delegate to service  
-    const { result, error } = await ErrorHandlingMiddleware.withErrorHandling(
+    const { result, error } = await this.executeServiceOrError(
       async () => {
         const analyticsService = this.serviceFactory.getAnalyticsService();
         return await analyticsService.getPerformanceAnalytics(queryParams);
