@@ -1,0 +1,2638 @@
+{
+  "metadata": {
+    "creation_date": "2025-08-11T20:20:40.140859",
+    "version": "2.1_fixed",
+    "description": "AWS Certification Study Dataset - sap-c02_6 (Fixed Extraction)",
+    "total_questions": 59,
+    "answered_questions": 59,
+    "coverage_percentage": 100.0,
+    "source_pdf": "sap-c02_6.pdf",
+    "extraction_method": "v2_fixed_parser",
+    "processing_stats": {
+      "questions_loaded": 59,
+      "questions_with_answers": 59,
+      "questions_with_explanations": 58
+    }
+  },
+  "study_data": [
+    {
+      "question": {
+        "id": "sap-c02_6_q1",
+        "number": 1,
+        "text": "A company wants to migrate its data analytics environment from on premises to AWS The environment consists of two simple Node js applications One of the\napplications collects sensor data and loads it into a MySQL database The other application aggregates the data into reports When the aggregation jobs run. some\nof the load jobs fail to run correctly\nThe company must resolve the data loading issue The company also needs the migration to occur without interruptions or changes for the company's customers\nWhat should a solutions architect do to meet these requirements?",
+        "options": [
+          {
+            "text": "Set up an Amazon Aurora MySQL database as a replication target for the on-premises database Create an Aurora Replica for the Aurora MySQL database, and move the aggregation jobs to run against the Aurora Replica Set up collection endpomts as AWS Lambda functions behind a Network Load Balancer (NLB). and use Amazon RDS Proxy to wnte to the Aurora MySQL database When the databases are synced disable the replication job and restart the Aurora Replica as the primary instanc",
+            "letter": "A"
+          },
+          {
+            "text": "Point the collector DNS record to the NLB.",
+            "letter": "B"
+          },
+          {
+            "text": "Set up an Amazon Aurora MySQL database Use AWS Database Migration Service (AWS DMS) to perform continuous data replication from the on-premises database to Aurora Move the aggregation jobs to run against the Aurora MySQL database Set up collection endpomts behind an Application Load Balancer (ALB) as Amazon EC2 instances in an Auto Scaling group When the databases are synced, point the collector DNS record to the ALB Disable the AWS DMS sync task after the cutover from on premises to AWS",
+            "letter": "C"
+          },
+          {
+            "text": "Set up an Amazon Aurora MySQL database Use AWS Database Migration Service (AWS DMS) to perform continuous data replication from the on-premises database to Aurora Create an Aurora Replica for the Aurora MySQL database and move the aggregation jobs to run against the Aurora Replica Set up collection endpoints as AWS Lambda functions behind an Application Load Balancer (ALB) and use Amazon RDS Proxy to write to the Aurora MySQL database When the databases are synced, point the collector DNS record to the ALB Disable the AWS DMS sync task after the cutover from on premises to AWS",
+            "letter": "D"
+          },
+          {
+            "text": "Set up an Amazon Aurora MySQL database Create an Aurora Replica for the Aurora MySQL database and move the aggregation jobs to run against the Aurora Replica Set up collection endpoints as an Amazon Kinesis data stream Use Amazon Kinesis Data Firehose to replicate the data to the Aurora MySQL database When the databases are synced disable the replication job and restart the Aurora Replica as the primary instance Point the collector DNS record to the Kinesis data stream.",
+            "letter": "E"
+          }
+        ],
+        "topic": 1,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "C",
+        "explanation": "Set up an Amazon Aurora MySQL database. Use AWS Database Migration Service (AWS DMS) to perform continuous data replication from the on-premises database to Aurora. Create an Aurora Replica for the Aurora MySQL database, and move the aggregation jobs to run against the Aurora Replica. Set up collection endpoints as AWS Lambda functions behind an Application Load Balancer (ALB), and use Amazon RDS Proxy to write to the Aurora MySQL database. When the databases are synced, point the collector DNS record to the ALB. Disable the AWS DMS sync task after the cutover from on premises to AWS. Amazon RDS Proxy allows applications to pool and share connections established with the database, improving database efficiency and application scalability. With RDS Proxy, failover times for Aurora and RDS databases are reduced by up to 66%",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 5,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 3513
+      }
+    },
+    {
+      "question": {
+        "id": "sap-c02_6_q2",
+        "number": 2,
+        "text": "A solutions architect needs to advise a company on how to migrate its on-premises data processing application to the AWS Cloud. Currently, users upload input\nfiles through a web portal. The web server then stores the uploaded files on NAS and messages the processing server over a message queue. Each media file can\ntake up to 1 hour to process. The company has determined that the number of media files awaiting processing is significantly higher during business hours, with\nthe number of files rapidly declining after business hours.\nWhat is the MOST cost-effective migration recommendation?",
+        "options": [
+          {
+            "text": "Create a queue using Amazon SQ",
+            "letter": "A"
+          },
+          {
+            "text": "Configure the existing web server to publish to the new queue.When there are messages in the queue, invoke an AWS Lambda function to pull requests from the queue and process the file",
+            "letter": "B"
+          },
+          {
+            "text": "Store the processed files in an Amazon S3 bucket.",
+            "letter": "C"
+          },
+          {
+            "text": "Create a queue using Amazon",
+            "letter": "D"
+          },
+          {
+            "text": "Configure the existing web server to publish to the new queu F. When there are messages in the queue, create a new Amazon EC2 instance to pull requests from the queue and process the file G. Store the processed files in Amazon EF H. Shut down the EC2 instance after the task is complete. I. Create a queue using Amazon M J. Configure the existing web server to publish to the new queue.When there are messages in the queue, invoke an AWS Lambda function to pull requests from the queue and process the file K. Store the processed files in Amazon EFS. L. Create a queue using Amazon SO M. Configure the existing web server to publish to the new queu N. Use Amazon EC2 instances in an EC2 Auto Scaling group to pull requests from the queue and process the file O. Scale the EC2 instances based on the SOS queue lengt P. Store the processed files in an Amazon S3 bucket.",
+            "letter": "E"
+          }
+        ],
+        "topic": 1,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "D",
+        "explanation": "https://aws.amazon.com/blogs/compute/operating-lambda-performance-optimization-part-1/",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 5,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 1878
+      }
+    },
+    {
+      "question": {
+        "id": "sap-c02_6_q3",
+        "number": 3,
+        "text": "A company runs an loT platform on AWS loT sensors in various locations send data to the company's Node js API servers on Amazon EC2 instances running\nbehind an Application Load Balancer The data is stored in an Amazon RDS MySQL DB instance that uses a 4 TB General Purpose SSD volume\nThe number of sensors the company has deployed in the field has increased over time and is expected to grow significantly The API servers are consistently\noverloaded and RDS metrics show high write latency\nWhich of the following steps together will resolve the issues permanently and enable growth as new sensors are provisioned, while keeping this platform cost-\nefficient? {Select TWO.)",
+        "options": [
+          {
+            "text": "Resize the MySQL General Purpose SSD storage to 6 TB to improve the volume's IOPS",
+            "letter": "A"
+          },
+          {
+            "text": "Re-architect the database tier to use Amazon Aurora instead of an RDS MySQL DB instance and add read replicas Passing Certification Exams Made Easy visit - https://www.surepassexam.com Recommend!! Get the Full SAP-C02 dumps in VCE and PDF From SurePassExam https://www.surepassexam.com/SAP-C02-exam-dumps.html (300 New Questions)",
+            "letter": "B"
+          },
+          {
+            "text": "Leverage Amazon Kinesis Data Streams and AWS Lambda to ingest and process the raw data",
+            "letter": "C"
+          },
+          {
+            "text": "Use AWS X-Ray to analyze and debug application issues and add more API servers to match the load",
+            "letter": "D"
+          },
+          {
+            "text": "Re-architect the database tier to use Amazon DynamoDB instead of an RDS MySQL DB instance",
+            "letter": "E"
+          }
+        ],
+        "topic": 1,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "CE",
+        "explanation": "Option C is correct because leveraging Amazon Kinesis Data Streams and AWS Lambda to ingest and process the raw data resolves the issues permanently and enable growth as new sensors are provisioned. Amazon Kinesis Data Streams is a serverless streaming data service that simplifies the capture, processing, and storage of data streams at any scale. Kinesis Data Streams can handle any amount of streaming data and process data from hundreds of thousands of sources with very low latency. AWS Lambda is a serverless compute service that lets you run code without provisioning or managing servers. Lambda can be triggered by Kinesis Data Streams events and process the data records in real time. Lambda can also scale automatically based on the incoming data volume. By using Kinesis Data Streams and Lambda, the company can reduce the load on the API servers and improve the performance and scalability of the data ingestion and processing layer3 Option E is correct because re-architecting the database tier to use Amazon DynamoDB instead of an RDS MySQL DB instance resolves the issues permanently and enable growth as new sensors are provisioned. Amazon DynamoDB is a fully managed key-value and document database that delivers single- digit millisecond performance at any scale. DynamoDB supports auto scaling, which automatically adjusts read and write capacity based on actual traffic patterns. DynamoDB also supports on-demand capacity mode, which instantly accommodates up to double the previous peak traffic on a table. By using DynamoDB instead of RDS MySQL DB instance, the company can eliminate high write latency and improve scalability and performance of the database tier. References: 1: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-volume-types.html 2: https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/CHAP_AuroraOverview.html 3: https://docs.aws.amazon.com/streams/latest/dev/introduction.html : https://docs.aws.amazon.com/lambda/latest/dg/welcome.html : https://docs.aws.amazon.com/xray/latest/devguide/aws-xray.html : https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Introduction.html :",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 5,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 3558
+      }
+    },
+    {
+      "question": {
+        "id": "sap-c02_6_q4",
+        "number": 4,
+        "text": "A company is refactoring its on-premises order-processing platform in the AWS Cloud. The platform includes a web front end that is hosted on a fleet of VMs\nRabbitMQ to connect the front end to the backend, and a Kubernetes cluster to run a containerized backend system to process the orders. The company does not\nwant to make any major changes to the application\nWhich solution will meet these requirements with the LEAST operational overhead?",
+        "options": [
+          {
+            "text": "Create an AMI of the web server VM Create an Amazon EC2 Auto Scaling group that uses the AMI and an Application Load Balancer Set up Amazon MQ to replace the on-premises messaging queue Configure Amazon Elastic Kubernetes Service (Amazon EKS) to host the order-processing backend",
+            "letter": "A"
+          },
+          {
+            "text": "Create a custom AWS Lambda runtime to mimic the web server environment Create an Amazon API Gateway API to replace the front-end web servers Set up Amazon MQ to replace the on-premises messaging queue Configure Amazon Elastic Kubernetes Service (Amazon EKS) to host theorder-processing backend",
+            "letter": "B"
+          },
+          {
+            "text": "Create an AMI of the web server VM Create an Amazon EC2 Auto Scaling group that uses the AMI and an Application Load Balancer Set up Amazon MQ to replace the on-premises messaging queue Install Kubernetes on a fleet of different EC2 instances to host the order-processing backend",
+            "letter": "C"
+          },
+          {
+            "text": "Create an AMI of the web server VM Create an Amazon EC2 Auto Scaling group that uses the AMI and an Application Load Balancer Set up an Amazon Simple Queue Service (Amazon SQS) queue to replace the on-premises messaging queue Configure Amazon Elastic Kubernetes Service (Amazon EKS) to host the order-processing backend",
+            "letter": "D"
+          }
+        ],
+        "topic": 1,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "A",
+        "explanation": "https://aws.amazon.com/about-aws/whats-new/2020/11/announcing-amazon-mq-rabbitmq/",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 4,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 1734
+      }
+    },
+    {
+      "question": {
+        "id": "sap-c02_6_q5",
+        "number": 5,
+        "text": "A software as a service (SaaS) based company provides a case management solution to customers A3 part of the solution. The company uses a standalone\nSimple Mail Transfer Protocol (SMTP) server to send email messages from an application. The application also stores an email template for acknowledgement\nemail messages that populate customer data before the application sends the email message to the customer.\nThe company plans to migrate this messaging functionality to the AWS Cloud and needs to minimize operational overhead.\nWhich solution will meet these requirements MOST cost-effectively?",
+        "options": [
+          {
+            "text": "Set up an SMTP server on Amazon EC2 instances by using an AMI from the AWS Marketplac",
+            "letter": "A"
+          },
+          {
+            "text": "Store the email template in an Amazon S3 bucke",
+            "letter": "B"
+          },
+          {
+            "text": "Create an AWS Lambda function to retrieve the template from the S3 bucket and to merge the customer data from the application with the templat",
+            "letter": "C"
+          },
+          {
+            "text": "Use an SDK in the Lambda function to send the email message.",
+            "letter": "D"
+          },
+          {
+            "text": "Set up Amazon Simple Email Service (Amazon SES) to send email message F. Store the email template in an Amazon S3 bucke G. Create an AWS Lambda function to retrieve the template from the S3 bucket and to merge the customer data from the application with the templat H. Use an SDK in the Lambda function to send the email message. I. Set up an SMTP server on Amazon EC2 instances by using an AMI from the AWS Marketplac J. Store the email template in Amazon Simple Email Service (Amazon SES) with parameters for the customer dat K. Create an AWS Lambda function to call the SES template and to pass customer data to replace the parameter L. Use the AWS Marketplace SMTP server to send the email message. M. Set up Amazon Simple Email Service (Amazon SES) to send email message N. Store the email template on Amazon SES with parameters for the customer dat O. Create an AWS Lambda function to call the SendTemplatedEmail API operation and to pass customer data to replace the parameters and the email destination.",
+            "letter": "E"
+          }
+        ],
+        "topic": 1,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "D",
+        "explanation": "In this solution, the company can use Amazon SES to send email messages, which will minimize operational overhead as SES is a fully managed service that handles sending and receiving email messages. The company can store the email template on Amazon SES with parameters for the customer data and use an AWS Lambda function to call the SendTemplatedEmail API operation, passing in the customer data to replace the parameters and the email destination. This solution eliminates the need to set up and manage an SMTP server on EC2 instances, which can be costly and time-consuming. Passing Certification Exams Made Easy visit - https://www.surepassexam.com Recommend!! Get the Full SAP-C02 dumps in VCE and PDF From SurePassExam https://www.surepassexam.com/SAP-C02-exam-dumps.html (300",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 5,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 2797
+      }
+    },
+    {
+      "question": {
+        "id": "sap-c02_6_q6",
+        "number": 6,
+        "text": "An international delivery company hosts a delivery management system on AWS. Drivers use the system to upload confirmation of delivery. Confirmation includes\nthe recipient's signature or a photo of the package with the recipient. The driver's handheld device uploads signatures and photos through FTP to a single Amazon\nEC2 instance. Each handheld device saves a file in a directory based on the signed-in user, and the file name matches the delivery number. The EC2 instance\nthen adds metadata to the file after querying a central database to pull delivery information. The file is then placed in Amazon S3 for archiving.\nAs the company expands, drivers report that the system is rejecting connections. The FTP server is having problems because of dropped connections and\nmemory issues. In response to these problems, a system engineer schedules a cron task to reboot the EC2 instance every 30 minutes. The billing team reports\nthat files are not always in the archive and that the central system is not always updated.\nA solutions architect needs to design a solution that maximizes scalability to ensure that the archive always receives the files and that systems are always\nupdated. The handheld devices cannot be modified, so the company cannot deploy a new application.\nWhich solution will meet these requirements?",
+        "options": [
+          {
+            "text": "Create an AMI of the existing EC2 instanc",
+            "letter": "A"
+          },
+          {
+            "text": "Create an Auto Scaling group of EC2 instances behind an Application Load Balance",
+            "letter": "B"
+          },
+          {
+            "text": "Configure the Auto Scaling group to have a minimum of three instances.",
+            "letter": "C"
+          },
+          {
+            "text": "Use AWS Transfer Family to create an FTP server that places the files in Amazon Elastic File System (Amazon EFS). Mount the EFS volume to the existing EC2 instanc",
+            "letter": "D"
+          },
+          {
+            "text": "Point the EC2 instance to the new path for file processing. F. Use AWS Transfer Family to create an FTP server that places the files in Amazon S3. Use an S3 event notification through Amazon Simple Notification Service (Amazon SNS) to invoke an AWS Lambda functio G. Configure the Lambda function to add the metadata and update the delivery system. H. Update the handheld devices to place the files directly in Amazon S3. Use an S3 event notification through Amazon Simple Queue Service (Amazon SQS) to invoke an AWS Lambda functio I. Configure the Lambda function to add the metadata and update the delivery system.",
+            "letter": "E"
+          }
+        ],
+        "topic": 1,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "C",
+        "explanation": "Using AWS Transfer Family to create an FTP server that places the files in Amazon S3 and using S3 event notifications through Amazon Simple Notification Service (Amazon SNS) to invoke an AWS Lambda function will ensure that the archive always receives the files and that the central system is always updated. This solution maximizes scalability and eliminates the need for manual intervention, such as rebooting the EC2 instance.",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 5,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 2762
+      }
+    },
+    {
+      "question": {
+        "id": "sap-c02_6_q7",
+        "number": 7,
+        "text": "A company is hosting a three-tier web application in an on-premises environment. Due to a recent surge in traffic that resulted in downtime and a significant\nfinancial impact, company management has ordered that the application be moved to AWS. The application is written in .NET and has a dependency on a MySQL\ndatabase A solutions architect must design a scalable and highly available solution to meet the demand of 200000 daily users.\nWhich steps should the solutions architect take to design an appropriate solution?",
+        "options": [
+          {
+            "text": "Use AWS Elastic Beanstalk to create a new application with a web server environment and an Amazon RDS MySQL Multi-AZ DB instance The environment should launch a Network Load Balancer (NLB) in front of an Amazon EC2 Auto Scaling group in multiple Availability Zones Use an Amazon Route 53 alias record to route traffic from the company's domain to the NLB.",
+            "letter": "A"
+          },
+          {
+            "text": "Use AWS CloudFormation to launch a stack containing an Application Load Balancer (ALB) in front of an Amazon EC2 Auto Scaling group spanning three Availability Zone",
+            "letter": "B"
+          },
+          {
+            "text": "The stack should launch a Multi-AZ deployment of an Amazon Aurora MySQL DB cluster with a Retain deletion polic",
+            "letter": "C"
+          },
+          {
+            "text": "Use an Amazon Route 53 alias record to route traffic from the company's domain to the ALB",
+            "letter": "D"
+          },
+          {
+            "text": "Use AWS Elastic Beanstalk to create an automatically scaling web server environment that spans two separate Regions with an Application Load Balancer (ALB) in each Regio F. Create a Multi-AZ deployment of an Amazon Aurora MySQL DB cluster with a cross-Region read replica Use Amazon Route 53 with a geoproximity routing policy to route traffic between the two Regions. G. Use AWS CloudFormation to launch a stack containing an Application Load Balancer (ALB) in front of an Amazon ECS cluster of Spot Instances spanning three Availability Zones The stack should launch an Amazon RDS MySQL DB instance with a Snapshot deletion policy Use an Amazon Route 53 alias record to route traffic from the company's domain to the ALB",
+            "letter": "E"
+          }
+        ],
+        "topic": 1,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "C",
+        "explanation": "Using AWS CloudFormation to launch a stack with an Application Load Balancer (ALB) in front of an Amazon EC2 Auto Scaling group spanning three Availability Zones, a Multi-AZ deployment of an Amazon Aurora MySQL DB cluster with a Retain deletion policy, and an Amazon Route 53 alias record to route traffic from the company’s domain to the ALB will ensure that",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 5,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 2364
+      }
+    },
+    {
+      "question": {
+        "id": "sap-c02_6_q8",
+        "number": 8,
+        "text": "A software company hosts an application on AWS with resources in multiple AWS accounts and Regions. The application runs on a group of Amazon EC2\ninstances in an application VPC located in the us-east-1 Region with an IPv4 CIDR block of 10.10.0.0/16. In a different AWS account, a shared services VPC is\nlocated in the us-east-2 Region with an IPv4 CIDR block of 10.10.10.0/24. When a cloud engineer uses AWS CloudFormation to attempt to peer the application\nVPC with the shared services VPC, an error message indicates a peering failure. Which factors could cause this error? (Choose two.)",
+        "options": [
+          {
+            "text": "The IPv4 CIDR ranges of the two VPCs overlap",
+            "letter": "A"
+          },
+          {
+            "text": "The VPCs are not in the same Region",
+            "letter": "B"
+          },
+          {
+            "text": "One or both accounts do not have access to an Internet gateway",
+            "letter": "C"
+          },
+          {
+            "text": "One of the VPCs was not shared through AWS Resource Access Manager",
+            "letter": "D"
+          },
+          {
+            "text": "The IAM role in the peer accepter account does not have the correct permissions",
+            "letter": "E"
+          }
+        ],
+        "topic": 1,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "AE",
+        "explanation": "https://aws.amazon.com/about-aws/whats-new/2017/11/announcing-support-for-inter-region-vpc-peering/ Passing Certification Exams Made Easy visit - https://www.surepassexam.com Recommend!! Get the Full SAP-C02 dumps in VCE and PDF From SurePassExam https://www.surepassexam.com/SAP-C02-exam-dumps.html (300",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 5,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 1256
+      }
+    },
+    {
+      "question": {
+        "id": "sap-c02_6_q9",
+        "number": 9,
+        "text": "A company has 50 AWS accounts that are members of an organization in AWS Organizations Each account contains multiple VPCs The company wants to use\nAWS Transit Gateway to establish connectivity between the VPCs in each member account Each time a new member account is created, the company wants to\nautomate the process of creating a new VPC and a transit gateway attachment.\nWhich combination of steps will meet these requirements? (Select TWO)",
+        "options": [
+          {
+            "text": "From the management account, share the transit gateway with member accounts by using AWS Resource Access Manager",
+            "letter": "A"
+          },
+          {
+            "text": "Prom the management account, share the transit gateway with member accounts by using an AWS Organizations SCP",
+            "letter": "B"
+          },
+          {
+            "text": "Launch an AWS CloudFormation stack set from the management account that automatical^/ creates a new VPC and a VPC transit gateway attachment in a member accoun",
+            "letter": "C"
+          },
+          {
+            "text": "Associate the attachment with the transit gateway in the management account by using the transit gateway ID.",
+            "letter": "D"
+          },
+          {
+            "text": "Launch an AWS CloudFormation stack set from the management account that automatical^ creates a new VPC and a peering transit gateway attachment in a member accoun F. Share the attachment with the transit gateway in the management account by using a transit gateway service-linked role. G. From the management account, share the transit gateway with member accounts by using AWS Service Catalog",
+            "letter": "E"
+          }
+        ],
+        "topic": 1,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "AC",
+        "explanation": "https://aws.amazon.com/blogs/mt/self-service-vpcs-in-aws-control-tower-using-aws-service-catalog/ https://docs.aws.amazon.com/vpc/latest/tgw/tgw-transit- gateways.html https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-transitgatewayattachme",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 5,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 1640
+      }
+    },
+    {
+      "question": {
+        "id": "sap-c02_6_q10",
+        "number": 10,
+        "text": "A company manages multiple AWS accounts by using AWS Organizations. Under the root OU. the company has two OUs: Research and DataOps.\nBecause of regulatory requirements, all resources that the company deploys in the organization must reside in the ap-northeast-1 Region. Additionally. EC2\ninstances that the company deploys in the DataOps OU must use a predefined list of instance types\nA solutions architect must implement a solution that applies these restrictions. The solution must maximize operational efficiency and must minimize ongoing\nmaintenance\nWhich combination of steps will meet these requirements? (Select TWO )",
+        "options": [
+          {
+            "text": "Create an IAM role in one account under the DataOps OU Use the ec2 Instance Type condition key in an inline policy on the role to restrict access to specific instance types.",
+            "letter": "A"
+          },
+          {
+            "text": "Create an IAM user in all accounts under the root OU Use the aws RequestedRegion condition key in an inline policy on each user to restrict access to all AWS Regions except ap-northeast-1.",
+            "letter": "B"
+          },
+          {
+            "text": "Create an SCP Use the aws:RequestedRegion condition key to restrict access to all AWS Regions except ap-northeast-1 Apply the SCP to the root OU.",
+            "letter": "C"
+          },
+          {
+            "text": "Create an SCP Use the ec2Reo»on condition key to restrict access to all AWS Regions except ap-northeast-1. Apply the SCP to the root O",
+            "letter": "D"
+          },
+          {
+            "text": "the DataOps O F. and the Research OU. G. Create an SCP Use the ec2:lnstanceType condition key to restrict access to specific instance types Apply the SCP to the DataOps OU.",
+            "letter": "E"
+          }
+        ],
+        "topic": 1,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "CE",
+        "explanation": "https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_examples_aws_deny-requested-region.h https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_policies_scps_examples_ec2.html",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 5,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 1690
+      }
+    },
+    {
+      "question": {
+        "id": "sap-c02_6_q10",
+        "number": 10,
+        "text": "A finance company hosts a data lake in Amazon S3. The company receives financial data records over SFTP each night from several third parties. The company\nruns its own SFTP server on an Amazon EC2 instance in a public subnet of a VPC. After the files ate uploaded, they are moved to the data lake by a cron job that\nruns on the same instance. The SFTP server is reachable on DNS sftp.examWe.com through the use of Amazon Route 53.\nWhat should a solutions architect do to improve the reliability and scalability of the SFTP solution?",
+        "options": [
+          {
+            "text": "Move the EC2 instance into an Auto Scaling grou",
+            "letter": "A"
+          },
+          {
+            "text": "Place the EC2 instance behind an Application Load Balancer (ALB). Update the DNS record sftp.example.com in Route 53 to point to the ALB.",
+            "letter": "B"
+          },
+          {
+            "text": "Migrate the SFTP server to AWS Transfer for SFT",
+            "letter": "C"
+          },
+          {
+            "text": "Update the DNS record sftp.example.com in Route 53 to point to the server endpoint hostname.",
+            "letter": "D"
+          },
+          {
+            "text": "Migrate the SFTP server to a file gateway in AWS Storage Gatewa F. Update the DNS record sflp.example.com in Route 53 to point to the file gateway endpoint. G. Place the EC2 instance behind a Network Load Balancer (NLB). Update the DNS record sftp.example.com in Route 53 to point to the NLB.",
+            "letter": "E"
+          }
+        ],
+        "topic": 1,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "B",
+        "explanation": "https://aws.amazon.com/aws-transfer-family/faqs/ https://docs.aws.amazon.com/transfer/latest/userguide/what-is-aws-transfer-family.html https://aws.amazon.com/about-aws/whats-new/2018/11/aws-transfer-for-sftp-fully-managed-sftp-for-s3/?nc1=h_",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 5,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 1433
+      }
+    },
+    {
+      "question": {
+        "id": "sap-c02_6_q14",
+        "number": 14,
+        "text": "A company is running a critical application that uses an Amazon RDS for MySQL database to store data. The RDS DB instance is deployed in Multi-AZ mode.\nA recent RDS database failover test caused a 40-second outage to the application A solutions architect needs to design a solution to reduce the outage time to\nless than 20 seconds.\nWhich combination of steps should the solutions architect take to meet these requirements? (Select THREE.)",
+        "options": [
+          {
+            "text": "Use Amazon ElastiCache for Memcached in front of the database",
+            "letter": "A"
+          },
+          {
+            "text": "Use Amazon ElastiCache for Redis in front of the database.",
+            "letter": "B"
+          },
+          {
+            "text": "Use RDS Proxy in front of the database Passing Certification Exams Made Easy visit - https://www.surepassexam.com Recommend!! Get the Full SAP-C02 dumps in VCE and PDF From SurePassExam https://www.surepassexam.com/SAP-C02-exam-dumps.html (300 New Questions)",
+            "letter": "C"
+          },
+          {
+            "text": "Migrate the database to Amazon Aurora MySQL",
+            "letter": "D"
+          },
+          {
+            "text": "Create an Amazon Aurora Replica F. Create an RDS for MySQL read replica",
+            "letter": "E"
+          }
+        ],
+        "topic": 1,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "CDE",
+        "explanation": "Migrate the database to Amazon Aurora MySQL. - Create an Amazon Aurora Replica. - Use RDS Proxy in front of the database. - These options are correct because they address the requirement of reducing the failover time to less than 20 seconds. Migrating to Amazon Aurora MySQL and creating an Aurora replica can reduce the failover time to less than 20 seconds. Aurora has a built-in, fault-tolerant storage system that can automatically detect and repair failures. Additionally, Aurora has a feature called \"Aurora Global Database\" which allows you to create read-only replicas across multiple AWS regions which can further help to reduce the failover time. Creating an Aurora replica can also help to reduce the failover time as it can take over as the primary DB instance in case of a failure. Using RDS proxy can also help to reduce the failover time as it can route the queries to the healthy DB instance, it also helps to balance the load across multiple DB instances.",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 5,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 1964
+      }
+    },
+    {
+      "question": {
+        "id": "sap-c02_6_q17",
+        "number": 17,
+        "text": "An enterprise company wants to allow its developers to purchase third-party software through AWS Marketplace. The company uses an AWS Organizations\naccount structure with full features enabled, and has a shared services account in each organizational unit (OU) that will be used by procurement managers. The\nprocurement team's policy indicates that developers should be able to obtain third-party software from an approved list only and use Private Marketplace in AWS\nMarketplace to achieve this requirement . The procurement team wants administration of Private Marketplace to be restricted to a role named\nprocurement-manager-role, which could be assumed by procurement managers Other IAM users groups, roles, and account administrators in the company should\nbe denied Private Marketplace administrative access\nWhat is the MOST efficient way to design an architecture to meet these requirements?",
+        "options": [
+          {
+            "text": "Create an IAM role named procurement-manager-role in all AWS accounts in the organization Add the PowerUserAccess managed policy to the role Apply an inline policy to all IAM users and roles in every AWS account to deny permissions on the AWSPrivateMarketplaceAdminFullAccess managed policy.",
+            "letter": "A"
+          },
+          {
+            "text": "Create an IAM role named procurement-manager-role in all AWS accounts in the organization Add the AdministratorAccess managed policy to the role Define a permissions boundary with the AWSPrivateMarketplaceAdminFullAccess managed policy and attach it to all the developer roles.",
+            "letter": "B"
+          },
+          {
+            "text": "Create an IAM role named procurement-manager-role in all the shared services accounts in the organization Add the AWSPrivateMarketplaceAdminFullAccess managed policy to the role Create an organization root-level SCP to deny permissions to administer Private Marketplace to everyone exceptthe role named procurement-manager-role Create another organization root-level SCP to deny permissions to create an IAM role named procurement-manager-role to everyone in the organization.",
+            "letter": "C"
+          },
+          {
+            "text": "Create an IAM role named procurement-manager-role in all AWS accounts that will be used by developer",
+            "letter": "D"
+          },
+          {
+            "text": "Add the AWSPrivateMarketplaceAdminFullAccess managed policy to the rol F. Create an SCP in Organizations to deny permissions to administer Private Marketplace to everyone except the role named procurement-manager-rol G. Apply the SCP to all the shared services accounts in the organization.",
+            "letter": "E"
+          }
+        ],
+        "topic": 1,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "C",
+        "explanation": "SCP to deny permissions to administer Private Marketplace to everyone except the role named procurement-manager-role. https://aws.amazon.com/blogs/awsmarketplace/controlling-access-to-a-well-architected-private-marketplace-usi This approach allows the procurement managers to assume the procurement-manager-role in shared services accounts, which have the AWSPrivateMarketplaceAdminFullAccess managed policy attached to it and can then manage the Private Marketplace. The organization root-level SCP denies the permission to administer Private Marketplace to everyone except the role named procurement-manager-role and another SCP denies the permission to create an IAM role named procurement-manager-role to everyone in the organization, ensuring that only the procurement team can assume the role and manage the Private Marketplace. This approach provides a centralized way to manage and restrict access to Private Marketplace while maintaining a high level of security.",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 5,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 3347
+      }
+    },
+    {
+      "question": {
+        "id": "sap-c02_6_q19",
+        "number": 19,
+        "text": "A company has developed APIs that use Amazon API Gateway with Regional endpoints. The APIs call AWS Lambda functions that use API Gateway\nauthentication mechanisms. After a design review, a solutions architect identifies a set of APIs that do not require public access.\nThe solutions architect must design a solution to make the set of APIs accessible only from a VPC. All APIs need to be called with an authenticated user.\nWhich solution will meet these requirements with the LEAST amount of effort?",
+        "options": [
+          {
+            "text": "Create an internal Application Load Balancer (ALB). Create a target grou",
+            "letter": "A"
+          },
+          {
+            "text": "Select the Lambda function to cal",
+            "letter": "B"
+          },
+          {
+            "text": "Use the ALB DNS name to call the API from the VPC.",
+            "letter": "C"
+          },
+          {
+            "text": "Remove the DNS entry that is associated with the API in API Gatewa",
+            "letter": "D"
+          },
+          {
+            "text": "Create a hosted zone in Amazon Route 53. Create a CNAME record in the hosted zon F. Update the API in API Gateway with the CNAME recor G. Use the CNAME record to call the API from the VPC. H. Update the API endpoint from Regional to private in API Gatewa I. Create an interface VPC endpoint in the VP J. Create a resource policy, and attach it to the AP K. Use the VPC endpoint to call the API from the VPC. L. Deploy the Lambda functions inside the VP M. Provision an EC2 instance, and install an Apache server.From the Apache server, call the Lambda function N. Use the internal CNAME record of the EC2 instance to call the API from the VPC.",
+            "letter": "E"
+          }
+        ],
+        "topic": 1,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "C",
+        "explanation": "This solution requires the least amount of effort as it only requires to update the API endpoint to private in API Gateway and create an interface VPC endpoint. Then create a resource policy and attach it to the API. This will make the API only accessible from the VPC and still keep the authentication mechanism intact. Reference: https://aws.amazon.com/api-gateway/features/ Passing Certification Exams Made Easy visit - https://www.surepassexam.com Recommend!! Get the Full SAP-C02 dumps in VCE and PDF From SurePassExam https://www.surepassexam.com/SAP-C02-exam-dumps.html (300",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 5,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 2020
+      }
+    },
+    {
+      "question": {
+        "id": "sap-c02_6_q20",
+        "number": 20,
+        "text": "A security engineer determined that an existing application retrieves credentials to an Amazon RDS for MySQL database from an encrypted file in Amazon S3. For\nthe next version of the application, the security engineer wants to implement the following application design changes to improve security:\nThe database must use strong, randomly generated passwords stored in a secure AWS managed service.\nThe application resources must be deployed through AWS CloudFormation.\nThe application must rotate credentials for the database every 90 days.\nA solutions architect will generate a CloudFormation template to deploy the application.\nWhich resources specified in the CloudFormation template will meet the security engineer's requirements with the LEAST amount of operational overhead?",
+        "options": [
+          {
+            "text": "Generate the database password as a secret resource using AWS Secrets Manage",
+            "letter": "A"
+          },
+          {
+            "text": "Create an AWS Lambda function resource to rotate the database passwor",
+            "letter": "B"
+          },
+          {
+            "text": "Specify a Secrets Manager RotationSchedule resource to rotate the database password every 90 days.",
+            "letter": "C"
+          },
+          {
+            "text": "Generate the database password as a SecureString parameter type using AWS Systems Manager Parameter Stor",
+            "letter": "D"
+          },
+          {
+            "text": "Create an AWS Lambda function resource to rotate the database passwor F. Specify a Parameter Store RotationSchedule resource to rotate the database password every 90 days. G. Generate the database password as a secret resource using AWS Secrets Manage H. Create an AWS Lambda function resource to rotate the database passwor I. Create an Amazon EventBridge scheduled rule resource to trigger the Lambda function password rotation every 90 days. J. Generate the database password as a SecureString parameter type using AWS Systems Manager Parameter Stor K. Specify an AWS AppSync DataSource resource to automatically rotate the database password every 90 days.",
+            "letter": "E"
+          }
+        ],
+        "topic": 1,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "B",
+        "explanation": "https://aws.amazon.com/blogs/security/how-to-securely-provide-database-credentials-to-lambda-functions-by-us https://docs.aws.amazon.com/secretsmanager/latest/userguide/rotating-secrets.html https://docs.aws.amazon.com/secretsmanager/latest/userguide/integrating_cloudformation.html",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 5,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 2112
+      }
+    },
+    {
+      "question": {
+        "id": "sap-c02_6_q22",
+        "number": 22,
+        "text": "A retail company is hosting an ecommerce website on AWS across multiple AWS Regions. The company wants the website to be operational at all times for online\npurchases. The website stores data in an Amazon RDS for MySQL DB instance.\nWhich solution will provide the HIGHEST availability for the database?",
+        "options": [
+          {
+            "text": "Configure automated backups on Amazon RD",
+            "letter": "A"
+          },
+          {
+            "text": "In the case of disruption, promote an automated backup to be a standalone DB instanc",
+            "letter": "B"
+          },
+          {
+            "text": "Direct database traffic to the promoted DB instanc",
+            "letter": "C"
+          },
+          {
+            "text": "Create a replacement read replica that has the promoted DB instance as its source.",
+            "letter": "D"
+          },
+          {
+            "text": "Configure global tables and read replicas on Amazon RD F. Activate the cross-Region scop G. In the case of disruption, use AWS Lambda to copy the read replicas from one Region to another Region. H. Configure global tables and automated backups on Amazon RD I. In the case of disruption, use AWS Lambda to copy the read replicas from one Region to another Region. J. Configure read replicas on Amazon RD K. In the case of disruption, promote a cross-Region and read replica to be a standalone DB instanc L. Direct database traffic to the promoted DB instanc M. Create areplacement read replica that has the promoted DB instance as its source.",
+            "letter": "E"
+          }
+        ],
+        "topic": 1,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "D",
+        "explanation": "This solution will provide the highest availability for the database, as the read replicas will allow the database to be available in multiple Regions, thus reducing the chances of disruption. Additionally, the promotion of the cross-Region read replica to become a standalone DB instance will ensure that the database is still available even if one of the Regions experiences disruptions.",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 5,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 1632
+      }
+    },
+    {
+      "question": {
+        "id": "sap-c02_6_q24",
+        "number": 24,
+        "text": "A company uses Amazon S3 to store files and images in a variety of storage classes. The company's S3 costs have increased substantially during the past year.\nA solutions architect needs to review data trends for the past 12 months and identity the appropriate storage class for the objects.\nWhich solution will meet these requirements?",
+        "options": [
+          {
+            "text": "Download AWS Cost and Usage Reports for the last 12 months of S3 usag",
+            "letter": "A"
+          },
+          {
+            "text": "Review AWS Trusted Advisor recommendations for cost savings.",
+            "letter": "B"
+          },
+          {
+            "text": "Use S3 storage class analysi",
+            "letter": "C"
+          },
+          {
+            "text": "Import data trends into an Amazon QuickSight dashboard to analyze storage trends.",
+            "letter": "D"
+          },
+          {
+            "text": "Use Amazon S3 Storage Len F. Upgrade the default dashboard to include advanced metrics for storage trends. G. Use Access Analyzer for S3. Download the Access Analyzer for S3 report for the last 12 month H. Import the csvfile to an Amazon QuickSight dashboard.",
+            "letter": "E"
+          }
+        ],
+        "topic": 1,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "B",
+        "explanation": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/storage_lens.html",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 5,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 947
+      }
+    },
+    {
+      "question": {
+        "id": "sap-c02_6_q27",
+        "number": 27,
+        "text": "A company developed a pilot application by using AWS Elastic Beanstalk and Java. To save costs during development, the company's development team\nPassing Certification Exams Made Easy visit - https://www.surepassexam.com\n\n\nRecommend!! Get the Full SAP-C02 dumps in VCE and PDF From SurePassExam\nhttps://www.surepassexam.com/SAP-C02-exam-dumps.html (300 New Questions)\ndeployed the application into a single-instance environment. Recent tests indicate that the application consumes more CPU than expected. CPU utilization is\nregularly greater than 85%, which causes some performance bottlenecks.\nA solutions architect must mitigate the performance issues before the company launches the application to production.\nWhich solution will meet these requirements with the LEAST operational overhead?",
+        "options": [
+          {
+            "text": "Create a new Elastic Beanstalk applicatio",
+            "letter": "A"
+          },
+          {
+            "text": "Select a load-balanced environment typ",
+            "letter": "B"
+          },
+          {
+            "text": "Select all Availability Zone",
+            "letter": "C"
+          },
+          {
+            "text": "Add a scale-out rule that will run if the maximum CPU utilization is over 85% for 5 minutes.",
+            "letter": "D"
+          },
+          {
+            "text": "Create a second Elastic Beanstalk environmen F. Apply the traffic-splitting deployment polic G. Specify a percentage of incoming traffic to direct to the new environment in the average CPU utilization is over 85% for 5 minutes. H. Modify the existing environment's capacity configuration to use a load-balanced environment type.Select all Availability Zone I. Add a scale-out rule that will run if the average CPU utilization is over 85% for 5 minutes. J. Select the Rebuild environment action with the load balancing option Select an Availability Zones Add a scale-out rule that will run if the sum CPU utilization is over 85% for 5 minutes.",
+            "letter": "E"
+          }
+        ],
+        "topic": 1,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "C",
+        "explanation": "This solution will meet the requirements with the least operational overhead because it allows the company to modify the existing environment's capacity configuration, so it becomes a load-balanced environment type. By selecting all availability zones, the company can ensure that the application is running in multiple availability zones, which can help to improve the availability and scalability of the application. The company can also add a scale-out rule that will run if the average CPU utilization is over 85% for 5 minutes, which can help to mitigate the performance issues. This solution does not require creating new Elastic Beanstalk environments or rebuilding the existing one, which reduces the operational overhead. You can refer to the AWS Elastic Beanstalk documentation for more information on how to use this service: https://aws.amazon.com/elasticbeanstalk/ You can refer to the AWS documentation for more information on how to use autoscaling: https://aws.amazon.com/autoscaling/",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 5,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 2692
+      }
+    },
+    {
+      "question": {
+        "id": "sap-c02_6_q32",
+        "number": 32,
+        "text": "A company is subject to regulatory audits of its financial information. External auditors who use a single AWS account need access to the company's AWS\naccount. A solutions architect must provide the auditors with secure, read-only access to the company's AWS account. The solution must comply with AWS\nsecurity best practices.\nWhich solution will meet these requirements?",
+        "options": [
+          {
+            "text": "In the company's AWS account, create resource policies for all resources in the account to grant access to the auditors' AWS accoun",
+            "letter": "A"
+          },
+          {
+            "text": "Assign a unique external ID to the resource policy.",
+            "letter": "B"
+          },
+          {
+            "text": "In the company's AWS account create an IAM role that trusts the auditors' AWS account Create an IAM policy that has the required permission",
+            "letter": "C"
+          },
+          {
+            "text": "Attach the policy to the rol",
+            "letter": "D"
+          },
+          {
+            "text": "Assign a unique external ID to the role's trust policy. F. In the company's AWS account, create an IAM use G. Attach the required IAM policies to the IAM user.Create API access keys for the IAM use H. Share the access keys with the auditors. I. In the company's AWS account, create an IAM group that has the required permissions Create an IAM user in the company s account for each audito J. Add the IAM users to the IAM group.",
+            "letter": "E"
+          }
+        ],
+        "topic": 1,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "B",
+        "explanation": "This solution will allow the external auditors to have read-only access to the company's AWS account while being compliant with AWS security best practices. By creating an IAM role, which is a secure and flexible way of granting access to AWS resources, and trusting the auditors' AWS account, the company can ensure that the auditors only have the permissions that are required for their role and nothing more. Assigning a unique external ID to the role's trust policy, it will ensure that only the auditors' AWS account can assume the role. Reference: AWS IAM Roles documentation: https://aws.amazon.com/iam/features/roles/ AWS IAM Best practices: https://aws.amazon.com/iam/security-best-practices/",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 5,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 1893
+      }
+    },
+    {
+      "question": {
+        "id": "sap-c02_6_q37",
+        "number": 37,
+        "text": "A company is using an on-premises Active Directory service for user authentication. The company wants to use the same authentication service to sign in to the\ncompany's AWS accounts, which are using AWS Organizations. AWS Site-to-Site VPN connectivity already exists between the on-premises environment and all\nthe company's AWS accounts.\nThe company's security policy requires conditional access to the accounts based on user groups and roles. User identities must be managed in a single location.\nWhich solution will meet these requirements?",
+        "options": [
+          {
+            "text": "Configure AWS Single Sign-On (AWS SSO) to connect to Active Directory by using SAML 2.0.Enable automatic provisioning by using the System for Cross- domain Identity Management (SCIM) v2.0 protoco",
+            "letter": "A"
+          },
+          {
+            "text": "Grant access to the AWS accounts by using attribute-based access controls (ABACs).",
+            "letter": "B"
+          },
+          {
+            "text": "Configure AWS Single Sign-On (AWS SSO) by using AWS SSO as an identity sourc",
+            "letter": "C"
+          },
+          {
+            "text": "Enable automatic provisioning by using the System for Cross-domain Identity Management (SCIM) v2.0 protoco",
+            "letter": "D"
+          },
+          {
+            "text": "Grant access to the AWS accounts by using AWS SSO permission sets. F. In one of the company's AWS accounts, configure AWS Identity and Access Management (IAM) to use a SAML 2.0 identity provide G. Provision IAM users that are mapped to the federated user H. Grant access that corresponds to appropriate groups in Active Director I. Grant access to the required AWS accounts by using cross-account IAM users. J. In one of the company's AWS accounts, configure AWS Identity and Access Management (IAM) to use an OpenID Connect (OIDC) identity provide K. Provision IAM roles that grant access to the AWS account for the federated users that correspond to appropriate groups in Active Director L. Grant access to the required AWS accounts by using cross-account IAM roles.",
+            "letter": "E"
+          }
+        ],
+        "topic": 1,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "D",
+        "explanation": "Passing Certification Exams Made Easy visit - https://www.surepassexam.com Recommend!! Get the Full SAP-C02 dumps in VCE and PDF From SurePassExam https://www.surepassexam.com/SAP-C02-exam-dumps.html (300",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 5,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 2143
+      }
+    },
+    {
+      "question": {
+        "id": "sap-c02_6_q42",
+        "number": 42,
+        "text": "A company has developed a web application. The company is hosting the application on a group of Amazon EC2 instances behind an Application Load Balancer.\nThe company wants to improve the security posture of the application and plans to use AWS WAF web ACLs. The solution must not adversely affect legitimate\ntraffic to the application.\nHow should a solutions architect configure the web ACLs to meet these requirements?",
+        "options": [
+          {
+            "text": "Set the action of the web ACL rules to Coun",
+            "letter": "A"
+          },
+          {
+            "text": "Enable AWS WAF logging Analyze the requests for false positives Modify the rules to avoid any false positive Over time change the action of the web ACL rules from Count to Block.",
+            "letter": "B"
+          },
+          {
+            "text": "Use only rate-based rules in the web ACL",
+            "letter": "C"
+          },
+          {
+            "text": "and set the throttle limit as high as possible Temporarily block all requests that exceed the limi",
+            "letter": "D"
+          },
+          {
+            "text": "Define nested rules to narrow the scope of the rate tracking. F. Set the action o' the web ACL rules to Bloc G. Use only AWS managed rule groups in the web ACLs Evaluate the rule groups by using Amazon CloudWatch metrics with AWS WAF sampled requests or AWS WAF logs. H. Use only custom rule groups in the web ACL I. and set the action to Allow Enable AWS WAF logging Analyze the requests tor false positives Modify the rules to avoid any false positive Over time, change the action of the web ACL rules from Allow to Block.",
+            "letter": "E"
+          }
+        ],
+        "topic": 1,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "A",
+        "explanation": "https://aws.amazon.com/premiumsupport/knowledge-center/waf-analyze-count-action-rules/",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 5,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 1432
+      }
+    },
+    {
+      "question": {
+        "id": "sap-c02_6_q46",
+        "number": 46,
+        "text": "A company runs its application in the eu-west-1 Region and has one account for each of its environments development, testing, and production All the\nenvironments are running 24 hours a day 7 days a week by using stateful Amazon EC2 instances and Amazon RDS for MySQL databases The databases are\nbetween 500 GB and 800 GB in size\nThe development team and testing team work on business days during business hours, but the production environment operates 24 hours a day. 7 days a week.\nThe company wants to reduce costs AH resources are tagged with an environment tag with either development, testing, or production as the key. What should a\nsolutions architect do to reduce costs with the LEAST operational effort?",
+        "options": [
+          {
+            "text": "Create an Amazon EventBridge (Amazon CloudWatch Events) rule that runs once every day Configure the rule to invoke one AWS Lambda function that starts or stops instances based on the tag day and time.",
+            "letter": "A"
+          },
+          {
+            "text": "Create an Amazon EventBridge (Amazon CloudWatch Events) rule that runs every business day in the evenin",
+            "letter": "B"
+          },
+          {
+            "text": "Configure the rule to invoke an AWS Lambda function that stops instances based on thetag-Create a second EventBridge (CloudWatch Events) rule that runs every business day in the morning Configure the second rule to invoke another Lambda function that starts instances based on the tag",
+            "letter": "C"
+          },
+          {
+            "text": "Create an Amazon EventBridge (Amazon CloudWatch Events) rule that runs every business day in the evening Configure the rule to invoke an AWS Lambda function that terminates instances based on the tag Create a second EventBridge (CloudWatch Events) rule that runs every business day in the morning Configure the second rule to invoke another Lambda function that restores the instances from their last backup based on the tag.",
+            "letter": "D"
+          },
+          {
+            "text": "Create an Amazon EventBridge rule that runs every hou F. Configure the rule to invoke one AWS Lambda function that terminates or restores instances from their last backup based on the ta G. day, and time.",
+            "letter": "E"
+          }
+        ],
+        "topic": 1,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "B",
+        "explanation": "Creating an Amazon EventBridge rule that runs every business day in the evening to stop instances and another rule that runs every business day in the morning to start instances based on the tag will reduce costs with the least operational effort. This approach allows for instances to be stopped during non-business hours when they are not in use, reducing the costs associated with running them. It also allows for instances to be started again in the morning when the development and testing teams need to use them.",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 5,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 2490
+      }
+    },
+    {
+      "question": {
+        "id": "sap-c02_6_q49",
+        "number": 49,
+        "text": "A company is in the process of implementing AWS Organizations to constrain its developers to use only Amazon EC2. Amazon S3 and Amazon DynamoDB. The\ndevelopers account resides In a dedicated organizational unit (OU). The solutions architect has implemented the following SCP on the developers account:\nPassing Certification Exams Made Easy visit - https://www.surepassexam.com\n\n\nRecommend!! Get the Full SAP-C02 dumps in VCE and PDF From SurePassExam\nhttps://www.surepassexam.com/SAP-C02-exam-dumps.html (300 New Questions)\nWhen this policy is deployed, IAM users in the developers account are still able to use AWS services that are not listed in the policy. What should the solutions\narchitect do to eliminate the developers' ability to use services outside the scope of this policy?",
+        "options": [
+          {
+            "text": "Create an explicit deny statement for each AWS service that should be constrained",
+            "letter": "A"
+          },
+          {
+            "text": "Remove the Full AWS Access SCP from the developer account's OU",
+            "letter": "B"
+          },
+          {
+            "text": "Modify the Full AWS Access SCP to explicitly deny all services",
+            "letter": "C"
+          },
+          {
+            "text": "Add an explicit deny statement using a wildcard to the end of the SCP",
+            "letter": "D"
+          }
+        ],
+        "topic": 1,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "B",
+        "explanation": "https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_policies_inheritance_auth.html",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 4,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 1215
+      }
+    },
+    {
+      "question": {
+        "id": "sap-c02_6_q50",
+        "number": 50,
+        "text": "A company is hosting a monolithic REST-based API for a mobile app on five Amazon EC2 instances in public subnets of a VPC. Mobile clients connect to the API\nby using a domain name that is hosted on Amazon Route 53. The company has created a Route 53 multivalue answer routing policy with the IP addresses of all\nthe EC2 instances. Recently, the app has been overwhelmed by large and sudden increases to traffic. The app has not been able to keep up with the traffic.\nA solutions architect needs to implement a solution so that the app can handle the new and varying load. Which solution will meet these requirements with the\nLEAST operational overhead?",
+        "options": [
+          {
+            "text": "Separate the API into individual AWS Lambda function",
+            "letter": "A"
+          },
+          {
+            "text": "Configure an Amazon API Gateway REST API with Lambda integration for the backen",
+            "letter": "B"
+          },
+          {
+            "text": "Update the Route 53 record to point to the API Gateway API.",
+            "letter": "C"
+          },
+          {
+            "text": "Containerize the API logi",
+            "letter": "D"
+          },
+          {
+            "text": "Create an Amazon Elastic Kubernetes Service (Amazon EKS) cluste F. Run the containers in the cluster by using Amazon EC2. Create a Kubernetes ingres G. Update the Route 53 record to point to the Kubernetes ingress. H. Create an Auto Scaling grou I. Place all the EC2 instances in the Auto Scaling grou J. Configure the Auto Scaling group to perform scaling actions that are based on CPU utilizatio K. Create an AWS Lambda function that reacts to Auto Scaling group changes and updates the Route 53 record. L. Create an Application Load Balancer (ALB) in front of the AP M. Move the EC2 instances to private subnets in the VP N. Add the EC2 instances as targets for the AL O. Update the Route 53 record to point to the ALB.",
+            "letter": "E"
+          }
+        ],
+        "topic": 1,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "D",
+        "explanation": "By breaking down the monolithic API into individual Lambda functions and using API Gateway to handle the incoming requests, the solution can automatically scale to handle the new and varying load without the need for manual scaling actions. Additionally, this option will automatically handle the traffic without the need of having EC2 instances running all the time and only pay for the number of requests and the duration of the execution of the Lambda function. By updating the Route 53 record to point to the API Gateway, the solution can handle the traffic and also it will direct the traffic to the correct endpoint.",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 5,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 2255
+      }
+    },
+    {
+      "question": {
+        "id": "sap-c02_6_q51",
+        "number": 51,
+        "text": "A company is using multiple AWS accounts The DNS records are stored in a private hosted zone for Amazon Route 53 in Account A The company's applications\nand databases are running in Account B.\nA solutions architect win deploy a two-net application In a new VPC To simplify the configuration, the db.example com CNAME record set tor the Amazon RDS\nendpoint was created in a private hosted zone for Amazon Route 53.\nPassing Certification Exams Made Easy visit - https://www.surepassexam.com\n\n\nRecommend!! Get the Full SAP-C02 dumps in VCE and PDF From SurePassExam\nhttps://www.surepassexam.com/SAP-C02-exam-dumps.html (300 New Questions)\nDuring deployment, the application failed to start. Troubleshooting revealed that db.example com is not resolvable on the Amazon EC2 instance The solutions\narchitect confirmed that the record set was created correctly in Route 53.\nWhich combination of steps should the solutions architect take to resolve this issue? (Select TWO )",
+        "options": [
+          {
+            "text": "Deploy the database on a separate EC2 instance in the new VPC Create a record set for the instance's private IP in the private hosted zone",
+            "letter": "A"
+          },
+          {
+            "text": "Use SSH to connect to the application tier EC2 instance Add an RDS endpoint IP address to the/eto/resolv.conf file",
+            "letter": "B"
+          },
+          {
+            "text": "Create an authorization lo associate the private hosted zone in Account A with the new VPC In Account B",
+            "letter": "C"
+          },
+          {
+            "text": "Create a private hosted zone for the example.com domain m Account B Configure Route 53 replication between AWS accounts",
+            "letter": "D"
+          },
+          {
+            "text": "Associate a new VPC in Account B with a hosted zone in Account F. Delete the association authorization In Account A.",
+            "letter": "E"
+          }
+        ],
+        "topic": 1,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "CE",
+        "explanation": "https://aws.amazon.com/premiumsupport/knowledge-center/private-hosted-zone-different-account/",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 5,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 1709
+      }
+    },
+    {
+      "question": {
+        "id": "sap-c02_6_q56",
+        "number": 56,
+        "text": "A company with global offices has a single 1 Gbps AWS Direct Connect connection to a single AWS Region. The company's on-premises network uses the\nconnection to communicate with the company's resources in the AWS Cloud. The connection has a single private virtual interface that connects to a single VPC.\nA solutions architect must implement a solution that adds a redundant Direct Connect connection in the same Region. The solution also must provide connectivity\nto other Regions through the same pair of Direct Connect connections as the company expands into other Regions.\nWhich solution meets these requirements?",
+        "options": [
+          {
+            "text": "Provision a Direct Connect gatewa",
+            "letter": "A"
+          },
+          {
+            "text": "Delete the existing private virtual interface from the existing connectio",
+            "letter": "B"
+          },
+          {
+            "text": "Create the second Direct Connect connectio",
+            "letter": "C"
+          },
+          {
+            "text": "Create a new private virtual interlace on each connection, and connect both private victual interfaces to the Direct Connect gatewa",
+            "letter": "D"
+          },
+          {
+            "text": "Connect the Direct Connect gateway to the single VPC. F. Keep the existing private virtual interfac G. Create the second Direct Connect connectio H. Create a new private virtual interface on the new connection, and connect the new private virtual interface to the single VPC. I. Keep the existing private virtual interfac J. Create the second Direct Connect connectio K. Create a new public virtual interface on the new connection, and connect the new public virtual interface to the single VPC. L. Provision a transit gatewa M. Delete the existing private virtual interface from the existing connection.Create the second Direct Connect connectio N. Create a new private virtual interface on each connection, and connect both private virtual interfaces to the transit gatewa O. Associate the transit gateway with the single VPC.",
+            "letter": "E"
+          }
+        ],
+        "topic": 1,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "A",
+        "explanation": "A Direct Connect gateway is a globally available resource. You can create the Direct Connect gateway in any Region and access it from all other Regions. The following describe scenarios where you can use a Direct Connect gateway. https://docs.aws.amazon.com/directconnect/latest/UserGuide/direct-connect-gateways-intro.html",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 5,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 2091
+      }
+    },
+    {
+      "question": {
+        "id": "sap-c02_6_q57",
+        "number": 57,
+        "text": "A company has its cloud infrastructure on AWS A solutions architect needs to define the infrastructure as code. The infrastructure is currently deployed in one\nAWS Region. The company's business expansion plan includes deployments in multiple Regions across multiple AWS accounts\nWhat should the solutions architect do to meet these requirements?",
+        "options": [
+          {
+            "text": "Use AWS CloudFormation templates Add IAM policies to control the various accounts Deploy the templates across the multiple Regions",
+            "letter": "A"
+          },
+          {
+            "text": "Use AWS Organizations Deploy AWS CloudFormation templates from the management account Use AWS Control Tower to manage deployments across accounts",
+            "letter": "B"
+          },
+          {
+            "text": "Use AWS Organizations and AWS CloudFormation StackSets Deploy a CloudFormation template from an account that has the necessary IAM permissions",
+            "letter": "C"
+          },
+          {
+            "text": "Use nested stacks with AWS CloudFormation templates Change the Region by using nested stacks",
+            "letter": "D"
+          }
+        ],
+        "topic": 1,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "C",
+        "explanation": "https://aws.amazon.com/blogs/aws/new-use-aws-cloudformation-stacksets-for-multiple-accounts-in-an-aws-orga AWS Organizations allows the management of multiple AWS accounts as a single entity and AWS CloudFormation StackSets allows creating, updating, and deleting stacks across multiple accounts and regions in an organization. This solution allows creating a single CloudFormation template that can be deployed across multiple accounts and regions, and also allows for the management of access and permissions for the different accounts through the use of IAM roles and policies in the management account.",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 4,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 1501
+      }
+    },
+    {
+      "question": {
+        "id": "sap-c02_6_q59",
+        "number": 59,
+        "text": "A company built an application based on AWS Lambda deployed in an AWS CloudFormation stack. The last production release of the web application introduced\nan issue that resulted in an outage lasting several minutes. A solutions architect must adjust the deployment process to support a canary release.\nWhich solution will meet these requirements?",
+        "options": [
+          {
+            "text": "Create an alias for every new deployed version of the Lambda functio",
+            "letter": "A"
+          },
+          {
+            "text": "Use the AWS CLI update-alias command with the routing-config parameter to distribute the load.",
+            "letter": "B"
+          },
+          {
+            "text": "Deploy the application into a new CloudFormation stac",
+            "letter": "C"
+          },
+          {
+            "text": "Use an Amazon Route 53 weighted routing policy to distribute the load.",
+            "letter": "D"
+          },
+          {
+            "text": "Create a version for every new deployed Lambda functio F. Use the AWS CLIupdate-function-configuration command with the routing-config parameter to distribute the load. Passing Certification Exams Made Easy visit - https://www.surepassexam.com Recommend!! Get the Full SAP-C02 dumps in VCE and PDF From SurePassExam https://www.surepassexam.com/SAP-C02-exam-dumps.html (300 New Questions) G. Configure AWS CodeDeploy and use CodeDeployDefault.OneAtATime in the Deployment configuration to distribute the load.",
+            "letter": "E"
+          }
+        ],
+        "topic": 1,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "A",
+        "explanation": "https://aws.amazon.com/blogs/compute/implementing-canary-deployments-of-aws-lambda-functions-with-alias- https://docs.aws.amazon.com/lambda/latest/dg/configuration-aliases.html",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 5,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 1376
+      }
+    },
+    {
+      "question": {
+        "id": "sap-c02_6_q63",
+        "number": 63,
+        "text": "A retail company is operating its ecommerce application on AWS. The application runs on Amazon EC2 instances behind an Application Load Balancer (ALB). The\ncompany uses an Amazon RDS DB instance as the database backend. Amazon CloudFront is configured with one origin that points to the ALB. Static content is\ncached. Amazon Route 53 is used to host all public zones.\nAfter an update of the application, the ALB occasionally returns a 502 status code (Bad Gateway) error. The root cause is malformed HTTP headers that are\nreturned to the ALB. The webpage returns successfully when a solutions architect reloads the webpage immediately after the error occurs.\nWhile the company is working on the problem, the solutions architect needs to provide a custom error page instead of the standard ALB error page to visitors.\nWhich combination of steps will meet this requirement with the LEAST amount of operational overhead? (Choose two.)",
+        "options": [
+          {
+            "text": "Create an Amazon S3 bucke",
+            "letter": "A"
+          },
+          {
+            "text": "Configure the S3 bucket to host a static webpag",
+            "letter": "B"
+          },
+          {
+            "text": "Upload the custom error pages to Amazon S3.",
+            "letter": "C"
+          },
+          {
+            "text": "Create an Amazon CloudWatch alarm to invoke an AWS Lambda function if the ALB health check response Target.FailedHealthChecks is greater than 0. Configure the Lambda function to modify the forwarding rule at the ALB to point to a publicly accessible web server.",
+            "letter": "D"
+          },
+          {
+            "text": "Modify the existing Amazon Route 53 records by adding health check F. Configure a fallback target if the health check fail G. Modify DNS records to point to a publicly accessible webpage. H. Create an Amazon CloudWatch alarm to invoke an AWS Lambda function if the ALB health check response Elb.InternalError is greater than 0. Configure the Lambda function to modify the forwarding rule at the ALB to point to a public accessible web server. I. Add a custom error response by configuring a CloudFront custom error pag J. Modify DNS records to point to a publicly accessible web page.",
+            "letter": "E"
+          }
+        ],
+        "topic": 1,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "CE",
+        "explanation": "\"Save your custom error pages in a location that is accessible to CloudFront. We recommend that you store them in an Amazon S3 bucket, and that you don’t store them in the same place as the rest of your website or application’s content. If you store the custom error pages on the same origin as your website or application, and the origin starts to return 5xx errors, CloudFront can’t get the custom error pages because the origin server is unavailable.\" https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/GeneratingCustomErrorResponses.htm",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 5,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 2492
+      }
+    },
+    {
+      "question": {
+        "id": "sap-c02_6_q67",
+        "number": 67,
+        "text": "A solutions architect needs to implement a client-side encryption mechanism for objects that will be stored in a new Amazon S3 bucket. The solutions architect\ncreated a CMK that is stored in AWS Key Management Service (AWS KMS) for this purpose.\nThe solutions architect created the following IAM policy and attached it to an IAM role:\nDuring tests, me solutions architect was able to successfully get existing test objects m the S3 bucket However, attempts to upload a new object resulted in an\nerror message. The error message stated that me action was forbidden.\nWhich action must me solutions architect add to the IAM policy to meet all the requirements?",
+        "options": [
+          {
+            "text": "Kms:GenerateDataKey",
+            "letter": "A"
+          },
+          {
+            "text": "KmsGetKeyPolpcy",
+            "letter": "B"
+          },
+          {
+            "text": "kmsGetPubKKey",
+            "letter": "C"
+          },
+          {
+            "text": "kms:SKjn",
+            "letter": "D"
+          }
+        ],
+        "topic": 1,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "A",
+        "explanation": "https://aws.amazon.com/premiumsupport/knowledge-center/s3-access-denied-error-kms/ \"An error occurred (AccessDenied) when calling the PutObject operation: Access Denied\" This error message indicates that your IAM user or role needs Passing Certification Exams Made Easy visit - https://www.surepassexam.com Recommend!! Get the Full SAP-C02 dumps in VCE and PDF From SurePassExam https://www.surepassexam.com/SAP-C02-exam-dumps.html (300",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 4,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 1267
+      }
+    },
+    {
+      "question": {
+        "id": "sap-c02_6_q68",
+        "number": 68,
+        "text": "A company with several AWS accounts is using AWS Organizations and service control policies (SCPs). An Administrator created the following SCP and has\nattached it to an organizational unit (OU) that contains AWS account 1111-1111-1111:\nDevelopers working in account 1111-1111-1111 complain that they cannot create Amazon S3 buckets. How should the Administrator address this problem?",
+        "options": [
+          {
+            "text": "Add s3:CreateBucket with €Allow€ effect to the SCP.",
+            "letter": "A"
+          },
+          {
+            "text": "Remove the account from the OU, and attach the SCP directly to account 1111-1111-1111.",
+            "letter": "B"
+          },
+          {
+            "text": "Instruct the Developers to add Amazon S3 permissions to their IAM entities.",
+            "letter": "C"
+          },
+          {
+            "text": "Remove the SCP from account 1111-1111-1111.",
+            "letter": "D"
+          }
+        ],
+        "topic": 1,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "C",
+        "explanation": "However A's explanation is incorrect - https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_policies_scps.html \"SCPs are similar to AWS Identity and Access Management (IAM) permission policies and use almost the same syntax. However, an SCP never grants permissions.\" SCPs alone are not sufficient to granting permissions to the accounts in your organization. No permissions are granted by an SCP. An SCP defines a guardrail, or sets limits, on the actions that the account's administrator can delegate to the IAM users and roles in the affected accounts. The administrator must still attach identity-based or resource-based policies to IAM users or roles, or to the resources in your accounts to actually grant permissions. The effective permissions are the logical intersection between what is allowed by the SCP and what is allowed by the IAM and resource-based policies.",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 4,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 1570
+      }
+    },
+    {
+      "question": {
+        "id": "sap-c02_6_q69",
+        "number": 69,
+        "text": "A financial company is planning to migrate its web application from on premises to AWS. The company uses a third-party security tool to monitor the inbound traffic\nto the application. The company has used the security tool for the last 15 years, and the tool has no cloud solutions available from its vendor. The company's\nsecurity team is concerned about how to integrate the security tool with AWS technology.\nThe company plans to deploy the application migration to AWS on Amazon EC2 instances. The EC2 instances will run in an Auto Scaling group in a dedicated\nVPC. The company needs to use the security tool to inspect all packets that come in and out of the VPC. This inspection must occur in real time and must not\naffect the application's performance. A solutions architect must design a target architecture on AWS that is highly available within an AWS Region.\nWhich combination of steps should the solutions architect take to meet these requirements? (Select TWO.)",
+        "options": [
+          {
+            "text": "Deploy the security tool on EC2 instances in a new Auto Scaling group in the existing VPC.",
+            "letter": "A"
+          },
+          {
+            "text": "Deploy the web application behind a Network Load Balancer.",
+            "letter": "B"
+          },
+          {
+            "text": "Deploy an Application Load Balancer in front of the security tool instances.",
+            "letter": "C"
+          },
+          {
+            "text": "Provision a Gateway Load Balancer for each Availability Zone to redirect the traffic to the security tool.",
+            "letter": "D"
+          },
+          {
+            "text": "Provision a transit gateway to facilitate communication between VPCs.",
+            "letter": "E"
+          }
+        ],
+        "topic": 1,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "AD",
+        "explanation": "Option A, Deploy the security tool on EC2 instances in a new Auto Scaling group in the existing VPC, allows the company to use its existing security tool while still running it within the AWS environment. This ensures that all packets coming in and out of the VPC are inspected by the security tool in real time. Option D, Provision a Gateway Load Balancer for each Availability Zone to redirect the traffic to the security tool, allows for high availability within an AWS Region. By provisioning a Gateway Load Balancer for each Availability Zone, the traffic is redirected to the security tool in the event of any failures or outages. This ensures that the security tool is always available to inspect the traffic, even in the event of a failure.",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 5,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 2166
+      }
+    },
+    {
+      "question": {
+        "id": "sap-c02_6_q73",
+        "number": 73,
+        "text": "A company has introduced a new policy that allows employees to work remotely from their homes if they connect by using a VPN The company Is hosting Internal\napplications with VPCs in multiple AWS accounts Currently the applications are accessible from the company's on-premises office network through an AWS Site-to-\nSite VPN connection The VPC in the company's main AWS account has peering connections established with VPCs in other AWS accounts.\nA solutions architect must design a scalable AWS Client VPN solution for employees to use while they work from home\nWhat is the MOST cost-effective solution that meets these requirements?\nPassing Certification Exams Made Easy visit - https://www.surepassexam.com\n\n\nRecommend!! Get the Full SAP-C02 dumps in VCE and PDF From SurePassExam\nhttps://www.surepassexam.com/SAP-C02-exam-dumps.html (300 New Questions)",
+        "options": [
+          {
+            "text": "Create a Client VPN endpoint in each AWS account Configure required routing that allows access to internal applications",
+            "letter": "A"
+          },
+          {
+            "text": "Create a Client VPN endpoint in the mam AWS account Configure required routing that allows access to internal applications",
+            "letter": "B"
+          },
+          {
+            "text": "Create a Client VPN endpoint in the main AWS account Provision a transit gateway that is connected to each AWS account Configure required routing that allows access to internal applications",
+            "letter": "C"
+          },
+          {
+            "text": "Create a Client VPN endpoint in the mam AWS account Establish connectivity between the Client VPN endpoint and the AWS Site-to-Site VPN",
+            "letter": "D"
+          }
+        ],
+        "topic": 1,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "C",
+        "explanation": "https://docs.aws.amazon.com/vpn/latest/clientvpn-admin/scenario-peered.html",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 4,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 1552
+      }
+    },
+    {
+      "question": {
+        "id": "sap-c02_6_q74",
+        "number": 74,
+        "text": "A solutions architect is designing the data storage and retrieval architecture for a new application that a company will be launching soon. The application is\ndesigned to ingest millions of small records per minute from devices all around the world. Each record is less than 4 KB in size and needs to be stored in a durable\nlocation where it can be retrieved with low latency. The data is ephemeral and the company is required to store the data for 120 days only, after which the data can\nbe deleted.\nThe solutions architect calculates that, during the course of a year, the storage requirements would be about 10-15 TB.\nWhich storage strategy is the MOST cost-effective and meets the design requirements?",
+        "options": [
+          {
+            "text": "Design the application to store each incoming record as a single .csv file in an Amazon S3 bucket to allow for indexed retrieva",
+            "letter": "A"
+          },
+          {
+            "text": "Configure a lifecycle policy to delete data older than 120 days.",
+            "letter": "B"
+          },
+          {
+            "text": "Design the application to store each incoming record in an Amazon DynamoDB table properly configured for the scal",
+            "letter": "C"
+          },
+          {
+            "text": "Configure the DynamoOB Time to Live (TTL) feature to delete records older than 120 days.",
+            "letter": "D"
+          },
+          {
+            "text": "Design the application to store each incoming record in a single table in an Amazon RDS MySQL databas F. Run a nightly cron job that executes a query to delete any records older than 120 days. G. Design the application to batch incoming records before writing them to an Amazon S3 bucke H. Updatethe metadata for the object to contain the list of records in the batch and use the Amazon S3 metadata search feature to retrieve the dat I. Configure a lifecycle policy to delete the data after 120 days.",
+            "letter": "E"
+          }
+        ],
+        "topic": 1,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "B",
+        "explanation": "DynamoDB with TTL, cheaper for sustained throughput of small items + suited for fast retrievals. S3 cheaper for storage only, much higher costs with writes. RDS not designed for this use case.",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 5,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 1833
+      }
+    },
+    {
+      "question": {
+        "id": "sap-c02_6_q75",
+        "number": 75,
+        "text": "A company has registered 10 new domain names. The company uses the domains for online marketing. The company needs a solution that will redirect online\nvisitors to a specific URL for each domain. All domains and target URLs are defined in a JSON document. All DNS records are managed by Amazon Route 53.\nA solutions architect must implement a redirect service that accepts HTTP and HTTPS requests.\nWhich combination of steps should the solutions architect take to meet these requirements with the LEAST amount of operational effort? (Choose three.)",
+        "options": [
+          {
+            "text": "Create a dynamic webpage that runs on an Amazon EC2 instanc",
+            "letter": "A"
+          },
+          {
+            "text": "Configure the webpage to use the JSON document in combination with the event message to look up and respond with a redirect URL.",
+            "letter": "B"
+          },
+          {
+            "text": "Create an Application Load Balancer that includes HTTP and HTTPS listeners.",
+            "letter": "C"
+          },
+          {
+            "text": "Create an AWS Lambda function that uses the JSON document in combination with the event message to look up and respond with a redirect URL.",
+            "letter": "D"
+          },
+          {
+            "text": "Use an Amazon API Gateway API with a custom domain to publish an AWS Lambda function. F. Create an Amazon CloudFront distributio G. Deploy a Lambda@Edge function. H. Create an SSL certificate by using AWS Certificate Manager (ACM). Include the domains as Subject Alternative Names.",
+            "letter": "E"
+          }
+        ],
+        "topic": 1,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "CE",
+        "explanation": "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/lambda-edge-how-it-works-tutorial.ht",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 5,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 1379
+      }
+    },
+    {
+      "question": {
+        "id": "sap-c02_6_q77",
+        "number": 77,
+        "text": "The company needs to determine which costs on the monthly AWS bill are attributable to each application or team. The company also must be able to create\nreports to compare costs from the last 12 months and to help forecast costs for the next 12 months. A solutions architect must recommend an AWS Billing and\nCost Management solution that provides these cost reports.\nWhich combination of actions will meet these requirements? (Select THREE.)",
+        "options": [
+          {
+            "text": "Activate the user-defined cost allocation tags that represent the application and the team.",
+            "letter": "A"
+          },
+          {
+            "text": "Activate the AWS generated cost allocation tags that represent the application and the team.",
+            "letter": "B"
+          },
+          {
+            "text": "Create a cost category for each application in Billing and Cost Management.",
+            "letter": "C"
+          },
+          {
+            "text": "Activate IAM access to Billing and Cost Management.",
+            "letter": "D"
+          },
+          {
+            "text": "Create a cost budget. F. Enable Cost Explorer.",
+            "letter": "E"
+          }
+        ],
+        "topic": 1,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "AC",
+        "explanation": "https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/manage-cost-categories.html https://aws.amazon.com/premiumsupport/knowledge-center/cost- explorer-analyze-spending-and-usage/ https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/manage-cost-categories.html https://docs.aws.amazon.com/cost-management/latest/userguide/ce-enable.html The best combination of actions to meet the company’s requirements is Options A, C, and F. Option A involves activating the user-defined cost allocation tags that represent the application and the team. This will allow the company to assign costs to different applications or teams, and will allow them to be tracked in the monthly AWS bill. Passing Certification Exams Made Easy visit - https://www.surepassexam.com Recommend!! Get the Full SAP-C02 dumps in VCE and PDF From SurePassExam https://www.surepassexam.com/SAP-C02-exam-dumps.html (300",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 5,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 2857
+      }
+    },
+    {
+      "question": {
+        "id": "sap-c02_6_q81",
+        "number": 81,
+        "text": "A weather service provides high-resolution weather maps from a web application hosted on AWS in the\neu-west-1 Region. The weather maps are updated frequently and stored in Amazon S3 along with static HTML content. The web application is fronted by Amazon\nCloudFront.\nThe company recently expanded to serve users in the us-east-1 Region, and these new users report that viewing their respective weather maps is slow from time\nto time.\nWhich combination of steps will resolve the us-east-1 performance issues? (Choose two.)",
+        "options": [
+          {
+            "text": "Configure the AWS Global Accelerator endpoint for the S3 bucket in eu-west-1. Configure endpoint groups for TCP ports 80 and 443 in us-east-1.",
+            "letter": "A"
+          },
+          {
+            "text": "Create a new S3 bucket in us-east-1. Configure S3 cross-Region replication to synchronize from the S3 bucket in eu-west-1.",
+            "letter": "B"
+          },
+          {
+            "text": "Use Lambda@Edge to modify requests from North America to use the S3 Transfer Acceleration endpoint in us-east-1.",
+            "letter": "C"
+          },
+          {
+            "text": "Use Lambda@Edge to modify requests from North America to use the S3 bucket in us-east-1.",
+            "letter": "D"
+          },
+          {
+            "text": "Configure the AWS Global Accelerator endpoint for us-east-1 as an origin on the CloudFront distributio F. Use Lambda@Edge to modify requests from North America to use the new origin.",
+            "letter": "E"
+          }
+        ],
+        "topic": 1,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "BD",
+        "explanation": "https://aws.amazon.com/about-aws/whats-new/2016/04/transfer-files-into-amazon-s3-up-to-300-percent-faster/",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 5,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 1318
+      }
+    },
+    {
+      "question": {
+        "id": "sap-c02_6_q84",
+        "number": 84,
+        "text": "A company has hundreds of AWS accounts. The company recently implemented a centralized internal process for purchasing new Reserved Instances and\nmodifying existing Reserved Instances. This process requires all business units that want to purchase or modify Reserved Instances to submit requests to a\ndedicated team for procurement. Previously, business units directly purchased or modified Reserved Instances in their own respective AWS accounts\nautonomously.\nA solutions architect needs to enforce the new process in the most secure way possible.\nWhich combination of steps should the solutions architect take to meet these requirements? (Choose two.)",
+        "options": [
+          {
+            "text": "Ensure that all AWS accounts are part of an organization in AWS Organizations with all features enabled.",
+            "letter": "A"
+          },
+          {
+            "text": "Use AWS Config to report on the attachment of an IAM policy that denies access to the ec2:PurchaseReservedInstancesOffering action and the ec2:ModifyReservedInstances action.",
+            "letter": "B"
+          },
+          {
+            "text": "In each AWS account, create an IAM policy that denies the ec2:PurchaseReservedInstancesOffering action and the ec2:ModifyReservedInstances action.",
+            "letter": "C"
+          },
+          {
+            "text": "Create an SCP that denies the ec2:PurchaseReservedInstancesOffering action and the ec2:ModifyReservedInstances actio",
+            "letter": "D"
+          },
+          {
+            "text": "Attach the SCP to each OU of the organization. F. Ensure that all AWS accounts are part of an organization in AWS Organizations that uses the consolidated billing feature.",
+            "letter": "E"
+          }
+        ],
+        "topic": 1,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "AD",
+        "explanation": "All features – The default feature set that is available to AWS Organizations. It includes all the functionality of consolidated billing, plus advanced features that give you more control over accounts in your organization. For example, when all features are enabled the management account of the organization has full control over what member accounts can do. The management account can apply SCPs to restrict the services and actions that users (including the root user) and roles in an account can access. https://docs.aws.amazon.com/organizations/latest/userguide/orgs_getting-started_concepts.html#feature-set",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 5,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 2023
+      }
+    },
+    {
+      "question": {
+        "id": "sap-c02_6_q86",
+        "number": 86,
+        "text": "A company has an organization in AWS Organizations. The company is using AWS Control Tower to deploy a landing zone for the organization. The company\nwants to implement governance and policy enforcement. The company must implement a policy that will detect Amazon RDS DB instances that are not encrypted\nat rest in the company’s production OU.\nWhich solution will meet this requirement?",
+        "options": [
+          {
+            "text": "Turn on mandatory guardrails in AWS Control Towe",
+            "letter": "A"
+          },
+          {
+            "text": "Apply the mandatory guardrails to the production OU.",
+            "letter": "B"
+          },
+          {
+            "text": "Enable the appropriate guardrail from the list of strongly recommended guardrails in AWS Control Towe",
+            "letter": "C"
+          },
+          {
+            "text": "Apply the guardrail to the production OU.",
+            "letter": "D"
+          },
+          {
+            "text": "Use AWS Config to create a new mandatory guardrai F. Apply the rule to all accounts in the production OU. G. Create a custom SCP in AWS Control Towe H. Apply the SCP to the production OU.",
+            "letter": "E"
+          }
+        ],
+        "topic": 1,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "B",
+        "explanation": "AWS Control Tower provides a set of \"strongly recommended guardrails\" that can be enabled to implement governance and policy enforcement. One of these guardrails is \"Encrypt Amazon RDS instances\" which will detect RDS DB instances that are not encrypted at rest. By enabling this guardrail and applying it to the production OU, the company will be able to enforce encryption for RDS instances in the production environment. Passing Certification Exams Made Easy visit - https://www.surepassexam.com Recommend!! Get the Full SAP-C02 dumps in VCE and PDF From SurePassExam https://www.surepassexam.com/SAP-C02-exam-dumps.html (300",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 5,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 1519
+      }
+    },
+    {
+      "question": {
+        "id": "sap-c02_6_q88",
+        "number": 88,
+        "text": "A global media company is planning a multi-Region deployment of an application. Amazon DynamoDB global tables will back the deployment to keep the user\nexperience consistent across the two continents where users are concentrated. Each deployment will have a public Application Load Balancer (ALB). The\ncompany manages public DNS internally. The company wants to make the application available through an apex domain.\nWhich solution will meet these requirements with the LEAST effort?",
+        "options": [
+          {
+            "text": "Migrate public DNS to Amazon Route 53. Create CNAME records for the apex domain to point to the AL",
+            "letter": "A"
+          },
+          {
+            "text": "Use a geolocation routing policy to route traffic based on user location.",
+            "letter": "B"
+          },
+          {
+            "text": "Place a Network Load Balancer (NLB) in front of the AL",
+            "letter": "C"
+          },
+          {
+            "text": "Migrate public DNS to Amazon Route 53.Create a CNAME record for the apex domain to point to the NLB's static IP addres",
+            "letter": "D"
+          },
+          {
+            "text": "Use a geolocation routing policy to route traffic based on user location. F. Create an AWS Global Accelerator accelerator with multiple endpoint groups that target endpoints in appropriate AWS Region G. Use the accelerator's static IP address to create a record in public DNS for the apex domain. H. Create an Amazon API Gateway API that is backed by AWS Lambda in one of the AWS Regions.Configure a Lambda function to route traffic to application deployments by using the round robin metho I. Create CNAME records for the apex domain to point to the API's URL.",
+            "letter": "E"
+          }
+        ],
+        "topic": 1,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "C",
+        "explanation": "AWS Global Accelerator is a service that directs traffic to optimal endpoints (in this case, the Application Load Balancer) based on the health of the endpoints and network routing. It allows you to create an accelerator that directs traffic to multiple endpoint groups, one for each Region where the application is deployed. The accelerator uses the AWS global network to optimize the traffic routing to the healthy endpoint. By using Global Accelerator, the company can use a single static IP address for the apex domain, and traffic will be directed to the optimal endpoint based on the user's location, without the need for additional load balancers or routing policies. Reference: AWS Global Accelerator documentation: https://aws.amazon.com/global-accelerator/ Routing User Traffic to the Optimal AWS Region using Global Accelerator documentation: https://aws.amazon.com/blogs/networking-and-content-delivery/routing-user-traffic-to-the-optimal-aws-region-u",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 5,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 2394
+      }
+    },
+    {
+      "question": {
+        "id": "sap-c02_6_q92",
+        "number": 92,
+        "text": "A company wants to deploy an AWS WAF solution to manage AWS WAF rules across multiple AWS accounts. The accounts are managed under different OUs in\nAWS Organizations.\nAdministrators must be able to add or remove accounts or OUs from managed AWS WAF rule sets as needed Administrators also must have the ability to\nautomatically update and remediate noncompliant AWS WAF rules in all accounts\nWhich solution meets these requirements with the LEAST amount of operational overhead?",
+        "options": [
+          {
+            "text": "Use AWS Firewall Manager to manage AWS WAF rules across accounts in the organizatio",
+            "letter": "A"
+          },
+          {
+            "text": "Use an AWS Systems Manager Parameter Store parameter to store account numbers and OUs to manage Update the parameter as needed to add or remove accounts or OUs Use an Amazon EventBridge (Amazon CloudWatch Events) rule to identify any changes to the parameter and to invoke an AWS Lambda function to update the security policy in the Firewall Manager administrative account",
+            "letter": "B"
+          },
+          {
+            "text": "Deploy an organization-wide AWS Config rule that requires all resources in the selected OUs to associate the AWS WAF rule",
+            "letter": "C"
+          },
+          {
+            "text": "Deploy automated remediation actions by using AWS Lambda to fix noncompliant resources Deploy AWS WAF rules by using an AWS CloudFormation stack set to target the same OUs where the AWS Config rule is applied.",
+            "letter": "D"
+          },
+          {
+            "text": "Create AWS WAF rules in the management account of the organization Use AWS Lambda environment variables to store account numbers and OUs to manage Update environment variables as needed to add or remove accounts or OUs Create cross-account IAM roles in member accounts Assume the rotes by using AWS Security Token Service (AWS STS) in the Lambda function to create and update AWS WAF rules in the member accounts. F. Use AWS Control Tower to manage AWS WAF rules across accounts in the organization Use AWS Key Management Service (AWS KMS) to store account numbers and OUs to manage Update AWS KMS as needed to add or remove accounts or OUs Create IAM users in member accounts Allow AWS Control Tower in the management account to use the access key and secret access key to create and update AWS WAF rules in the member accounts",
+            "letter": "E"
+          }
+        ],
+        "topic": 1,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "A",
+        "explanation": "https://aws.amazon.com/solutions/implementations/automations-for-aws-firewall-manager/ In this solution, AWS Firewall Manager is used to manage AWS WAF rules across accounts in the organization. An AWS Systems Manager Parameter Store parameter is used to store account numbers and OUs to manage. This parameter can be updated as needed to add or remove accounts or OUs. An Amazon EventBridge rule is used to identify any changes to the parameter and to invoke an AWS Lambda function to update the security policy in the Firewall Manager administrative account. This solution allows for easy management of AWS WAF rules across multiple accounts with minimal operational overhead",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 5,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 2812
+      }
+    },
+    {
+      "question": {
+        "id": "sap-c02_6_q96",
+        "number": 96,
+        "text": "A retail company has structured its AWS accounts to be part of an organization in AWS Organizations. The company has set up consolidated billing and has\nmapped its departments to the following OUs: Finance. Sales. Human Resources <HR). Marketing, and Operations. Each OU has multiple AWS accounts, one for\neach environment within a department. These environments are development, test, pre-production, and production.\nThe HR department is releasing a new system thai will launch in 3 months. In preparation, the HR department has purchased several Reserved Instances (RIs) in\nits production AWS account. The HR department will install the new application on this account. The HR department wants to make sure that other departments\ncannot share the Rl discounts.\nWhich solution will meet these requirements?",
+        "options": [
+          {
+            "text": "In the AWS Billing and Cost Management console for the HR department's production account, turn off R1 sharing.",
+            "letter": "A"
+          },
+          {
+            "text": "Remove the HR department's production AWS account from the organizatio",
+            "letter": "B"
+          },
+          {
+            "text": "Add the account to the consolidating billing configuration only.",
+            "letter": "C"
+          },
+          {
+            "text": "In the AWS Billing and Cost Management console, use the organization's management account to turn off R1 sharing for the HR department's production AWS account.",
+            "letter": "D"
+          },
+          {
+            "text": "Create an SCP in the organization to restrict access to the RI F. Apply the SCP to the OUs of the other departments.",
+            "letter": "E"
+          }
+        ],
+        "topic": 1,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "C",
+        "explanation": "You can use the management account of the organization in AWS Billing and Cost Management console to turn off RI sharing for the HR department's production AWS account. This will prevent other departments from sharing the RI discounts and ensure that only the HR department can use the RIs purchased in their production account.",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 5,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 1937
+      }
+    },
+    {
+      "question": {
+        "id": "sap-c02_6_q100",
+        "number": 100,
+        "text": "A company runs a proprietary stateless ETL application on an Amazon EC2 Linux instance. The application is a Linux binary, and the source code cannot be\nmodified. The application is single-threaded, uses 2 GB of RAM. and is highly CPU intensive The application is scheduled to run every 4 hours and runs for up to\n20 minutes A solutions architect wants to revise the architecture for the solution.\nWhich strategy should the solutions architect use?",
+        "options": [
+          {
+            "text": "Use AWS Lambda to run the applicatio",
+            "letter": "A"
+          },
+          {
+            "text": "Use Amazon CloudWatch Logs to invoke the Lambda function every 4 hours.",
+            "letter": "B"
+          },
+          {
+            "text": "Use AWS Batch to run the applicatio",
+            "letter": "C"
+          },
+          {
+            "text": "Use an AWS Step Functions state machine to invoke the AWS Batch job every 4 hours.",
+            "letter": "D"
+          },
+          {
+            "text": "Use AWS Fargate to run the applicatio F. Use Amazon EventBridge (Amazon CloudWatch Events) to invoke the Fargate task every 4 hours. G. Use Amazon EC2 Spot Instances to run the applicatio H. Use AWS CodeDeploy to deploy and run the application every 4 hours.",
+            "letter": "E"
+          }
+        ],
+        "topic": 1,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "C",
+        "explanation": "step function could run a scheduled task when triggered by eventbrige, but why would you add that layer of complexity just to run aws batch when you could directly invoke it through eventbridge. The link provided - https://aws.amazon.com/pt/blogs/compute/orchestrating-high-performance-computing-with-aws-step- functions- makes sense only for HPC, this is a single instance that needs to be run",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 5,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 1368
+      }
+    },
+    {
+      "question": {
+        "id": "sap-c02_6_q103",
+        "number": 103,
+        "text": "A company has deployed an application on AWS Elastic Beanstalk. The application uses Amazon Aurora for the database layer. An Amazon CloudFront\ndistribution serves web requests and includes the Elastic Beanstalk domain name as the origin server. The distribution is configured with an alternate domain\nname that visitors use when they access the application.\nEach week, the company takes the application out of service for routine maintenance. During the time that the application is unavailable, the company wants\nvisitors to receive an informational message instead of a\nCloudFront error message.\nA solutions architect creates an Amazon S3 bucket as the first step in the process.\nWhich combination of steps should the solutions architect take next to meet the requirements? (Choose three.)",
+        "options": [
+          {
+            "text": "Upload static informational content to the S3 bucket.",
+            "letter": "A"
+          },
+          {
+            "text": "Create a new CloudFront distributio",
+            "letter": "B"
+          },
+          {
+            "text": "Set the S3 bucket as the origin.",
+            "letter": "C"
+          },
+          {
+            "text": "Set the S3 bucket as a second origin in the original CloudFront distributio",
+            "letter": "D"
+          },
+          {
+            "text": "Configure the distribution and the S3 bucket to use an origin access identity (OAI). F. During the weekly maintenance, edit the default cache behavior to use the S3 origi G. Revert the change when the maintenance is complete. H. During the weekly maintenance, create a cache behavior for the S3 origin on the new distributio I. Set the path pattern to \\ Set the precedence to 0. Delete the cache behavior when the maintenance is complete. J. During the weekly maintenance, configure Elastic Beanstalk to serve traffic from the S3 bucket.",
+            "letter": "E"
+          }
+        ],
+        "topic": 1,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "ACD",
+        "explanation": "The company wants to serve static content from an S3 bucket during the maintenance period. To do this, the following steps are required: Upload static informational content to the S3 bucket. This will provide the source of the content that will be served to the visitors. Set the S3 bucket as a second origin in the original CloudFront distribution. Configure the distribution and the S3 bucket to use an origin access identity (OAI). This will allow CloudFront to access the S3 bucket securely and prevent public access to the bucket. During the weekly maintenance, edit the default cache behavior to use the S3 origin. Revert the change when the maintenance is complete. This will redirect all web requests to the S3 bucket instead of the Elastic Beanstalk domain name. The other options are not correct because: Creating a new CloudFront distribution is not necessary and would require changing the alternate domain name configuration. Creating a cache behavior for the S3 origin on a new distribution would not work because the visitors would still access the original distribution using the alternate domain name. Configuring Elastic Beanstalk to serve traffic from the S3 bucket is not possible and would not achieve the desired result. References: https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/distribution-web-values-specify.",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 5,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 2924
+      }
+    },
+    {
+      "question": {
+        "id": "sap-c02_6_q104",
+        "number": 104,
+        "text": "A company's solutions architect is analyzing costs of a multi-application environment. The environment is deployed across multiple Availability Zones in a single\nAWS Region. After a recent acquisition, the company manages two organizations in AWS Organizations. The company has created multiple service provider\napplications as AWS PrivateLink-powered VPC endpoint services in one organization. The company has created multiple service consumer applications in the\nother organization.\nData transfer charges are much higher than the company expected, and the solutions architect needs to reduce the costs. The solutions architect must\nrecommend guidelines for developers to follow when they deploy services. These guidelines must minimize data transfer charges for the whole environment.\nWhich guidelines meet these requirements? (Select TWO.)\nPassing Certification Exams Made Easy visit - https://www.surepassexam.com\n\n\nRecommend!! Get the Full SAP-C02 dumps in VCE and PDF From SurePassExam\nhttps://www.surepassexam.com/SAP-C02-exam-dumps.html (300 New Questions)",
+        "options": [
+          {
+            "text": "Use AWS Resource Access Manager to share the subnets that host the service provider applications with other accounts in the organization.",
+            "letter": "A"
+          },
+          {
+            "text": "Place the service provider applications and the service consumer applications in AWS accounts in the same organization.",
+            "letter": "B"
+          },
+          {
+            "text": "Turn off cross-zone load balancing for the Network Load Balancer in all service provider application deployments.",
+            "letter": "C"
+          },
+          {
+            "text": "Ensure that service consumer compute resources use the Availability Zone-specific endpoint service by using the endpoint's local DNS name.",
+            "letter": "D"
+          },
+          {
+            "text": "Create a Savings Plan that provides adequate coverage for the organization's planned inter-Availability Zone data transfer usage.",
+            "letter": "E"
+          }
+        ],
+        "topic": 2,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "CD",
+        "explanation": "Cross-zone load balancing enables traffic to be distributed evenly across all registered instances in all enabled Availability Zones. However, this also increases data transfer charges between Availability Zones. By turning off cross-zone load balancing, the service provider applications can reduce inter-Availability Zone data transfer costs. Similarly, by using the Availability Zone-specific endpoint service, the service consumer applications can ensure that they connect to the nearest service provider application in the same Availability Zone, avoiding cross-Availability Zone data transfer charges. References: https://docs.aws.amazon.com/vpc/latest/userguide/vpce-interface.html#vpce-interface-dns",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 5,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 2467
+      }
+    },
+    {
+      "question": {
+        "id": "sap-c02_6_q109",
+        "number": 109,
+        "text": "A company provides auction services for artwork and has users across North America and Europe. The company hosts its application in Amazon EC2 instances in\nthe us-east-1 Region. Artists upload photos of their work as large-size, high-resolution image files from their mobile phones to a centralized Amazon S3 bucket\ncreated in the us-east-l Region. The users in Europe are reporting slow performance for their Image uploads.\nHow can a solutions architect improve the performance of the image upload process?",
+        "options": [
+          {
+            "text": "Redeploy the application to use S3 multipart uploads.",
+            "letter": "A"
+          },
+          {
+            "text": "Create an Amazon CloudFront distribution and point to the application as a custom origin",
+            "letter": "B"
+          },
+          {
+            "text": "Configure the buckets to use S3 Transfer Acceleration.",
+            "letter": "C"
+          },
+          {
+            "text": "Create an Auto Scaling group for the EC2 instances and create a scaling policy.",
+            "letter": "D"
+          }
+        ],
+        "topic": 2,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "C",
+        "explanation": "Transfer acceleration. S3 Transfer Acceleration utilizes the Amazon CloudFront global network of edge locations to accelerate the transfer of data to and from S3 buckets. By enabling S3 Transfer Acceleration on the centralized S3 bucket, the users in Europe will experience faster uploads as their data will be routed through the closest CloudFront edge location.",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 4,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 1184
+      }
+    },
+    {
+      "question": {
+        "id": "sap-c02_6_q113",
+        "number": 113,
+        "text": "A company processes environment data. The has a set up sensors to provide a continuous stream of data from different areas in a city. The data is available in\nJSON format.\nThe company wants to use an AWS solution to send the data to a database that does not require fixed schemas for storage. The data must be send in real time.\nWhich solution will meet these requirements?",
+        "options": [
+          {
+            "text": "Use Amazon Kinesis Data Firehouse to send the data to Amazon Redshift.",
+            "letter": "A"
+          },
+          {
+            "text": "Use Amazon Kinesis Data streams to send the data to Amazon DynamoDB.",
+            "letter": "B"
+          },
+          {
+            "text": "Use Amazon Managed Streaming for Apache Kafka (Amazon MSK) to send the data to Amazon Aurora.",
+            "letter": "C"
+          },
+          {
+            "text": "Use Amazon Kinesis Data firehouse to send the data to Amazon Keyspaces (for Apache Cassandra).",
+            "letter": "D"
+          }
+        ],
+        "topic": 2,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "B",
+        "explanation": "Amazon Kinesis Data Streams is a service that enables real-time data ingestion and processing. Amazon DynamoDB is a NoSQL database that does not require fixed schemas for storage. By using Kinesis Data Streams and DynamoDB, the company can send the JSON data to a database that can handle schemaless data in real time. References: https://docs.aws.amazon.com/streams/latest/dev/introduction.html https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Introduction.html",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 4,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 1216
+      }
+    },
+    {
+      "question": {
+        "id": "sap-c02_6_q117",
+        "number": 117,
+        "text": "A company wants to containerize a multi-tier web application and move the application from an on-premises data center to AWS. The application includes web.\napplication, and database tiers. The company needs to make the application fault tolerant and scalable. Some frequently accessed data must always be available\nacross application servers. Frontend web servers need session persistence and must scale to meet increases in traffic.\nWhich solution will meet these requirements with the LEAST ongoing operational overhead?",
+        "options": [
+          {
+            "text": "Run the application on Amazon Elastic Container Service (Amazon ECS) on AWS Fargat",
+            "letter": "A"
+          },
+          {
+            "text": "Use Amazon Elastic File System (Amazon EFS) for data that is frequently accessed between the web and application tier",
+            "letter": "B"
+          },
+          {
+            "text": "Store the frontend web server session data in Amazon Simple Queue Service (Amazon SOS).",
+            "letter": "C"
+          },
+          {
+            "text": "Run the application on Amazon Elastic Container Service (Amazon ECS) on Amazon EC2. Use Amazon ElastiCache for Redis to cache frontend web server session dat",
+            "letter": "D"
+          },
+          {
+            "text": "Use Amazon Elastic Block Store (Amazon EBS) with Multi-Attach on EC2 instances that are distributed across multiple Availability Zones. F. Run the application on Amazon Elastic Kubernetes Service (Amazon EKS). Configure Amazon EKS to use managed node group G. Use ReplicaSets to run the web servers and application H. Create an Amazon Elastic File System (Amazon EFS) Me syste I. Mount the EFS file system across all EKS pods to store frontend web server session data. J. Deploy the application on Amazon Elastic Kubernetes Service (Amazon EKS) Configure Amazon EKS to use managed node group K. Run the web servers and application as Kubernetes deployments in the EKS cluste L. Store the frontend web server session data in an Amazon DynamoDB tabl M. Create an Amazon Elastic File System (Amazon EFS) volume that all applications will mount at the time of deployment.",
+            "letter": "E"
+          }
+        ],
+        "topic": 2,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "D",
+        "explanation": "Deploying the application on Amazon EKS with managed node groups simplifies the operational overhead of managing the Kubernetes cluster. Running the web servers and application as Kubernetes deployments ensures that the desired number of pods are always running and can scale up or down as needed. Storing the frontend web server session data in an Amazon DynamoDB table provides a fast, scalable, and durable storage option that can be accessed across multiple Availability Zones. Creating an Amazon EFS volume that all applications will mount at the time of deployment allows the application to share data that is frequently accessed between the web and application tiers. References: https://docs.aws.amazon.com/eks/latest/userguide/managed-node-groups.html https://docs.aws.amazon.com/eks/latest/userguide/deployments.html https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Introduction.html https://docs.aws.amazon.com/efs/latest/ug/mounting-fs.html",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 5,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 3081
+      }
+    },
+    {
+      "question": {
+        "id": "sap-c02_6_q122",
+        "number": 122,
+        "text": "A company has a website that runs on Amazon EC2 instances behind an Application Load Balancer (ALB). The instances are in an Auto Scaling group. The ALB\nis associated with an AWS WAF web ACL.\nThe website often encounters attacks in the application layer. The attacks produce sudden and significant increases in traffic on the application server. The access\nlogs show that each attack originates from different IP addresses. A solutions architect needs to implement a solution to mitigate these attacks.\nWhich solution will meet these requirements with the LEAST operational overhead?",
+        "options": [
+          {
+            "text": "Create an Amazon CloudWatch alarm that monitors server acces",
+            "letter": "A"
+          },
+          {
+            "text": "Set a threshold based on access by IP addres",
+            "letter": "B"
+          },
+          {
+            "text": "Configure an alarm action that adds the IP address to the web ACL’s deny list.",
+            "letter": "C"
+          },
+          {
+            "text": "Deploy AWS Shield Advanced in addition to AWS WA",
+            "letter": "D"
+          },
+          {
+            "text": "Add the ALB as a protected resource. F. Create an Amazon CloudWatch alarm that monitors user IP addresse G. Set a threshold based on access by IP addres H. Configure the alarm to invoke an AWS Lambda function to add a deny rule in the application server’s subnet route table for any IP addresses that activate the alarm. I. Inspect access logs to find a pattern of IP addresses that launched the attack J. Use an Amazon Route 53 geolocation routing policy to deny traffic from the countries that host those IP addresses.",
+            "letter": "E"
+          }
+        ],
+        "topic": 2,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "C",
+        "explanation": "\"The AWS WAF API supports security automation such as blacklisting IP addresses that exceed request limits, which can be useful for mitigating HTTP flood attacks.\" > https://aws.amazon.com/blogs/security/how-to-protect-dynamic-web-applications-against-ddos-attacks-by-using",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 5,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 1650
+      }
+    },
+    {
+      "question": {
+        "id": "sap-c02_6_q123",
+        "number": 123,
+        "text": "A solutions architect wants to cost-optimize and appropriately size Amazon EC2 instances in a single AWS account. The solutions architect wants to ensure that\nthe instances are optimized based on CPU, memory, and network metrics.\nWhich combination of steps should the solutions architect take to meet these requirements? (Choose two.)",
+        "options": [
+          {
+            "text": "Purchase AWS Business Support or AWS Enterprise Support for the account.",
+            "letter": "A"
+          },
+          {
+            "text": "Turn on AWS Trusted Advisor and review any “Low Utilization Amazon EC2 Instances” recommendations.",
+            "letter": "B"
+          },
+          {
+            "text": "Install the Amazon CloudWatch agent and configure memory metric collection on the EC2 instances.",
+            "letter": "C"
+          },
+          {
+            "text": "Configure AWS Compute Optimizer in the AWS account to receive findings and optimization recommendations.",
+            "letter": "D"
+          },
+          {
+            "text": "Create an EC2 Instance Savings Plan for the AWS Regions, instance families, and operating systems of interest.",
+            "letter": "E"
+          }
+        ],
+        "topic": 2,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "BD",
+        "explanation": "AWS Trusted Advisor is a service that provides real-time guidance to help users provision their resources following AWS best practices1. One of the Trusted Advisor checks is “Low Utilization Amazon EC2 Instances”, which identifies EC2 instances that appear to be underutilized based on CPU, network I/O, and disk I/O metrics1. This check can help users optimize the cost and size of their EC2 instances by recommending smaller or more appropriate instance types. AWS Compute Optimizer is a service that analyzes the configuration and utilization metrics of AWS resources and generates optimization recommendations to reduce the cost and improve the performance of workloads2. Compute Optimizer supports four types of AWS resources: EC2 instances, EBS volumes, ECS services on AWS Fargate, and Lambda functions2. For EC2 instances, Compute Optimizer evaluates the vCPUs, memory, storage, and other specifications, as well as the CPU utilization, network in and out, disk read and write, and other utilization metrics of currently running instances3. It then recommends optimal instance types based on price-performance trade-offs. Option A is incorrect because purchasing AWS Business Support or AWS Enterprise Support for the account will not directly help with cost-optimization and sizing of EC2 instances. However, these support plans do provide access to more Trusted Advisor checks than the basic support plan1. Option C is incorrect because installing the Amazon CloudWatch agent and configuring memory metric collection on the EC2 instances will not provide any optimization recommendations by itself. However, memory metrics can be used by Compute Optimizer to enhance its recommendations if enabled3. Option E is incorrect because creating an EC2 Instance Savings Plan for the AWS Regions, instance families, and operating systems of interest will not help with cost-optimization and sizing of EC2 instances. Savings Plans are a flexible pricing model that offer lower prices on Amazon EC2 usage in exchange for a commitment to a consistent amount of usage for a 1- or 3-year term4. Savings Plans do not affect the configuration or utilization of EC2 instances.",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 5,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 3029
+      }
+    },
+    {
+      "question": {
+        "id": "sap-c02_6_q126",
+        "number": 126,
+        "text": "A company has many separate AWS accounts and uses no central billing or management. Each AWS account hosts services for different departments in the\ncompany. The company has a Microsoft Azure Active Directory that is deployed.\nA solution architect needs to centralize billing and management of the company’s AWS accounts. The company wants to start using identify federation instead of\nmanual user management. The company also wants to use temporary credentials instead of long-lived access keys.\nWhich combination of steps will meet these requirements? (Select THREE)",
+        "options": [
+          {
+            "text": "Create a new AWS account to serve as a management accoun Passing Certification Exams Made Easy visit - https://www.surepassexam.com Recommend!! Get the Full SAP-C02 dumps in VCE and PDF From SurePassExam https://www.surepassexam.com/SAP-C02-exam-dumps.html (300 New Questions)",
+            "letter": "A"
+          },
+          {
+            "text": "Deploy an organization in AWS Organization",
+            "letter": "B"
+          },
+          {
+            "text": "Invite each existing AWS account to join the organizatio",
+            "letter": "C"
+          },
+          {
+            "text": "Ensure that each account accepts the invitation.",
+            "letter": "D"
+          },
+          {
+            "text": "Configure each AWS Account’s email address to be aws+<account id>@example.com so that account management email messages and invoices are sent to the same place. F. Deploy AWS IAM Identity Center (AWS Single Sign-On) in the management accoun G. Connect IAM Identity Center to the Azure Active Director H. Configure IAM Identity Center for automatic synchronization of users and groups. I. Deploy an AWS Managed Microsoft AD directory in the management accoun J. Share the directory with all other accounts in the organization by using AWS Resource Access Manager (AWS RAM). K. Create AWS IAM Identity Center (AWS Single Sign-On) permission set L. Attach the permission sets to the appropriate IAM Identity Center groups and AWS accounts. M. Configure AWS Identity and Access Management (IAM) in each AWS account to use AWS Managed Microsoft AD for authentication and authorization.",
+            "letter": "E"
+          }
+        ],
+        "topic": 2,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "ACE",
+        "explanation": "",
+        "confidence": "medium"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 5,
+        "has_answer": true,
+        "has_explanation": false,
+        "content_length": 1919
+      }
+    },
+    {
+      "question": {
+        "id": "sap-c02_6_q131",
+        "number": 131,
+        "text": "A company has millions of objects in an Amazon S3 bucket. The objects are in the S3 Standard storage class. All the S3 objects are accessed frequently. The\nnumber of users and applications that access the objects is increasing rapidly. The objects are encrypted with server-side encryption with AWS KMS Keys (SSE-\nKMS).\nA solutions architect reviews the company's monthly AWS invoice and notices that AWS KMS costs are increasing because of the high number of requests from\nAmazon S3. The solutions architect needs to optimize costs with minimal changes to the application.\nWhich solution will meet these requirements with the LEAST operational overhead?",
+        "options": [
+          {
+            "text": "Create a new S3 bucket that has server-side encryption with customer-provided keys (SSE-C) as the encryption typ",
+            "letter": "A"
+          },
+          {
+            "text": "Copy the existing objects to the new S3 bucke",
+            "letter": "B"
+          },
+          {
+            "text": "Specify SSE-C.",
+            "letter": "C"
+          },
+          {
+            "text": "Create a new S3 bucket that has server-side encryption with Amazon S3 managed keys (SSE-S3) as the encryption typ",
+            "letter": "D"
+          },
+          {
+            "text": "Use S3 Batch Operations to copy the existing objects to the new S3 bucke F. Specify SSE-S3. G. Use AWS CloudHSM to store the encryption key H. Create a new S3 bucke I. Use S3 Batch Operations to copy the existing objects to the new S3 bucke J. Encrypt the objects by using the keys from CloudHSM. K. Use the S3 Intelligent-Tiering storage class for the S3 bucke L. Create an S3 Intelligent-Tiering archive configuration to transition objects that are not accessed for 90 days to S3 Glacier Deep Archive.",
+            "letter": "E"
+          }
+        ],
+        "topic": 2,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "B",
+        "explanation": "To reduce the volume of Amazon S3 calls to AWS KMS, use Amazon S3 bucket keys, which are protected encryption keys that are reused for a limited time in Amazon S3. Bucket keys can reduce costs for AWS KMS requests by up to 99%. You can configure a bucket key for all objects in an Amazon S3 bucket, or for a specific object in an Amazon S3 bucket. https://docs.aws.amazon.com/fr_fr/kms/latest/developerguide/services-s3.html",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 5,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 1909
+      }
+    },
+    {
+      "question": {
+        "id": "sap-c02_6_q134",
+        "number": 134,
+        "text": "A company is building a hybrid environment that includes servers in an on-premises data center and in the AWS Cloud. The company has deployed Amazon EC2\ninstances in three VPCs. Each VPC is in a different AWS Region. The company has established an AWS Direct Connect connection to the data center from the\nRegion that is closest to the data center.\nThe company needs the servers in the on-premises data center to have access to the EC2 instances in all three VPCs. The servers in the on-premises data center\nalso must have access to AWS public services.\nWhich combination of steps will meet these requirements with the LEAST cost? (Select TWO.)",
+        "options": [
+          {
+            "text": "Create a Direct Connect gateway in the Region that is closest to the data cente",
+            "letter": "A"
+          },
+          {
+            "text": "Attach the Direct Connect connection to the Direct Connect gatewa",
+            "letter": "B"
+          },
+          {
+            "text": "Use the",
+            "letter": "C"
+          },
+          {
+            "text": "Direct Connect gateway to connect the VPCs in the other two Regions.",
+            "letter": "D"
+          },
+          {
+            "text": "Set up additional Direct Connect connections from the on-premises data center to the other two Regions. F. Create a private VI G. Establish an AWS Site-to-Site VPN connection over the private VIF to the VPCs in the other two Regions. H. Create a public VI I. Establish an AWS Site-to-Site VPN connection over the public VIF to the VPCs in the other two Regions. J. Use VPC peering to establish a connection between the VPCs across the Region K. Create a private VIF with the existing Direct Connect connection to connect to the peered VPCs.",
+            "letter": "E"
+          }
+        ],
+        "topic": 2,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "AE",
+        "explanation": "A Direct Connect gateway allows you to connect multiple VPCs across different Regions to a Direct Connect connection1. A public VIF allows you to access AWS public services such as EC21. A Site-to-Site VPN connection over the public VIF provides encryption and redundancy for the traffic between the on-premises data center and the VPCs2. This solution is cheaper than setting up additional Direct Connect connections or using a private VIF with VPC peering.",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 5,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 1906
+      }
+    },
+    {
+      "question": {
+        "id": "sap-c02_6_q139",
+        "number": 139,
+        "text": "A company plans to migrate a three-tiered web application from an on-premises data center to AWS The company developed the Ui by using server-side\nJavaScript libraries The business logic and API tier uses a Python-based web framework The data tier runs on a MySQL database\nThe company custom built the application to meet business requirements The company does not want to\nre-architect the application The company needs a solution to replatform the application to AWS with the least possible amount of development The solution needs\nto be highly available and must reduce operational overhead\nPassing Certification Exams Made Easy visit - https://www.surepassexam.com\n\n\nRecommend!! Get the Full SAP-C02 dumps in VCE and PDF From SurePassExam\nhttps://www.surepassexam.com/SAP-C02-exam-dumps.html (300 New Questions)\nWhich solution will meet these requirements?",
+        "options": [
+          {
+            "text": "Deploy the UI to a static website on Amazon S3 Use Amazon CloudFront to deliver the website Build the business logic in a Docker image Store the image in AmazonElastic Container Registry (Amazon ECR) Use Amazon Elastic Container Service (Amazon ECS) with the Fargate launch type to host the website with an Application Load Balancer in front Deploy the datalayer to an Amazon Aurora MySQL DB cluster",
+            "letter": "A"
+          },
+          {
+            "text": "Build the UI and business logic in Docker images Store the images in Amazon Elastic Container Registry (Amazon ECR) Use Amazon Elastic Container Service (Amazon ECS) with the Fargate launch type to host the UI and business logic applications with an Application Load Balancer in front Migrate the database to an Amazon RDS for MySQL Multi-AZ DB instance",
+            "letter": "B"
+          },
+          {
+            "text": "Deploy the UI to a static website on Amazon S3 Use Amazon CloudFront to deliver the website Convert the business logic to AWS Lambda functions Integrate the functions with Amazon API Gateway Deploy the data layer to an Amazon Aurora MySQL DB cluster",
+            "letter": "C"
+          },
+          {
+            "text": "Build the UI and business logic in Docker images Store the images in Amazon Elastic Container Registry (Amazon ECR) Use Amazon Elastic Kubernetes Service(Amazon EKS) with Fargate profiles to host the UI and business logic Use AWS Database Migration Service (AWS DMS) to migrate the data layer to Amazon DynamoDB",
+            "letter": "D"
+          }
+        ],
+        "topic": 2,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "A",
+        "explanation": "This solution utilizes Amazon S3 and CloudFront to deploy the UI as a static website, which can be done with minimal development effort. The business logic and API tier can be containerized in a Docker image and stored in Amazon Elastic Container Registry (ECR) and run on Amazon Elastic Container Service (ECS) with the Fargate launch type, which allows the application to be highly available with minimal operational overhead. The data layer can be deployed on an Amazon Aurora MySQL DB cluster which is a fully managed relational database service. Amazon Aurora provides high availability and performance for the data layer without the need for managing the underlying infrastructure.",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 4,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 2913
+      }
+    },
+    {
+      "question": {
+        "id": "sap-c02_6_q143",
+        "number": 143,
+        "text": "A company is migrating its development and production workloads to a new organization in AWS Organizations. The company has created a separate member\naccount for development and a separate member account for production. Consolidated billing is linked to the management account. In the management account, a\nsolutions architect needs to create an 1AM user that can stop or terminate resources in both member accounts.\nWhich solution will meet this requirement?",
+        "options": [
+          {
+            "text": "Create an IAM user and a cross-account role in the management accoun",
+            "letter": "A"
+          },
+          {
+            "text": "Configure the cross-account role with least privilege access to the member accounts.",
+            "letter": "B"
+          },
+          {
+            "text": "Create an IAM user in each member accoun",
+            "letter": "C"
+          },
+          {
+            "text": "In the management account, create a cross-account role that has least privilege acces",
+            "letter": "D"
+          },
+          {
+            "text": "Grant the IAM users access to the cross-account role by using a trust policy. F. Create an IAM user in the management accoun G. In the member accounts, create an IAM group that has least privilege acces H. Add the IAM user from the management account to each IAM group in the member accounts. I. Create an IAM user in the management accoun J. In the member accounts, create cross-account roles that have least privilege acces K. Grant the IAM user access to the roles by using a trust policy.",
+            "letter": "E"
+          }
+        ],
+        "topic": 2,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "D",
+        "explanation": "Cross account role should be created in destination(member) account. The role has trust entity to master account.",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 5,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 1385
+      }
+    },
+    {
+      "question": {
+        "id": "sap-c02_6_q148",
+        "number": 148,
+        "text": "A company runs an application on AWS. The company curates data from several different sources. The company uses proprietary algorithms to perform data\ntransformations and aggregations. After the company performs E TL processes, the company stores the results in Amazon Redshift tables. The company sells this\ndata to other companies. The company downloads the data as files from the Amazon Redshift tables and transmits the files to several data customers by using\nFTP. The number of data customers has grown significantly. Management of the data customers has become difficult.\nThe company will use AWS Data Exchange to create a data product that the company can use to share data with customers. The company wants to confirm the\nidentities of the customers before the company shares data.\nThe customers also need access to the most recent data when the company publishes the data. Which solution will meet these requirements with the LEAST\noperational overhead?",
+        "options": [
+          {
+            "text": "Use AWS Data Exchange for APIs to share data with customer",
+            "letter": "A"
+          },
+          {
+            "text": "Configure subscription verification In the AWS account of the company that produces the data, create an Amazon API Gateway Data API service integration with Amazon Redshif",
+            "letter": "B"
+          },
+          {
+            "text": "Require the data customers to subscribe to the data product In the AWS account of the company that produces the data, create an AWS Data Exchange datashare by connecting AWS Data Exchange to the Redshift",
+            "letter": "C"
+          },
+          {
+            "text": "cluste",
+            "letter": "D"
+          },
+          {
+            "text": "Configure subscription verificatio F. Require the data customers to subscribe to the data product. G. Download the data from the Amazon Redshift tables to an Amazon S3 bucket periodicall H. Use AWS Data Exchange for S3 to share data with customers. I. Configure subscription verificatio J. Require the data customers to subscribe to the data product Publish the Amazon Redshift data to an Open Data on AWS Data Exchang K. Require the customers to subscribe to the data product in AWS Data Exchang L. In the AWS account of the company that produces the data, attach IAM resource-based policies to the Amazon Redshift tables to allow access only to verified AWS accounts.",
+            "letter": "E"
+          }
+        ],
+        "topic": 2,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "C",
+        "explanation": "The company should download the data from the Amazon Redshift tables to an Amazon S3 bucket periodically and use AWS Data Exchange for S3 to share data with customers. The company should configure subscription verification and require the data customers to subscribe to the data product. This solution will meet the requirements with the least operational overhead because AWS Data Exchange for S3 is a feature that enables data subscribers to access third-party data files directly from data providers’ Amazon S3 buckets. Subscribers can easily use these files for their data analysis with AWS services without needing to create or Passing Certification Exams Made Easy visit - https://www.surepassexam.com Recommend!! Get the Full SAP-C02 dumps in VCE and PDF From SurePassExam https://www.surepassexam.com/SAP-C02-exam-dumps.html (300",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 5,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 5535
+      }
+    },
+    {
+      "question": {
+        "id": "sap-c02_6_q150",
+        "number": 150,
+        "text": "A company has a critical application in which the data tier is deployed in a single AWS Region. The data tier uses an Amazon DynamoDB table and an Amazon\nAurora MySQL DB cluster. The current Aurora MySQL engine version supports a global database. The application tier is already deployed in two Regions.\nCompany policy states that critical applications must have application tier components and data tier components deployed across two Regions. The RTO and RPO\nmust be no more than a few minutes each. A solutions architect must recommend a solution to make the data tier compliant with company policy.\nWhich combination of steps will meet these requirements? (Choose two.)",
+        "options": [
+          {
+            "text": "Add another Region to the Aurora MySQL DB cluster",
+            "letter": "A"
+          },
+          {
+            "text": "Add another Region to each table in the Aurora MySQL DB cluster",
+            "letter": "B"
+          },
+          {
+            "text": "Set up scheduled cross-Region backups for the DynamoDB table and the Aurora MySQL DB cluster",
+            "letter": "C"
+          },
+          {
+            "text": "Convert the existing DynamoDB table to a global table by adding another Region to its configuration",
+            "letter": "D"
+          },
+          {
+            "text": "Use Amazon Route 53 Application Recovery Controller to automate database backup and recovery to the secondary Region",
+            "letter": "E"
+          }
+        ],
+        "topic": 2,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "AD",
+        "explanation": "The company should use Amazon Aurora global database and Amazon DynamoDB global table to deploy the data tier components across two Regions. Amazon Aurora global database is a feature that allows a single Aurora database to span multiple AWS Regions, enabling low-latency global reads and fast recovery from Region-wide outages1. Amazon DynamoDB global table is a feature that allows a single DynamoDB table to span multiple AWS Regions, enabling low-latency global reads and writes and fast recovery from Region-wide outages2. References: https://aws.amazon.com/rds/aurora/global-database/ https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/globaltables_HowItWorks.html https://aws.amazon.com/route53/application-recovery-controller/",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 5,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 1885
+      }
+    },
+    {
+      "question": {
+        "id": "sap-c02_6_q152",
+        "number": 152,
+        "text": "A company is running a containerized application in the AWS Cloud. The application is running by using Amazon Elastic Container Service (Amazon ECS) on a set\nof Amazon EC2 instances. The EC2 instances run in an Auto Scaling group.\nThe company uses Amazon Elastic Container Registry (Amazon ECR) to store its container images. When a new image version is uploaded, the new image\nversion receives a unique tag.\nThe company needs a solution that inspects new image versions for common vulnerabilities and exposures. The solution must automatically delete new image\ntags that have Critical or High severity findings. The solution also must notify the development team when such a deletion occurs.\nWhich solution meets these requirements?",
+        "options": [
+          {
+            "text": "Configure scan on push on the repository Use Amazon EventBridge to invoke an AWS Step Functions state machine when a scan is complete for images that have Critical or High severity finding",
+            "letter": "A"
+          },
+          {
+            "text": "Use the Step Functions state machine to delete the image tag for those images and to notify the development team through Amazon Simple Notification Service (Amazon SNS).",
+            "letter": "B"
+          },
+          {
+            "text": "Configure scan on push on the repository Configure scan results to be pushed to an Amazon Simple Queue Service (Amazon SQS) queu",
+            "letter": "C"
+          },
+          {
+            "text": "Invoke an AWS Lambda function when a new message is added to the SQS queu",
+            "letter": "D"
+          },
+          {
+            "text": "Use the Lambda function to delete the image tag for images that have Critical or High seventy finding F. Notify the development team by using Amazon Simple Email Service (Amazon SES). G. Schedule an AWS Lambda function to start a manual image scan every hou H. Configure Amazon EventBridge to invoke another Lambda function when a scan is complet I. Use the second Lambda function to delete the image tag for images that have Critical or High severity finding J. Notify the development team by using Amazon Simple Notification Service (Amazon SNS). K. Configure periodic image scan on the repositor L. Configure scan results to be added lo an Amazon Simple Queue Service (Amazon SQS) queu M. Invoke an AWS Step Functions state machine when a new message is added to the SQS queu Passing Certification Exams Made Easy visit - https://www.surepassexam.com Recommend!! Get the Full SAP-C02 dumps in VCE and PDF From SurePassExam https://www.surepassexam.com/SAP-C02-exam-dumps.html (300 New Questions) N. Use the Step Functions state machine to delete the image tag for images that have Critical or High severity finding O. Notify the development team by using Amazon Simple Email Service (Amazon SES).",
+            "letter": "E"
+          }
+        ],
+        "topic": 2,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "A",
+        "explanation": "https://docs.aws.amazon.com/AmazonECR/latest/userguide/ecr-eventbridge.html \"Activating an AWS Step Functions state machine\" https://docs.aws.amazon.com/step-functions/latest/dg/tutorial-creating-lambda-state-machine.html",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 5,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 2772
+      }
+    },
+    {
+      "question": {
+        "id": "sap-c02_6_q157",
+        "number": 157,
+        "text": "A company has an on-premises Microsoft SOL Server database that writes a nightly 200 GB export to a local drive. The company wants to move the backups to\nmore robust cloud storage on Amazon S3. The company has set up a 10 Gbps AWS Direct Connect connection between the on-premises data center and AWS.\nWhich solution meets these requirements MOST cost-effectively?",
+        "options": [
+          {
+            "text": "Create a new S3 bucke",
+            "letter": "A"
+          },
+          {
+            "text": "Deploy an AWS Storage Gateway file gateway within the VPC that Is connected to the Direct Connect connectio",
+            "letter": "B"
+          },
+          {
+            "text": "Create a new SMB file shar",
+            "letter": "C"
+          },
+          {
+            "text": "Write nightly database exports to the new SMB file share.",
+            "letter": "D"
+          },
+          {
+            "text": "Create an Amazon FSx for Windows File Server Single-AZ file system within the VPC that is connected to the Direct Connect connectio F. Create a new SMB file shar G. Write nightly database exports to an SMB file share on the Amazon FSx file syste H. Enable nightly backups. I. Create an Amazon FSx for Windows File Server Multi-AZ file system within the VPC that is connected to the Direct Connect connectio J. Create a new SMB file shar K. Write nightly database exports to an SMB file share on the Amazon FSx file syste L. Enable nightly backups. M. Create a new S3 bucke N. Deploy an AWS Storage Gateway volume gateway within the VPC that Is connected to the Direct Connect connectio O. Create a new SMB file shar P. Write nightly database exports to the new SMB file share on the volume gateway, and automate copies of this data to an S3 bucket.",
+            "letter": "E"
+          }
+        ],
+        "topic": 2,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "A",
+        "explanation": "https://docs.aws.amazon.com/filegateway/latest/files3/CreatingAnSMBFileShare.html",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 5,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 1548
+      }
+    }
+  ]
+}

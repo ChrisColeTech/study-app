@@ -1,0 +1,3892 @@
+{
+  "metadata": {
+    "creation_date": "2025-08-11T20:20:31.557380",
+    "version": "2.1_fixed",
+    "description": "AWS Certification Study Dataset - clf-c02_2 (Fixed Extraction)",
+    "total_questions": 93,
+    "answered_questions": 93,
+    "coverage_percentage": 100.0,
+    "source_pdf": "clf-c02_2.pdf",
+    "extraction_method": "v2_fixed_parser",
+    "processing_stats": {
+      "questions_loaded": 93,
+      "questions_with_answers": 93,
+      "questions_with_explanations": 93
+    }
+  },
+  "study_data": [
+    {
+      "question": {
+        "id": "clf-c02_2_q1",
+        "number": 1,
+        "text": "A company plans to migrate to the AWS Cloud. The company is gathering information about its on-premises infrastructure and requires information such as the\nhostname, IP address, and MAC address.\nWhich AWS service will meet these requirements?",
+        "options": [
+          {
+            "text": "AWS DataSync",
+            "letter": "A"
+          },
+          {
+            "text": "AWS Application Migration Service",
+            "letter": "B"
+          },
+          {
+            "text": "AWS Application Discovery Service",
+            "letter": "C"
+          },
+          {
+            "text": "AWS Database Migration Service (AWS DMS)",
+            "letter": "D"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "C",
+        "explanation": "AWS Application Discovery Service is a service that helps you plan your migration to the AWS Cloud by collecting usage and configuration data about your on- premises servers and databases. This data includes information such as the hostname, IP address, and MAC address of each server, as well as the performance metrics, network connections, and processes running on them. You can use AWS Application Discovery Service to discover your on-premises inventory, map the dependencies between servers and applications, and estimate the cost and effort of migrating to AWS. You can also export the data to other AWS services, such as AWS Migration Hub and AWS Database Migration Service, to support your migration tasks. AWS Application Discovery Service offers two ways of performing discovery: agentless discovery and agent-based discovery. Agentless discovery uses a virtual appliance that you deploy on your VMware vCenter to collect data from your virtual machines and hosts. Agent-based discovery uses an agent that you install on each of your physical or virtual servers to collect data. You can choose the method that best suits your environment and needs. AWS DataSync is a service that helps you transfer data between your on-premises storage and AWS storage services, such as Amazon S3, Amazon EFS, and Amazon FSx for Windows File Server. AWS DataSync does not collect information about your on- premises infrastructure, but rather focuses on optimizing the data transfer speed, security, and reliability. AWS Application Migration Service is a service that helps you migrate your applications from your on-premises or cloud environment to AWS without making any changes to the applications, their architecture, or the migrated servers. AWS Application Migration Service does not collect information about your on- premises infrastructure, but rather uses a lightweight agent to replicate your servers as Amazon Machine Images (AMIs) and launch them as EC2 instances on AWS. AWS Database Migration Service is a service that helps you migrate your databases from your on-premises or cloud environment to AWS, either as a one-time migration or as a continuous replication. AWS Database Migration Service does not collect information about your on-premises infrastructure, but rather uses a source and a target endpoint to connect to your databases and transfer the data. References: AWS Application Discovery Service, AWS DataSync, AWS Application Migration Service, [AWS Database Migration Service]",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 4,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 2903
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q2",
+        "number": 2,
+        "text": "A developer has been hired by a large company and needs AWS credentials. Which are security best practices that should be followed? (Select TWO.)",
+        "options": [
+          {
+            "text": "Grant the developer access to only the AWS resources needed to perform the job.",
+            "letter": "A"
+          },
+          {
+            "text": "Share the AWS account root user credentials with the developer.",
+            "letter": "B"
+          },
+          {
+            "text": "Add the developer to the administrator's group in AWS IAM.",
+            "letter": "C"
+          },
+          {
+            "text": "Configure a password policy that ensures the developer's password cannot be changed.",
+            "letter": "D"
+          },
+          {
+            "text": "Ensure the account password policy requires a minimum length.",
+            "letter": "E"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "AE",
+        "explanation": "The security best practices that should be followed are A and E. * A. Grant the developer access to only the AWS resources needed to perform the job. This is an example of the principle of least privilege, which means giving the minimum permissions necessary to achieve a task. This reduces the risk of unauthorized access, data leakage, or accidental damage to AWS resources. You can use AWS Identity and Access Management (IAM) to create users, groups, roles, and policies that grant fine- grained access to AWS resources12. * E. Ensure the account password policy requires a minimum length. This is a basic security measure that helps prevent brute-force attacks or guessing of passwords. A longer password is harder to crack than a shorter one. You can use IAM to configure a password policy that enforces a minimum password length, as well as other requirements such as complexity, expiration, and history34. * B. Share the AWS account root user credentials with the developer. This is a bad practice that should be avoided. The root user has full access to all AWS resources and services, and can perform sensitive actions such as changing billing information, closing the account, or deleting all resources. Sharing the root user credentials exposes your account to potential compromise or misuse. You should never share your root user credentials with anyone, and use them only for account administration tasks5 . * C. Add the developer to the administrator’s group in IAM. This is also a bad practice that should be avoided. The administrator’s group has full access to all AWS resources and services, which is more than what a developer needs to perform their job. Adding the developer to the administrator’s group violates the principle of least privilege and increases the risk of unauthorized access, data leakage, or accidental damage to AWS resources. You should create a custom group for the developer that grants only the necessary permissions for their role12. * D. Configure a password policy that ensures the developer’s password cannot be changed. This is another bad practice that should be avoided. Preventing the developer from changing their password reduces their ability to protect their credentials and comply with security policies. For example, if the developer’s password is compromised, they cannot change it to prevent further unauthorized access. Or if the company requires periodic password rotation, they cannot update their password to meet this requirement. You should allow the developer to change their password as needed, and enforce a password policy that sets reasonable rules for password management34.",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 5,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 3181
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q3",
+        "number": 3,
+        "text": "A company wants to make an upfront commitment for continued use of its production Amazon EC2 instances in exchange for a reduced overall cost.\nWhich pricing options meet these requirements with the LOWEST cost? (Select TWO.)",
+        "options": [
+          {
+            "text": "Spot Instances",
+            "letter": "A"
+          },
+          {
+            "text": "On-Demand Instances",
+            "letter": "B"
+          },
+          {
+            "text": "Reserved Instances",
+            "letter": "C"
+          },
+          {
+            "text": "Savings Plans",
+            "letter": "D"
+          },
+          {
+            "text": "Dedicated Hosts",
+            "letter": "E"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "CD",
+        "explanation": "Passing Certification Exams Made Easy visit - https://www.surepassexam.com Recommend!! Get the Full CLF-C02 dumps in VCE and PDF From SurePassExam https://www.surepassexam.com/CLF-C02-exam-dumps.html (120",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 5,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 3139
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q4",
+        "number": 4,
+        "text": "Which AWS service is a cloud security posture management (CSPM) service that aggregates alerts from various AWS services and partner products in a\nstandardized format?",
+        "options": [
+          {
+            "text": "AWS Security Hub",
+            "letter": "A"
+          },
+          {
+            "text": "AWS Trusted Advisor",
+            "letter": "B"
+          },
+          {
+            "text": "Amazon EventBndge",
+            "letter": "C"
+          },
+          {
+            "text": "Amazon GuardDuty",
+            "letter": "D"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "A",
+        "explanation": "AWS Security Hub is a cloud security posture management (CSPM) service that performs security best practice checks, aggregates alerts, and enables automated remediation. Security Hub collects findings from the security services enabled across your AWS accounts, such as intrusion detection findings from Amazon GuardDuty, vulnerability scans from Amazon Inspector, and sensitive data identification findings from Amazon Macie. Security Hub also collects findings from partner security products using a standardized AWS Security Finding Format, eliminating the need for time-consuming data parsing and normalization efforts. Customers can designate an administrator account that can access all findings across their accounts. References: AWS Security Hub Overview, AWS Security Hub FAQs",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 4,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 1060
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q5",
+        "number": 5,
+        "text": "What is the LEAST expensive AWS Support plan that provides the full set of AWS Trusted Advisor best practice checks for cost optimization?",
+        "options": [
+          {
+            "text": "AWS Enterprise Support",
+            "letter": "A"
+          },
+          {
+            "text": "AWS Business Support",
+            "letter": "B"
+          },
+          {
+            "text": "AWS Developer Support",
+            "letter": "C"
+          },
+          {
+            "text": "AWS Basic Support",
+            "letter": "D"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "B",
+        "explanation": "AWS Business Support is the least expensive AWS Support plan that provides the full set of AWS Trusted Advisor best practice checks for cost optimization. AWS Trusted Advisor is a service that provides best practices and recommendations for cost optimization, performance, security, and fault tolerance. AWS Business Support also provides other benefits, such as 24/7 technical support, unlimited cases, and faster response times. AWS Enterprise Support is the most expensive AWS Support plan that provides the same benefits as AWS Business Support, plus additional benefits, such as a technical account manager and enterprise concierge support. AWS Developer Support and AWS Basic Support are cheaper AWS Support plans that provide only a limited set of AWS Trusted Advisor best practice checks for cost optimization .",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 4,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 1077
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q6",
+        "number": 6,
+        "text": "A company is migrating its applications from on-premises to the AWS Cloud. The company wants to ensure that the applications are assigned only the minimum\npermissions that are needed to perform all operations.\nWhich AWS service will meet these requirements'?",
+        "options": [
+          {
+            "text": "AWS Identity and Access Management (IAM)",
+            "letter": "A"
+          },
+          {
+            "text": "Amazon CloudWatch",
+            "letter": "B"
+          },
+          {
+            "text": "Amazon Macie",
+            "letter": "C"
+          },
+          {
+            "text": "Amazon GuardDuty",
+            "letter": "D"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "A",
+        "explanation": "AWS Identity and Access Management (IAM) is a service that helps you securely control access to AWS resources for your users. You use IAM to control who can use your AWS resources (authentication) and what resources they can use and in what ways (authorization). IAM also enables you to follow the principle of least privilege, which means granting only the permissions that are necessary to perform a task1. References: AWS Identity and Access Management (IAM) - AWS Documentation",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 4,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 864
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q7",
+        "number": 7,
+        "text": "Passing Certification Exams Made Easy visit - https://www.surepassexam.com\n\n\nRecommend!! Get the Full CLF-C02 dumps in VCE and PDF From SurePassExam\nhttps://www.surepassexam.com/CLF-C02-exam-dumps.html (120 New Questions)\n- (Topic 3)\nA company encourages its teams to test failure scenarios regularly and to validate their understanding of the impact of potential failures.\nWhich pillar of the AWS Well-Architected Framework does this philosophy represent?",
+        "options": [
+          {
+            "text": "Operational excellence",
+            "letter": "A"
+          },
+          {
+            "text": "Cost optimization",
+            "letter": "B"
+          },
+          {
+            "text": "Performance efficiency",
+            "letter": "C"
+          },
+          {
+            "text": "Security",
+            "letter": "D"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "A",
+        "explanation": "This is the pillar of the AWS Well-Architected Framework that represents the philosophy of testing failure scenarios regularly and validating the understanding of the impact of potential failures. The operational excellence pillar covers the best practices for designing, running, monitoring, and improving systems in the AWS Cloud. Testing failure scenarios is one of the ways to improve the system’s resilience, reliability, and recovery. You can learn more about the operational excellence pillar from this whitepaper or this digital course.",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 4,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 1123
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q8",
+        "number": 8,
+        "text": "A company that has multiple business units wants to centrally manage and govern its AWS Cloud environments. The company wants to automate the creation of\nAWS accounts, apply service control policies (SCPs), and simplify billing processes.\nWhich AWS service or tool should the company use to meet these requirements?",
+        "options": [
+          {
+            "text": "AWS Organizations",
+            "letter": "A"
+          },
+          {
+            "text": "Cost Explorer",
+            "letter": "B"
+          },
+          {
+            "text": "AWS Budgets",
+            "letter": "C"
+          },
+          {
+            "text": "AWS Trusted Advisor",
+            "letter": "D"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "A",
+        "explanation": "AWS Organizations is an AWS service that enables you to centrally manage and govern your AWS Cloud environments across multiple business units. AWS Organizations allows you to create an organization that consists of AWS accounts that you create or invite to join. You can group your accounts into organizational units (OUs) and apply service control policies (SCPs) to them. SCPs are a type of policy that specify the maximum permissions for the accounts in your organization, and can help you enforce compliance and security requirements. AWS Organizations also simplifies billing processes by enabling you to consolidate and pay for all member accounts with a single payment method. You can also use AWS Organizations to automate the creation of AWS accounts by using APIs or AWS CloudFormation templates. References: What is AWS Organizations?, Policy-Based Management - AWS Organizations",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 4,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 1306
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q9",
+        "number": 9,
+        "text": "An ecommerce company has migrated its IT infrastructure from an on-premises data center to the AWS Cloud. Which cost is the company's direct responsibility?",
+        "options": [
+          {
+            "text": "Cost of application software licenses",
+            "letter": "A"
+          },
+          {
+            "text": "Cost of the hardware infrastructure on AWS",
+            "letter": "B"
+          },
+          {
+            "text": "Cost of power for the AWS servers",
+            "letter": "C"
+          },
+          {
+            "text": "Cost of physical security for the AWS data center",
+            "letter": "D"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "A",
+        "explanation": "The cost of application software licenses is the company’s direct responsibility when it migrates its IT infrastructure from an on-premises data center to the AWS Cloud. Application software licenses are the agreements that grant users the right to use specific software products, such as operating systems, databases, or applications. Depending on the type and terms of the license, users may need to pay a fee to the software vendor or provider to use the software legally and access its features and updates. When users migrate their IT infrastructure to the AWS Cloud, they can choose to buy new licenses from AWS, bring their own licenses (BYOL), or use a combination of both. However, regardless of the option they choose, they are still responsible for complying with the license terms and paying the license fees to the software vendor or provider. AWS does not charge users for the application software licenses they bring or buy, but only for the AWS resources they use to run their applications. Therefore, the cost of application software licenses is the only cost among the options that is the company’s direct responsibility. The other costs are either included in the AWS service fees or covered by AWS. References: AWS License Manager Pricing, Software licensing: The blind spot in public cloud costs, Cost Optimization tips for SQL Server Licenses on AWS, Microsoft Licensing on AWS",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 4,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 1756
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q10",
+        "number": 10,
+        "text": "What is a benefit of using AWS serverless computing?",
+        "options": [
+          {
+            "text": "Application deployment and management are not required",
+            "letter": "A"
+          },
+          {
+            "text": "Application security will be fully managed by AWS",
+            "letter": "B"
+          },
+          {
+            "text": "Monitoring and logging are not needed",
+            "letter": "C"
+          },
+          {
+            "text": "Management of infrastructure is offloaded to AWS",
+            "letter": "D"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "D",
+        "explanation": "AWS serverless computing is a way of building and running applications without thinking about servers. AWS manages the infrastructure for you, so you don’t have to provision, scale, patch, or monitor servers. You only pay for the compute time you consume, and you can focus on your application logic instead of managing servers12. References: Serverless Computing – Amazon Web Services, AWS Serverless Computing, Benefits, Architecture and Use-cases - XenonStack",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 4,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 742
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q10",
+        "number": 10,
+        "text": "Passing Certification Exams Made Easy visit - https://www.surepassexam.com\n\n\nRecommend!! Get the Full CLF-C02 dumps in VCE and PDF From SurePassExam\nhttps://www.surepassexam.com/CLF-C02-exam-dumps.html (120 New Questions)\n- (Topic 3)\nA company is running its application in the AWS Cloud and wants to protect against a DDoS attack. The company's security team wants near real-time visibility\ninto DDoS attacks.\nWhich AWS service or traffic filter will meet these requirements with the MOST features for DDoS protection?",
+        "options": [
+          {
+            "text": "AWS Shield Advanced",
+            "letter": "A"
+          },
+          {
+            "text": "AWS Shield",
+            "letter": "B"
+          },
+          {
+            "text": "Amazon GuardDuty",
+            "letter": "C"
+          },
+          {
+            "text": "Network ACLs",
+            "letter": "D"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "A",
+        "explanation": "AWS Shield Advanced is a managed Distributed Denial of Service (DDoS) protection service that safeguards applications running on AWS. AWS Shield Advanced provides you with 24x7 access to the AWS DDoS Response Team (DRT) and protection against DDoS attacks of any size or duration. AWS Shield Advanced also provides near real-time visibility into attacks, advanced attack mitigation capabilities, and integration with AWS WAF and AWS Firewall Manager1. AWS Shield is a standard service that provides always-on detection and automatic inline mitigations to minimize application downtime and latency, but it does not offer the same level of features and support as AWS Shield Advanced2. Amazon GuardDuty is a threat detection service that continuously monitors for malicious activity and unauthorized behavior, but it does not provide DDoS protection3. Network ACLs are stateless filters that can be associated with a subnet to control the traffic to and from the subnet, but they are not designed to protect against DDoS attacks",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 4,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 1656
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q12",
+        "number": 12,
+        "text": "A company is planning to migrate to the AWS Cloud and wants to become more responsive to customer inquiries and feedback. The company wants to focus on\norganizational transformation.\nA company wants to give its customers the ability to view specific data that is hosted in Amazon S3 buckets. The company wants to keep control over the full\ndatasets that the company shares with the customers.\nWhich S3 feature will meet these requirements?",
+        "options": [
+          {
+            "text": "S3 Storage Lens",
+            "letter": "A"
+          },
+          {
+            "text": "S3 Cross-Region Replication (CRR)",
+            "letter": "B"
+          },
+          {
+            "text": "S3 Versioning",
+            "letter": "C"
+          },
+          {
+            "text": "S3 Access Points",
+            "letter": "D"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "D",
+        "explanation": "S3 Access Points are a feature of Amazon S3 that allows you to easily manage access to specific data that is hosted in S3 buckets. S3 Access Points are unique hostnames that customers can use to access data in S3 buckets. You can create multiple access points for a single bucket, each with its own name and permissions. You can use S3 Access Points to provide different levels of access to different groups of customers, such as read-only or write-only access. You can also use S3 Access Points to enforce encryption or logging requirements for specific data. S3 Access Points help you keep control over the full datasets that you share with your customers, while simplifying the access management and improving the performance and scalability of your applications.",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 4,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 1322
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q15",
+        "number": 15,
+        "text": "A company wants to receive a notification when a specific AWS cost threshold is reached.\nWhich AWS services or tools can the company use to meet this requirement? (Select TWO.)",
+        "options": [
+          {
+            "text": "Amazon Simple Queue Service (Amazon SQS)",
+            "letter": "A"
+          },
+          {
+            "text": "AWS Budgets",
+            "letter": "B"
+          },
+          {
+            "text": "Cost Explorer",
+            "letter": "C"
+          },
+          {
+            "text": "Amazon CloudWatch",
+            "letter": "D"
+          },
+          {
+            "text": "AWS Cost and Usage Report",
+            "letter": "E"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "BD",
+        "explanation": "AWS Budgets and Amazon CloudWatch are two AWS services or tools that the company can use to receive a notification when a specific AWS cost threshold is reached. AWS Budgets allows users to set custom budgets to track their costs and usage, and respond quickly to alerts received from email or Amazon Simple Notification Service (Amazon SNS) notifications if they exceed their threshold. Users can create cost budgets with fixed or variable target amounts, and configure their notifications for actual or forecasted spend. Users can also set up custom actions to run automatically or through an approval process when a budget target is exceeded. For example, users could automatically apply a custom IAM policy that denies them the ability to provision additional resources within an account. Amazon CloudWatch is a service that monitors applications, responds to performance changes, optimizes resource use, and provides insights into operational health. Users can use CloudWatch to collect and track metrics, which are variables they can measure for their resources and applications. Users can create alarms that watch metrics and send notifications or automatically make changes to the resources they are monitoring when a threshold is breached. Users can use CloudWatch to monitor their AWS costs and usage by creating billing alarms that send notifications when their estimated charges exceed a specified threshold amount. Users can also use CloudWatch to monitor their Reserved Instance (RI) or Savings Plans utilization and coverage, and receive notifications when they fall below a certain level. References: Cloud Cost And Usage Budgets - AWS Budgets, What is Amazon CloudWatch?, Creating a billing alarm - Amazon CloudWatch",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 5,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 2060
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q17",
+        "number": 17,
+        "text": "Which AWS service or storage class provides low-cost, long-term data storage?",
+        "options": [
+          {
+            "text": "Amazon S3 Glacier Deep Archive",
+            "letter": "A"
+          },
+          {
+            "text": "AWS Snowball",
+            "letter": "B"
+          },
+          {
+            "text": "Amazon MQ",
+            "letter": "C"
+          },
+          {
+            "text": "AWS Storage Gateway Passing Certification Exams Made Easy visit - https://www.surepassexam.com Recommend!! Get the Full CLF-C02 dumps in VCE and PDF From SurePassExam https://www.surepassexam.com/CLF-C02-exam-dumps.html (120 New Questions)",
+            "letter": "D"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "A",
+        "explanation": "Amazon S3 Glacier Deep Archive is a storage class within Amazon S3 that provides the lowest-cost, long-term data storage for data that is rarely accessed. AWS Snowball is a service that provides a physical device for transferring large amounts of data into and out of AWS. Amazon MQ is a service that provides managed message broker service for Apache ActiveMQ. AWS Storage Gateway is a service that provides hybrid cloud storage for on-premises applications.",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 4,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 882
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q20",
+        "number": 20,
+        "text": "A company wants to minimize network latency between its Amazon EC2 instances. The EC2 instances do not need to be highly available.\nWhich solution meets these requirements?",
+        "options": [
+          {
+            "text": "Use EC2 instances in a single Availability Zone.",
+            "letter": "A"
+          },
+          {
+            "text": "Use Amazon CloudFront as the database for the EC2 instances.",
+            "letter": "B"
+          },
+          {
+            "text": "Use EC2 instances in the same edge location and the same Availability Zone.",
+            "letter": "C"
+          },
+          {
+            "text": "Use EC2 instances in the same edge location and the same AWS Region.",
+            "letter": "D"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "A",
+        "explanation": "Using EC2 instances in a single Availability Zone is a solution that meets the requirements of minimizing network latency between the EC2 instances and not needing high availability. An Availability Zone is a physically isolated location within an AWS Region that has its own power, cooling, and network connectivity. EC2 instances within the same Availability Zone can communicate with each other using low-latency private IP addresses. However, EC2 instances in a single Availability Zone are not highly available, because they are vulnerable to failures or disruptions that affect the Availability Zone",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 4,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 1068
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q22",
+        "number": 22,
+        "text": "Which benefits can customers gain by using AWS Marketplace? (Select TWO.)",
+        "options": [
+          {
+            "text": "Speed of business",
+            "letter": "A"
+          },
+          {
+            "text": "Fewer legal objections",
+            "letter": "B"
+          },
+          {
+            "text": "Ability to pay with credit cards",
+            "letter": "C"
+          },
+          {
+            "text": "No requirement for product licenses for any products",
+            "letter": "D"
+          },
+          {
+            "text": "Free use of all services for the first hour",
+            "letter": "E"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "AB",
+        "explanation": "AWS Marketplace is a digital catalog that offers thousands of software products and solutions from independent software vendors (ISVs) and AWS partners. Customers can use AWS Marketplace to find, buy, and deploy software on AWS. Some of the benefits of using AWS Marketplace are: ? Speed of business: You can quickly and easily discover and deploy software that meets your business needs, without having to go through lengthy procurement processes. You can also use AWS Marketplace to test and compare different solutions before making a purchase decision. ? Fewer legal objections: You can benefit from standardized contract terms and conditions that are pre-negotiated between AWS and the ISVs. This reduces the time and effort required to review and approve legal agreements.",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 5,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 1062
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q27",
+        "number": 27,
+        "text": "A company processes personally identifiable information (Pll) and must keep data in the country where it was generated. The company wants to use Amazon EC2\ninstances for these workloads.\nWhich AWS service will meet these requirements?",
+        "options": [
+          {
+            "text": "AWS Outposts",
+            "letter": "A"
+          },
+          {
+            "text": "AWS Storage Gateway",
+            "letter": "B"
+          },
+          {
+            "text": "AWS DataSync",
+            "letter": "C"
+          },
+          {
+            "text": "AWS OpsWorks",
+            "letter": "D"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "A",
+        "explanation": "AWS Outposts is an AWS service that extends AWS infrastructure, services, APIs, and tools to virtually any datacenter, co-location space, or on-premises facility. AWS Outposts enables you to run Amazon EC2 instances and other AWS services locally, while maintaining a consistent and seamless connection to the AWS Cloud. AWS Outposts is ideal for workloads that require low latency, local data processing, or data residency. By using AWS Outposts, the company can process personally identifiable information (PII) and keep data in the country where it was generated, while leveraging the benefits of AWS",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 4,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 932
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q30",
+        "number": 30,
+        "text": "A company wants its AWS usage to be more sustainable. The company wants to track, measure, review, and forecast polluting emissions that result from its AWS\napplications.\nWhich AWS service or tool can the company use to meet these requirements?",
+        "options": [
+          {
+            "text": "AWS Health Dashboard",
+            "letter": "A"
+          },
+          {
+            "text": "AWS customer carbon footprint tool",
+            "letter": "B"
+          },
+          {
+            "text": "AWS Support Center",
+            "letter": "C"
+          },
+          {
+            "text": "Amazon QuickSight",
+            "letter": "D"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "B",
+        "explanation": "Passing Certification Exams Made Easy visit - https://www.surepassexam.com Recommend!! Get the Full CLF-C02 dumps in VCE and PDF From SurePassExam https://www.surepassexam.com/CLF-C02-exam-dumps.html (120",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 4,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 1343
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q34",
+        "number": 34,
+        "text": "A company needs to run a workload for several batch image rendering applications. It is acceptable for the workload to experience downtime.\nWhich Amazon EC2 pricing model would be MOST cost-effective in this situation?",
+        "options": [
+          {
+            "text": "On-Demand Instances",
+            "letter": "A"
+          },
+          {
+            "text": "Reserved Instances",
+            "letter": "B"
+          },
+          {
+            "text": "Dedicated Instances",
+            "letter": "C"
+          },
+          {
+            "text": "Spot Instances",
+            "letter": "D"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "D",
+        "explanation": "Amazon EC2 Spot Instances are instances that use spare EC2 capacity that is available at up to a 90% discount compared to On-Demand prices. You can use Spot Instances for various stateless, fault-tolerant, or flexible applications such as big data, containerized workloads, high-performance computing (HPC), and test & development workloads. Spot Instances are ideal for workloads that can be interrupted, such as batch image rendering applications1. On-Demand Instances are instances that let you pay for compute capacity by the hour or second (minimum of 60 seconds) with no long-term commitments. This frees you from the costs and complexities of planning, purchasing, and maintaining hardware and transforms what are commonly large fixed costs into much smaller variable costs2. Reserved Instances are instances that provide you with a significant discount (up to 75%) compared to On-Demand Instance pricing. In exchange, you select a term and make an upfront payment to reserve a certain amount of compute capacity for that term3. Dedicated Instances are instances that run in a VPC on hardware that’s dedicated to a single customer. Your Dedicated Instances are physically isolated at the host hardware level from instances that belong to other AWS accounts4.",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 4,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 1593
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q35",
+        "number": 35,
+        "text": "A company has deployed an application in the AWS Cloud. The company wants to ensure that the application is highly resilient.\nWhich component of AWS infrastructure can the company use to meet this requirement?",
+        "options": [
+          {
+            "text": "Content delivery network (CDN)",
+            "letter": "A"
+          },
+          {
+            "text": "Edge locations",
+            "letter": "B"
+          },
+          {
+            "text": "Wavelength Zones",
+            "letter": "C"
+          },
+          {
+            "text": "Availability Zones",
+            "letter": "D"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "D",
+        "explanation": "Availability Zones are components of AWS infrastructure that can help the company ensure that the application is highly resilient. Availability Zones are multiple, isolated locations within each AWS Region. Each Availability Zone has independent power, cooling, and physical security, and is connected to the other Availability Zones in the same Region via low-latency, high-throughput, and highly redundant networking. Availability Zones allow you to operate production applications and databases that are more highly available, fault tolerant, and scalable than would be possible from a single data center.",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 4,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 935
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q36",
+        "number": 36,
+        "text": "A software engineer wants to launch a virtual machine (VM) and MySQL database on AWS.\nWhich AWS service will meet these requirements with the LEAST operational effort?",
+        "options": [
+          {
+            "text": "Amazon Elastic Container Service (Amazon ECS)",
+            "letter": "A"
+          },
+          {
+            "text": "AWS Elastic Beanstalk",
+            "letter": "B"
+          },
+          {
+            "text": "Amazon Lightsail",
+            "letter": "C"
+          },
+          {
+            "text": "Amazon EC2",
+            "letter": "D"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "B",
+        "explanation": "AWS Elastic Beanstalk is a service that enables you to quickly deploy and manage applications in the AWS Cloud without worrying about the infrastructure that runs those applications. You simply upload your application, and Elastic Beanstalk automatically handles the details of capacity provisioning, load balancing, scaling, and application health monitoring. Elastic Beanstalk supports several platform configurations for Java, .NET, PHP, Node.js, Python, Ruby, Go, and Docker web applications that can run on familiar servers such as Apache, Nginx, Passenger, and IIS. You can also use Elastic Beanstalk to launch a virtual machine (VM) and MySQL database on AWS with the least operational effort. Amazon Elastic Container Service (Amazon ECS) is a fully managed container orchestration service that enables you to easily run, scale, and secure Docker containerized applications on AWS. However, it requires more operational effort than Elastic Beanstalk, as you need to define your application architecture and the specifications of the containers that run it. Amazon Lightsail is an easy-to-use cloud platform that offers everything you need to build an application or website, plus a cost-effective, monthly plan. It is designed for developers who have little or no prior cloud experience and want to launch and manage applications on AWS with minimal complexity. However, it does not support MySQL databases, and it requires more operational effort than Elastic Beanstalk, as you need to configure your VM and database settings. Amazon EC2 is a web service that provides secure, resizable compute capacity in the cloud. It allows you to launch a virtual machine (VM) and MySQL database on AWS, but it requires the most operational effort, as you need to provision, monitor, and manage your EC2 instances and database.",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 4,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 2123
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q37",
+        "number": 37,
+        "text": "A company is storing sensitive customer data in an Amazon S3 bucket. The company wants to protect the data from accidental deletion or overwriting.\nWhich S3 feature should the company use to meet these requirements?",
+        "options": [
+          {
+            "text": "S3 Lifecycle rules",
+            "letter": "A"
+          },
+          {
+            "text": "S3 Versioning Passing Certification Exams Made Easy visit - https://www.surepassexam.com Recommend!! Get the Full CLF-C02 dumps in VCE and PDF From SurePassExam https://www.surepassexam.com/CLF-C02-exam-dumps.html (120 New Questions)",
+            "letter": "B"
+          },
+          {
+            "text": "S3 bucket policies",
+            "letter": "C"
+          },
+          {
+            "text": "S3 server-side encryption",
+            "letter": "D"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "B",
+        "explanation": "S3 Versioning is a feature that allows you to keep multiple versions of an object in the same bucket. You can use S3 Versioning to protect your data from accidental deletion or overwriting by enabling it on a bucket or a specific object. S3 Versioning also allows you to restore previous versions of an object if needed. S3 Lifecycle rules are used to automate the transition of objects between storage classes or to expire objects after a certain period of time. S3 bucket policies are used to control access to the objects in a bucket. S3 server-side encryption is used to encrypt the data at rest in S3. References: S3 Versioning, S3 Lifecycle rules, S3 bucket policies, S3 server-side encryption",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 4,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 1264
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q38",
+        "number": 38,
+        "text": "Which AWS service or feature is associated with a subnet in a VPC and is used to control inbound and outbound traffic?",
+        "options": [
+          {
+            "text": "Amazon Inspector",
+            "letter": "A"
+          },
+          {
+            "text": "Network ACLs",
+            "letter": "B"
+          },
+          {
+            "text": "AWS Shield",
+            "letter": "C"
+          },
+          {
+            "text": "VPC Flow Logs",
+            "letter": "D"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "B",
+        "explanation": "Network ACLs (network access control lists) are an optional layer of security for your VPC that act as a firewall for controlling traffic in and out of one or more subnets. You can use network ACLs to allow or deny traffic based on protocol, port, or source and destination IP address. Network ACLs are stateless, meaning that they do not track the traffic that flows through them. Therefore, you must create rules for both inbound and outbound traffic.",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 4,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 662
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q39",
+        "number": 39,
+        "text": "Which company needs to apply security rules to a subnet for Amazon EC2 instances. Which AWS service or feature provides this functionality?",
+        "options": [
+          {
+            "text": "Network ACLs",
+            "letter": "A"
+          },
+          {
+            "text": "Security groups",
+            "letter": "B"
+          },
+          {
+            "text": "AWS Certificate Manager (ACM)",
+            "letter": "C"
+          },
+          {
+            "text": "AWS Config",
+            "letter": "D"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "A",
+        "explanation": "Network ACLs (network access control lists) are an AWS service or feature that provides the functionality of applying security rules to a subnet for EC2 instances. A subnet is a logical partition of an IP network within a VPC (virtual private cloud). A VPC is a logically isolated section of the AWS Cloud where the company can launch AWS resources in a virtual network that they define. A network ACL is a virtual firewall that controls the inbound and outbound traffic for one or more subnets. The company can use network ACLs to allow or deny traffic based on protocol, port, or source and destination IP address. Network ACLs are stateless, meaning that they do not track the traffic that flows through them. Therefore, the company must create rules for both inbound and outbound traffic4",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 4,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 1037
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q41",
+        "number": 41,
+        "text": "A company needs a fully managed file server that natively supports Microsoft workloads and file systems The file server must also support the SMB protocol.\nWhich AWS service should the company use to meet these requirements?",
+        "options": [
+          {
+            "text": "Amazon Elastic File System (Amazon EFS)",
+            "letter": "A"
+          },
+          {
+            "text": "Amazon FSx for Lustre",
+            "letter": "B"
+          },
+          {
+            "text": "Amazon FSx for Windows File Server",
+            "letter": "C"
+          },
+          {
+            "text": "Amazon Elastic Block Store (Amazon EBS)",
+            "letter": "D"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "C",
+        "explanation": "Amazon FSx for Windows File Server is a fully managed file server that supports Microsoft workloads and file systems, including the SMB protocol. It provides features such as user quotas, end-user file restore, and Microsoft Active Directory integration. Amazon EFS is a fully managed file system that supports the NFS protocol, not SMB. Amazon FSx for Lustre is a fully managed file system that supports high- performance computing workloads, not Microsoft workloads. Amazon EBS is a block storage service that does not provide a file system or SMB support. References: Amazon FSx for Windows File Server, Amazon FSx for Lustre, Amazon EFS, Amazon EBS",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 4,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 1049
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q43",
+        "number": 43,
+        "text": "A company wants to set AWS spending targets and track costs against those targets. Which AWS tool or feature should the company use to meet these\nrequirements?",
+        "options": [
+          {
+            "text": "AWS Cost Explorer",
+            "letter": "A"
+          },
+          {
+            "text": "AWS Budgets",
+            "letter": "B"
+          },
+          {
+            "text": "AWS Cost and Usage Report",
+            "letter": "C"
+          },
+          {
+            "text": "Savings Plans",
+            "letter": "D"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "B",
+        "explanation": "AWS Budgets is a tool that allows users to set AWS spending targets and track costs against those targets. Users can create budgets for various dimensions, such as service, linked account, tag, and more. Users can also receive alerts when the actual or forecasted costs exceed or are projected to exceed the budgeted amount. AWS Cost Explorer, AWS Cost and Usage Report, and Savings Plans are other AWS tools or features that can help users manage and optimize their AWS costs, but they do not enable users to set and track spending targets .",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 4,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 1043
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q47",
+        "number": 47,
+        "text": "A team of researchers is going to collect data at remote locations around the world Many locations do not have internet connectivity. The team needs to capture\nthe data in the field, and transfer it to the AWS Cloud later\nWhich AWS service will support these requirements?",
+        "options": [
+          {
+            "text": "AWS Outposts",
+            "letter": "A"
+          },
+          {
+            "text": "AWS Transfer Family",
+            "letter": "B"
+          },
+          {
+            "text": "AWS Snow Family",
+            "letter": "C"
+          },
+          {
+            "text": "AWS Migration Hub",
+            "letter": "D"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "C",
+        "explanation": "AWS Snow Family is a group of devices that transport data in and out of AWS. AWS Snow Family devices are physical devices that can transfer up to exabytes of data. One exabyte is 1 000 000 000 000 megabytes. AWS Snow Family devices are designed for use in remote locations where internet connectivity is limited or unavailable. You can use these devices to collect and process data at the edge, and then ship them back to AWS for data upload. AWS Snow Family consists of three types of devices: AWS Snowcone, AWS Snowball, and AWS Snowmobile1234. References: 1: Edge Computing Devices, Secure Data Transfer - AWS Snow Family - AWS, 2: AWS Snow Family Documentation, 3: AWS Snow Family - W3Schools, 4: AWS Snow Family: Data Storage, Migration, and Computation",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 4,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 1133
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q50",
+        "number": 50,
+        "text": "Which AWS services can be used to store files? (Select TWO.)",
+        "options": [
+          {
+            "text": "Amazon S3",
+            "letter": "A"
+          },
+          {
+            "text": "AWS Lambda",
+            "letter": "B"
+          },
+          {
+            "text": "Amazon Elastic Block Store (Amazon EBS)",
+            "letter": "C"
+          },
+          {
+            "text": "Amazon SageMaker",
+            "letter": "D"
+          },
+          {
+            "text": "AWS Storage Gateway",
+            "letter": "E"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "AC",
+        "explanation": "Amazon S3 and Amazon EBS are two AWS services that can be used to store files . Amazon S3 is an object storage service that offers high scalability, durability, availability, and performance. Amazon EBS is a block storage service that provides persistent and low-latency storage volumes for Amazon EC2 instances. AWS Lambda, Amazon SageMaker, and AWS Storage Gateway are other AWS services that have different purposes, such as serverless computing, machine learning, and hybrid cloud storage .",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 5,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 692
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q53",
+        "number": 53,
+        "text": "A company is operating several factories where it builds products. The company needs the ability to process data, store data, and run applications with local\nsystem interdependencies that require low latency.\nWhich AWS service should the company use to meet these requirements?",
+        "options": [
+          {
+            "text": "AWS loT Greengrass",
+            "letter": "A"
+          },
+          {
+            "text": "AWS Lambda",
+            "letter": "B"
+          },
+          {
+            "text": "AWS Outposts",
+            "letter": "C"
+          },
+          {
+            "text": "AWS Snowball Edge",
+            "letter": "D"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "C",
+        "explanation": "AWS Outposts is a service that provides fully managed AWS infrastructure and services on premises. It allows users to run applications that require low latency and local data processing, while seamlessly connecting to the AWS Cloud for a consistent hybrid experience. AWS IoT Greengrass is a service that provides local compute, messaging, data caching, sync, and ML inference capabilities for connected devices. AWS Lambda is a service that allows users to run code without provisioning or managing servers. AWS Snowball Edge is a device that provides a petabyte-scale data transport and edge computing solution.",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 4,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 987
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q56",
+        "number": 56,
+        "text": "A company is running its application in the AWS Cloud. The company wants to periodically review its AWS account for cost optimization opportunities.\nWhich AWS service or tool can the company use to meet these requirements?",
+        "options": [
+          {
+            "text": "AWS Cost Explorer",
+            "letter": "A"
+          },
+          {
+            "text": "AWS Trusted Advisor",
+            "letter": "B"
+          },
+          {
+            "text": "AWS Pricing Calculator",
+            "letter": "C"
+          },
+          {
+            "text": "AWS Budgets",
+            "letter": "D"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "A",
+        "explanation": "AWS Cost Explorer is an AWS service or tool that the company can use to periodically review its AWS account for cost optimization opportunities. AWS Cost Explorer is a tool that enables the company to visualize, understand, and manage their AWS costs and usage over time. The company can use AWS Cost Explorer to access interactive graphs and tables that show the breakdown of their costs and usage by service, region, account, tag, and more. The company can Passing Certification Exams Made Easy visit - https://www.surepassexam.com Recommend!! Get the Full CLF-C02 dumps in VCE and PDF From SurePassExam https://www.surepassexam.com/CLF-C02-exam-dumps.html (120",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 4,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 1193
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q61",
+        "number": 61,
+        "text": "An IT engineer needs to access AWS services from an on-premises application. Which credentials or keys does the application need for authentication?",
+        "options": [
+          {
+            "text": "AWS account user name and password",
+            "letter": "A"
+          },
+          {
+            "text": "IAM access key and secret",
+            "letter": "B"
+          },
+          {
+            "text": "Amazon EC2 key pairs",
+            "letter": "C"
+          },
+          {
+            "text": "AWS Key Management Service (AWS KMS) keys",
+            "letter": "D"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "B",
+        "explanation": "IAM access keys are long-term credentials that consist of an access key ID and a secret access key. You use access keys to sign programmatic requests that you make to AWS. If you need to access AWS services from an on-premises application, you can use IAM access keys to authenticate your requests. AWS account user name and password are used to sign in to the AWS Management Console. Amazon EC2 key pairs are used to connect to your EC2 instances using SSH. AWS Key Management Service (AWS KMS) keys are used to encrypt and decrypt your data using the AWS Encryption SDK or the AWS CLI.",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 4,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 895
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q65",
+        "number": 65,
+        "text": "A company's application has high customer usage during certain times of the day. The company wants to reduce the number of Amazon EC2 instances that run\nwhen application usage is low.\nWhich AWS service or instance purchasing option should the company use to meet this requirement?",
+        "options": [
+          {
+            "text": "EC2 Instance Savings Plans",
+            "letter": "A"
+          },
+          {
+            "text": "Spot Instances",
+            "letter": "B"
+          },
+          {
+            "text": "Reserved Instances",
+            "letter": "C"
+          },
+          {
+            "text": "Amazon EC2 Auto Scaling",
+            "letter": "D"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "D",
+        "explanation": "Amazon EC2 Auto Scaling is an AWS service that can help users reduce the number of Amazon EC2 instances that run when application usage is low. Amazon EC2 Auto Scaling allows users to create scaling policies that automatically adjust the number of EC2 instances based on the demand or a schedule. EC2 Instance Savings Plans, Spot Instances, and Reserved Instances are instance purchasing options that can help users save money on EC2 usage, but they do not automatically scale the number of instances according to the application usage .",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 4,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 938
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q69",
+        "number": 69,
+        "text": "A company wants to migrate its database to a managed AWS service that is compatible with PostgreSQL.\nWhich AWS services will meet these requirements? (Select TWO)",
+        "options": [
+          {
+            "text": "Amazon Athena",
+            "letter": "A"
+          },
+          {
+            "text": "Amazon RDS",
+            "letter": "B"
+          },
+          {
+            "text": "Amazon EC2",
+            "letter": "C"
+          },
+          {
+            "text": "Amazon DynamoDB",
+            "letter": "D"
+          },
+          {
+            "text": "Amazon Aurora",
+            "letter": "E"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "BE",
+        "explanation": "Amazon RDS and Amazon Aurora are both managed AWS services that support the PostgreSQL database engine. Amazon RDS makes it easier to set up, operate, and scale PostgreSQL deployments on the cloud, while Amazon Aurora is a cloud-native database engine that is compatible with PostgreSQL and offers higher performance and availability. Amazon Athena is a serverless query service that does not support PostgreSQL, but can analyze data in Amazon S3 using standard SQL. Amazon EC2 is a compute service that allows users to launch virtual machines, but does not provide any database management features. Amazon DynamoDB is a NoSQL database service that is not compatible with PostgreSQL, but offers fast and consistent performance at any scale. References: Hosted PostgreSQL - Amazon RDS for PostgreSQL - AWS, Amazon RDS for PostgreSQL - Amazon Relational Database Service, AWS PostgreSQL: Managed or Self- Managed? - NetApp, AWS Announces Amazon Aurora Supports PostgreSQL 12 - InfoQ, Amazon Aurora vs PostgreSQL | What are the differences? - StackShare",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 5,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 1318
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q73",
+        "number": 73,
+        "text": "Which AWS services can a company use to achieve a loosely coupled architecture? (Select TWO.)",
+        "options": [
+          {
+            "text": "Amazon Workspaces",
+            "letter": "A"
+          },
+          {
+            "text": "Amazon Simple Queue Service (Amazon SQS)",
+            "letter": "B"
+          },
+          {
+            "text": "Amazon Connect",
+            "letter": "C"
+          },
+          {
+            "text": "AWS Trusted Advisor",
+            "letter": "D"
+          },
+          {
+            "text": "AWS Step Functions",
+            "letter": "E"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "BE",
+        "explanation": "Amazon Simple Queue Service (Amazon SQS) and AWS Step Functions are AWS services that can be used to achieve a loosely coupled architecture. Amazon SQS is a fully managed message queuing service that enables you to decouple and scale microservices, distributed systems, and serverless applications. AWS Step Functions lets you coordinate multiple AWS services into serverless workflows so you can build and update apps quickly. Using Step Functions, you can design and run workflows that stitch together services such as AWS Lambda and Amazon SNS into feature-rich applications. References: Amazon SQS, AWS Step Functions Passing Certification Exams Made Easy visit - https://www.surepassexam.com Recommend!! Get the Full CLF-C02 dumps in VCE and PDF From SurePassExam https://www.surepassexam.com/CLF-C02-exam-dumps.html (120",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 5,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 1104
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q74",
+        "number": 74,
+        "text": "A development team wants to deploy multiple test environments for an application in a fast repeatable manner.\nWhich AWS service should the team use?",
+        "options": [
+          {
+            "text": "Amazon EC2",
+            "letter": "A"
+          },
+          {
+            "text": "AWS CloudFormation",
+            "letter": "B"
+          },
+          {
+            "text": "Amazon QuickSight",
+            "letter": "C"
+          },
+          {
+            "text": "Amazon Elastic Container Service (Amazon ECS)",
+            "letter": "D"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "B",
+        "explanation": "AWS CloudFormation is a service that allows you to model and provision your AWS resources using templates. You can define your infrastructure as code and automate the creation and update of your resources. AWS CloudFormation also supports nested stacks, change sets, and rollback features to help you manage complex and dynamic environments34. References: ? AWS CloudFormation ? AWS Certified Cloud Practitioner Exam Guide",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 4,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 700
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q79",
+        "number": 79,
+        "text": "What is a customer responsibility when using AWS Lambda according to the AWS shared responsibility model?",
+        "options": [
+          {
+            "text": "Managing the code within the Lambda function",
+            "letter": "A"
+          },
+          {
+            "text": "Confirming that the hardware is working in the data center",
+            "letter": "B"
+          },
+          {
+            "text": "Patching the operating system",
+            "letter": "C"
+          },
+          {
+            "text": "Shutting down Lambda functions when they are no longer in use",
+            "letter": "D"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "A",
+        "explanation": "According to the AWS shared responsibility model, AWS is responsible for the security of the cloud, while customers are responsible for the security in the cloud. This means that AWS is responsible for the physical servers, networking, and operating system that run Lambda functions, while customers are responsible for the security of their code and AWS IAM to the Lambda service and within their function1. Customers need to manage the code within the Lambda function, such as writing, testing, debugging, deploying, and updating the code, as well as ensuring that the code does not contain any vulnerabilities or malicious code that could compromise the security or performance of the function23. References: 2: AWS Lambda - Amazon Web Services (AWS), 3: AWS Lambda Documentation, 1: Amazon CLF-C02: What is customer responsibility under AWS … - PUPUWEB",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 4,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 1193
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q80",
+        "number": 80,
+        "text": "A company is building a mobile app to provide shopping recommendations to its customers. The company wants to use a graph database as part of the shopping\nrecommendation engine.\nWhich AWS database service should the company choose?",
+        "options": [
+          {
+            "text": "Amazon DynamoDB",
+            "letter": "A"
+          },
+          {
+            "text": "Amazon Aurora",
+            "letter": "B"
+          },
+          {
+            "text": "Amazon Neptune",
+            "letter": "C"
+          },
+          {
+            "text": "Amazon DocumentDB (with MongoDB compatibility)",
+            "letter": "D"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "C",
+        "explanation": "Amazon Neptune is a service that provides a fully managed graph database that supports property graphs and RDF graphs. It can be used to build applications that work with highly connected datasets, such as shopping recommendations, social networks, fraud detection, and knowledge graphs2. Amazon DynamoDB is a service that provides a fully managed NoSQL database that delivers fast and consistent performance at any scale. Amazon Aurora is a service that provides a fully managed relational database that is compatible with MySQL and PostgreSQL. Amazon DocumentDB (with MongoDB compatibility) is a service that provides a fully managed document database that is compatible with MongoDB.",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 4,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 1045
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q81",
+        "number": 81,
+        "text": "A company wants to monitor its workload performance. The company wants to ensure that the cloud services are delivered at a level that meets its business\nneeds.\nWhich AWS Cloud Adoption Framework (AWS CAF) perspective will meet these requirements?",
+        "options": [
+          {
+            "text": "Business",
+            "letter": "A"
+          },
+          {
+            "text": "Governance",
+            "letter": "B"
+          },
+          {
+            "text": "Platform",
+            "letter": "C"
+          },
+          {
+            "text": "Operations",
+            "letter": "D"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "D",
+        "explanation": "The Operations perspective helps you monitor and manage your cloud workloads to ensure that they are delivered at a level that meets your business needs. Common stakeholders include chief operations officer (COO), cloud director, cloud operations manager, and cloud operations engineers1. The Operations perspective covers capabilities such as workload health monitoring, incident management, change management, release management, configuration management, and disaster recovery2. The Business perspective helps ensure that your cloud investments accelerate your digital transformation ambitions and business outcomes. Common stakeholders include chief executive officer (CEO), chief financial officer (CFO), chief information officer (CIO), and chief technology officer (CTO). The Business perspective covers capabilities such as business case development, value realization, portfolio management, and stakeholder Passing Certification Exams Made Easy visit - https://www.surepassexam.com Recommend!! Get the Full CLF-C02 dumps in VCE and PDF From SurePassExam https://www.surepassexam.com/CLF-C02-exam-dumps.html (120",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 4,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 2622
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q82",
+        "number": 82,
+        "text": "Which tasks are customer responsibilities, according to the AWS shared responsibility model? (Select TWO.)",
+        "options": [
+          {
+            "text": "Configure the AWS provided security group firewall.",
+            "letter": "A"
+          },
+          {
+            "text": "Classify company assets in the AWS Cloud.",
+            "letter": "B"
+          },
+          {
+            "text": "Determine which Availability Zones to use for Amazon S3 buckets.",
+            "letter": "C"
+          },
+          {
+            "text": "Patch or upgrade Amazon DynamoDB.",
+            "letter": "D"
+          },
+          {
+            "text": "Select Amazon EC2 instances to run AWS Lambda on. F. AWS Config",
+            "letter": "E"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "AB",
+        "explanation": "According to the AWS shared responsibility model, the customer is responsible for security in the cloud, which includes the tasks of configuring the AWS provided security group firewall and classifying company assets in the AWS Cloud. A security group is a virtual firewall that controls the inbound and outbound traffic for one or more EC2 instances. The customer must configure the security group rules to allow or deny traffic based on protocol, port, or source and destination IP address2 Classifying company assets in the AWS Cloud means identifying the types, categories, and sensitivity levels of the data and resources that the customer stores and processes on AWS. The customer must also determine the applicable compliance requirements and regulations that apply to their assets, and implement the appropriate security controls and measures to protect them",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 5,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 1269
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q87",
+        "number": 87,
+        "text": "A company wants to query its server logs to gain insights about its customers' experiences. Which AWS service will store this data MOST cost-effectively?",
+        "options": [
+          {
+            "text": "Amazon Aurora",
+            "letter": "A"
+          },
+          {
+            "text": "Amazon Elastic File System (Amazon EFS)",
+            "letter": "B"
+          },
+          {
+            "text": "Amazon Elastic Block Store (Amazon EBS)",
+            "letter": "C"
+          },
+          {
+            "text": "Amazon S3",
+            "letter": "D"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "D",
+        "explanation": "Amazon S3 is an AWS service that provides scalable, durable, and cost- effective object storage in the cloud. Amazon S3 can store any amount and type of data, such as server logs, and offers various storage classes with different performance and pricing characteristics. Amazon S3 is the most cost-effective option for storing server logs, as it offers low-cost storage classes, such as S3 Standard-Infrequent Access (S3 Standard-IA) and S3 Intelligent-Tiering, that are suitable for infrequently accessed or changing access patterns data. Amazon S3 also integrates with other AWS services, such as Amazon Athena and Amazon OpenSearch Service, that can query the server logs directly from S3 without requiring any additional data loading or transformation. References: Amazon S3, Amazon S3 Storage Classes, Querying Data in Amazon S3",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 4,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 1126
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q88",
+        "number": 88,
+        "text": "A company wants to generate a list of IAM users. The company also wants to view the status of various credentials that are associated with the users, such as\npassword, access keys: and multi-factor authentication (MFA) devices\nWhich AWS service or feature will meet these requirements?",
+        "options": [
+          {
+            "text": "IAM credential report",
+            "letter": "A"
+          },
+          {
+            "text": "AWS IAM Identity Center (AWS Single Sign-On)",
+            "letter": "B"
+          },
+          {
+            "text": "AWS Identity and Access Management Access Analyzer",
+            "letter": "C"
+          },
+          {
+            "text": "AWS Cost and Usage Report",
+            "letter": "D"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "A",
+        "explanation": "An IAM credential report is a feature of AWS Identity and Access Management (IAM) that allows you to view and download a report that lists all IAM users in your account and the status of their various credentials, such as passwords, access keys, and MFA devices. You can use this report to audit the security status of your IAM users and ensure that they follow the best practices for credential management1. References: 1: AWS Documentation - IAM User Guide - Getting credential reports for your AWS account",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 4,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 973
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q93",
+        "number": 93,
+        "text": "Which capabilities are in the platform perspective of the AWS Cloud Adoption Framework (AWS CAF)? (Select TWO.)",
+        "options": [
+          {
+            "text": "Performance and capacity management",
+            "letter": "A"
+          },
+          {
+            "text": "Data engineering",
+            "letter": "B"
+          },
+          {
+            "text": "Continuous integration and continuous delivery (CI/CD) Passing Certification Exams Made Easy visit - https://www.surepassexam.com Recommend!! Get the Full CLF-C02 dumps in VCE and PDF From SurePassExam https://www.surepassexam.com/CLF-C02-exam-dumps.html (120 New Questions)",
+            "letter": "C"
+          },
+          {
+            "text": "Infrastructure protection",
+            "letter": "D"
+          },
+          {
+            "text": "Change and release management",
+            "letter": "E"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "BC",
+        "explanation": "These are two of the seven capabilities that are in the platform perspective of the AWS Cloud Adoption Framework (AWS CAF). The platform perspective helps you build an enterprise-grade, scalable, hybrid cloud platform, modernize existing workloads, and implement new cloud-native solutions1. The other five capabilities are: ? Platform architecture – Establish and maintain guidelines, principles, patterns, and guardrails for your cloud environment. ? Platform engineering – Build a compliant multi-account cloud environment with enhanced security features, and packaged, reusable cloud products. ? Platform operations – Manage and optimize your cloud environment with automation, monitoring, and incident response. ? Application development – Develop and deploy cloud-native applications using modern architectures and best practices. ? Application migration – Migrate your existing applications to the cloud using proven methodologies and tools. Performance and capacity management, infrastructure protection, and change and release management are not capabilities of the platform perspective. They are part of the operations perspective, which helps you achieve operational excellence in the cloud2. The operations perspective comprises six capabilities: ? Performance and capacity management – Monitor and optimize the performance and capacity of your cloud workloads. ? Infrastructure protection – Protect your cloud infrastructure from unauthorized access, malicious attacks, and data breaches. ? Change and release management – Manage changes and releases to your cloud workloads using automation and governance. ? Configuration management – Manage the configuration of your cloud resources and applications using automation and version control. ? Incident management – Respond to incidents affecting your cloud workloads using best practices and tools. ? Service continuity management – Ensure the availability and resilience of your cloud workloads using backup, recovery, and disaster recovery strategies.",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 5,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 2568
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q98",
+        "number": 98,
+        "text": "A company wants to integrate natural language processing (NLP) into business intelligence (Bl) dashboards. The company wants to ask questions and receive\nanswers with relevant visualizations.\nWhich AWS service or tool will meet these requirements?",
+        "options": [
+          {
+            "text": "Amazon Macie",
+            "letter": "A"
+          },
+          {
+            "text": "Amazon Rekognition",
+            "letter": "B"
+          },
+          {
+            "text": "Amazon QuickSight Q",
+            "letter": "C"
+          },
+          {
+            "text": "Amazon Lex",
+            "letter": "D"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "C",
+        "explanation": "Amazon QuickSight Q is a natural language query feature that lets you ask questions about your data using everyday language and get answers in seconds. You can type questions such as “What are the total sales by region?” or “How did marketing campaign A perform?” and get answers in the form of relevant visualizations, such as charts or tables. You can also use Q to drill down into details, filter data, or perform calculations. Q uses machine learning to understand your data and your intent, and provides suggestions and feedback to help you refine your questions.",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 4,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 914
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q102",
+        "number": 102,
+        "text": "Which AWS service uses AWS Compute Optimizer to provide sizing recommendations based on workload metrics?",
+        "options": [
+          {
+            "text": "Amazon EC2",
+            "letter": "A"
+          },
+          {
+            "text": "Amazon RDS",
+            "letter": "B"
+          },
+          {
+            "text": "Amazon Lightsail",
+            "letter": "C"
+          },
+          {
+            "text": "AWS Step Functions",
+            "letter": "D"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "A",
+        "explanation": "Amazon EC2 is a web service that provides secure, resizable compute capacity in the cloud. It allows you to launch virtual servers, called instances, with different configurations of CPU, memory, storage, and networking resources. AWS Compute Optimizer analyzes the specifications and utilization metrics of your Amazon EC2 instances and generates recommendations for optimal instance types that can reduce costs and improve performance. You can view the recommendations on the AWS Compute Optimizer console or the Amazon EC2 console12. Amazon RDS, Amazon Lightsail, and AWS Step Functions are not supported by AWS Compute Optimizer. Amazon RDS is a managed relational database service that lets you set up, operate, and scale a relational database in the cloud. Amazon Lightsail is an easy- to-use cloud platform that offers everything you need to build an application or website, plus a cost-effective, monthly plan. AWS Step Functions lets you coordinate multiple AWS services into serverless workflows so you can build and update apps quickly3 .",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 4,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 1248
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q103",
+        "number": 103,
+        "text": "A company is moving to the AWS Cloud to reduce operational overhead for its application infrastructure.\nWhich IT operation will the company still be responsible for after the migration to AWS?",
+        "options": [
+          {
+            "text": "Security patching of AWS Elastic Beanstalk",
+            "letter": "A"
+          },
+          {
+            "text": "Backups of data that is stored in Amazon Aurora",
+            "letter": "B"
+          },
+          {
+            "text": "Termination of Amazon EC2 instances that are managed by AWS Auto Scaling",
+            "letter": "C"
+          },
+          {
+            "text": "Configuration of IAM access controls",
+            "letter": "D"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "D",
+        "explanation": "AWS Elastic Beanstalk, Amazon Aurora, and AWS Auto Scaling are managed services that reduce the operational overhead for the customers. AWS is responsible for security patching, backups, and termination of these services. However, the customers are still responsible for configuring IAM access controls to manage the permissions and policies for their AWS resources. This is part of the AWS shared responsibility model, which defines the security and compliance responsibilities of AWS and the customers. You can learn more about the AWS shared responsibility model from this whitepaper or this digital course. Passing Certification Exams Made Easy visit - https://www.surepassexam.com Recommend!! Get the Full CLF-C02 dumps in VCE and PDF From SurePassExam https://www.surepassexam.com/CLF-C02-exam-dumps.html (120",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 4,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 1276
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q107",
+        "number": 107,
+        "text": "Which task must a user perform by using the AWS account root user credentials?",
+        "options": [
+          {
+            "text": "Make changes to AWS production resources.",
+            "letter": "A"
+          },
+          {
+            "text": "Change AWS Support plans.",
+            "letter": "B"
+          },
+          {
+            "text": "Access AWS Cost and Usage Reports.",
+            "letter": "C"
+          },
+          {
+            "text": "Grant auditors’ access to an AWS account for a compliance audit.",
+            "letter": "D"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "B",
+        "explanation": "Changing AWS Support plans is a task that must be performed by using the AWS account root user credentials. The root user is the email address that you used to sign up for AWS. It has complete access to all AWS services and resources in the account. You should use the root user only to perform a few account and service management tasks, such as changing AWS Support plans, closing the account, or changing the account name or email address. Making changes to AWS production resources, accessing AWS Cost and Usage Reports, and granting auditors access to an AWS account for a compliance audit are tasks that can be performed by using IAM users or roles, which are entities that you create in AWS to delegate permissions to access AWS services and resources.",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 4,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 1041
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q112",
+        "number": 112,
+        "text": "A company deployed an application on an Amazon EC2 instance. The application ran as expected for 6 months. In the past week, users have reported latency\nissues. A system administrator found that the CPU utilization was at 100% during business hours. The company wants a scalable solution to meet demand.\nWhich AWS service or feature should the company use to handle the load for its application during periods of high demand?",
+        "options": [
+          {
+            "text": "Auto Scaling groups",
+            "letter": "A"
+          },
+          {
+            "text": "AWS Global Accelerator",
+            "letter": "B"
+          },
+          {
+            "text": "Amazon Route 53",
+            "letter": "C"
+          },
+          {
+            "text": "An Elastic IP address",
+            "letter": "D"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "A",
+        "explanation": "Auto Scaling groups are a feature that allows users to automatically scale the number of Amazon EC2 instances up or down based on demand or a predefined schedule. Auto Scaling groups can help improve the performance and availability of applications by adjusting the capacity in response to traffic fluctuations1. AWS Global Accelerator is a service that improves the availability and performance of applications by routing traffic through AWS edge locations2. Amazon Route 53 is a service that provides scalable and reliable domain name system (DNS) service3. An Elastic IP address is a static IPv4 address that can be associated with an Amazon EC2 instance4.",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 4,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 1201
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q115",
+        "number": 115,
+        "text": "A company simulates workflows to review and validate that all processes are effective and that staff are familiar with the processes.\nWhich design principle of the AWS Well-Architected Framework is the company following with this practice?",
+        "options": [
+          {
+            "text": "Perform operations as code.",
+            "letter": "A"
+          },
+          {
+            "text": "Refine operation procedures frequently.",
+            "letter": "B"
+          },
+          {
+            "text": "Make frequent, small, reversible changes.",
+            "letter": "C"
+          },
+          {
+            "text": "Structure the company to support business outcomes.",
+            "letter": "D"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "B",
+        "explanation": "Refining operation procedures frequently is one of the design principles of the operational excellence pillar of the AWS Well-Architected Framework. It means that you should review and validate your processes regularly to ensure they are effective and that staff are familiar with them. Performing operations as code, making frequent, small, reversible changes, and structuring the company to support business outcomes are design principles of other pillars of the AWS Well-Architected Framework.",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 4,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 933
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q120",
+        "number": 120,
+        "text": "A company is running an Amazon EC2 instance in a VPC.\nAn ecommerce company is using Amazon EC2 Auto Scaling groups to manage a fleet of web servers running on Amazon EC2.\nThis architecture follows which AWS Well-Architected Framework best practice?",
+        "options": [
+          {
+            "text": "Secure the workload",
+            "letter": "A"
+          },
+          {
+            "text": "Decouple infrastructure components",
+            "letter": "B"
+          },
+          {
+            "text": "Design for failure",
+            "letter": "C"
+          },
+          {
+            "text": "Think parallel",
+            "letter": "D"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "C",
+        "explanation": "Design for failure is one of the best practices of the AWS Well-Architected Framework. It means that the architecture should be resilient and fault-tolerant, and able to handle failures without impacting the availability and performance of the applications. By using Amazon EC2 Auto Scaling groups, the ecommerce company can design for failure by automatically scaling the number of EC2 instances up or down based on demand or health status. Amazon EC2 Auto Scaling groups can also distribute the EC2 instances across multiple Availability Zones, which are isolated locations within an AWS Region that have independent power, cooling, and network connectivity. This way, the company can ensure that their web servers can handle traffic spikes, recover from failures, and provide a consistent user experience",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 4,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 1180
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q124",
+        "number": 124,
+        "text": "Passing Certification Exams Made Easy visit - https://www.surepassexam.com\n\n\nRecommend!! Get the Full CLF-C02 dumps in VCE and PDF From SurePassExam\nhttps://www.surepassexam.com/CLF-C02-exam-dumps.html (120 New Questions)\n- (Topic 3)\nWhich of the following is a benefit of using an AWS managed service?",
+        "options": [
+          {
+            "text": "Reduced operational overhead for a company's IT staff",
+            "letter": "A"
+          },
+          {
+            "text": "Increased fixed costs that can be predicted by a finance team",
+            "letter": "B"
+          },
+          {
+            "text": "Removal of the need to have a backup strategy",
+            "letter": "C"
+          },
+          {
+            "text": "Removal of the need to follow compliance standards",
+            "letter": "D"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "A",
+        "explanation": "This is a benefit of using an AWS managed service, such as Amazon S3, Amazon DynamoDB, or AWS Lambda. AWS managed services are fully managed by AWS, which means that AWS handles the provisioning, scaling, patching, backup, and recovery of the underlying infrastructure and software. This reduces the operational overhead for the company’s IT staff, who can focus on their core business logic and innovation. You can learn more about the AWS managed services from this webpage or this digital course.",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 4,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 1065
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q125",
+        "number": 125,
+        "text": "Which of the following are general AWS Cloud design principles described in the AWS Well-Architected Framework?",
+        "options": [
+          {
+            "text": "Consolidate key components into monolithic architectures.",
+            "letter": "A"
+          },
+          {
+            "text": "Test systems at production scale.",
+            "letter": "B"
+          },
+          {
+            "text": "Provision more capacity than a workload is expected to need.",
+            "letter": "C"
+          },
+          {
+            "text": "Drive architecture design based on data collected about the workload behavior and requirements.",
+            "letter": "D"
+          },
+          {
+            "text": "Make AWS Cloud architectural decisions static, one-time events.",
+            "letter": "E"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "BD",
+        "explanation": "These are two of the general AWS Cloud design principles described in the AWS Well-Architected Framework. Testing systems at production scale means using tools such as AWS CloudFormation, AWS CodeDeploy, and AWS X-Ray to simulate real-world scenarios and measure the performance, scalability, and availability of the system. Driving architecture design based on data means using tools such as Amazon CloudWatch, AWS CloudTrail, and AWS Config to collect and analyze metrics, logs, and events about the system and use the insights to optimize the system’s design and operation. You can learn more about the AWS Well-Architected Framework from this whitepaper or [this digital course].",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 5,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 1147
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q130",
+        "number": 130,
+        "text": "Which pillar of the AWS Well-Architected Framework includes the AWS shared responsibility model?",
+        "options": [
+          {
+            "text": "Operational excellence",
+            "letter": "A"
+          },
+          {
+            "text": "Performance efficiency",
+            "letter": "B"
+          },
+          {
+            "text": "Reliability",
+            "letter": "C"
+          },
+          {
+            "text": "Security",
+            "letter": "D"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "D",
+        "explanation": "The AWS Well-Architected Framework is a set of best practices and guidelines for designing and operating reliable, secure, efficient, and cost-effective systems in the cloud. The framework consists of five pillars: operational excellence, performance efficiency, reliability, security, and cost optimization. The security pillar covers the AWS shared responsibility model, which defines the security and compliance responsibilities of AWS and the customers. You can learn more about the AWS Well-Architected Framework from [this whitepaper] or [this digital course].",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 4,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 765
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q133",
+        "number": 133,
+        "text": "A company is considering migration to the AWS Cloud. The company wants a fully managed service or feature that can transfer streaming data from multiple\nsources to an Amazon S3 bucket.\nWhich AWS service or feature should the company use to meet these requirements?",
+        "options": [
+          {
+            "text": "AWS DataSync",
+            "letter": "A"
+          },
+          {
+            "text": "Amazon Kinesis Data Firehose",
+            "letter": "B"
+          },
+          {
+            "text": "S3 Select",
+            "letter": "C"
+          },
+          {
+            "text": "AWS Transfer Family",
+            "letter": "D"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "B",
+        "explanation": "Amazon Kinesis Data Firehose is a fully managed service that delivers real- time streaming data to destinations such as Amazon S3, Amazon Redshift, Amazon Elasticsearch Service, and Splunk. You can use Amazon Kinesis Data Firehose to capture, transform, and load streaming data from multiple sources, such as web applications, mobile devices, IoT sensors, and social media.",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 4,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 745
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q135",
+        "number": 135,
+        "text": "What does the concept of agility mean in AWS Cloud computing? (Select TWO.)",
+        "options": [
+          {
+            "text": "The speed at which AWS resources are implemented",
+            "letter": "A"
+          },
+          {
+            "text": "The speed at which AWS creates new AWS Regions",
+            "letter": "B"
+          },
+          {
+            "text": "The ability to experiment quickly",
+            "letter": "C"
+          },
+          {
+            "text": "The elimination of wasted capacity",
+            "letter": "D"
+          },
+          {
+            "text": "The low cost of entry into cloud computing Passing Certification Exams Made Easy visit - https://www.surepassexam.com Recommend!! Get the Full CLF-C02 dumps in VCE and PDF From SurePassExam https://www.surepassexam.com/CLF-C02-exam-dumps.html (120 New Questions)",
+            "letter": "E"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "AC",
+        "explanation": "Agility in AWS Cloud computing means the ability to rapidly provision and deprovision AWS resources as needed, and the ability to experiment quickly with new ideas and solutions. Agility helps businesses to respond to changing customer demands, market opportunities, and competitive threats, and to innovate faster and cheaper. Agility also reduces the risk of failure, as businesses can test and validate their assumptions before committing to large-scale deployments. Some of the benefits of agility in AWS Cloud computing are: ? The speed at which AWS resources are implemented: AWS provides a variety of services and tools that allow you to create, configure, and launch AWS resources in minutes, using the AWS Management Console, the AWS Command Line Interface (AWS CLI), the AWS Software Development Kits (AWS SDKs), or the AWS CloudFormation templates. You can also use the AWS Cloud Development Kit (AWS CDK) to define your AWS resources as code using familiar programming languages, and synthesize them into AWS CloudFormation templates. You can also use the AWS Service Catalog to create and manage standardized portfolios of AWS resources that meet your organizational policies and best practices. AWS also offers on-demand, pay-as-you-go pricing models, so you only pay for the resources you use, and you can scale them up or down as your needs change12345 ? The ability to experiment quickly: AWS enables you to experiment quickly with new ideas and solutions, without having to invest in upfront capital or long-term commitments. You can use AWS to create and test multiple prototypes, hypotheses, and minimum viable products (MVPs) in parallel, and measure their performance and feedback. You can also use AWS to leverage existing services and solutions, such as AWS Marketplace, AWS Solutions, and AWS Quick Starts, that can help you accelerate your innovation process. AWS also supports a culture of experimentation and learning, by providing tools and resources for continuous integration and delivery (CI/CD), testing, monitoring, and analytics. References: Six advantages of cloud computing - Overview of Amazon Web Services, AWS Cloud Development Kit (AWS CDK), AWS Service Catalog, AWS Pricing, AWS CloudFormation, [Experimentation and Testing - AWS Well-Architected Framework], [AWS Marketplace], [AWS Solutions], [AWS Quick Starts], [AWS Developer Tools]",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 5,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 2938
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q140",
+        "number": 140,
+        "text": "A company plans to migrate to the AWS Cloud. The company wants to use the AWS Cloud Adoption Framework (AWS CAF) to define and track business\noutcomes as part of its cloud transformation journey.\nWhich AWS CAF governance perspective capability will meet these requirements?",
+        "options": [
+          {
+            "text": "Benefits management",
+            "letter": "A"
+          },
+          {
+            "text": "Risk management",
+            "letter": "B"
+          },
+          {
+            "text": "Application portfolio management",
+            "letter": "C"
+          },
+          {
+            "text": "Cloud financial management",
+            "letter": "D"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "A",
+        "explanation": "The correct answer is A. Benefits management. Benefits management is the AWS CAF governance perspective capability that helps you define and track business outcomes as part of your cloud transformation journey. Benefits management helps you align your cloud initiatives with your business objectives, measure the value and impact of your cloud investments, and communicate the benefits of cloud adoption to your stakeholders12. Risk management is the AWS CAF governance perspective capability that helps you identify and mitigate the potential risks associated with cloud adoption, such as security, compliance, legal, and operational risks12. Application portfolio management is the AWS CAF governance perspective capability that helps you assess and optimize your existing application portfolio for cloud migration or modernization. Application portfolio management helps you categorize your applications based on their business value and technical fit, prioritize them for cloud adoption, and select the best migration or modernization strategy for each application12. Cloud financial management is the AWS CAF governance perspective capability that helps you manage and optimize the costs and value of your cloud resources. Cloud financial management helps you plan and budget for cloud adoption, track and allocate cloud costs, implement cost optimization strategies, and report on cloud financial performance12. References: 1: AWS Cloud Adoption Framework: Governance Perspective 2: All you need to know about AWS Cloud Adoption Framework — Governance Perspective",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 4,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 1974
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q144",
+        "number": 144,
+        "text": "Which AWS service can a company use to visually design and build serverless applications?",
+        "options": [
+          {
+            "text": "AWS Lambda",
+            "letter": "A"
+          },
+          {
+            "text": "AWS Batch",
+            "letter": "B"
+          },
+          {
+            "text": "AWS Application Composer",
+            "letter": "C"
+          },
+          {
+            "text": "AWS App Runner",
+            "letter": "D"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "C",
+        "explanation": "AWS Application Composer is a service that allows users to visually design and build serverless applications. Users can drag and drop components, such as AWS Lambda functions, Amazon API Gateway endpoints, Amazon DynamoDB tables, and Amazon S3 buckets, to create a serverless application architecture. Users can also configure the properties, permissions, and dependencies of each component, and deploy the application to their AWS account with a few clicks. AWS Application Composer simplifies the design and configuration of serverless applications, and reduces the need to write code or use AWS CloudFormation templates. References: AWS Application Composer, AWS releases Application Composer to make serverless ‘easier’ but initial scope is limited",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 4,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 938
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q145",
+        "number": 145,
+        "text": "An ecommerce company wants to distribute traffic between the Amazon EC2 instances that host its website.\nWhich AWS service or resource will meet these requirements?",
+        "options": [
+          {
+            "text": "Application Load Balancer",
+            "letter": "A"
+          },
+          {
+            "text": "AWS WAF",
+            "letter": "B"
+          },
+          {
+            "text": "AWS CloudHSM",
+            "letter": "C"
+          },
+          {
+            "text": "AWS Direct Connect",
+            "letter": "D"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "A",
+        "explanation": "This is the AWS service or resource that will meet the requirements of distributing traffic between the Amazon EC2 instances that host the website. Application Load Balancer is a type of Elastic Load Balancing that distributes incoming application traffic across multiple targets, such as Amazon EC2 instances, containers, IP addresses, and Lambda functions. Application Load Balancer operates at the application layer (layer 7) of the OSI model and supports advanced features such as path-based routing, host-based routing, health checks, and SSL termination. You can learn more about Application Load Balancer from [this webpage] or [this digital course].",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 4,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 1160
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q149",
+        "number": 149,
+        "text": "A company wants to use the AWS Cloud to deploy an application globally.\nWhich architecture deployment model should the company use to meet this requirement?",
+        "options": [
+          {
+            "text": "Multi-Region",
+            "letter": "A"
+          },
+          {
+            "text": "Single-Region",
+            "letter": "B"
+          },
+          {
+            "text": "Multi-AZ",
+            "letter": "C"
+          },
+          {
+            "text": "Single-AZ",
+            "letter": "D"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "A",
+        "explanation": "The architecture deployment model that the company should use to meet this requirement is A. Multi-Region. A multi-region deployment model is a cloud computing architecture that distributes an application and its data across multiple geographic regions. A multi-region deployment model enables a company to achieve global reach, high availability, disaster recovery, and performance optimization. By deploying an application in multiple regions, a company can serve customers from the nearest region, reduce latency, increase redundancy, and comply with data sovereignty regulations12. A single-region deployment model is a cloud computing architecture that runs an application and its data within a single geographic region. A single-region deployment model is simpler and cheaper than a multi-region deployment model, but it has limited scalability, availability, and performance. A single-region deployment model may not be suitable for a company that wants to deploy an application globally, as it may face challenges such as network latency, regional outages, or regulatory compliance12. A multi-AZ (Availability Zone) deployment model is a cloud computing architecture that distributes an application and its data across multiple isolated locations within a single region. An Availability Zone is a physically separate location within an AWS Region that has independent power, cooling, and networking. A multi- AZ deployment model enhances the availability and durability of an application by providing redundancy and fault tolerance within a region34. A single-AZ deployment model is a cloud computing architecture that runs an application and its data within a single Availability Zone. A single-AZ deployment model is the simplest and most cost-effective option, but it has no redundancy or fault tolerance. A single-AZ deployment model may not be suitable for a company that wants to deploy an application globally, as it may face challenges such as network latency, regional outages, or regulatory compliance34. References: 1: AWS Cloud Computing - W3Schools 2: Understand the Different Cloud Computing Deployment Models Unit - Trailhead 3: Regions and Availability Zones - Amazon Elastic Compute Cloud 4: AWS Reference Architecture Diagrams",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 4,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 2490
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q154",
+        "number": 154,
+        "text": "Which AWS service or feature identifies whether an Amazon S3 bucket or an IAM role has been shared with an external entity?",
+        "options": [
+          {
+            "text": "AWS Service Catalog",
+            "letter": "A"
+          },
+          {
+            "text": "AWS Systems Manager",
+            "letter": "B"
+          },
+          {
+            "text": "AWS IAM Access Analyzer",
+            "letter": "C"
+          },
+          {
+            "text": "AWS Organizations",
+            "letter": "D"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "C",
+        "explanation": "AWS IAM Access Analyzer is a service that helps you identify the resources in your organization and accounts, such as Amazon S3 buckets or IAM roles, that are shared with an external entity. This lets you identify unintended access to your resources and data, which is a security risk. IAM Access Analyzer uses logic-based reasoning to analyze the resource-based policies in your AWS environment. For each instance of a resource shared outside of your account, IAM Access Analyzer generates a finding. Findings include information about the access and the external principal granted to it345. References: 3: Using AWS Identity and Access Management Access Analyzer, 4: IAM Access Analyzer - Amazon Web Services (AWS), 5: Welcome - IAM Access Analyzer",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 4,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 991
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q157",
+        "number": 157,
+        "text": "A company wants to migrate to AWS and use the same security software it uses on premises. The security software vendor offers its security software as a service\non AWS.\nWhere can the company purchase the security solution?",
+        "options": [
+          {
+            "text": "AWS Partner Solutions Finder",
+            "letter": "A"
+          },
+          {
+            "text": "AWS Support Center",
+            "letter": "B"
+          },
+          {
+            "text": "AWS Management Console",
+            "letter": "C"
+          },
+          {
+            "text": "AWS Marketplace",
+            "letter": "D"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "D",
+        "explanation": "AWS Marketplace is an online store that helps customers find, buy, and immediately start using the software and services that run on AWS. Customers can choose from a wide range of software products in popular categories such as security, networking, storage, machine learning, business intelligence, database, and DevOps. Customers can also use AWS Marketplace to purchase software as a service (SaaS) solutions that are integrated with AWS. Customers can benefit from simplified procurement, billing, and deployment processes, as well as flexible pricing options and free trials. Customers can also leverage AWS Marketplace to discover and subscribe to solutions offered by AWS Partners, such as the security software vendor mentioned in the question. References: AWS Marketplace, [AWS Marketplace: Software as a Service (SaaS)], [AWS Cloud Practitioner Essentials: Module 6 - AWS Pricing, Billing, and Support]",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 4,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 1257
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q162",
+        "number": 162,
+        "text": "Passing Certification Exams Made Easy visit - https://www.surepassexam.com\n\n\nRecommend!! Get the Full CLF-C02 dumps in VCE and PDF From SurePassExam\nhttps://www.surepassexam.com/CLF-C02-exam-dumps.html (120 New Questions)\nAt what support level do users receive access to a support concierge?",
+        "options": [
+          {
+            "text": "Basic Support",
+            "letter": "A"
+          },
+          {
+            "text": "Developer Support",
+            "letter": "B"
+          },
+          {
+            "text": "Business Support",
+            "letter": "C"
+          },
+          {
+            "text": "Enterprise Support",
+            "letter": "D"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "D",
+        "explanation": "Users receive access to a support concierge at the Enterprise Support level. A support concierge is a team of AWS billing and account experts that specialize in working with enterprise accounts. They can help users with billing and account inquiries, cost optimization, FinOps support, cost analysis, and prioritized answers to billing questions. The support concierge is included as part of the Enterprise Support plan, which also provides access to a Technical Account Manager (TAM), Infrastructure Event Management, AWS Trusted Advisor, and 24/7 technical support. References: AWS Support Plan Comparison, AWS Enterprise Support Plan, AWS Support Concierge",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 4,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 1069
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q165",
+        "number": 165,
+        "text": "A company is launching a mobile app. The company wants customers to be able to use the app without upgrading their mobile devices.\nWhich pillar of the AWS Well-Architected Framework does this goal represent?",
+        "options": [
+          {
+            "text": "Security",
+            "letter": "A"
+          },
+          {
+            "text": "Reliability",
+            "letter": "B"
+          },
+          {
+            "text": "Cost optimization",
+            "letter": "C"
+          },
+          {
+            "text": "Sustainability",
+            "letter": "D"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "C",
+        "explanation": "Cost optimization is one of the five pillars of the AWS Well-Architected Framework. It focuses on avoiding unnecessary costs, understanding and controlling where money is being spent, selecting the most appropriate and right number of resource types, analyzing spend over time, and scaling to meet business needs without overspending.",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 4,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 631
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q166",
+        "number": 166,
+        "text": "A user needs a relational database but does not have the resources to manage the hardware, resiliency, and replication.\nWhich AWS service option meets the user's requirements'?",
+        "options": [
+          {
+            "text": "Run MySQL on Amazon Elastic Container Service (Amazon ECS)",
+            "letter": "A"
+          },
+          {
+            "text": "Run MySQL on Amazon EC2",
+            "letter": "B"
+          },
+          {
+            "text": "Choose Amazon RDS for MySQL",
+            "letter": "C"
+          },
+          {
+            "text": "Choose Amazon ElastiCache for Redis",
+            "letter": "D"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "C",
+        "explanation": "Amazon RDS for MySQL is a fully managed, open-source cloud database service that allows you to easily operate and scale your relational database of choice, including MySQL. With Amazon RDS for MySQL, you don’t have to worry about the hardware, resiliency, and replication of your database, as Amazon RDS handles these tasks for you. Amazon RDS for MySQL also provides features such as automated backups, multi-AZ deployments, read replicas, encryption, monitoring, and more. Amazon RDS for MySQL is compatible with the MySQL Community Edition versions 5.7 and 8.0, which means that you can use the same code, applications, and tools that you already use with MySQL4567. References: 4: Hosted MySQL - Amazon RDS for MySQL - AWS, 5: Amazon RDS for MySQL - Amazon Relational Database Service, 6: Amazon RDS for MySQL —, 7: Managed SQL Database - Amazon Relational Database Service (RDS) - AWS",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 4,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 1248
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q170",
+        "number": 170,
+        "text": "Which AWS service is always provided at no charge?",
+        "options": [
+          {
+            "text": "Amazon S3",
+            "letter": "A"
+          },
+          {
+            "text": "AWS Identity and Access Management (IAM)",
+            "letter": "B"
+          },
+          {
+            "text": "Elastic Load Balancers",
+            "letter": "C"
+          },
+          {
+            "text": "AWS WAF",
+            "letter": "D"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "B",
+        "explanation": "AWS Identity and Access Management (IAM) is a web service that helps you securely control access to AWS resources. You can use IAM to create and manage AWS users and groups, and use permissions to allow and deny their access to AWS resources. IAM is always provided at no charge12. References: 1: AWS Identity and Access Management (IAM) - Amazon Web Services (AWS), 2: Which aws service is always provided at no charge? - Brainly.in",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 4,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 601
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q173",
+        "number": 173,
+        "text": "Which options are AWS Cloud Adoption Framework (AWS CAF) cloud transformation journey\nrecommendations? (Select TWO.)",
+        "options": [
+          {
+            "text": "Envision phase",
+            "letter": "A"
+          },
+          {
+            "text": "Align phase",
+            "letter": "B"
+          },
+          {
+            "text": "Assess phase",
+            "letter": "C"
+          },
+          {
+            "text": "Mobilize phase",
+            "letter": "D"
+          },
+          {
+            "text": "Migrate and modernize phase Passing Certification Exams Made Easy visit - https://www.surepassexam.com Recommend!! Get the Full CLF-C02 dumps in VCE and PDF From SurePassExam https://www.surepassexam.com/CLF-C02-exam-dumps.html (120 New Questions)",
+            "letter": "E"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "AB",
+        "explanation": "The AWS Cloud Adoption Framework (AWS CAF) cloud transformation journey is a four-phase process that helps customers plan and execute their cloud migration and digital transformation. The four phases are: ? Envision phase: This phase focuses on demonstrating how cloud will help accelerate the business outcomes of the customer. It involves identifying and prioritizing transformation opportunities across four domains: business, people, governance, and platform. It also involves associating the transformation initiatives with key stakeholders and measurable business outcomes1. ? Align phase: This phase focuses on identifying capability gaps across six perspectives: business, people, governance, platform, security, and operations. It also involves identifying cross-organizational dependencies and surfacing stakeholder concerns and challenges. The goal of this phase is to create strategies for improving the cloud readiness, ensure stakeholder alignment, and facilitate relevant organizational change management activities1. ? Launch phase: This phase focuses on delivering pilot initiatives in production and demonstrating incremental business value. Pilots should be highly impactful and influence future direction. The customer should learn from the pilots and adjust their approach before scaling to full production1. ? Scale phase: This phase focuses on expanding production pilots and business value to the desired scale and ensuring that the business benefits associated with the cloud investments are realized and sustained1.",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 5,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 2017
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q174",
+        "number": 174,
+        "text": "An ecommerce company wants to use Amazon EC2 Auto Scaling to add and remove EC2 instances based on CPU utilization.\nWhich AWS service or feature can initiate an Amazon EC2 Auto Scaling action to achieve this goal?",
+        "options": [
+          {
+            "text": "Amazon Simple Queue Service (Amazon SQS)",
+            "letter": "A"
+          },
+          {
+            "text": "Amazon Simple Notification Service (Amazon SNS)",
+            "letter": "B"
+          },
+          {
+            "text": "AWS Systems Manager",
+            "letter": "C"
+          },
+          {
+            "text": "Amazon CloudWatch alarm",
+            "letter": "D"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "D",
+        "explanation": "Amazon CloudWatch alarm is an AWS service or feature that can initiate an Amazon EC2 Auto Scaling action based on CPU utilization. Amazon CloudWatch is a monitoring and observability service that collects and tracks metrics, logs, events, and alarms for your AWS resources and applications. Amazon CloudWatch alarms are actions that you can configure to send notifications or automatically make changes to the resources you are monitoring based on rules that you define67. Amazon EC2 Auto Scaling is a service that helps you maintain application availability and allows you to automatically add or remove EC2 instances according to definable conditions. You can create dynamic scaling policies that track a specific CloudWatch metric, such as CPU utilization, and define what action to take when the associated CloudWatch alarm is in ALARM. When the policy is in effect, Amazon EC2 Auto Scaling adjusts the group’s desired capacity up or down when the threshold of an alarm is breached89. References: 6: Cloud Monitoring - Amazon CloudWatch - AWS, 7: Amazon CloudWatch Documentation, 8: Dynamic scaling for Amazon EC2 Auto Scaling, 9: Amazon EC2 Auto Scaling Documentation",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 4,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 1554
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q176",
+        "number": 176,
+        "text": "Which of the following actions are controlled with AWS Identity and Access Management (IAM)? (Select TWO.)",
+        "options": [
+          {
+            "text": "Control access to AWS service APIs and to other specific resources.",
+            "letter": "A"
+          },
+          {
+            "text": "Provide intelligent threat detection and continuous monitoring.",
+            "letter": "B"
+          },
+          {
+            "text": "Protect the AWS environment using multi-factor authentication (MFA).",
+            "letter": "C"
+          },
+          {
+            "text": "Grant users access to AWS data centers.",
+            "letter": "D"
+          },
+          {
+            "text": "Provide firewall protection for applications from common web attacks.",
+            "letter": "E"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "AC",
+        "explanation": "AWS Identity and Access Management (IAM) is a service that enables you to manage access to AWS services and resources securely. You can use IAM to perform the following actions: ? Control access to AWS service APIs and to other specific resources: You can create users, groups, roles, and policies that define who can access which AWS resources and how. You can also use IAM to grant temporary access to users or applications that need to perform certain tasks on your behalf3 ? Protect the AWS environment using multi-factor authentication (MFA): You can enable MFA for your IAM users and root user to add an extra layer of security to your AWS account. MFA requires users to provide a unique authentication code from an approved device or SMS text message, in addition to their user name and password, when they sign in to AWS4",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 5,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 1286
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q179",
+        "number": 179,
+        "text": "A company wants to migrate its on-premises relational databases to the AWS Cloud. The company wants to use infrastructure as close to its current geographical\nlocation as possible.\nWhich AWS service or resource should the company use to select its Amazon RDS deployment area?",
+        "options": [
+          {
+            "text": "Amazon Connect",
+            "letter": "A"
+          },
+          {
+            "text": "AWS Wavelength",
+            "letter": "B"
+          },
+          {
+            "text": "AWS Regions",
+            "letter": "C"
+          },
+          {
+            "text": "AWS Direct Connect",
+            "letter": "D"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "C",
+        "explanation": "AWS Regions are the AWS service or resource that the company should use to select its Amazon RDS deployment area. AWS Regions are separate geographic areas where AWS clusters its data centers. Each AWS Region consists of multiple, isolated, and physically separate Availability Zones within a geographic area. Each AWS Region is designed to be isolated from the other AWS Regions to achieve the highest possible fault tolerance and stability. AWS provides a more extensive global footprint than any other cloud provider, and to support its global footprint and ensure customers are served across the world, AWS opens new Regions rapidly. AWS maintains multiple geographic Regions, including Regions in North America, South America, Europe, China, Asia Pacific, South Africa, and Passing Certification Exams Made Easy visit - https://www.surepassexam.com Recommend!! Get the Full CLF-C02 dumps in VCE and PDF From SurePassExam https://www.surepassexam.com/CLF-C02-exam-dumps.html (120",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 4,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 1934
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q184",
+        "number": 184,
+        "text": "A company is assessing its AWS Business Support plan to determine if the plan still meets the company's needs. The company is considering switching to AWS\nEnterprise Support.\nWhich additional benefit will the company receive with AWS Enterprise Support?",
+        "options": [
+          {
+            "text": "A full set of AWS Trusted Advisor checks",
+            "letter": "A"
+          },
+          {
+            "text": "Phone, email, and chat access to cloud support engineers 24 hours a day, 7 days a week",
+            "letter": "B"
+          },
+          {
+            "text": "A designated technical account manager (TAM) to assist in monitoring and optimization",
+            "letter": "C"
+          },
+          {
+            "text": "A consultative review and architecture guidance for the company's applications",
+            "letter": "D"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "C",
+        "explanation": "AWS Enterprise Support provides customers with a designated technical account manager (TAM) who is a single point of contact for all technical and operational issues. The TAM provides consultative architectural and operational guidance delivered in the context of the customer’s applications and use-cases to help them achieve the greatest value from AWS. The TAM also helps customers with proactive services, such as strategic business reviews, security improvement programs, guided Well-Architected reviews, cost optimization workshops, and more1. A full set of AWS Trusted Advisor checks is not an additional benefit of AWS Enterprise Support, as it is also included in the AWS Business Support plan2. AWS Trusted Advisor is a tool that provides best practice recommendations for cost optimization, performance, security, fault tolerance, and service limits. Phone, email, and chat access to cloud support engineers 24 hours a day, 7 days a week is not an additional benefit of AWS Enterprise Support, as it is also included in the AWS Business Support plan2. Cloud support engineers can help customers with technical issues, such as troubleshooting, configuration, usage, and service features. A consultative review and architecture guidance for the company’s applications is not an additional benefit of AWS Enterprise Support, as it is also included in the AWS Business Support plan2. Customers can request a consultative review from a solutions architect who will provide best practices and recommendations based on the customer’s use-cases and goals.",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 4,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 2140
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q185",
+        "number": 185,
+        "text": "Which of the following is a software development framework that a company can use to define cloud resources as code and provision the resources through AWS\nCloudFormation?",
+        "options": [
+          {
+            "text": "AWS CLI",
+            "letter": "A"
+          },
+          {
+            "text": "AWS Developer Center",
+            "letter": "B"
+          },
+          {
+            "text": "AWS Cloud Development Kit (AWS CDK)",
+            "letter": "C"
+          },
+          {
+            "text": "AWS CodeStar",
+            "letter": "D"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "C",
+        "explanation": "AWS Cloud Development Kit (AWS CDK) is a software development framework that allows you to define cloud resources as code using familiar programming languages, such as TypeScript, Python, Java, .NET, and Go (in Developer Preview). You can use AWS CDK to model your application resources using high-level constructs that provide sensible defaults and best practices, or use low-level constructs that provide full access to the underlying AWS CloudFormation resources. AWS CDK synthesizes your code into AWS CloudFormation templates that you can deploy using the AWS CDK CLI or the AWS Management Console. AWS CDK also integrates with other AWS services, such as AWS CodeCommit, AWS CodeBuild, AWS CodePipeline, AWS Lambda, Amazon EC2, Amazon S3, and more, to help you automate your development and deployment processes. AWS CDK is an open-source framework that you can extend and contribute to. References: Cloud Development Framework - AWS Cloud Development Kit - AWS, AWS Cloud Development Kit Documentation, AWS Cloud Development Kit - Wikipedia, AWS CDK Intro Workshop | AWS CDK Workshop",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 4,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 1375
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q186",
+        "number": 186,
+        "text": "Which of the following is a pillar of the AWS Well-Architected Framework?",
+        "options": [
+          {
+            "text": "Redundancy",
+            "letter": "A"
+          },
+          {
+            "text": "Operational excellence",
+            "letter": "B"
+          },
+          {
+            "text": "Availability",
+            "letter": "C"
+          },
+          {
+            "text": "Multi-Region",
+            "letter": "D"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "B",
+        "explanation": "The AWS Well-Architected Framework helps cloud architects build secure, high-performing, resilient, and efficient infrastructure for their applications and workloads. Based on five pillars — operational excellence, security, reliability, performance efficiency, and cost optimization — the Framework provides a consistent approach for customers and partners to evaluate architectures, and implement designs that can scale over time. Operational excellence is one of the pillars of the Framework, and it focuses on running and monitoring systems to deliver business value, and continually improving processes and procedures.",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 4,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 792
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q188",
+        "number": 188,
+        "text": "Which AWS service or feature is an example of a relational database management system?",
+        "options": [
+          {
+            "text": "Amazon Athena",
+            "letter": "A"
+          },
+          {
+            "text": "Amazon Redshift",
+            "letter": "B"
+          },
+          {
+            "text": "Amazon S3 Select",
+            "letter": "C"
+          },
+          {
+            "text": "Amazon Kinesis Data Streams Passing Certification Exams Made Easy visit - https://www.surepassexam.com Recommend!! Get the Full CLF-C02 dumps in VCE and PDF From SurePassExam https://www.surepassexam.com/CLF-C02-exam-dumps.html (120 New Questions)",
+            "letter": "D"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "B",
+        "explanation": "Amazon Redshift is a fully managed, petabyte-scale data warehouse service in the cloud. You can start with just a few hundred gigabytes of data and scale to a petabyte or more. This enables you to use your data to acquire new insights for your business and customers. Amazon Redshift is a relational database management system (RDBMS), so it is compatible with other RDBMS applications. You can use standard SQL to query the data.",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 4,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 864
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q193",
+        "number": 193,
+        "text": "A company is building an application in the AWS Cloud. The company wants to use temporary credentials for the application to access other AWS resources.\nWhich AWS service will meet these requirements?",
+        "options": [
+          {
+            "text": "AWS Key Management Service (Aws KMS)",
+            "letter": "A"
+          },
+          {
+            "text": "AWS CloudHSM",
+            "letter": "B"
+          },
+          {
+            "text": "Amazon Cognito",
+            "letter": "C"
+          },
+          {
+            "text": "AWS Security Token Service (Aws STS)",
+            "letter": "D"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "D",
+        "explanation": "AWS Security Token Service (AWS STS) is a service that provides temporary security credentials to users or applications that need to access AWS resources. The temporary credentials have a limited lifetime and can be configured to last from a few minutes to several hours. The credentials are not stored with the user or application, but are generated dynamically and provided on request. The credentials work almost identically to long-term access key credentials, but have the advantage of not requiring distribution, rotation, or revocation1. AWS Key Management Service (AWS KMS) is a service that provides encryption and decryption services for data and keys. It does not provide temporary security credentials2. AWS CloudHSM is a service that provides hardware security modules (HSMs) for cryptographic operations and key management. It does not provide temporary security credentials3. Amazon Cognito is a service that provides user authentication and authorization for web and mobile applications. It can also provide temporary security credentials for authenticated users, but not for applications4.",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 4,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 1444
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q198",
+        "number": 198,
+        "text": "Which type of AWS storage is ephemeral and is deleted when an Amazon EC2 instance is stopped or terminated?",
+        "options": [
+          {
+            "text": "Amazon Elastic Block Store (Amazon EBS)",
+            "letter": "A"
+          },
+          {
+            "text": "Amazon EC2 instance store",
+            "letter": "B"
+          },
+          {
+            "text": "Amazon Elastic File System (Amazon EFS)",
+            "letter": "C"
+          },
+          {
+            "text": "Amazon S3",
+            "letter": "D"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "B",
+        "explanation": "Amazon EC2 instance store provides temporary block-level storage for your EC2 instance. This storage is located on disks that are physically attached to the host computer. Instance store is ideal for temporary storage of information that changes frequently, such as buffers, caches, scratch data, and other temporary content. It can also be used to store temporary data that you replicate across a fleet of instances, such as a load-balanced pool of web servers. An instance store consists of one or more instance store volumes exposed as block devices. The size of an instance store as well as the number of devices available varies by instance type and instance size. The virtual devices for instance store volumes are ephemeral[0-23]. Instance types that support one instance store volume have ephemeral0. Instance types that support two or more instance store volumes have ephemeral0, ephemeral1, and so on. Instance store pricing Instance store volumes are included as part of the instance’s usage cost. The data on an instance store volume persists even if the instance is rebooted. However, the data does not persist if the instance is stopped, hibernated, or terminated. When the instance is stopped, hibernated, or terminated, every block of the instance store volume is cryptographically erased. Therefore, do not rely on instance store volumes for valuable, long-term data. If you need to retain the data stored on an instance store volume beyond the lifetime of the instance, you need to manually copy that data to more persistent storage, such as an Amazon EBS volume, an Amazon S3 bucket, or an Amazon EFS file system. There are some events that can result in your data not persisting throughout the lifetime of the instance. The following table indicates whether data on instance store volumes is persisted during specific events, for both virtualized and bare metal instances1. References: Amazon EC2 instance store - Amazon Elastic Compute Cloud",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 4,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 2221
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q203",
+        "number": 203,
+        "text": "According to the AWS shared responsibility model, who is responsible for the virtualization layer down to the physical security of the facilities in which AWS\nservices operate?",
+        "options": [
+          {
+            "text": "It is the sole responsibility of the customer.",
+            "letter": "A"
+          },
+          {
+            "text": "It is the sole responsibility of AWS.",
+            "letter": "B"
+          },
+          {
+            "text": "It is a shared responsibility between AWS and the customer.",
+            "letter": "C"
+          },
+          {
+            "text": "The customer's AWS Support plan tier determines who manages the configuration.",
+            "letter": "D"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "B",
+        "explanation": "According to the AWS shared responsibility model, AWS is responsible for the security of the cloud, which includes the virtualization layer down to the physical security of the facilities in which AWS services operate1. The customer is responsible for the security in the cloud, which includes the configuration and management of the AWS resources and applications that they use1.",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 4,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 816
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q208",
+        "number": 208,
+        "text": "A company wants to use the latest technologies and wants to minimize its capital investment. Instead of upgrading on-premises infrastructure, the company wants\nto move to the AWS Cloud.\nWhich AWS Cloud benefit does this scenario describe?\nPassing Certification Exams Made Easy visit - https://www.surepassexam.com\n\n\nRecommend!! Get the Full CLF-C02 dumps in VCE and PDF From SurePassExam\nhttps://www.surepassexam.com/CLF-C02-exam-dumps.html (120 New Questions)",
+        "options": [
+          {
+            "text": "Increased speed to market",
+            "letter": "A"
+          },
+          {
+            "text": "The trade of infrastructure expenses for operating expenses",
+            "letter": "B"
+          },
+          {
+            "text": "Massive economies of scale",
+            "letter": "C"
+          },
+          {
+            "text": "The ability to go global in minutes",
+            "letter": "D"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "B",
+        "explanation": "The trade of infrastructure expenses for operating expenses is one of the benefits of the AWS Cloud. By moving to the AWS Cloud, the company can avoid the upfront costs of purchasing and maintaining on-premises infrastructure, such as servers, storage, network, and software. Instead, the company can pay only for the AWS resources and services that they use, as they use them. This reduces the risk and complexity of planning and managing IT infrastructure, and allows the company to focus on innovation and growth. Increased speed to market, massive economies of scale, and the ability to go global in minutes are also benefits of the AWS Cloud, but they are not the best ones to describe this scenario. Increased speed to market means that the company can launch new products and services faster by using AWS services and tools. Massive economies of scale means that the company can benefit from the lower costs and higher performance that AWS achieves by operating at a large scale. The ability to go global in minutes means that the company can deploy their applications and data in multiple regions and availability zones around the world to reach their customers faster and improve performance and reliability5",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 4,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 1877
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q209",
+        "number": 209,
+        "text": "A company website is experiencing DDoS attacks.\nWhich AWS service can help protect the company website against these attacks?",
+        "options": [
+          {
+            "text": "AWS Resource Access Manager",
+            "letter": "A"
+          },
+          {
+            "text": "AWS Amplify",
+            "letter": "B"
+          },
+          {
+            "text": "AWS Shield",
+            "letter": "C"
+          },
+          {
+            "text": "Amazon GuardDuty",
+            "letter": "D"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "C",
+        "explanation": "AWS Shield is a managed DDoS protection service that safeguards applications running on AWS from distributed denial of service (DDoS) attacks. DDoS attacks are malicious attempts to disrupt the normal functioning of a website or application by overwhelming it with a large volume of traffic from multiple sources. AWS Shield provides two tiers of protection: Standard and Advanced. AWS Shield Standard is automatically enabled for all AWS customers at no additional cost. It protects your AWS resources, such as Amazon CloudFront, AWS Global Accelerator, and Amazon Route 53, from the most common and frequently occurring network and transport layer DDoS attacks. AWS Shield Advanced is an optional paid service that provides additional protection for your AWS resources and applications, such as Amazon Elastic Compute Cloud (Amazon EC2), Elastic Load Balancing (ELB), Amazon Simple Storage Service (Amazon S3), Amazon Relational Database Service (Amazon RDS), and AWS Elastic Beanstalk. AWS Shield Advanced offers enhanced detection and mitigation capabilities, 24/7 access to the AWS DDoS Response Team (DRT), real-time visibility and reporting, and cost protection against DDoS-related spikes in your AWS bill12 References: AWS Shield, What is a DDOS Attack & How to Protect Your Site Against One",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 4,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 1529
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q213",
+        "number": 213,
+        "text": "A company wants to migrate its server-based applications to the AWS Cloud. The company wants to determine the total cost of ownership for its compute\nresources that will be hosted on the AWS Cloud.\nWhich combination of AWS services or tools will meet these requirements?",
+        "options": [
+          {
+            "text": "AWS Pricing Calculator",
+            "letter": "A"
+          },
+          {
+            "text": "Migration Evaluator",
+            "letter": "B"
+          },
+          {
+            "text": "AWS Support Center",
+            "letter": "C"
+          },
+          {
+            "text": "AWS Application Discovery Service",
+            "letter": "D"
+          },
+          {
+            "text": "AWS Database Migration Service (AWS DMS)",
+            "letter": "E"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "AD",
+        "explanation": "AWS Pricing Calculator and AWS Application Discovery Service are the best combination of AWS services or tools to meet the requirements of determining the total cost of ownership for compute resources that will be hosted on the AWS Cloud. AWS Pricing Calculator is a tool that enables you to estimate the cost of using AWS services based on your usage scenarios and requirements. You can use AWS Pricing Calculator to compare the costs of running your applications on- premises or on AWS, and to optimize your AWS spending. AWS Application Discovery Service is a service that helps you plan your migration to the AWS Cloud by collecting and analyzing information about your on- premises servers, applications, and dependencies. You can use AWS Application Discovery Service to identify the inventory of your on-premises infrastructure, group servers by applications, and estimate the performance and resource utilization of your applications45",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 5,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 1390
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q216",
+        "number": 216,
+        "text": "AWS has the ability to achieve lower pay-as-you-go pricing by aggregating usage across hundreds of thousands of users.\nThis describes which advantage of the AWS Cloud?",
+        "options": [
+          {
+            "text": "Launch globally in minutes",
+            "letter": "A"
+          },
+          {
+            "text": "Increase speed and agility",
+            "letter": "B"
+          },
+          {
+            "text": "High economies of scale",
+            "letter": "C"
+          },
+          {
+            "text": "No guessing about compute capacity",
+            "letter": "D"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "C",
+        "explanation": "AWS has the ability to achieve lower pay-as-you-go pricing by aggregating usage across hundreds of thousands of users. This means that AWS can leverage its massive scale and purchasing power to reduce the costs of infrastructure, hardware, software, and operations. These savings are then passed on to the customers, who only pay for the resources they use. You can learn more about the AWS pricing model from [this webpage] or [this digital course]. Passing Certification Exams Made Easy visit - https://www.surepassexam.com Recommend!! Get the Full CLF-C02 dumps in VCE and PDF From SurePassExam https://www.surepassexam.com/CLF-C02-exam-dumps.html (120",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 4,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 1003
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q220",
+        "number": 220,
+        "text": "Which mechanism allows developers to access AWS services from application code?",
+        "options": [
+          {
+            "text": "AWS Software Development Kit",
+            "letter": "A"
+          },
+          {
+            "text": "AWS Management Console",
+            "letter": "B"
+          },
+          {
+            "text": "AWS CodePipeline",
+            "letter": "C"
+          },
+          {
+            "text": "AWS Config",
+            "letter": "D"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "A",
+        "explanation": "AWS Software Development Kit (SDK) is a set of platform-specific building tools for developers. It allows developers to access AWS services from application code using familiar programming languages. It provides pre-built components and libraries that can be incorporated into applications, as well as tools to debug, monitor, and optimize performance2. References: What is SDK? - SDK Explained - AWS",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 4,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 595
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q225",
+        "number": 225,
+        "text": "A company wants to create a set of custom dashboards to collect metrics to monitor its applications.\nWhich AWS service will meet these requirements?",
+        "options": [
+          {
+            "text": "Amazon CloudWatch",
+            "letter": "A"
+          },
+          {
+            "text": "AWS X-Ray",
+            "letter": "B"
+          },
+          {
+            "text": "AWS Systems Manager",
+            "letter": "C"
+          },
+          {
+            "text": "AWS CloudTrail",
+            "letter": "D"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "A",
+        "explanation": "Amazon CloudWatch is a service that provides monitoring and observability for AWS resources and applications. Users can create custom dashboards to collect and visualize metrics, logs, alarms, and events from different sources5. AWS X-Ray is a service that provides distributed tracing and analysis for applications. AWS Systems Manager is a service that provides operational management for AWS resources and applications. AWS CloudTrail is a service that provides governance, compliance, and auditing for AWS account activity.",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 4,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 774
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q229",
+        "number": 229,
+        "text": "A company is moving an on-premises data center to the AWS Cloud. The company must migrate 50 petabytes of file storage data to AWS with the least possible\noperational overhead.\nWhich AWS service or resource should the company use to meet these requirements?",
+        "options": [
+          {
+            "text": "AWS Snowmobile",
+            "letter": "A"
+          },
+          {
+            "text": "AWS Snowball Edge",
+            "letter": "B"
+          },
+          {
+            "text": "AWS Data Exchange",
+            "letter": "C"
+          },
+          {
+            "text": "AWS Database Migration Service (AWS DMS)",
+            "letter": "D"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "A",
+        "explanation": "The AWS service that the company should use to meet these requirements is A. AWS Snowmobile. AWS Snowmobile is a service that allows you to migrate large amounts of data to AWS using a 45-foot long ruggedized shipping container that can store up to 100 petabytes of data. AWS Snowmobile is designed for situations where you need to move massive amounts of data to the cloud in a fast, secure, and cost-effective way. AWS Snowmobile has the least possible operational overhead because it eliminates the need to buy, configure, or manage hundreds or thousands of storage devices12. AWS Snowball Edge is a service that allows you to migrate data to AWS using a physical device that can store up to 80 terabytes of data and has compute and storage capabilities to run applications on the device. AWS Snowball Edge is suitable for situations where you have limited or intermittent network connectivity, or where bandwidth costs are high. However, AWS Snowball Edge has more operational overhead than AWS Snowmobile because you need to request multiple devices and transfer your data onto them using the client3. AWS Data Exchange is a service that allows you to find, subscribe to, and use third-party data in the cloud. AWS Data Exchange is not a data migration service, but rather a data marketplace that enables data providers and data consumers to exchange data sets securely and efficiently4. AWS Database Migration Service (AWS DMS) is a service that helps migrate databases to AWS. AWS DMS does not migrate file storage data, but rather supports various database platforms and engines as sources and targets5. References: 1: AWS Snowmobile – Move Exabytes of Data to the Cloud in Weeks 2: AWS Snowmobile - Amazon Web Services 3: Automated Software Vulnerability Management - Amazon Inspector - AWS 4: AWS Data Exchange - Find, subscribe to, and use third- party data in … 5: AWS Database Migration Service – Amazon Web Services",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 4,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 2314
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q231",
+        "number": 231,
+        "text": "A company wants to define a central data protection policy that works across AWS services for compute, storage, and database resources.\nWhich AWS service will meet this requirement?",
+        "options": [
+          {
+            "text": "AWS Batch",
+            "letter": "A"
+          },
+          {
+            "text": "AWS Elastic Disaster Recovery",
+            "letter": "B"
+          },
+          {
+            "text": "AWS Backup",
+            "letter": "C"
+          },
+          {
+            "text": "Amazon FSx",
+            "letter": "D"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "C",
+        "explanation": "The AWS service that will meet this requirement is C. AWS Backup. Passing Certification Exams Made Easy visit - https://www.surepassexam.com Recommend!! Get the Full CLF-C02 dumps in VCE and PDF From SurePassExam https://www.surepassexam.com/CLF-C02-exam-dumps.html (120",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 4,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 2220
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q233",
+        "number": 233,
+        "text": "A company wants to migrate its PostgreSQL database to AWS. The company does not use the database frequently.\nWhich AWS service or resource will meet these requirements with the LEAST management overhead?",
+        "options": [
+          {
+            "text": "PostgreSQL on Amazon EC2",
+            "letter": "A"
+          },
+          {
+            "text": "Amazon RDS for PostgreSQL",
+            "letter": "B"
+          },
+          {
+            "text": "Amazon Aurora PostgreSQL-Compatible Edition",
+            "letter": "C"
+          },
+          {
+            "text": "Amazon Aurora Serverless",
+            "letter": "D"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "D",
+        "explanation": "Amazon Aurora Serverless is an on-demand, auto-scaling configuration for Amazon Aurora PostgreSQL-Compatible Edition. It is a fully managed service that automatically scales up and down based on the application’s actual needs. Amazon Aurora Serverless is suitable for applications that have infrequent, intermittent, or unpredictable database workloads, and that do not require the full power and range of options provided by provisioned Aurora clusters. Amazon Aurora Serverless eliminates the need to provision and manage database instances, and reduces the management overhead associated with database administration tasks such as scaling, patching, backup, and recovery. References: Amazon Aurora Serverless, Choosing between Aurora Serverless and provisioned Aurora DB clusters, [AWS Cloud Practitioner Essentials: Module 4 - Databases in the Cloud]",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 4,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 1213
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q234",
+        "number": 234,
+        "text": "Which service enables customers to audit API calls in their AWS accounts'?",
+        "options": [
+          {
+            "text": "AWS CloudTrail",
+            "letter": "A"
+          },
+          {
+            "text": "AWS Trusted Advisor",
+            "letter": "B"
+          },
+          {
+            "text": "Amazon Inspector",
+            "letter": "C"
+          },
+          {
+            "text": "AWS X-Ray",
+            "letter": "D"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "A",
+        "explanation": "AWS CloudTrail is a service that provides a record of actions taken by a user, role, or an AWS service in your AWS account. CloudTrail captures all API calls for AWS services as events, including calls from the AWS Management Console, AWS SDKs, command line tools, and higher-level AWS services. You can use CloudTrail to monitor, audit, and troubleshoot your AWS account activity34. AWS Trusted Advisor is a service that provides best practices recommendations for cost optimization, performance, security, and fault tolerance in your AWS account5. Amazon Inspector is a service that helps you improve the security and compliance of your applications deployed on AWS by automatically assessing them for vulnerabilities and deviations from best practices6. AWS X-Ray is a service that helps you analyze and debug your applications by collecting data about the requests that your application serves, and providing tools to view, filter, and gain insights into that data7. References: Logging AWS Audit Manager API calls with CloudTrail, Logging AWS Account Management API calls using AWS CloudTrail, Review API calls in your AWS account using CloudTrail, Monitor the usage of AWS API calls using Amazon CloudWatch, Which service enables customers to audit API calls in their AWS …",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 4,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 1451
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q236",
+        "number": 236,
+        "text": "A company seeks cost savings in exchange for a commitment to use a specific amount of an AWS service or category ofAWS services for 1 year or 3 years.\nWhich AWS pricing model or offering will meet these requirements?",
+        "options": [
+          {
+            "text": "Pay-as-you-go pricing",
+            "letter": "A"
+          },
+          {
+            "text": "Savings Plans",
+            "letter": "B"
+          },
+          {
+            "text": "AWS Free Tier",
+            "letter": "C"
+          },
+          {
+            "text": "Volume discounts",
+            "letter": "D"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "B",
+        "explanation": "Savings Plans are an AWS pricing model or offering that can meet the requirements of seeking cost savings in exchange for a commitment to use a specific amount of an AWS service or category of AWS services for 1 year or 3 years. Savings Plans are flexible plans that offer significant discounts on AWS compute usage, such as EC2, Lambda, and Fargate. The company can choose from two types of Savings Plans: Compute Savings Plans and EC2 Instance Savings Plans. Compute Savings Plans provide the most flexibility and apply to any eligible compute usage, regardless of instance family, size, region, operating system, or tenancy. EC2 Instance Savings Plans provide more savings and apply to a specific instance family within a region. The company can select the amount of compute usage per hour (e.g., $10/hour) that they want to commit to for the duration of the plan (1 year or 3 years). The company will pay the discounted Savings Plan rate for the amount of usage that matches their commitment, and the regular on-demand rate for any usage beyond that",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 4,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 1372
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q239",
+        "number": 239,
+        "text": "Passing Certification Exams Made Easy visit - https://www.surepassexam.com\n\n\nRecommend!! Get the Full CLF-C02 dumps in VCE and PDF From SurePassExam\nhttps://www.surepassexam.com/CLF-C02-exam-dumps.html (120 New Questions)\nWhich AWS service requires the customer to be fully responsible for applying operating system patches?",
+        "options": [
+          {
+            "text": "Amazon DynamoDB",
+            "letter": "A"
+          },
+          {
+            "text": "AWS Lambda",
+            "letter": "B"
+          },
+          {
+            "text": "AWS Fargate",
+            "letter": "C"
+          },
+          {
+            "text": "Amazon EC2",
+            "letter": "D"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "D",
+        "explanation": "Amazon EC2 is the AWS service that requires the customer to be fully responsible for applying operating system patches. Amazon EC2 is a service that provides secure, resizable compute capacity in the cloud. Customers can launch virtual servers called instances and choose from various configurations of CPU, memory, storage, and networking resources1. Customers have full control and access to their instances, which means they are also responsible for managing and maintaining them, including applying operating system patches2. Customers can use AWS Systems Manager Patch Manager, a feature of AWS Systems Manager, to automate the process of patching their EC2 instances with both security-related updates and other types of updates3.",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 4,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 1161
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q242",
+        "number": 242,
+        "text": "How does the AWS Enterprise Support Concierge team help users?",
+        "options": [
+          {
+            "text": "Supporting application development",
+            "letter": "A"
+          },
+          {
+            "text": "Providing architecture guidance",
+            "letter": "B"
+          },
+          {
+            "text": "Answering billing and account inquiries",
+            "letter": "C"
+          },
+          {
+            "text": "Answering questions regarding technical support cases",
+            "letter": "D"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "C",
+        "explanation": "The AWS Enterprise Support Concierge team is a group of billing and account experts who specialize in working with enterprise customers. They can help customers with questions about billing, account management, cost optimization, and other non-technical issues. They can also assist customers with navigating and optimizing their AWS environment, such as setting up consolidated billing, applying for service limit increases, or requesting refunds. References: ? AWS Support Plan Comparison ? AWS Enterprise Support Plan ? Answer Explained: Which AWS Support plan provides access to AWS Concierge Support team for account assistance?",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 4,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 892
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q245",
+        "number": 245,
+        "text": "Which option is an AWS Cloud Adoption Framework (AWS CAF) foundational capability for the operations perspective?",
+        "options": [
+          {
+            "text": "Performance and capacity management",
+            "letter": "A"
+          },
+          {
+            "text": "Application portfolio management",
+            "letter": "B"
+          },
+          {
+            "text": "Identity and access management",
+            "letter": "C"
+          },
+          {
+            "text": "Product management",
+            "letter": "D"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "C",
+        "explanation": "Identity and access management is one of the foundational capabilities for the operations perspective of the AWS Cloud Adoption Framework (AWS CAF). It involves managing the identities, roles, permissions, and credentials of users and systems that interact with AWS resources. Performance and capacity management is a capability for the platform perspective. Application portfolio management is a capability for the business perspective. Product management is a capability for the governance perspective.",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 4,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 772
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q246",
+        "number": 246,
+        "text": "Which perspective in the AWS Cloud Adoption Framework (AWS CAF) includes a capability for well-designed data and analytics architecture?",
+        "options": [
+          {
+            "text": "Security",
+            "letter": "A"
+          },
+          {
+            "text": "Governance",
+            "letter": "B"
+          },
+          {
+            "text": "Operations",
+            "letter": "C"
+          },
+          {
+            "text": "Platform",
+            "letter": "D"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "D",
+        "explanation": "The correct answer is D. Platform. The Platform perspective in the AWS Cloud Adoption Framework (AWS CAF) includes a capability for well-designed data and analytics architecture. This capability helps you design, implement, and optimize your data and analytics solutions on AWS, using services such as Amazon S3, Amazon Redshift, Amazon EMR, Amazon Kinesis, Amazon Athena, and Amazon QuickSight. A well-designed data and analytics architecture enables you to collect, store, process, analyze, and visualize data from various sources, and derive insights that can drive your business decisions12. The Security perspective does not include a capability for data and analytics architecture, but it does include a capability for data protection, which helps you secure your data at rest and in transit using encryption, key management, access control, and auditing13. The Governance perspective does not include a capability for data and analytics architecture, but it does include a capability for data governance, which helps you manage the quality, availability, usability, integrity, and security of your data assets14. The Operations perspective does not include a capability for data and analytics architecture, but it does include a capability for data operations, which helps you monitor, troubleshoot, and optimize the performance and availability of your data pipelines and workloads1 . References: 1: Foundational capabilities - An Overview of the AWS Cloud Adoption Framework 2: [AWS Cloud Adoption Framework: Platform Perspective] 3: [AWS Cloud Adoption Framework: Security Perspective] 4: [AWS Cloud Adoption Framework: Governance Perspective] : [AWS Cloud Adoption Framework: Operations Perspective] Passing Certification Exams Made Easy visit - https://www.surepassexam.com Recommend!! Get the Full CLF-C02 dumps in VCE and PDF From SurePassExam https://www.surepassexam.com/CLF-C02-exam-dumps.html (120",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 4,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 2159
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q247",
+        "number": 247,
+        "text": "Which scenarios represent the concept of elasticity on AWS? (Select TWO.)",
+        "options": [
+          {
+            "text": "Scaling the number of Amazon EC2 instances based on traffic",
+            "letter": "A"
+          },
+          {
+            "text": "Resizing Amazon RDS instances as business needs change",
+            "letter": "B"
+          },
+          {
+            "text": "Automatically directing traffic to less-utilized Amazon EC2 instances",
+            "letter": "C"
+          },
+          {
+            "text": "Using AWS compliance documents to accelerate the compliance process",
+            "letter": "D"
+          },
+          {
+            "text": "Having the ability to create and govern environments using code",
+            "letter": "E"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "AB",
+        "explanation": "These are two scenarios that represent the concept of elasticity on AWS. Elasticity means the ability to adjust the resources and capacity of the system in response to changes in demand or environment. Scaling the number of Amazon EC2 instances based on traffic means using services such as AWS Auto Scaling or Elastic Load Balancing to add or remove instances as the traffic increases or decreases. Resizing Amazon RDS instances as business needs change means using the Amazon RDS console or API to modify the instance type, storage type, or storage size of the database as the workload grows or shrinks. You can learn more about the concept of elasticity on AWS from [this webpage] or [this digital course].",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 5,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 1139
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q252",
+        "number": 252,
+        "text": "A company needs to block SQL injection attacks.\nWhich AWS service or feature can meet this requirement?",
+        "options": [
+          {
+            "text": "AWS WAF",
+            "letter": "A"
+          },
+          {
+            "text": "AWS Shield",
+            "letter": "B"
+          },
+          {
+            "text": "Network ACLs",
+            "letter": "C"
+          },
+          {
+            "text": "Security groups",
+            "letter": "D"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "A",
+        "explanation": "AWS WAF is a web application firewall that helps protect web applications from common web exploits, such as SQL injection attacks. It allows customers to create custom rules that block malicious requests. AWS Shield is a managed service that protects against distributed denial of service (DDoS) attacks, not SQL injection attacks. Network ACLs and security groups are network-level security features that filter traffic based on IP addresses and ports, not web requests or SQL queries. References: [AWS WAF], [AWS Shield], [Network ACLs], [Security groups]",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 4,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 744
+      }
+    },
+    {
+      "question": {
+        "id": "clf-c02_2_q257",
+        "number": 257,
+        "text": "Which AWS service or feature can a company use to apply security rules to specific Amazon EC2 instances?",
+        "options": [
+          {
+            "text": "Network ACLs",
+            "letter": "A"
+          },
+          {
+            "text": "Security groups",
+            "letter": "B"
+          },
+          {
+            "text": "AWS Trusted Advisor",
+            "letter": "C"
+          },
+          {
+            "text": "AWS WAF",
+            "letter": "D"
+          }
+        ],
+        "topic": 3,
+        "difficulty": "medium",
+        "keywords": []
+      },
+      "answer": {
+        "correct_answer": "B",
+        "explanation": "Security groups are the AWS service or feature that can be used to apply security rules to specific Amazon EC2 instances. Security groups are virtual firewalls that control the inbound and outbound traffic for one or more instances. Customers can create security groups and add rules that reflect the role of the instance that is associated with the security group. For example, a web server instance needs security group rules that allow inbound HTTP and HTTPS access, while a database instance needs rules that allow access for the type of database12. Security groups are stateful, meaning that the responses to allowed inbound traffic are also allowed, regardless of the outbound rules1. Customers can assign multiple security groups to an instance, and the rules from each security group are effectively aggregated to create one set of rules1. Network ACLs are another AWS service or feature that can be used to control the traffic for a subnet. Network ACLs are stateless, meaning that they do not track the traffic that they allow. Therefore, customers must add rules for both inbound and outbound traffic3. Network ACLs are applied at the subnet level, not at the instance level. AWS Trusted Advisor is an AWS service that provides best practice recommendations for security, performance, cost optimization, and fault tolerance. AWS Trusted Advisor does not apply security rules to specific Amazon EC2 instances, but it can help customers identify security gaps and improve their security posture4. AWS WAF is an AWS service that helps protect web applications from common web exploits, such as SQL injection, cross-site scripting, and bot attacks. AWS WAF does not apply security rules to specific Amazon EC2 instances, but it can be integrated with other AWS services, such as Amazon CloudFront, Amazon API Gateway, and Application Load Balancer.",
+        "confidence": "high"
+      },
+      "metadata": {
+        "extraction_method": "fixed_v2_parser",
+        "format": "surepassexam",
+        "options_count": 4,
+        "has_answer": true,
+        "has_explanation": true,
+        "content_length": 2052
+      }
+    }
+  ]
+}

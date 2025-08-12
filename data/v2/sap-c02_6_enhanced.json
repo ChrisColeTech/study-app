@@ -1,0 +1,3298 @@
+{
+  "metadata": {
+    "parsing_date": "2025-08-11T19:40:23.925766",
+    "source_pdf": "docs/exam-material/sap-c02_6.pdf",
+    "source_questions": "data/v2/sap-c02_6_classified.json",
+    "detected_format": "surepassexam",
+    "total_questions": 51,
+    "answers_extracted": 48,
+    "extraction_success_rate": 0.941,
+    "letter_extraction_success_rate": 0.941,
+    "index_mapping_success_rate": 1.0,
+    "average_confidence": 0.01,
+    "fuzzy_match_fallbacks": 0,
+    "manual_review_flagged": 48,
+    "confidence_distribution": {
+      "high": 0,
+      "medium": 0,
+      "low": 48
+    },
+    "extraction_methods": {
+      "pattern_1": 48
+    },
+    "enhancement_date": "2025-08-11T19:41:41.229922",
+    "enhancement_source_pdf": "docs/exam-material/sap-c02_6.pdf",
+    "original_answers": 48,
+    "enhanced_answers": 51,
+    "total_answers": 99,
+    "enhancement_success_rate": 1.0,
+    "enhancement_patterns": {
+      "service_pattern": 42,
+      "option_format": 3
+    }
+  },
+  "answers": [
+    {
+      "question_id": "t4_q1",
+      "question_number": 1,
+      "raw_answer_text": "C",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        2
+      ],
+      "validation_confidence": 0.013888888888888888,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "Set up an Amazon Aurora MySQL database. Use AWS Database Migration Service (AWS DMS) to perform continuous data replication from the on-premises database to Aurora. Create an Aurora Replica for the Aurora MySQL database, and move the aggregation jobs to run against the Aurora Replica. Set up collection endpoints as AWS Lambda functions behind an Application Load Balancer (ALB), and use Amazon RDS Proxy to write to the Aurora MySQL database. When the databases are synced, point the collector DNS record to the ALB. Disable the AWS DMS sync task after the cutover from on premises to AWS. Amazon RDS Proxy allows applications to pool and share connections established with the database, improving database efficiency and application scalability. With RDS Proxy, failover times for Aurora and RDS databases are reduced by up to 66%",
+      "keywords": [
+        "RDS",
+        "Lambda"
+      ],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t4_q1",
+      "question_number": 1,
+      "raw_answer_text": "Set up collection endpomts as AWS Lambda functions behind a Network Load Balancer (NLB).",
+      "extraction_method": "service_pattern",
+      "correct_answers": [
+        4,
+        2,
+        4,
+        2,
+        4,
+        3,
+        0,
+        0,
+        0,
+        1,
+        3,
+        0,
+        2,
+        1,
+        4,
+        3,
+        0,
+        4,
+        0,
+        3,
+        1,
+        0,
+        0,
+        2,
+        4,
+        1
+      ],
+      "validation_confidence": 0.7,
+      "mapping_issues": [
+        "Enhanced pattern extraction"
+      ],
+      "mapping_method": "enhanced_letter_mapping",
+      "explanation": "Set up an Amazon Aurora MySQL database. Use AWS Database Migration Service (AWS DMS) to perform continuous data replication from the on-premises database to Aurora. Create an Aurora Replica for the Aurora MySQL database, and move the aggregation jobs to run against the Aurora Replica. Set up collection endpoints as AWS Lambda functions behind an Application Load Balancer (ALB), and use Amazon RDS Proxy to write to the Aurora MySQL database. When the databases are synced, point the collector DNS record to the ALB. Disable the AWS DMS sync task after the cutover from on premises to AWS. Amazon RDS Proxy allows applications to pool and share connections established with the database, improving database efficiency and application scalability. With RDS Proxy, failover times for Aurora and RDS d...",
+      "keywords": [
+        "EC2",
+        "RDS",
+        "Lambda",
+        "Auto Scaling",
+        "Kinesis"
+      ],
+      "requires_manual_review": false,
+      "enhanced": true
+    },
+    {
+      "question_id": "t7_q2",
+      "question_number": 2,
+      "raw_answer_text": "D",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        3
+      ],
+      "validation_confidence": 0.0,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "https://aws.amazon.com/blogs/compute/operating-lambda-performance-optimization-part-1/",
+      "keywords": [
+        "Lambda"
+      ],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t7_q2",
+      "question_number": 2,
+      "raw_answer_text": "create a new Amazon EC2 instance to pull requests from the queue and process the file\nG.",
+      "extraction_method": "service_pattern",
+      "correct_answers": [
+        2,
+        4,
+        0,
+        4,
+        0,
+        4,
+        0,
+        0,
+        4,
+        2,
+        0,
+        2,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        0,
+        3,
+        2,
+        4,
+        4,
+        4
+      ],
+      "validation_confidence": 0.7,
+      "mapping_issues": [
+        "Enhanced pattern extraction"
+      ],
+      "mapping_method": "enhanced_letter_mapping",
+      "explanation": "https://aws.amazon.com/blogs/compute/operating-lambda-performance-optimization-part-1/",
+      "keywords": [
+        "S3",
+        "EC2",
+        "Lambda",
+        "Auto Scaling",
+        "Config"
+      ],
+      "requires_manual_review": false,
+      "enhanced": true
+    },
+    {
+      "question_id": "t2_q3",
+      "question_number": 4,
+      "raw_answer_text": "A",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        0
+      ],
+      "validation_confidence": 0.0,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "https://aws.amazon.com/about-aws/whats-new/2020/11/announcing-amazon-mq-rabbitmq/",
+      "keywords": [],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t2_q3",
+      "question_number": 4,
+      "raw_answer_text": "Create an AMI of the web server VM Create an Amazon EC2 Auto Scaling group that uses the AMI and an Application Load Balancer Set up Amazon MQ to\nreplace the on-premises messaging queue Configure Amazon Elastic Kubernetes Service (Amazon EKS) to host the order-processing backend\nB.",
+      "extraction_method": "service_pattern",
+      "correct_answers": [
+        2,
+        0,
+        0,
+        0,
+        1,
+        2,
+        0,
+        0,
+        0,
+        0,
+        2,
+        0,
+        2,
+        0,
+        0,
+        0,
+        0,
+        3,
+        0,
+        0,
+        2,
+        0,
+        0,
+        3,
+        1,
+        0,
+        0,
+        2,
+        0,
+        0,
+        0,
+        2,
+        0,
+        2,
+        0,
+        0,
+        0,
+        2,
+        1,
+        2,
+        0,
+        0,
+        3,
+        2,
+        1,
+        0,
+        2,
+        3,
+        1
+      ],
+      "validation_confidence": 0.7,
+      "mapping_issues": [
+        "Enhanced pattern extraction"
+      ],
+      "mapping_method": "enhanced_letter_mapping",
+      "explanation": "https://aws.amazon.com/about-aws/whats-new/2020/11/announcing-amazon-mq-rabbitmq/",
+      "keywords": [
+        "EC2",
+        "Lambda",
+        "Auto Scaling",
+        "SQS",
+        "API Gateway",
+        "EKS",
+        "Config"
+      ],
+      "requires_manual_review": false,
+      "enhanced": true
+    },
+    {
+      "question_id": "t7_q4",
+      "question_number": 5,
+      "raw_answer_text": "D",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        3
+      ],
+      "validation_confidence": 0.0,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "In this solution, the company can use Amazon SES to send email messages, which will minimize operational overhead as SES is a fully managed service that handles sending and receiving email messages. The company can store the email template on Amazon SES with parameters for the customer data and use an AWS Lambda function to call the SendTemplatedEmail API operation, passing in the customer data to replace the parameters and the email destination. This solution eliminates the need to set up and manage an SMTP server on EC2 instances, which can be costly and time-consuming. Passing Certification Exams Made Easy visit - https://www.surepassexam.com Recommend!! Get the Full SAP-C02 dumps in VCE and PDF From SurePassExam https://www.surepassexam.com/SAP-C02-exam-dumps.html (300",
+      "keywords": [
+        "EC2",
+        "Lambda"
+      ],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t7_q4",
+      "question_number": 5,
+      "raw_answer_text": "Set up an SMTP server on Amazon EC2 instances by using an AMI from the AWS Marketplac\nB.",
+      "extraction_method": "service_pattern",
+      "correct_answers": [
+        4,
+        0,
+        4,
+        4,
+        0,
+        0,
+        4,
+        2,
+        0,
+        2,
+        4,
+        1,
+        0,
+        0,
+        4,
+        0,
+        0,
+        4,
+        0,
+        2,
+        1
+      ],
+      "validation_confidence": 0.7,
+      "mapping_issues": [
+        "Enhanced pattern extraction"
+      ],
+      "mapping_method": "enhanced_letter_mapping",
+      "explanation": "In this solution, the company can use Amazon SES to send email messages, which will minimize operational overhead as SES is a fully managed service that handles sending and receiving email messages. The company can store the email template on Amazon SES with parameters for the customer data and use an AWS Lambda function to call the SendTemplatedEmail API operation, passing in the customer data to replace the parameters and the email destination. This solution eliminates the need to set up and manage an SMTP server on EC2 instances, which can be costly and time-consuming. Passing Certification Exams Made Easy visit - https://www.surepassexam.com Recommend!! Get the Full SAP-C02 dumps in VCE and PDF From SurePassExam https://www.surepassexam.com/SAP-C02-exam-dumps.html (300",
+      "keywords": [
+        "S3",
+        "EC2",
+        "Lambda"
+      ],
+      "requires_manual_review": false,
+      "enhanced": true
+    },
+    {
+      "question_id": "t2_q5",
+      "question_number": 6,
+      "raw_answer_text": "C",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        2
+      ],
+      "validation_confidence": 0.0,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "Using AWS Transfer Family to create an FTP server that places the files in Amazon S3 and using S3 event notifications through Amazon Simple Notification Service (Amazon SNS) to invoke an AWS Lambda function will ensure that the archive always receives the files and that the central system is always updated. This solution maximizes scalability and eliminates the need for manual intervention, such as rebooting the EC2 instance.",
+      "keywords": [
+        "S3",
+        "EC2",
+        "Lambda",
+        "SNS"
+      ],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t2_q5",
+      "question_number": 6,
+      "raw_answer_text": "Create an AMI of the existing EC2 instanc\nB.",
+      "extraction_method": "service_pattern",
+      "correct_answers": [
+        2,
+        4,
+        0,
+        4,
+        0,
+        0,
+        4,
+        4,
+        4,
+        2,
+        0,
+        2,
+        1
+      ],
+      "validation_confidence": 0.7,
+      "mapping_issues": [
+        "Enhanced pattern extraction"
+      ],
+      "mapping_method": "enhanced_letter_mapping",
+      "explanation": "Using AWS Transfer Family to create an FTP server that places the files in Amazon S3 and using S3 event notifications through Amazon Simple Notification Service (Amazon SNS) to invoke an AWS Lambda function will ensure that the archive always receives the files and that the central system is always updated. This solution maximizes scalability and eliminates the need for manual intervention, such as rebooting the EC2 instance.",
+      "keywords": [
+        "S3",
+        "EC2",
+        "Lambda",
+        "Auto Scaling",
+        "SQS",
+        "SNS",
+        "Config"
+      ],
+      "requires_manual_review": false,
+      "enhanced": true
+    },
+    {
+      "question_id": "t4_q6",
+      "question_number": 7,
+      "raw_answer_text": "C",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        2
+      ],
+      "validation_confidence": 0.017857142857142856,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "Using AWS CloudFormation to launch a stack with an Application Load Balancer (ALB) in front of an Amazon EC2 Auto Scaling group spanning three Availability Zones, a Multi-AZ deployment of an Amazon Aurora MySQL DB cluster with a Retain deletion policy, and an Amazon Route 53 alias record to route traffic from the company’s domain to the ALB will ensure that",
+      "keywords": [
+        "EC2",
+        "Auto Scaling",
+        "CloudFormation",
+        "Route 53"
+      ],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t4_q6",
+      "question_number": 7,
+      "raw_answer_text": "Use AWS Elastic Beanstalk to create a new application with a web server environment and an Amazon RDS MySQL Multi-AZ DB instance The environment\nshould launch a Network Load Balancer (NLB) in front of an Amazon EC2 Auto Scaling group in multiple Availability Zones Use an Amazon Route 53 alias record\nto route traffic from the company's domain to the NLB.",
+      "extraction_method": "service_pattern",
+      "correct_answers": [
+        4,
+        0,
+        4,
+        0,
+        2,
+        1,
+        4,
+        0,
+        0,
+        2,
+        4,
+        0,
+        4,
+        0,
+        4,
+        0,
+        2,
+        0,
+        0,
+        4,
+        1,
+        4,
+        4,
+        4,
+        4,
+        0,
+        3,
+        0,
+        0,
+        0,
+        3,
+        0,
+        3,
+        1,
+        0,
+        2,
+        4,
+        4,
+        4,
+        4,
+        3,
+        0,
+        2,
+        0,
+        4,
+        0,
+        3,
+        1,
+        0,
+        0,
+        2,
+        4,
+        1,
+        0,
+        0,
+        0,
+        4,
+        2,
+        0,
+        2,
+        0,
+        4,
+        0,
+        0,
+        0,
+        1,
+        4,
+        4,
+        0,
+        0,
+        0,
+        4,
+        0,
+        0,
+        4,
+        2,
+        3,
+        4,
+        0,
+        2,
+        4,
+        2,
+        0,
+        3,
+        0,
+        4,
+        1
+      ],
+      "validation_confidence": 0.7,
+      "mapping_issues": [
+        "Enhanced pattern extraction"
+      ],
+      "mapping_method": "enhanced_letter_mapping",
+      "explanation": "Using AWS CloudFormation to launch a stack with an Application Load Balancer (ALB) in front of an Amazon EC2 Auto Scaling group spanning three Availability Zones, a Multi-AZ deployment of an Amazon Aurora MySQL DB cluster with a Retain deletion policy, and an Amazon Route 53 alias record to route traffic from the company’s domain to the ALB will ensure that",
+      "keywords": [
+        "EC2",
+        "RDS",
+        "Auto Scaling",
+        "CloudFormation",
+        "Route 53",
+        "ECS"
+      ],
+      "requires_manual_review": false,
+      "enhanced": true
+    },
+    {
+      "question_id": "t3_q7",
+      "question_number": 8,
+      "raw_answer_text": "A",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        0
+      ],
+      "validation_confidence": 0.0,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "https://aws.amazon.com/about-aws/whats-new/2017/11/announcing-support-for-inter-region-vpc-peering/ Passing Certification Exams Made Easy visit - https://www.surepassexam.com Recommend!! Get the Full SAP-C02 dumps in VCE and PDF From SurePassExam https://www.surepassexam.com/SAP-C02-exam-dumps.html (300",
+      "keywords": [
+        "VPC"
+      ],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t3_q7",
+      "question_number": 8,
+      "raw_answer_text": "instances in an application VPC located in the us-east-1 Region with an IPv4 CIDR block of 10.10.0.0/16. In a different AWS account, a shared services VPC is",
+      "extraction_method": "fuzzy_enhanced",
+      "correct_answers": [
+        1
+      ],
+      "validation_confidence": 0.34249999999999997,
+      "mapping_issues": [
+        "Fuzzy match, similarity: 0.571"
+      ],
+      "mapping_method": "fuzzy_text_match",
+      "explanation": "https://aws.amazon.com/about-aws/whats-new/2017/11/announcing-support-for-inter-region-vpc-peering/ Passing Certification Exams Made Easy visit - https://www.surepassexam.com Recommend!! Get the Full SAP-C02 dumps in VCE and PDF From SurePassExam https://www.surepassexam.com/SAP-C02-exam-dumps.html (300",
+      "keywords": [
+        "EC2",
+        "VPC",
+        "IAM",
+        "CloudFormation"
+      ],
+      "requires_manual_review": true,
+      "enhanced": true
+    },
+    {
+      "question_id": "t3_q8",
+      "question_number": 9,
+      "raw_answer_text": "A",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        0
+      ],
+      "validation_confidence": 0.017699115044247787,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "https://aws.amazon.com/blogs/mt/self-service-vpcs-in-aws-control-tower-using-aws-service-catalog/ https://docs.aws.amazon.com/vpc/latest/tgw/tgw-transit- gateways.html https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-transitgatewayattachme",
+      "keywords": [
+        "EC2",
+        "VPC",
+        "CloudFormation"
+      ],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t3_q8",
+      "question_number": 9,
+      "raw_answer_text": "use\nAWS Transit Gateway to establish connectivity between the VPCs in each member account Each time a new member account is created, the company wants to\nautomate the process of creating a new VPC and a transit gateway attachment.",
+      "extraction_method": "service_pattern",
+      "correct_answers": [
+        4,
+        0,
+        0,
+        0,
+        4,
+        0,
+        4,
+        0,
+        1,
+        2,
+        4,
+        2,
+        1,
+        4,
+        4,
+        4,
+        4,
+        2,
+        4,
+        0,
+        2,
+        4,
+        1,
+        4,
+        0,
+        2,
+        2,
+        4,
+        0,
+        2,
+        4,
+        0,
+        4,
+        4,
+        1,
+        4,
+        0,
+        2,
+        2,
+        2,
+        4,
+        0,
+        4,
+        3,
+        4,
+        2,
+        0,
+        0,
+        0,
+        0,
+        4,
+        4,
+        2,
+        4,
+        2,
+        4,
+        0,
+        0,
+        4,
+        2,
+        0,
+        3,
+        0,
+        0,
+        0,
+        4,
+        0,
+        0,
+        0,
+        2,
+        4
+      ],
+      "validation_confidence": 0.7,
+      "mapping_issues": [
+        "Enhanced pattern extraction"
+      ],
+      "mapping_method": "enhanced_letter_mapping",
+      "explanation": "https://aws.amazon.com/blogs/mt/self-service-vpcs-in-aws-control-tower-using-aws-service-catalog/ https://docs.aws.amazon.com/vpc/latest/tgw/tgw-transit- gateways.html https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-transitgatewayattachme",
+      "keywords": [
+        "EC2",
+        "VPC",
+        "CloudFormation"
+      ],
+      "requires_manual_review": false,
+      "enhanced": true
+    },
+    {
+      "question_id": "t2_q9",
+      "question_number": 10,
+      "raw_answer_text": "C",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        2
+      ],
+      "validation_confidence": 0.0136986301369863,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_examples_aws_deny-requested-region.h https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_policies_scps_examples_ec2.html",
+      "keywords": [
+        "EC2",
+        "IAM"
+      ],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t3_q10",
+      "question_number": 10,
+      "raw_answer_text": "B",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        1
+      ],
+      "validation_confidence": 0.0,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "https://aws.amazon.com/aws-transfer-family/faqs/ https://docs.aws.amazon.com/transfer/latest/userguide/what-is-aws-transfer-family.html https://aws.amazon.com/about-aws/whats-new/2018/11/aws-transfer-for-sftp-fully-managed-sftp-for-s3/?nc1=h_",
+      "keywords": [
+        "S3"
+      ],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t2_q9",
+      "question_number": 10,
+      "raw_answer_text": "Create an IAM role in one account under the DataOps OU Use the ec2 Instance Type condition key in an inline policy on the role to restrict access to specific\ninstance types.",
+      "extraction_method": "service_pattern",
+      "correct_answers": [
+        2,
+        4,
+        0,
+        4,
+        0,
+        0,
+        4,
+        4,
+        0,
+        2,
+        2,
+        3,
+        4,
+        4,
+        3,
+        0,
+        0,
+        4,
+        4,
+        4,
+        2,
+        0,
+        2,
+        4,
+        4,
+        2,
+        3,
+        4,
+        0,
+        4,
+        2,
+        4,
+        4,
+        4,
+        2,
+        0,
+        2,
+        2,
+        4,
+        4,
+        2,
+        2,
+        0,
+        2,
+        4,
+        4
+      ],
+      "validation_confidence": 0.7,
+      "mapping_issues": [
+        "Enhanced pattern extraction"
+      ],
+      "mapping_method": "enhanced_letter_mapping",
+      "explanation": "https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_examples_aws_deny-requested-region.h https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_policies_scps_examples_ec2.html",
+      "keywords": [
+        "EC2",
+        "IAM"
+      ],
+      "requires_manual_review": false,
+      "enhanced": true
+    },
+    {
+      "question_id": "t3_q10",
+      "question_number": 10,
+      "raw_answer_text": "use of Amazon Route 53.",
+      "extraction_method": "service_pattern",
+      "correct_answers": [
+        4,
+        0,
+        0,
+        4
+      ],
+      "validation_confidence": 0.7,
+      "mapping_issues": [
+        "Enhanced pattern extraction"
+      ],
+      "mapping_method": "enhanced_letter_mapping",
+      "explanation": "https://aws.amazon.com/aws-transfer-family/faqs/ https://docs.aws.amazon.com/transfer/latest/userguide/what-is-aws-transfer-family.html https://aws.amazon.com/about-aws/whats-new/2018/11/aws-transfer-for-sftp-fully-managed-sftp-for-s3/?nc1=h_",
+      "keywords": [
+        "S3",
+        "EC2",
+        "VPC",
+        "RDS",
+        "Auto Scaling",
+        "Route 53"
+      ],
+      "requires_manual_review": false,
+      "enhanced": true
+    },
+    {
+      "question_id": "t4_q11",
+      "question_number": 14,
+      "raw_answer_text": "A company is running a critical application that uses an Amazon RDS for MySQL database to store data. The RDS DB instance is deployed in Multi-AZ mode.",
+      "extraction_method": "fuzzy_enhanced",
+      "correct_answers": [
+        2
+      ],
+      "validation_confidence": 0.30698412698412697,
+      "mapping_issues": [
+        "Fuzzy match, similarity: 0.512"
+      ],
+      "mapping_method": "fuzzy_text_match",
+      "explanation": "Passing Certification Exams Made Easy visit - https://www.surepassexam.com Recommend!! Get the Full SAP-C02 dumps in VCE and PDF From SurePassExam https://www.surepassexam.com/SAP-C02-exam-dumps.html (300",
+      "keywords": [
+        "RDS",
+        "ElastiCache"
+      ],
+      "requires_manual_review": true,
+      "enhanced": true
+    },
+    {
+      "question_id": "t5_q12",
+      "question_number": 17,
+      "raw_answer_text": "C",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        2
+      ],
+      "validation_confidence": 0.0,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "SCP to deny permissions to administer Private Marketplace to everyone except the role named procurement-manager-role. https://aws.amazon.com/blogs/awsmarketplace/controlling-access-to-a-well-architected-private-marketplace-usi This approach allows the procurement managers to assume the procurement-manager-role in shared services accounts, which have the AWSPrivateMarketplaceAdminFullAccess managed policy attached to it and can then manage the Private Marketplace. The organization root-level SCP denies the permission to administer Private Marketplace to everyone except the role named procurement-manager-role and another SCP denies the permission to create an IAM role named procurement-manager-role to everyone in the organization, ensuring that only the procurement team can assume the role and manage the Private Marketplace. This approach provides a centralized way to manage and restrict access to Private Marketplace while maintaining a high level of security.",
+      "keywords": [
+        "IAM"
+      ],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t5_q12",
+      "question_number": 17,
+      "raw_answer_text": "Create an IAM role named procurement-manager-role in all AWS accounts in the organization Add the PowerUserAccess managed policy to the role Apply an\ninline policy to all IAM users and roles in every AWS account to deny permissions on the AWSPrivateMarketplaceAdminFullAccess managed policy.",
+      "extraction_method": "service_pattern",
+      "correct_answers": [
+        2,
+        4,
+        0,
+        4,
+        0,
+        0,
+        4,
+        0,
+        4,
+        3,
+        2,
+        4,
+        4,
+        0,
+        0,
+        4,
+        4,
+        0,
+        0,
+        0,
+        2,
+        2,
+        4,
+        0,
+        0,
+        0,
+        3,
+        3,
+        4,
+        4,
+        4,
+        0,
+        2,
+        2,
+        4,
+        0,
+        0,
+        4,
+        3,
+        2,
+        4,
+        4,
+        0,
+        0,
+        4,
+        2,
+        0,
+        0,
+        4,
+        0,
+        3,
+        4,
+        4,
+        4,
+        0,
+        0,
+        2,
+        2,
+        3,
+        4,
+        4,
+        4,
+        0,
+        0,
+        4,
+        0,
+        4,
+        0,
+        2,
+        4,
+        0,
+        3,
+        0,
+        2,
+        2,
+        4,
+        0,
+        0,
+        4,
+        3,
+        2
+      ],
+      "validation_confidence": 0.7,
+      "mapping_issues": [
+        "Enhanced pattern extraction"
+      ],
+      "mapping_method": "enhanced_letter_mapping",
+      "explanation": "SCP to deny permissions to administer Private Marketplace to everyone except the role named procurement-manager-role. https://aws.amazon.com/blogs/awsmarketplace/controlling-access-to-a-well-architected-private-marketplace-usi This approach allows the procurement managers to assume the procurement-manager-role in shared services accounts, which have the AWSPrivateMarketplaceAdminFullAccess managed policy attached to it and can then manage the Private Marketplace. The organization root-level SCP denies the permission to administer Private Marketplace to everyone except the role named procurement-manager-role and another SCP denies the permission to create an IAM role named procurement-manager-role to everyone in the organization, ensuring that only the procurement team can assume the role a...",
+      "keywords": [
+        "IAM"
+      ],
+      "requires_manual_review": false,
+      "enhanced": true
+    },
+    {
+      "question_id": "t3_q13",
+      "question_number": 19,
+      "raw_answer_text": "C",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        2
+      ],
+      "validation_confidence": 0.0,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "This solution requires the least amount of effort as it only requires to update the API endpoint to private in API Gateway and create an interface VPC endpoint. Then create a resource policy and attach it to the API. This will make the API only accessible from the VPC and still keep the authentication mechanism intact. Reference: https://aws.amazon.com/api-gateway/features/ Passing Certification Exams Made Easy visit - https://www.surepassexam.com Recommend!! Get the Full SAP-C02 dumps in VCE and PDF From SurePassExam https://www.surepassexam.com/SAP-C02-exam-dumps.html (300",
+      "keywords": [
+        "VPC",
+        "API Gateway"
+      ],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t3_q13",
+      "question_number": 19,
+      "raw_answer_text": "use Amazon API Gateway with Regional endpoints.",
+      "extraction_method": "service_pattern",
+      "correct_answers": [
+        4,
+        0,
+        0,
+        0,
+        0,
+        4,
+        0,
+        4,
+        0,
+        4,
+        3
+      ],
+      "validation_confidence": 0.7,
+      "mapping_issues": [
+        "Enhanced pattern extraction"
+      ],
+      "mapping_method": "enhanced_letter_mapping",
+      "explanation": "This solution requires the least amount of effort as it only requires to update the API endpoint to private in API Gateway and create an interface VPC endpoint. Then create a resource policy and attach it to the API. This will make the API only accessible from the VPC and still keep the authentication mechanism intact. Reference: https://aws.amazon.com/api-gateway/features/ Passing Certification Exams Made Easy visit - https://www.surepassexam.com Recommend!! Get the Full SAP-C02 dumps in VCE and PDF From SurePassExam https://www.surepassexam.com/SAP-C02-exam-dumps.html (300",
+      "keywords": [
+        "EC2",
+        "VPC",
+        "Lambda",
+        "Route 53",
+        "API Gateway"
+      ],
+      "requires_manual_review": false,
+      "enhanced": true
+    },
+    {
+      "question_id": "t7_q14",
+      "question_number": 20,
+      "raw_answer_text": "B",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        1
+      ],
+      "validation_confidence": 0.0,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "https://aws.amazon.com/blogs/security/how-to-securely-provide-database-credentials-to-lambda-functions-by-us https://docs.aws.amazon.com/secretsmanager/latest/userguide/rotating-secrets.html https://docs.aws.amazon.com/secretsmanager/latest/userguide/integrating_cloudformation.html",
+      "keywords": [
+        "Lambda",
+        "CloudFormation"
+      ],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t7_q14",
+      "question_number": 20,
+      "raw_answer_text": "Create an AWS Lambda function resource to rotate the database passwor\nC.",
+      "extraction_method": "service_pattern",
+      "correct_answers": [
+        2,
+        4,
+        0,
+        4,
+        0,
+        0,
+        0,
+        1,
+        3,
+        0,
+        2,
+        4,
+        2,
+        4,
+        0,
+        4,
+        4,
+        3,
+        0,
+        0,
+        1,
+        0,
+        4,
+        0,
+        2
+      ],
+      "validation_confidence": 0.7,
+      "mapping_issues": [
+        "Enhanced pattern extraction"
+      ],
+      "mapping_method": "enhanced_letter_mapping",
+      "explanation": "https://aws.amazon.com/blogs/security/how-to-securely-provide-database-credentials-to-lambda-functions-by-us https://docs.aws.amazon.com/secretsmanager/latest/userguide/rotating-secrets.html https://docs.aws.amazon.com/secretsmanager/latest/userguide/integrating_cloudformation.html",
+      "keywords": [
+        "S3",
+        "RDS",
+        "Lambda",
+        "CloudFormation",
+        "Systems Manager"
+      ],
+      "requires_manual_review": false,
+      "enhanced": true
+    },
+    {
+      "question_id": "t4_q15",
+      "question_number": 22,
+      "raw_answer_text": "D",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        3
+      ],
+      "validation_confidence": 0.024096385542168676,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "This solution will provide the highest availability for the database, as the read replicas will allow the database to be available in multiple Regions, thus reducing the chances of disruption. Additionally, the promotion of the cross-Region read replica to become a standalone DB instance will ensure that the database is still available even if one of the Regions experiences disruptions.",
+      "keywords": [],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t4_q15",
+      "question_number": 22,
+      "raw_answer_text": "use AWS Lambda to copy the read replicas from one Region to another Region.",
+      "extraction_method": "service_pattern",
+      "correct_answers": [
+        4,
+        0,
+        0,
+        1,
+        3,
+        0,
+        2,
+        4,
+        4,
+        0,
+        3,
+        4,
+        2,
+        0,
+        4,
+        4,
+        0,
+        4,
+        4
+      ],
+      "validation_confidence": 0.7,
+      "mapping_issues": [
+        "Enhanced pattern extraction"
+      ],
+      "mapping_method": "enhanced_letter_mapping",
+      "explanation": "This solution will provide the highest availability for the database, as the read replicas will allow the database to be available in multiple Regions, thus reducing the chances of disruption. Additionally, the promotion of the cross-Region read replica to become a standalone DB instance will ensure that the database is still available even if one of the Regions experiences disruptions.",
+      "keywords": [
+        "RDS",
+        "Lambda",
+        "EBS",
+        "Config"
+      ],
+      "requires_manual_review": false,
+      "enhanced": true
+    },
+    {
+      "question_id": "t1_q16",
+      "question_number": 24,
+      "raw_answer_text": "B",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        1
+      ],
+      "validation_confidence": 0.0,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/storage_lens.html",
+      "keywords": [
+        "S3"
+      ],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t1_q16",
+      "question_number": 24,
+      "raw_answer_text": "Use Amazon S3 Storage Len\nF.",
+      "extraction_method": "service_pattern",
+      "correct_answers": [
+        4,
+        0,
+        0,
+        0,
+        4,
+        4
+      ],
+      "validation_confidence": 0.7,
+      "mapping_issues": [
+        "Enhanced pattern extraction"
+      ],
+      "mapping_method": "enhanced_letter_mapping",
+      "explanation": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/storage_lens.html",
+      "keywords": [
+        "S3"
+      ],
+      "requires_manual_review": false,
+      "enhanced": true
+    },
+    {
+      "question_id": "t7_q17",
+      "question_number": 32,
+      "raw_answer_text": "B",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        1
+      ],
+      "validation_confidence": 0.0,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "This solution will allow the external auditors to have read-only access to the company's AWS account while being compliant with AWS security best practices. By creating an IAM role, which is a secure and flexible way of granting access to AWS resources, and trusting the auditors' AWS account, the company can ensure that the auditors only have the permissions that are required for their role and nothing more. Assigning a unique external ID to the role's trust policy, it will ensure that only the auditors' AWS account can assume the role. Reference: AWS IAM Roles documentation: https://aws.amazon.com/iam/features/roles/ AWS IAM Best practices: https://aws.amazon.com/iam/security-best-practices/",
+      "keywords": [
+        "IAM"
+      ],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t7_q17",
+      "question_number": 32,
+      "raw_answer_text": "create an IAM role that trusts the auditors' AWS account Create an IAM policy that has the required permission\nD.",
+      "extraction_method": "service_pattern",
+      "correct_answers": [
+        2,
+        4,
+        0,
+        4,
+        0,
+        0,
+        4,
+        0,
+        4,
+        0,
+        3,
+        0,
+        0,
+        2,
+        2,
+        2,
+        4,
+        0,
+        4,
+        0,
+        0,
+        2,
+        0,
+        0,
+        4,
+        4,
+        4,
+        3,
+        4,
+        3
+      ],
+      "validation_confidence": 0.7,
+      "mapping_issues": [
+        "Enhanced pattern extraction"
+      ],
+      "mapping_method": "enhanced_letter_mapping",
+      "explanation": "This solution will allow the external auditors to have read-only access to the company's AWS account while being compliant with AWS security best practices. By creating an IAM role, which is a secure and flexible way of granting access to AWS resources, and trusting the auditors' AWS account, the company can ensure that the auditors only have the permissions that are required for their role and nothing more. Assigning a unique external ID to the role's trust policy, it will ensure that only the auditors' AWS account can assume the role. Reference: AWS IAM Roles documentation: https://aws.amazon.com/iam/features/roles/ AWS IAM Best practices: https://aws.amazon.com/iam/security-best-practices/",
+      "keywords": [
+        "IAM"
+      ],
+      "requires_manual_review": false,
+      "enhanced": true
+    },
+    {
+      "question_id": "t5_q18",
+      "question_number": 37,
+      "raw_answer_text": "D",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        3
+      ],
+      "validation_confidence": 0.018691588785046728,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "Passing Certification Exams Made Easy visit - https://www.surepassexam.com Recommend!! Get the Full SAP-C02 dumps in VCE and PDF From SurePassExam https://www.surepassexam.com/SAP-C02-exam-dumps.html (300",
+      "keywords": [],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t5_q18",
+      "question_number": 37,
+      "raw_answer_text": "A company is using an on-premises Active Directory service for user authentication. The company wants to use the same authentication service to sign in to the",
+      "extraction_method": "fuzzy_enhanced",
+      "correct_answers": [
+        0
+      ],
+      "validation_confidence": 0.25098039215686274,
+      "mapping_issues": [
+        "Fuzzy match, similarity: 0.418"
+      ],
+      "mapping_method": "fuzzy_text_match",
+      "explanation": "Passing Certification Exams Made Easy visit - https://www.surepassexam.com Recommend!! Get the Full SAP-C02 dumps in VCE and PDF From SurePassExam https://www.surepassexam.com/SAP-C02-exam-dumps.html (300",
+      "keywords": [
+        "IAM",
+        "Config"
+      ],
+      "requires_manual_review": true,
+      "enhanced": true
+    },
+    {
+      "question_id": "t2_q19",
+      "question_number": 42,
+      "raw_answer_text": "A",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        0
+      ],
+      "validation_confidence": 0.045454545454545456,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "https://aws.amazon.com/premiumsupport/knowledge-center/waf-analyze-count-action-rules/",
+      "keywords": [],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t2_q19",
+      "question_number": 42,
+      "raw_answer_text": "Use only AWS managed rule groups in the web ACLs Evaluate the rule groups by using Amazon CloudWatch metrics with AWS WAF sampled requests or\nAWS WAF logs.",
+      "extraction_method": "service_pattern",
+      "correct_answers": [
+        4,
+        0,
+        0,
+        0,
+        4,
+        3,
+        4,
+        4,
+        4,
+        1,
+        0,
+        2,
+        4,
+        0,
+        0,
+        4,
+        4,
+        4,
+        1,
+        0,
+        0,
+        2,
+        3,
+        0,
+        2,
+        4,
+        2,
+        0,
+        0,
+        0,
+        4,
+        3,
+        4,
+        4,
+        0,
+        0
+      ],
+      "validation_confidence": 0.7,
+      "mapping_issues": [
+        "Enhanced pattern extraction"
+      ],
+      "mapping_method": "enhanced_letter_mapping",
+      "explanation": "https://aws.amazon.com/premiumsupport/knowledge-center/waf-analyze-count-action-rules/",
+      "keywords": [
+        "EC2",
+        "CloudWatch",
+        "Config"
+      ],
+      "requires_manual_review": false,
+      "enhanced": true
+    },
+    {
+      "question_id": "t4_q20",
+      "question_number": 46,
+      "raw_answer_text": "B",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        1
+      ],
+      "validation_confidence": 0.0,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "Creating an Amazon EventBridge rule that runs every business day in the evening to stop instances and another rule that runs every business day in the morning to start instances based on the tag will reduce costs with the least operational effort. This approach allows for instances to be stopped during non-business hours when they are not in use, reducing the costs associated with running them. It also allows for instances to be started again in the morning when the development and testing teams need to use them.",
+      "keywords": [],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t4_q20",
+      "question_number": 46,
+      "raw_answer_text": "Configure the rule to invoke one AWS Lambda function that starts\nor stops instances based on the tag day and time.",
+      "extraction_method": "service_pattern",
+      "correct_answers": [
+        2,
+        4,
+        4,
+        4,
+        4,
+        4,
+        0,
+        0,
+        1,
+        3,
+        0,
+        2,
+        0,
+        0,
+        0,
+        2,
+        4,
+        1,
+        0,
+        4,
+        3,
+        4,
+        0,
+        3,
+        0,
+        0,
+        3,
+        4
+      ],
+      "validation_confidence": 0.7,
+      "mapping_issues": [
+        "Enhanced pattern extraction"
+      ],
+      "mapping_method": "enhanced_letter_mapping",
+      "explanation": "Creating an Amazon EventBridge rule that runs every business day in the evening to stop instances and another rule that runs every business day in the morning to start instances based on the tag will reduce costs with the least operational effort. This approach allows for instances to be stopped during non-business hours when they are not in use, reducing the costs associated with running them. It also allows for instances to be started again in the morning when the development and testing teams need to use them.",
+      "keywords": [
+        "EC2",
+        "RDS",
+        "Lambda",
+        "CloudWatch",
+        "Config"
+      ],
+      "requires_manual_review": false,
+      "enhanced": true
+    },
+    {
+      "question_id": "t3_q21",
+      "question_number": 50,
+      "raw_answer_text": "D",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        3
+      ],
+      "validation_confidence": 0.0,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "By breaking down the monolithic API into individual Lambda functions and using API Gateway to handle the incoming requests, the solution can automatically scale to handle the new and varying load without the need for manual scaling actions. Additionally, this option will automatically handle the traffic without the need of having EC2 instances running all the time and only pay for the number of requests and the duration of the execution of the Lambda function. By updating the Route 53 record to point to the API Gateway, the solution can handle the traffic and also it will direct the traffic to the correct endpoint.",
+      "keywords": [
+        "EC2",
+        "Lambda",
+        "Route 53",
+        "API Gateway"
+      ],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t3_q21",
+      "question_number": 50,
+      "raw_answer_text": "Configure an Amazon API Gateway REST API with Lambda integration for the backen\nC.",
+      "extraction_method": "service_pattern",
+      "correct_answers": [
+        2,
+        4,
+        0,
+        0,
+        0,
+        0,
+        0,
+        4,
+        0,
+        4,
+        0,
+        0,
+        1,
+        3,
+        0,
+        4,
+        0,
+        4,
+        1,
+        0,
+        2,
+        4,
+        2
+      ],
+      "validation_confidence": 0.7,
+      "mapping_issues": [
+        "Enhanced pattern extraction"
+      ],
+      "mapping_method": "enhanced_letter_mapping",
+      "explanation": "By breaking down the monolithic API into individual Lambda functions and using API Gateway to handle the incoming requests, the solution can automatically scale to handle the new and varying load without the need for manual scaling actions. Additionally, this option will automatically handle the traffic without the need of having EC2 instances running all the time and only pay for the number of requests and the duration of the execution of the Lambda function. By updating the Route 53 record to point to the API Gateway, the solution can handle the traffic and also it will direct the traffic to the correct endpoint.",
+      "keywords": [
+        "EC2",
+        "VPC",
+        "Lambda",
+        "Auto Scaling",
+        "Route 53",
+        "API Gateway",
+        "EKS",
+        "Config"
+      ],
+      "requires_manual_review": false,
+      "enhanced": true
+    },
+    {
+      "question_id": "t3_q22",
+      "question_number": 56,
+      "raw_answer_text": "A",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        0
+      ],
+      "validation_confidence": 0.058823529411764705,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "A Direct Connect gateway is a globally available resource. You can create the Direct Connect gateway in any Region and access it from all other Regions. The following describe scenarios where you can use a Direct Connect gateway. https://docs.aws.amazon.com/directconnect/latest/UserGuide/direct-connect-gateways-intro.html",
+      "keywords": [],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t3_q22",
+      "question_number": 56,
+      "raw_answer_text": "connection to communicate with the company's resources in the AWS Cloud. The connection has a single private virtual interface that connects to a single VPC.",
+      "extraction_method": "fuzzy_enhanced",
+      "correct_answers": [
+        4
+      ],
+      "validation_confidence": 0.4085714285714286,
+      "mapping_issues": [
+        "Fuzzy match, similarity: 0.681"
+      ],
+      "mapping_method": "fuzzy_text_match",
+      "explanation": "A Direct Connect gateway is a globally available resource. You can create the Direct Connect gateway in any Region and access it from all other Regions. The following describe scenarios where you can use a Direct Connect gateway. https://docs.aws.amazon.com/directconnect/latest/UserGuide/direct-connect-gateways-intro.html",
+      "keywords": [
+        "VPC"
+      ],
+      "requires_manual_review": true,
+      "enhanced": true
+    },
+    {
+      "question_id": "t7_q23",
+      "question_number": 57,
+      "raw_answer_text": "C",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        2
+      ],
+      "validation_confidence": 0.0,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "https://aws.amazon.com/blogs/aws/new-use-aws-cloudformation-stacksets-for-multiple-accounts-in-an-aws-orga AWS Organizations allows the management of multiple AWS accounts as a single entity and AWS CloudFormation StackSets allows creating, updating, and deleting stacks across multiple accounts and regions in an organization. This solution allows creating a single CloudFormation template that can be deployed across multiple accounts and regions, and also allows for the management of access and permissions for the different accounts through the use of IAM roles and policies in the management account.",
+      "keywords": [
+        "IAM",
+        "CloudFormation"
+      ],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t7_q23",
+      "question_number": 57,
+      "raw_answer_text": "Use AWS CloudFormation templates Add IAM policies to control the various accounts Deploy the templates across the multiple Regions\nB.",
+      "extraction_method": "service_pattern",
+      "correct_answers": [
+        0,
+        2,
+        3,
+        0,
+        0,
+        0,
+        3,
+        3,
+        0,
+        2,
+        2,
+        0,
+        0,
+        2,
+        2,
+        3,
+        0,
+        0,
+        2,
+        1
+      ],
+      "validation_confidence": 0.7,
+      "mapping_issues": [
+        "Enhanced pattern extraction"
+      ],
+      "mapping_method": "enhanced_letter_mapping",
+      "explanation": "https://aws.amazon.com/blogs/aws/new-use-aws-cloudformation-stacksets-for-multiple-accounts-in-an-aws-orga AWS Organizations allows the management of multiple AWS accounts as a single entity and AWS CloudFormation StackSets allows creating, updating, and deleting stacks across multiple accounts and regions in an organization. This solution allows creating a single CloudFormation template that can be deployed across multiple accounts and regions, and also allows for the management of access and permissions for the different accounts through the use of IAM roles and policies in the management account.",
+      "keywords": [
+        "IAM",
+        "CloudFormation"
+      ],
+      "requires_manual_review": false,
+      "enhanced": true
+    },
+    {
+      "question_id": "t7_q24",
+      "question_number": 59,
+      "raw_answer_text": "Create an alias for every new deployed version of the Lambda functio\nB.",
+      "extraction_method": "service_pattern",
+      "correct_answers": [
+        2,
+        4,
+        0,
+        4,
+        0,
+        0,
+        0,
+        4,
+        4,
+        4,
+        3,
+        4,
+        4,
+        3,
+        4,
+        4,
+        0,
+        1,
+        3,
+        0,
+        2,
+        1
+      ],
+      "validation_confidence": 0.7,
+      "mapping_issues": [
+        "Enhanced pattern extraction"
+      ],
+      "mapping_method": "enhanced_letter_mapping",
+      "explanation": "F. Use the AWS CLIupdate-function-configuration command with the routing-config parameter to distribute the load. Passing Certification Exams Made Easy visit - https://www.surepassexam.com Recommend!! Get the Full SAP-C02 dumps in VCE and PDF From SurePassExam https://www.surepassexam.com/SAP-C02-exam-dumps.html (300",
+      "keywords": [
+        "Lambda",
+        "CloudFormation",
+        "Route 53",
+        "Config"
+      ],
+      "requires_manual_review": false,
+      "enhanced": true
+    },
+    {
+      "question_id": "t2_q25",
+      "question_number": 63,
+      "raw_answer_text": "C",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        2
+      ],
+      "validation_confidence": 0.0,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "\"Save your custom error pages in a location that is accessible to CloudFront. We recommend that you store them in an Amazon S3 bucket, and that you don’t store them in the same place as the rest of your website or application’s content. If you store the custom error pages on the same origin as your website or application, and the origin starts to return 5xx errors, CloudFront can’t get the custom error pages because the origin server is unavailable.\" https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/GeneratingCustomErrorResponses.htm",
+      "keywords": [
+        "S3",
+        "EBS",
+        "CloudFront"
+      ],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t2_q25",
+      "question_number": 63,
+      "raw_answer_text": "Create an Amazon S3 bucke\nB.",
+      "extraction_method": "service_pattern",
+      "correct_answers": [
+        2,
+        4,
+        0,
+        4,
+        0,
+        0,
+        0,
+        1,
+        2,
+        4,
+        1
+      ],
+      "validation_confidence": 0.7,
+      "mapping_issues": [
+        "Enhanced pattern extraction"
+      ],
+      "mapping_method": "enhanced_letter_mapping",
+      "explanation": "\"Save your custom error pages in a location that is accessible to CloudFront. We recommend that you store them in an Amazon S3 bucket, and that you don’t store them in the same place as the rest of your website or application’s content. If you store the custom error pages on the same origin as your website or application, and the origin starts to return 5xx errors, CloudFront can’t get the custom error pages because the origin server is unavailable.\" https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/GeneratingCustomErrorResponses.htm",
+      "keywords": [
+        "S3",
+        "EC2",
+        "RDS",
+        "Lambda",
+        "CloudWatch",
+        "EBS",
+        "ELB",
+        "Route 53"
+      ],
+      "requires_manual_review": false,
+      "enhanced": true
+    },
+    {
+      "question_id": "t5_q26",
+      "question_number": 67,
+      "raw_answer_text": "A",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        0
+      ],
+      "validation_confidence": 0.0,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "https://aws.amazon.com/premiumsupport/knowledge-center/s3-access-denied-error-kms/ \"An error occurred (AccessDenied) when calling the PutObject operation: Access Denied\" This error message indicates that your IAM user or role needs Passing Certification Exams Made Easy visit - https://www.surepassexam.com Recommend!! Get the Full SAP-C02 dumps in VCE and PDF From SurePassExam https://www.surepassexam.com/SAP-C02-exam-dumps.html (300",
+      "keywords": [
+        "S3",
+        "IAM",
+        "KMS"
+      ],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t5_q26",
+      "question_number": 67,
+      "raw_answer_text": "add to the IAM policy to meet all the requirements?\nA.",
+      "extraction_method": "service_pattern",
+      "correct_answers": [
+        0,
+        3,
+        3,
+        0,
+        2,
+        0,
+        0
+      ],
+      "validation_confidence": 0.7,
+      "mapping_issues": [
+        "Enhanced pattern extraction"
+      ],
+      "mapping_method": "enhanced_letter_mapping",
+      "explanation": "https://aws.amazon.com/premiumsupport/knowledge-center/s3-access-denied-error-kms/ \"An error occurred (AccessDenied) when calling the PutObject operation: Access Denied\" This error message indicates that your IAM user or role needs Passing Certification Exams Made Easy visit - https://www.surepassexam.com Recommend!! Get the Full SAP-C02 dumps in VCE and PDF From SurePassExam https://www.surepassexam.com/SAP-C02-exam-dumps.html (300",
+      "keywords": [
+        "S3",
+        "IAM",
+        "KMS"
+      ],
+      "requires_manual_review": false,
+      "enhanced": true
+    },
+    {
+      "question_id": "t1_q27",
+      "question_number": 68,
+      "raw_answer_text": "C",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        2
+      ],
+      "validation_confidence": 0.0,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "However A's explanation is incorrect - https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_policies_scps.html \"SCPs are similar to AWS Identity and Access Management (IAM) permission policies and use almost the same syntax. However, an SCP never grants permissions.\" SCPs alone are not sufficient to granting permissions to the accounts in your organization. No permissions are granted by an SCP. An SCP defines a guardrail, or sets limits, on the actions that the account's administrator can delegate to the IAM users and roles in the affected accounts. The administrator must still attach identity-based or resource-based policies to IAM users or roles, or to the resources in your accounts to actually grant permissions. The effective permissions are the logical intersection between what is allowed by the SCP and what is allowed by the IAM and resource-based policies.",
+      "keywords": [
+        "IAM"
+      ],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t1_q27",
+      "question_number": 68,
+      "raw_answer_text": "create Amazon S3 buckets.",
+      "extraction_method": "service_pattern",
+      "correct_answers": [
+        2,
+        0,
+        0,
+        0,
+        1,
+        2
+      ],
+      "validation_confidence": 0.7,
+      "mapping_issues": [
+        "Enhanced pattern extraction"
+      ],
+      "mapping_method": "enhanced_letter_mapping",
+      "explanation": "However A's explanation is incorrect - https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_policies_scps.html \"SCPs are similar to AWS Identity and Access Management (IAM) permission policies and use almost the same syntax. However, an SCP never grants permissions.\" SCPs alone are not sufficient to granting permissions to the accounts in your organization. No permissions are granted by an SCP. An SCP defines a guardrail, or sets limits, on the actions that the account's administrator can delegate to the IAM users and roles in the affected accounts. The administrator must still attach identity-based or resource-based policies to IAM users or roles, or to the resources in your accounts to actually grant permissions. The effective permissions are the logical intersection be...",
+      "keywords": [
+        "S3",
+        "IAM"
+      ],
+      "requires_manual_review": false,
+      "enhanced": true
+    },
+    {
+      "question_id": "t2_q28",
+      "question_number": 69,
+      "raw_answer_text": "A",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        0
+      ],
+      "validation_confidence": 0.0,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "Option A, Deploy the security tool on EC2 instances in a new Auto Scaling group in the existing VPC, allows the company to use its existing security tool while still running it within the AWS environment. This ensures that all packets coming in and out of the VPC are inspected by the security tool in real time. Option D, Provision a Gateway Load Balancer for each Availability Zone to redirect the traffic to the security tool, allows for high availability within an AWS Region. By provisioning a Gateway Load Balancer for each Availability Zone, the traffic is redirected to the security tool in the event of any failures or outages. This ensures that the security tool is always available to inspect the traffic, even in the event of a failure.",
+      "keywords": [
+        "EC2",
+        "VPC",
+        "Auto Scaling"
+      ],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t2_q28",
+      "question_number": 69,
+      "raw_answer_text": "A",
+      "extraction_method": "option_format",
+      "correct_answers": [
+        0
+      ],
+      "validation_confidence": 0.7,
+      "mapping_issues": [
+        "Enhanced pattern extraction"
+      ],
+      "mapping_method": "enhanced_letter_mapping",
+      "explanation": "Option A, Deploy the security tool on EC2 instances in a new Auto Scaling group in the existing VPC, allows the company to use its existing security tool while still running it within the AWS environment. This ensures that all packets coming in and out of the VPC are inspected by the security tool in real time. Option D, Provision a Gateway Load Balancer for each Availability Zone to redirect the traffic to the security tool, allows for high availability within an AWS Region. By provisioning a Gateway Load Balancer for each Availability Zone, the traffic is redirected to the security tool in the event of any failures or outages. This ensures that the security tool is always available to inspect the traffic, even in the event of a failure.",
+      "keywords": [
+        "EC2",
+        "VPC",
+        "Auto Scaling"
+      ],
+      "requires_manual_review": false,
+      "enhanced": true
+    },
+    {
+      "question_id": "t7_q29",
+      "question_number": 74,
+      "raw_answer_text": "B",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        1
+      ],
+      "validation_confidence": 0.0,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "DynamoDB with TTL, cheaper for sustained throughput of small items + suited for fast retrievals. S3 cheaper for storage only, much higher costs with writes. RDS not designed for this use case.",
+      "keywords": [
+        "S3",
+        "RDS",
+        "DynamoDB"
+      ],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t7_q29",
+      "question_number": 74,
+      "raw_answer_text": "use the Amazon S3 metadata search feature to retrieve the dat\nI.",
+      "extraction_method": "service_pattern",
+      "correct_answers": [
+        4,
+        4,
+        0,
+        0,
+        4,
+        0,
+        3,
+        0,
+        0,
+        4,
+        0,
+        2,
+        4,
+        0,
+        4,
+        4,
+        4,
+        4,
+        4,
+        3,
+        0
+      ],
+      "validation_confidence": 0.7,
+      "mapping_issues": [
+        "Enhanced pattern extraction"
+      ],
+      "mapping_method": "enhanced_letter_mapping",
+      "explanation": "DynamoDB with TTL, cheaper for sustained throughput of small items + suited for fast retrievals. S3 cheaper for storage only, much higher costs with writes. RDS not designed for this use case.",
+      "keywords": [
+        "S3",
+        "RDS",
+        "DynamoDB",
+        "Config"
+      ],
+      "requires_manual_review": false,
+      "enhanced": true
+    },
+    {
+      "question_id": "t3_q30",
+      "question_number": 75,
+      "raw_answer_text": "C",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        2
+      ],
+      "validation_confidence": 0.02631578947368421,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/lambda-edge-how-it-works-tutorial.ht",
+      "keywords": [
+        "Lambda",
+        "CloudFront"
+      ],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t3_q30",
+      "question_number": 75,
+      "raw_answer_text": "Create a dynamic webpage that runs on an Amazon EC2 instanc\nB.",
+      "extraction_method": "service_pattern",
+      "correct_answers": [
+        2,
+        4,
+        0,
+        4,
+        0,
+        3,
+        0,
+        2,
+        4,
+        1,
+        0,
+        4,
+        0,
+        0,
+        0,
+        0,
+        4,
+        2,
+        0,
+        2,
+        1
+      ],
+      "validation_confidence": 0.7,
+      "mapping_issues": [
+        "Enhanced pattern extraction"
+      ],
+      "mapping_method": "enhanced_letter_mapping",
+      "explanation": "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/lambda-edge-how-it-works-tutorial.ht",
+      "keywords": [
+        "EC2",
+        "RDS",
+        "Lambda",
+        "Route 53",
+        "CloudFront",
+        "API Gateway",
+        "Config"
+      ],
+      "requires_manual_review": false,
+      "enhanced": true
+    },
+    {
+      "question_id": "t7_q31",
+      "question_number": 77,
+      "raw_answer_text": "A",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        0
+      ],
+      "validation_confidence": 0.021739130434782608,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/manage-cost-categories.html https://aws.amazon.com/premiumsupport/knowledge-center/cost- explorer-analyze-spending-and-usage/ https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/manage-cost-categories.html https://docs.aws.amazon.com/cost-management/latest/userguide/ce-enable.html The best combination of actions to meet the company’s requirements is Options A, C, and F. Option A involves activating the user-defined cost allocation tags that represent the application and the team. This will allow the company to assign costs to different applications or teams, and will allow them to be tracked in the monthly AWS bill. Passing Certification Exams Made Easy visit - https://www.surepassexam.com Recommend!! Get the Full SAP-C02 dumps in VCE and PDF From SurePassExam https://www.surepassexam.com/SAP-C02-exam-dumps.html (300",
+      "keywords": [],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t7_q31",
+      "question_number": 77,
+      "raw_answer_text": "A",
+      "extraction_method": "option_format",
+      "correct_answers": [
+        0
+      ],
+      "validation_confidence": 0.7,
+      "mapping_issues": [
+        "Enhanced pattern extraction"
+      ],
+      "mapping_method": "enhanced_letter_mapping",
+      "explanation": "https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/manage-cost-categories.html https://aws.amazon.com/premiumsupport/knowledge-center/cost- explorer-analyze-spending-and-usage/ https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/manage-cost-categories.html https://docs.aws.amazon.com/cost-management/latest/userguide/ce-enable.html The best combination of actions to meet the company’s requirements is Options A, C, and F. Option A involves activating the user-defined cost allocation tags that represent the application and the team. This will allow the company to assign costs to different applications or teams, and will allow them to be tracked in the monthly AWS bill. Passing Certification Exams Made Easy visit - https://www.surepassexam.com Recommend!! Get the Full SAP-C0...",
+      "keywords": [
+        "IAM"
+      ],
+      "requires_manual_review": false,
+      "enhanced": true
+    },
+    {
+      "question_id": "t1_q32",
+      "question_number": 81,
+      "raw_answer_text": "B",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        1
+      ],
+      "validation_confidence": 0.0,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "https://aws.amazon.com/about-aws/whats-new/2016/04/transfer-files-into-amazon-s3-up-to-300-percent-faster/",
+      "keywords": [
+        "S3"
+      ],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t1_q32",
+      "question_number": 81,
+      "raw_answer_text": "Configure the AWS Global Accelerator endpoint for the S3 bucket in eu-west-1.",
+      "extraction_method": "service_pattern",
+      "correct_answers": [
+        2,
+        4,
+        4,
+        0,
+        1,
+        0,
+        0,
+        2,
+        2,
+        4,
+        4,
+        0,
+        4,
+        3,
+        4,
+        1,
+        2,
+        4,
+        4,
+        4
+      ],
+      "validation_confidence": 0.7,
+      "mapping_issues": [
+        "Enhanced pattern extraction"
+      ],
+      "mapping_method": "enhanced_letter_mapping",
+      "explanation": "https://aws.amazon.com/about-aws/whats-new/2016/04/transfer-files-into-amazon-s3-up-to-300-percent-faster/",
+      "keywords": [
+        "S3",
+        "Lambda",
+        "CloudFront",
+        "Config"
+      ],
+      "requires_manual_review": false,
+      "enhanced": true
+    },
+    {
+      "question_id": "t7_q33",
+      "question_number": 84,
+      "raw_answer_text": "A",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        0
+      ],
+      "validation_confidence": 0.01904761904761905,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "All features – The default feature set that is available to AWS Organizations. It includes all the functionality of consolidated billing, plus advanced features that give you more control over accounts in your organization. For example, when all features are enabled the management account of the organization has full control over what member accounts can do. The management account can apply SCPs to restrict the services and actions that users (including the root user) and roles in an account can access. https://docs.aws.amazon.com/organizations/latest/userguide/orgs_getting-started_concepts.html#feature-set",
+      "keywords": [],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t7_q33",
+      "question_number": 84,
+      "raw_answer_text": "Use AWS Config to report on the attachment of an IAM policy that denies access to the ec2:PurchaseReservedInstancesOffering action and the\nec2:ModifyReservedInstances action.",
+      "extraction_method": "service_pattern",
+      "correct_answers": [
+        4,
+        0,
+        2,
+        4,
+        4,
+        0,
+        0,
+        2,
+        4,
+        0,
+        0,
+        2,
+        0,
+        3,
+        4,
+        4,
+        0,
+        2,
+        2,
+        4,
+        4,
+        4,
+        2,
+        2,
+        0,
+        4,
+        4,
+        4,
+        4,
+        3,
+        0,
+        2,
+        4,
+        4,
+        0,
+        2,
+        0,
+        3,
+        4,
+        4,
+        2,
+        3,
+        4,
+        4,
+        4,
+        3,
+        0,
+        2,
+        4,
+        0,
+        2
+      ],
+      "validation_confidence": 0.7,
+      "mapping_issues": [
+        "Enhanced pattern extraction"
+      ],
+      "mapping_method": "enhanced_letter_mapping",
+      "explanation": "All features – The default feature set that is available to AWS Organizations. It includes all the functionality of consolidated billing, plus advanced features that give you more control over accounts in your organization. For example, when all features are enabled the management account of the organization has full control over what member accounts can do. The management account can apply SCPs to restrict the services and actions that users (including the root user) and roles in an account can access. https://docs.aws.amazon.com/organizations/latest/userguide/orgs_getting-started_concepts.html#feature-set",
+      "keywords": [
+        "EC2",
+        "IAM",
+        "Config"
+      ],
+      "requires_manual_review": false,
+      "enhanced": true
+    },
+    {
+      "question_id": "t4_q34",
+      "question_number": 86,
+      "raw_answer_text": "B",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        1
+      ],
+      "validation_confidence": 0.0,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "AWS Control Tower provides a set of \"strongly recommended guardrails\" that can be enabled to implement governance and policy enforcement. One of these guardrails is \"Encrypt Amazon RDS instances\" which will detect RDS DB instances that are not encrypted at rest. By enabling this guardrail and applying it to the production OU, the company will be able to enforce encryption for RDS instances in the production environment. Passing Certification Exams Made Easy visit - https://www.surepassexam.com Recommend!! Get the Full SAP-C02 dumps in VCE and PDF From SurePassExam https://www.surepassexam.com/SAP-C02-exam-dumps.html (300",
+      "keywords": [
+        "RDS"
+      ],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t4_q34",
+      "question_number": 86,
+      "raw_answer_text": "implement a policy that will detect Amazon RDS DB instances that are not encrypted\nat rest in the company’s production OU.",
+      "extraction_method": "service_pattern",
+      "correct_answers": [
+        4,
+        4,
+        0,
+        2,
+        0,
+        3,
+        4,
+        4,
+        2,
+        0,
+        0,
+        3,
+        3,
+        1,
+        0,
+        2,
+        4,
+        0,
+        0,
+        4,
+        4,
+        2,
+        4,
+        3,
+        0,
+        4,
+        4,
+        2,
+        0,
+        3,
+        2
+      ],
+      "validation_confidence": 0.7,
+      "mapping_issues": [
+        "Enhanced pattern extraction"
+      ],
+      "mapping_method": "enhanced_letter_mapping",
+      "explanation": "AWS Control Tower provides a set of \"strongly recommended guardrails\" that can be enabled to implement governance and policy enforcement. One of these guardrails is \"Encrypt Amazon RDS instances\" which will detect RDS DB instances that are not encrypted at rest. By enabling this guardrail and applying it to the production OU, the company will be able to enforce encryption for RDS instances in the production environment. Passing Certification Exams Made Easy visit - https://www.surepassexam.com Recommend!! Get the Full SAP-C02 dumps in VCE and PDF From SurePassExam https://www.surepassexam.com/SAP-C02-exam-dumps.html (300",
+      "keywords": [
+        "RDS",
+        "Config"
+      ],
+      "requires_manual_review": false,
+      "enhanced": true
+    },
+    {
+      "question_id": "t2_q35",
+      "question_number": 88,
+      "raw_answer_text": "C",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        2
+      ],
+      "validation_confidence": 0.03636363636363636,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "AWS Global Accelerator is a service that directs traffic to optimal endpoints (in this case, the Application Load Balancer) based on the health of the endpoints and network routing. It allows you to create an accelerator that directs traffic to multiple endpoint groups, one for each Region where the application is deployed. The accelerator uses the AWS global network to optimize the traffic routing to the healthy endpoint. By using Global Accelerator, the company can use a single static IP address for the apex domain, and traffic will be directed to the optimal endpoint based on the user's location, without the need for additional load balancers or routing policies. Reference: AWS Global Accelerator documentation: https://aws.amazon.com/global-accelerator/ Routing User Traffic to the Optimal AWS Region using Global Accelerator documentation: https://aws.amazon.com/blogs/networking-and-content-delivery/routing-user-traffic-to-the-optimal-aws-region-u",
+      "keywords": [],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t2_q35",
+      "question_number": 88,
+      "raw_answer_text": "Create CNAME records for the apex domain to point to the AL\nB.",
+      "extraction_method": "service_pattern",
+      "correct_answers": [
+        2,
+        4,
+        0,
+        4,
+        2,
+        0,
+        4,
+        4,
+        2,
+        3,
+        4,
+        0,
+        4,
+        3,
+        0,
+        4,
+        0,
+        1
+      ],
+      "validation_confidence": 0.7,
+      "mapping_issues": [
+        "Enhanced pattern extraction"
+      ],
+      "mapping_method": "enhanced_letter_mapping",
+      "explanation": "AWS Global Accelerator is a service that directs traffic to optimal endpoints (in this case, the Application Load Balancer) based on the health of the endpoints and network routing. It allows you to create an accelerator that directs traffic to multiple endpoint groups, one for each Region where the application is deployed. The accelerator uses the AWS global network to optimize the traffic routing to the healthy endpoint. By using Global Accelerator, the company can use a single static IP address for the apex domain, and traffic will be directed to the optimal endpoint based on the user's location, without the need for additional load balancers or routing policies. Reference: AWS Global Accelerator documentation: https://aws.amazon.com/global-accelerator/ Routing User Traffic to the Optim...",
+      "keywords": [
+        "RDS",
+        "Lambda",
+        "Route 53",
+        "DynamoDB",
+        "API Gateway",
+        "Config"
+      ],
+      "requires_manual_review": false,
+      "enhanced": true
+    },
+    {
+      "question_id": "t5_q36",
+      "question_number": 92,
+      "raw_answer_text": "A",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        0
+      ],
+      "validation_confidence": 0.023809523809523808,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "https://aws.amazon.com/solutions/implementations/automations-for-aws-firewall-manager/ In this solution, AWS Firewall Manager is used to manage AWS WAF rules across accounts in the organization. An AWS Systems Manager Parameter Store parameter is used to store account numbers and OUs to manage. This parameter can be updated as needed to add or remove accounts or OUs. An Amazon EventBridge rule is used to identify any changes to the parameter and to invoke an AWS Lambda function to update the security policy in the Firewall Manager administrative account. This solution allows for easy management of AWS WAF rules across multiple accounts with minimal operational overhead",
+      "keywords": [
+        "Lambda",
+        "Systems Manager"
+      ],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t5_q36",
+      "question_number": 92,
+      "raw_answer_text": "Use an AWS Systems Manager Parameter Store parameter to store account numbers and OUs to manage Update the parameter as needed to add or remove\naccounts or OUs Use an Amazon EventBridge (Amazon CloudWatch Events) rule to identify any changes to the parameter and to invoke an AWS Lambda\nfunction to update the security policy in the Firewall Manager administrative account\nC.",
+      "extraction_method": "service_pattern",
+      "correct_answers": [
+        4,
+        0,
+        0,
+        4,
+        0,
+        0,
+        4,
+        0,
+        0,
+        4,
+        4,
+        4,
+        0,
+        0,
+        4,
+        4,
+        4,
+        0,
+        2,
+        2,
+        1,
+        4,
+        0,
+        3,
+        0,
+        0,
+        4,
+        3,
+        0,
+        4,
+        4,
+        0,
+        0,
+        4,
+        4,
+        0,
+        4,
+        4,
+        3,
+        4,
+        3,
+        0,
+        3,
+        3,
+        4,
+        4,
+        0,
+        2,
+        2,
+        4,
+        0,
+        0,
+        0,
+        4,
+        4,
+        1,
+        3,
+        4,
+        0,
+        0,
+        2,
+        3,
+        0,
+        2,
+        4,
+        4,
+        4,
+        3,
+        4,
+        0,
+        2,
+        0,
+        4,
+        4,
+        0,
+        0,
+        4,
+        4,
+        0,
+        3,
+        4,
+        0,
+        0,
+        0,
+        1,
+        3,
+        0,
+        2,
+        3,
+        0,
+        4,
+        4,
+        4,
+        2,
+        2,
+        4,
+        4,
+        0,
+        0,
+        0,
+        4,
+        0,
+        3,
+        0,
+        4,
+        0,
+        2,
+        2,
+        2
+      ],
+      "validation_confidence": 0.7,
+      "mapping_issues": [
+        "Enhanced pattern extraction"
+      ],
+      "mapping_method": "enhanced_letter_mapping",
+      "explanation": "https://aws.amazon.com/solutions/implementations/automations-for-aws-firewall-manager/ In this solution, AWS Firewall Manager is used to manage AWS WAF rules across accounts in the organization. An AWS Systems Manager Parameter Store parameter is used to store account numbers and OUs to manage. This parameter can be updated as needed to add or remove accounts or OUs. An Amazon EventBridge rule is used to identify any changes to the parameter and to invoke an AWS Lambda function to update the security policy in the Firewall Manager administrative account. This solution allows for easy management of AWS WAF rules across multiple accounts with minimal operational overhead",
+      "keywords": [
+        "Lambda",
+        "CloudWatch",
+        "IAM",
+        "CloudFormation",
+        "KMS",
+        "Systems Manager",
+        "Config"
+      ],
+      "requires_manual_review": false,
+      "enhanced": true
+    },
+    {
+      "question_id": "t7_q37",
+      "question_number": 96,
+      "raw_answer_text": "C",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        2
+      ],
+      "validation_confidence": 0.0,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "Passing Certification Exams Made Easy visit - https://www.surepassexam.com Recommend!! Get the Full SAP-C02 dumps in VCE and PDF From SurePassExam https://www.surepassexam.com/SAP-C02-exam-dumps.html (300",
+      "keywords": [],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t7_q37",
+      "question_number": 96,
+      "raw_answer_text": "Recommend!! Get the Full SAP-C02 dumps in VCE and PDF From SurePassExam",
+      "extraction_method": "fuzzy_enhanced",
+      "correct_answers": [
+        1
+      ],
+      "validation_confidence": 0.24680851063829784,
+      "mapping_issues": [
+        "Fuzzy match, similarity: 0.411"
+      ],
+      "mapping_method": "fuzzy_text_match",
+      "explanation": "account. F. Apply the SCP to the OUs of the other departments. Answer: C Passing Certification Exams Made Easy visit - https://www.surepassexam.com Recommend!! Get the Full SAP-C02 dumps in VCE and PDF From SurePassExam https://www.surepassexam.com/SAP-C02-exam-dumps.html (300",
+      "keywords": [
+        "Config"
+      ],
+      "requires_manual_review": true,
+      "enhanced": true
+    },
+    {
+      "question_id": "t2_q38",
+      "question_number": 100,
+      "raw_answer_text": "C",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        2
+      ],
+      "validation_confidence": 0.05555555555555555,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "step function could run a scheduled task when triggered by eventbrige, but why would you add that layer of complexity just to run aws batch when you could directly invoke it through eventbridge. The link provided - https://aws.amazon.com/pt/blogs/compute/orchestrating-high-performance-computing-with-aws-step- functions- makes sense only for HPC, this is a single instance that needs to be run",
+      "keywords": [],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t2_q38",
+      "question_number": 100,
+      "raw_answer_text": "Use AWS Lambda to run the applicatio\nB.",
+      "extraction_method": "service_pattern",
+      "correct_answers": [
+        4,
+        0,
+        0,
+        1,
+        3,
+        0,
+        4,
+        0,
+        2,
+        0,
+        1
+      ],
+      "validation_confidence": 0.7,
+      "mapping_issues": [
+        "Enhanced pattern extraction"
+      ],
+      "mapping_method": "enhanced_letter_mapping",
+      "explanation": "step function could run a scheduled task when triggered by eventbrige, but why would you add that layer of complexity just to run aws batch when you could directly invoke it through eventbridge. The link provided - https://aws.amazon.com/pt/blogs/compute/orchestrating-high-performance-computing-with-aws-step- functions- makes sense only for HPC, this is a single instance that needs to be run",
+      "keywords": [
+        "EC2",
+        "Lambda",
+        "CloudWatch"
+      ],
+      "requires_manual_review": false,
+      "enhanced": true
+    },
+    {
+      "question_id": "t3_q39",
+      "question_number": 103,
+      "raw_answer_text": "A",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        0
+      ],
+      "validation_confidence": 0.0,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "The company wants to serve static content from an S3 bucket during the maintenance period. To do this, the following steps are required: Upload static informational content to the S3 bucket. This will provide the source of the content that will be served to the visitors. Set the S3 bucket as a second origin in the original CloudFront distribution. Configure the distribution and the S3 bucket to use an origin access identity (OAI). This will allow CloudFront to access the S3 bucket securely and prevent public access to the bucket. During the weekly maintenance, edit the default cache behavior to use the S3 origin. Revert the change when the maintenance is complete. This will redirect all web requests to the S3 bucket instead of the Elastic Beanstalk domain name. The other options are not correct because: Creating a new CloudFront distribution is not necessary and would require changing the alternate domain name configuration. Creating a cache behavior for the S3 origin on a new distribu...",
+      "keywords": [
+        "S3",
+        "CloudFront",
+        "Config"
+      ],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t3_q39",
+      "question_number": 103,
+      "raw_answer_text": "Create a new CloudFront distributio\nC.",
+      "extraction_method": "service_pattern",
+      "correct_answers": [
+        2,
+        4,
+        0,
+        4,
+        0,
+        4,
+        2,
+        3,
+        3,
+        1,
+        2
+      ],
+      "validation_confidence": 0.7,
+      "mapping_issues": [
+        "Enhanced pattern extraction"
+      ],
+      "mapping_method": "enhanced_letter_mapping",
+      "explanation": "The company wants to serve static content from an S3 bucket during the maintenance period. To do this, the following steps are required: Upload static informational content to the S3 bucket. This will provide the source of the content that will be served to the visitors. Set the S3 bucket as a second origin in the original CloudFront distribution. Configure the distribution and the S3 bucket to use an origin access identity (OAI). This will allow CloudFront to access the S3 bucket securely and prevent public access to the bucket. During the weekly maintenance, edit the default cache behavior to use the S3 origin. Revert the change when the maintenance is complete. This will redirect all web requests to the S3 bucket instead of the Elastic Beanstalk domain name. The other options are not co...",
+      "keywords": [
+        "S3",
+        "CloudFront",
+        "Config"
+      ],
+      "requires_manual_review": false,
+      "enhanced": true
+    },
+    {
+      "question_id": "t1_q40",
+      "question_number": 109,
+      "raw_answer_text": "C",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        2
+      ],
+      "validation_confidence": 0.0,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "Transfer acceleration. S3 Transfer Acceleration utilizes the Amazon CloudFront global network of edge locations to accelerate the transfer of data to and from S3 buckets. By enabling S3 Transfer Acceleration on the centralized S3 bucket, the users in Europe will experience faster uploads as their data will be routed through the closest CloudFront edge location.",
+      "keywords": [
+        "S3",
+        "CloudFront"
+      ],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t1_q40",
+      "question_number": 109,
+      "raw_answer_text": "deploy the application to use S3 multipart uploads.",
+      "extraction_method": "service_pattern",
+      "correct_answers": [
+        3,
+        0,
+        2,
+        0,
+        0,
+        0,
+        3
+      ],
+      "validation_confidence": 0.7,
+      "mapping_issues": [
+        "Enhanced pattern extraction"
+      ],
+      "mapping_method": "enhanced_letter_mapping",
+      "explanation": "Transfer acceleration. S3 Transfer Acceleration utilizes the Amazon CloudFront global network of edge locations to accelerate the transfer of data to and from S3 buckets. By enabling S3 Transfer Acceleration on the centralized S3 bucket, the users in Europe will experience faster uploads as their data will be routed through the closest CloudFront edge location.",
+      "keywords": [
+        "S3",
+        "EC2",
+        "Auto Scaling",
+        "CloudFront",
+        "Config"
+      ],
+      "requires_manual_review": false,
+      "enhanced": true
+    },
+    {
+      "question_id": "t4_q41",
+      "question_number": 113,
+      "raw_answer_text": "B",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        1
+      ],
+      "validation_confidence": 0.0,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "Amazon Kinesis Data Streams is a service that enables real-time data ingestion and processing. Amazon DynamoDB is a NoSQL database that does not require fixed schemas for storage. By using Kinesis Data Streams and DynamoDB, the company can send the JSON data to a database that can handle schemaless data in real time. References: https://docs.aws.amazon.com/streams/latest/dev/introduction.html https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Introduction.html",
+      "keywords": [
+        "DynamoDB",
+        "Kinesis"
+      ],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t4_q41",
+      "question_number": 113,
+      "raw_answer_text": "Use Amazon Kinesis Data Firehouse to send the data to Amazon Redshift.",
+      "extraction_method": "service_pattern",
+      "correct_answers": [
+        0,
+        0,
+        3,
+        0,
+        0,
+        3,
+        3,
+        0,
+        0,
+        0,
+        0,
+        3
+      ],
+      "validation_confidence": 0.7,
+      "mapping_issues": [
+        "Enhanced pattern extraction"
+      ],
+      "mapping_method": "enhanced_letter_mapping",
+      "explanation": "Amazon Kinesis Data Streams is a service that enables real-time data ingestion and processing. Amazon DynamoDB is a NoSQL database that does not require fixed schemas for storage. By using Kinesis Data Streams and DynamoDB, the company can send the JSON data to a database that can handle schemaless data in real time. References: https://docs.aws.amazon.com/streams/latest/dev/introduction.html https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Introduction.html",
+      "keywords": [
+        "DynamoDB",
+        "Kinesis"
+      ],
+      "requires_manual_review": false,
+      "enhanced": true
+    },
+    {
+      "question_id": "t7_q42",
+      "question_number": 117,
+      "raw_answer_text": "D",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        3
+      ],
+      "validation_confidence": 0.0,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "Passing Certification Exams Made Easy visit - https://www.surepassexam.com Recommend!! Get the Full SAP-C02 dumps in VCE and PDF From SurePassExam https://www.surepassexam.com/SAP-C02-exam-dumps.html (300",
+      "keywords": [],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t7_q42",
+      "question_number": 117,
+      "raw_answer_text": "across application servers. Frontend web servers need session persistence and must scale to meet increases in traffic.",
+      "extraction_method": "fuzzy_enhanced",
+      "correct_answers": [
+        2
+      ],
+      "validation_confidence": 0.25170731707317073,
+      "mapping_issues": [
+        "Fuzzy match, similarity: 0.420"
+      ],
+      "mapping_method": "fuzzy_text_match",
+      "explanation": "session dat F. Run the application on Amazon Elastic Kubernetes Service (Amazon EKS). Configure Amazon EKS to use managed node group G. Use ReplicaSets to run the web servers and application H. Create an Amazon Elastic File System (Amazon EFS) Me syste I. Mount the EFS file system across all EKS pods to store frontend web server session data. J. Deploy the application on Amazon Elastic Kubernetes Service (Amazon EKS) Configure Amazon EKS to use managed node group K. Run the web servers and application as Kubernetes deployments in the EKS cluste L. Store the frontend web server session data in ...",
+      "keywords": [
+        "EC2",
+        "EBS",
+        "DynamoDB",
+        "ElastiCache",
+        "ECS",
+        "EKS",
+        "Config"
+      ],
+      "requires_manual_review": true,
+      "enhanced": true
+    },
+    {
+      "question_id": "t2_q43",
+      "question_number": 122,
+      "raw_answer_text": "C",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        2
+      ],
+      "validation_confidence": 0.0,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "\"The AWS WAF API supports security automation such as blacklisting IP addresses that exceed request limits, which can be useful for mitigating HTTP flood attacks.\" > https://aws.amazon.com/blogs/security/how-to-protect-dynamic-web-applications-against-ddos-attacks-by-using",
+      "keywords": [],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t2_q43",
+      "question_number": 122,
+      "raw_answer_text": "Create an Amazon CloudWatch alarm that monitors server acces\nB.",
+      "extraction_method": "service_pattern",
+      "correct_answers": [
+        2,
+        4,
+        0,
+        4,
+        0,
+        0,
+        0,
+        2,
+        3,
+        0,
+        2,
+        0,
+        0,
+        0,
+        4,
+        4,
+        0,
+        2,
+        2,
+        4,
+        1
+      ],
+      "validation_confidence": 0.7,
+      "mapping_issues": [
+        "Enhanced pattern extraction"
+      ],
+      "mapping_method": "enhanced_letter_mapping",
+      "explanation": "\"The AWS WAF API supports security automation such as blacklisting IP addresses that exceed request limits, which can be useful for mitigating HTTP flood attacks.\" > https://aws.amazon.com/blogs/security/how-to-protect-dynamic-web-applications-against-ddos-attacks-by-using",
+      "keywords": [
+        "EC2",
+        "Lambda",
+        "CloudWatch",
+        "EBS",
+        "Auto Scaling",
+        "Route 53",
+        "Config"
+      ],
+      "requires_manual_review": false,
+      "enhanced": true
+    },
+    {
+      "question_id": "t7_q44",
+      "question_number": 123,
+      "raw_answer_text": "B",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        1
+      ],
+      "validation_confidence": 0.0,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "AWS Trusted Advisor is a service that provides real-time guidance to help users provision their resources following AWS best practices1. One of the Trusted Advisor checks is “Low Utilization Amazon EC2 Instances”, which identifies EC2 instances that appear to be underutilized based on CPU, network I/O, and disk I/O metrics1. This check can help users optimize the cost and size of their EC2 instances by recommending smaller or more appropriate instance types. AWS Compute Optimizer is a service that analyzes the configuration and utilization metrics of AWS resources and generates optimization recommendations to reduce the cost and improve the performance of workloads2. Compute Optimizer supports four types of AWS resources: EC2 instances, EBS volumes, ECS services on AWS Fargate, and Lambda functions2. For EC2 instances, Compute Optimizer evaluates the vCPUs, memory, storage, and other specifications, as well as the CPU utilization, network in and out, disk read and write, and other util...",
+      "keywords": [
+        "EC2",
+        "Lambda",
+        "EBS",
+        "ECS",
+        "Config"
+      ],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t7_q44",
+      "question_number": 123,
+      "raw_answer_text": "A",
+      "extraction_method": "option_format",
+      "correct_answers": [
+        0
+      ],
+      "validation_confidence": 0.7,
+      "mapping_issues": [
+        "Enhanced pattern extraction"
+      ],
+      "mapping_method": "enhanced_letter_mapping",
+      "explanation": "AWS Trusted Advisor is a service that provides real-time guidance to help users provision their resources following AWS best practices1. One of the Trusted Advisor checks is “Low Utilization Amazon EC2 Instances”, which identifies EC2 instances that appear to be underutilized based on CPU, network I/O, and disk I/O metrics1. This check can help users optimize the cost and size of their EC2 instances by recommending smaller or more appropriate instance types. AWS Compute Optimizer is a service that analyzes the configuration and utilization metrics of AWS resources and generates optimization recommendations to reduce the cost and improve the performance of workloads2. Compute Optimizer supports four types of AWS resources: EC2 instances, EBS volumes, ECS services on AWS Fargate, and Lambda ...",
+      "keywords": [
+        "S3",
+        "EC2",
+        "Lambda",
+        "CloudWatch",
+        "EBS",
+        "ECS",
+        "Config"
+      ],
+      "requires_manual_review": false,
+      "enhanced": true
+    },
+    {
+      "question_id": "t1_q45",
+      "question_number": 131,
+      "raw_answer_text": "B",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        1
+      ],
+      "validation_confidence": 0.0,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "To reduce the volume of Amazon S3 calls to AWS KMS, use Amazon S3 bucket keys, which are protected encryption keys that are reused for a limited time in Amazon S3. Bucket keys can reduce costs for AWS KMS requests by up to 99%. You can configure a bucket key for all objects in an Amazon S3 bucket, or for a specific object in an Amazon S3 bucket. https://docs.aws.amazon.com/fr_fr/kms/latest/developerguide/services-s3.html",
+      "keywords": [
+        "S3",
+        "KMS",
+        "Config"
+      ],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t1_q45",
+      "question_number": 131,
+      "raw_answer_text": "use of the high number of requests from\nAmazon S3.",
+      "extraction_method": "service_pattern",
+      "correct_answers": [
+        4,
+        4,
+        1,
+        4,
+        4,
+        4,
+        0,
+        0
+      ],
+      "validation_confidence": 0.7,
+      "mapping_issues": [
+        "Enhanced pattern extraction"
+      ],
+      "mapping_method": "enhanced_letter_mapping",
+      "explanation": "To reduce the volume of Amazon S3 calls to AWS KMS, use Amazon S3 bucket keys, which are protected encryption keys that are reused for a limited time in Amazon S3. Bucket keys can reduce costs for AWS KMS requests by up to 99%. You can configure a bucket key for all objects in an Amazon S3 bucket, or for a specific object in an Amazon S3 bucket. https://docs.aws.amazon.com/fr_fr/kms/latest/developerguide/services-s3.html",
+      "keywords": [
+        "S3",
+        "KMS",
+        "Config"
+      ],
+      "requires_manual_review": false,
+      "enhanced": true
+    },
+    {
+      "question_id": "t3_q46",
+      "question_number": 134,
+      "raw_answer_text": "A",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        0
+      ],
+      "validation_confidence": 0.025,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "A Direct Connect gateway allows you to connect multiple VPCs across different Regions to a Direct Connect connection1. A public VIF allows you to access AWS public services such as EC21. A Site-to-Site VPN connection over the public VIF provides encryption and redundancy for the traffic between the on-premises data center and the VPCs2. This solution is cheaper than setting up additional Direct Connect connections or using a private VIF with VPC peering.",
+      "keywords": [
+        "EC2",
+        "VPC"
+      ],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t3_q46",
+      "question_number": 134,
+      "raw_answer_text": "Use VPC peering to establish a connection between the VPCs across the Region\nK.",
+      "extraction_method": "service_pattern",
+      "correct_answers": [
+        4,
+        2,
+        4,
+        4,
+        4,
+        0,
+        1,
+        0,
+        2,
+        4,
+        2,
+        1,
+        4,
+        4,
+        4,
+        4,
+        2,
+        0,
+        2,
+        4,
+        4
+      ],
+      "validation_confidence": 0.7,
+      "mapping_issues": [
+        "Enhanced pattern extraction"
+      ],
+      "mapping_method": "enhanced_letter_mapping",
+      "explanation": "A Direct Connect gateway allows you to connect multiple VPCs across different Regions to a Direct Connect connection1. A public VIF allows you to access AWS public services such as EC21. A Site-to-Site VPN connection over the public VIF provides encryption and redundancy for the traffic between the on-premises data center and the VPCs2. This solution is cheaper than setting up additional Direct Connect connections or using a private VIF with VPC peering.",
+      "keywords": [
+        "EC2",
+        "VPC"
+      ],
+      "requires_manual_review": false,
+      "enhanced": true
+    },
+    {
+      "question_id": "t7_q47",
+      "question_number": 143,
+      "raw_answer_text": "D",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        3
+      ],
+      "validation_confidence": 0.0,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "Cross account role should be created in destination(member) account. The role has trust entity to master account.",
+      "keywords": [],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t7_q47",
+      "question_number": 143,
+      "raw_answer_text": "Create an IAM user and a cross-account role in the management accoun\nB.",
+      "extraction_method": "service_pattern",
+      "correct_answers": [
+        2,
+        4,
+        0,
+        4,
+        0,
+        0,
+        4,
+        0,
+        3,
+        0,
+        2,
+        0,
+        2,
+        2,
+        4,
+        4,
+        0,
+        0,
+        4,
+        4,
+        0,
+        2,
+        2,
+        1
+      ],
+      "validation_confidence": 0.7,
+      "mapping_issues": [
+        "Enhanced pattern extraction"
+      ],
+      "mapping_method": "enhanced_letter_mapping",
+      "explanation": "Cross account role should be created in destination(member) account. The role has trust entity to master account.",
+      "keywords": [
+        "IAM",
+        "Config"
+      ],
+      "requires_manual_review": false,
+      "enhanced": true
+    },
+    {
+      "question_id": "t4_q48",
+      "question_number": 148,
+      "raw_answer_text": "C",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        2
+      ],
+      "validation_confidence": 0.0136986301369863,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "The company should download the data from the Amazon Redshift tables to an Amazon S3 bucket periodically and use AWS Data Exchange for S3 to share data with customers. The company should configure subscription verification and require the data customers to subscribe to the data product. This solution will meet the requirements with the least operational overhead because AWS Data Exchange for S3 is a feature that enables data subscribers to access third-party data files directly from data providers’ Amazon S3 buckets. Subscribers can easily use these files for their data analysis with AWS services without needing to create or Passing Certification Exams Made Easy visit - https://www.surepassexam.com Recommend!! Get the Full SAP-C02 dumps in VCE and PDF From SurePassExam https://www.surepassexam.com/SAP-C02-exam-dumps.html (300",
+      "keywords": [
+        "S3",
+        "Config"
+      ],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t4_q48",
+      "question_number": 148,
+      "raw_answer_text": "create an Amazon API Gateway Data API service integration\nwith Amazon Redshif\nC.",
+      "extraction_method": "service_pattern",
+      "correct_answers": [
+        2,
+        4,
+        0,
+        4,
+        0,
+        0,
+        0,
+        0,
+        0,
+        4,
+        0,
+        3,
+        0,
+        0,
+        0,
+        4,
+        2,
+        4,
+        4,
+        0,
+        0,
+        0,
+        4,
+        3,
+        2
+      ],
+      "validation_confidence": 0.7,
+      "mapping_issues": [
+        "Enhanced pattern extraction"
+      ],
+      "mapping_method": "enhanced_letter_mapping",
+      "explanation": "The company should download the data from the Amazon Redshift tables to an Amazon S3 bucket periodically and use AWS Data Exchange for S3 to share data with customers. The company should configure subscription verification and require the data customers to subscribe to the data product. This solution will meet the requirements with the least operational overhead because AWS Data Exchange for S3 is a feature that enables data subscribers to access third-party data files directly from data providers’ Amazon S3 buckets. Subscribers can easily use these files for their data analysis with AWS services without needing to create or Passing Certification Exams Made Easy visit - https://www.surepassexam.com Recommend!! Get the Full SAP-C02 dumps in VCE and PDF From SurePassExam https://www.surepass...",
+      "keywords": [
+        "S3",
+        "IAM",
+        "API Gateway",
+        "Config"
+      ],
+      "requires_manual_review": false,
+      "enhanced": true
+    },
+    {
+      "question_id": "t4_q49",
+      "question_number": 150,
+      "raw_answer_text": "A",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        0
+      ],
+      "validation_confidence": 0.04,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "The company should use Amazon Aurora global database and Amazon DynamoDB global table to deploy the data tier components across two Regions. Amazon Aurora global database is a feature that allows a single Aurora database to span multiple AWS Regions, enabling low-latency global reads and fast recovery from Region-wide outages1. Amazon DynamoDB global table is a feature that allows a single DynamoDB table to span multiple AWS Regions, enabling low-latency global reads and writes and fast recovery from Region-wide outages2. References: https://aws.amazon.com/rds/aurora/global-database/ https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/globaltables_HowItWorks.html https://aws.amazon.com/route53/application-recovery-controller/",
+      "keywords": [
+        "RDS",
+        "DynamoDB"
+      ],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t4_q49",
+      "question_number": 150,
+      "raw_answer_text": "Use Amazon Route 53 Application Recovery Controller to automate database backup and recovery to the secondary Region\nAnswer: AD\nExplanation:\nThe company should use Amazon Aurora global database and Amazon DynamoDB global table to deploy the data tier components across two Regions.",
+      "extraction_method": "service_pattern",
+      "correct_answers": [
+        4,
+        0,
+        0,
+        4,
+        0,
+        2,
+        0,
+        4,
+        2,
+        4,
+        2,
+        4,
+        0,
+        0,
+        4,
+        3,
+        0,
+        0,
+        1,
+        0,
+        4,
+        1,
+        0,
+        2,
+        0,
+        3,
+        4,
+        2,
+        4,
+        4,
+        4,
+        2,
+        3,
+        0,
+        4,
+        0,
+        4,
+        0,
+        3,
+        4,
+        0,
+        0,
+        4,
+        2,
+        0,
+        3,
+        4,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        3,
+        0,
+        0,
+        1,
+        0,
+        4,
+        0,
+        3,
+        0,
+        0,
+        3,
+        0,
+        3,
+        1,
+        1,
+        0,
+        0,
+        1,
+        4,
+        3,
+        4,
+        4,
+        3,
+        0,
+        0,
+        4,
+        2,
+        4,
+        0,
+        2,
+        4
+      ],
+      "validation_confidence": 0.7,
+      "mapping_issues": [
+        "Enhanced pattern extraction"
+      ],
+      "mapping_method": "enhanced_letter_mapping",
+      "explanation": "The company should use Amazon Aurora global database and Amazon DynamoDB global table to deploy the data tier components across two Regions. Amazon Aurora global database is a feature that allows a single Aurora database to span multiple AWS Regions, enabling low-latency global reads and fast recovery from Region-wide outages1. Amazon DynamoDB global table is a feature that allows a single DynamoDB table to span multiple AWS Regions, enabling low-latency global reads and writes and fast recovery from Region-wide outages2. References: https://aws.amazon.com/rds/aurora/global-database/ https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/globaltables_HowItWorks.html https://aws.amazon.com/route53/application-recovery-controller/",
+      "keywords": [
+        "RDS",
+        "Route 53",
+        "DynamoDB",
+        "Config"
+      ],
+      "requires_manual_review": false,
+      "enhanced": true
+    },
+    {
+      "question_id": "t2_q50",
+      "question_number": 152,
+      "raw_answer_text": "Use the Lambda function to delete the image tag for images that have Critical or High seventy finding\nF.",
+      "extraction_method": "service_pattern",
+      "correct_answers": [
+        4,
+        4,
+        0,
+        1,
+        3,
+        0,
+        2,
+        3,
+        4,
+        4,
+        4,
+        4,
+        0,
+        4,
+        0,
+        0,
+        4,
+        0,
+        0,
+        4,
+        2,
+        2,
+        0,
+        4,
+        4,
+        3
+      ],
+      "validation_confidence": 0.7,
+      "mapping_issues": [
+        "Enhanced pattern extraction"
+      ],
+      "mapping_method": "enhanced_letter_mapping",
+      "explanation": "(Amazon SNS). F. Notify the development team by using Amazon Simple Email Service (Amazon SES). G. Schedule an AWS Lambda function to start a manual image scan every hou H. Configure Amazon EventBridge to invoke another Lambda function when a scan is complet I. Use the second Lambda function to delete the image tag for images that have Critical or High severity finding J. Notify the development team by using Amazon Simple Notification Service (Amazon SNS). K. Configure periodic image scan on the repositor L. Configure scan results to be added lo an Amazon Simple Queue Service (Amazon SQS) queu...",
+      "keywords": [
+        "EC2",
+        "Lambda",
+        "Auto Scaling",
+        "SQS",
+        "SNS",
+        "ECS",
+        "Config"
+      ],
+      "requires_manual_review": false,
+      "enhanced": true
+    },
+    {
+      "question_id": "t1_q51",
+      "question_number": 157,
+      "raw_answer_text": "A",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        0
+      ],
+      "validation_confidence": 0.0,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "https://docs.aws.amazon.com/filegateway/latest/files3/CreatingAnSMBFileShare.html",
+      "keywords": [
+        "S3"
+      ],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t1_q51",
+      "question_number": 157,
+      "raw_answer_text": "Create a new S3 bucke\nB.",
+      "extraction_method": "service_pattern",
+      "correct_answers": [
+        2,
+        4,
+        0,
+        4,
+        0,
+        4,
+        1,
+        2,
+        4,
+        1
+      ],
+      "validation_confidence": 0.7,
+      "mapping_issues": [
+        "Enhanced pattern extraction"
+      ],
+      "mapping_method": "enhanced_letter_mapping",
+      "explanation": "https://docs.aws.amazon.com/filegateway/latest/files3/CreatingAnSMBFileShare.html",
+      "keywords": [
+        "S3",
+        "VPC"
+      ],
+      "requires_manual_review": false,
+      "enhanced": true
+    }
+  ],
+  "enhancement_report": {
+    "original_count": 48,
+    "questions_needing_enhancement": 51,
+    "successful_enhancements": 51,
+    "failed_enhancements": 0,
+    "enhancement_patterns_used": {
+      "service_pattern": 42,
+      "option_format": 3
+    },
+    "fuzzy_matches": 6,
+    "explanation_inferences": 0,
+    "final_count": 99
+  }
+}

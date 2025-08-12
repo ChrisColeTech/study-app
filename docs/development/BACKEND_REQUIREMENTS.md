@@ -107,7 +107,7 @@ Create a well-architected application using modern development practices. This i
 
 **Requirements**:
 
-1. Must include SOLID principles with concrete examples
+1. Must include SOLID principles
 2. Must include DRY principle guidelines
 3. Must include specific anti-pattern prevention
 4. Must include directives against spaghetti code

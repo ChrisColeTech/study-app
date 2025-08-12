@@ -103,3 +103,4 @@ Thumbs.db
 # CDK
 cdk.context.json
 cdk.out/
+/.serena

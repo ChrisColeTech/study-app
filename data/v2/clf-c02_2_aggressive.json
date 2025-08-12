@@ -1,0 +1,28 @@
+{
+  "metadata": {
+    "parsing_date": "2025-08-11T19:47:55.082150",
+    "pdf_file": "docs/exam-material/clf-c02_2.pdf",
+    "enhanced_file": "data/v2/clf-c02_2_enhanced.json",
+    "phase": "aggressive_recovery",
+    "total_questions": 153,
+    "unanswered_questions": 0,
+    "aggressive_attempts": 0,
+    "aggressive_successes": 0,
+    "aggressive_success_rate": 0,
+    "additional_coverage_percent": 0.0,
+    "pattern_usage": {},
+    "confidence_distribution": {
+      "high": 0,
+      "medium": 0,
+      "low": 0
+    },
+    "inference_types": {}
+  },
+  "aggressive_answers": [],
+  "unanswered_remain": [],
+  "parsing_report": {
+    "successful_extractions": [],
+    "pattern_effectiveness": {},
+    "requires_ai_completion": 0
+  }
+}

@@ -1,0 +1,1245 @@
+{
+  "metadata": {
+    "parser_version": "2.0",
+    "detected_format": "simple_numbered",
+    "format_detection_scores": {
+      "surepassexam": 0,
+      "simple_numbered": 15,
+      "numbered": 0,
+      "standard": 0,
+      "legacy": 0
+    },
+    "extraction_date": "2025-08-11T19:29:27.048475",
+    "total_pages": 10,
+    "processed_pages": 10,
+    "failed_pages": [],
+    "total_questions": 26,
+    "total_topics": 1,
+    "extraction_success_rate": 1.0,
+    "extraction_errors": [],
+    "question_types": {
+      "single_choice": 26
+    },
+    "classification_date": "2025-08-11T19:29:27.343054",
+    "classification_version": "2.0",
+    "original_topics": 1,
+    "classified_topics": 4,
+    "average_classification_confidence": 0.079,
+    "low_confidence_count": 26,
+    "processing_errors": 0,
+    "topic_distribution": {
+      "Topic 7": {
+        "name": "Monitoring & Management",
+        "count": 22,
+        "percentage": 84.6
+      },
+      "Topic 5": {
+        "name": "Security & Identity",
+        "count": 2,
+        "percentage": 7.7
+      },
+      "Topic 2": {
+        "name": "Compute Services",
+        "count": 1,
+        "percentage": 3.8
+      },
+      "Topic 1": {
+        "name": "Storage Services",
+        "count": 1,
+        "percentage": 3.8
+      }
+    }
+  },
+  "questions": [
+    {
+      "topic_number": 7,
+      "question_number": 1,
+      "question_id": "t7_q1",
+      "question_text": "A company wants to use a large language model (LLM) on Amazon Bedrock for sentiment analysis. The company wants to know how much information can fit into\none prompt.\nWhich consideration will inform the company's decision?",
+      "question_type": "single_choice",
+      "select_count": 1,
+      "options": [
+        [
+          "A",
+          "Temperature"
+        ],
+        [
+          "B",
+          "Context window"
+        ],
+        [
+          "C",
+          "Batch size"
+        ],
+        [
+          "D",
+          "Model size"
+        ]
+      ],
+      "page_number": 2,
+      "extraction_confidence": 0.8,
+      "format_type": "simple_numbered",
+      "original_topic": 1,
+      "topic_name": "Monitoring & Management",
+      "classification_confidence": 0.1,
+      "detected_services": [
+        "GENERAL"
+      ]
+    },
+    {
+      "topic_number": 7,
+      "question_number": 2,
+      "question_id": "t7_q2",
+      "question_text": "A company has developed an ML model for image classification. The company wants to deploy the model to production so that a web application can use the\nmodel.\nThe company needs to implement a solution to host the model and serve predictions without managing any of the underlying infrastructure.\nWhich solution will meet these requirements?",
+      "question_type": "single_choice",
+      "select_count": 1,
+      "options": [
+        [
+          "A",
+          "Use Amazon SageMaker Serverless Inference to deploy the model."
+        ],
+        [
+          "B",
+          "Use Amazon CloudFront to deploy the model."
+        ],
+        [
+          "C",
+          "Use Amazon API Gateway to host the model and serve predictions."
+        ],
+        [
+          "D",
+          "Use AWS Batch to host the model and serve predictions."
+        ]
+      ],
+      "page_number": 2,
+      "extraction_confidence": 1.0,
+      "format_type": "simple_numbered",
+      "original_topic": 1,
+      "topic_name": "Monitoring & Management",
+      "classification_confidence": 0.1,
+      "detected_services": [
+        "GENERAL"
+      ]
+    },
+    {
+      "topic_number": 7,
+      "question_number": 3,
+      "question_id": "t7_q3",
+      "question_text": "An AI practitioner has built a deep learning model to classify the types of materials in images. The AI practitioner now wants to measure the model performance.\nWhich metric will help the AI practitioner evaluate the performance of the model?",
+      "question_type": "single_choice",
+      "select_count": 1,
+      "options": [
+        [
+          "A",
+          "Confusion matrix"
+        ],
+        [
+          "B",
+          "Correlation matrix"
+        ],
+        [
+          "C",
+          "R2 score"
+        ],
+        [
+          "D",
+          "Mean squared error (MSE)"
+        ]
+      ],
+      "page_number": 2,
+      "extraction_confidence": 0.8,
+      "format_type": "simple_numbered",
+      "original_topic": 1,
+      "topic_name": "Monitoring & Management",
+      "classification_confidence": 0.032,
+      "detected_services": [
+        "METRIC"
+      ]
+    },
+    {
+      "topic_number": 7,
+      "question_number": 4,
+      "question_id": "t7_q4",
+      "question_text": "A company uses a foundation model (FM) from Amazon Bedrock for an AI search tool. The company wants to fine-tune the model to be more accurate by using\nthe company's data.\nWhich strategy will successfully fine-tune the model?",
+      "question_type": "single_choice",
+      "select_count": 1,
+      "options": [
+        [
+          "A",
+          "Provide labeled data with the prompt field and the completion field."
+        ],
+        [
+          "B",
+          "Prepare the training dataset by creating a .txt file that contains multiple lines in .csv format."
+        ],
+        [
+          "C",
+          "Purchase Provisioned Throughput for Amazon Bedrock."
+        ],
+        [
+          "D",
+          "Train the model on journals and textbooks."
+        ]
+      ],
+      "page_number": 2,
+      "extraction_confidence": 1.0,
+      "format_type": "simple_numbered",
+      "original_topic": 1,
+      "topic_name": "Monitoring & Management",
+      "classification_confidence": 0.1,
+      "detected_services": [
+        "GENERAL"
+      ]
+    },
+    {
+      "topic_number": 7,
+      "question_number": 5,
+      "question_id": "t7_q5",
+      "question_text": "A company has a foundation model (FM) that was customized by using Amazon Bedrock to answer customer queries about products. The company wants to\nvalidate the model's responses to new types of queries. The company needs to upload a new dataset that Amazon Bedrock can use for validation.\nWhich AWS service meets these requirements?",
+      "question_type": "single_choice",
+      "select_count": 1,
+      "options": [
+        [
+          "A",
+          "Amazon S3"
+        ],
+        [
+          "B",
+          "Amazon Elastic Block Store (Amazon EBS)"
+        ],
+        [
+          "C",
+          "Amazon Elastic File System (Amazon EFS)"
+        ],
+        [
+          "D",
+          "AWS Snowcone"
+        ]
+      ],
+      "page_number": 3,
+      "extraction_confidence": 1.0,
+      "format_type": "simple_numbered",
+      "original_topic": 1,
+      "topic_name": "Monitoring & Management",
+      "classification_confidence": 0.1,
+      "detected_services": [
+        "GENERAL"
+      ]
+    },
+    {
+      "topic_number": 7,
+      "question_number": 6,
+      "question_id": "t7_q6",
+      "question_text": "How can companies use large language models (LLMs) securely on Amazon Bedrock?",
+      "question_type": "single_choice",
+      "select_count": 1,
+      "options": [
+        [
+          "A",
+          "Design clear and specific prompt"
+        ],
+        [
+          "B",
+          "Configure AWS Identity and Access Management (IAM) roles and policies by using least privilege access."
+        ],
+        [
+          "C",
+          "Enable AWS Audit Manager for automatic model evaluation jobs."
+        ],
+        [
+          "D",
+          "Enable Amazon Bedrock automatic model evaluation jobs."
+        ],
+        [
+          "E",
+          "Use Amazon CloudWatch Logs to make models explainable and to monitor for bias."
+        ]
+      ],
+      "page_number": 3,
+      "extraction_confidence": 1.0,
+      "format_type": "simple_numbered",
+      "original_topic": 1,
+      "topic_name": "Monitoring & Management",
+      "classification_confidence": 0.1,
+      "detected_services": [
+        "GENERAL"
+      ]
+    },
+    {
+      "topic_number": 7,
+      "question_number": 7,
+      "question_id": "t7_q7",
+      "question_text": "Which strategy evaluates the accuracy of a foundation model (FM) that is used in image classification tasks?",
+      "question_type": "single_choice",
+      "select_count": 1,
+      "options": [
+        [
+          "A",
+          "Calculate the total cost of resources used by the model."
+        ],
+        [
+          "B",
+          "Measure the model's accuracy against a predefined benchmark dataset."
+        ],
+        [
+          "C",
+          "Count the number of layers in the neural network."
+        ],
+        [
+          "D",
+          "Assess the color accuracy of images processed by the model."
+        ]
+      ],
+      "page_number": 3,
+      "extraction_confidence": 1.0,
+      "format_type": "simple_numbered",
+      "original_topic": 1,
+      "topic_name": "Monitoring & Management",
+      "classification_confidence": 0.1,
+      "detected_services": [
+        "GENERAL"
+      ]
+    },
+    {
+      "topic_number": 7,
+      "question_number": 8,
+      "question_id": "t7_q8",
+      "question_text": "A company built an AI-powered resume screening system. The company used a large dataset to train the model. The dataset contained resumes that were not\nrepresentative of all demographics. Which core dimension of responsible AI does this scenario present?",
+      "question_type": "single_choice",
+      "select_count": 1,
+      "options": [
+        [
+          "A",
+          "Fairness."
+        ],
+        [
+          "B",
+          "Explainability."
+        ],
+        [
+          "C",
+          "Privacy and security."
+        ],
+        [
+          "D",
+          "Transparency."
+        ]
+      ],
+      "page_number": 3,
+      "extraction_confidence": 0.8,
+      "format_type": "simple_numbered",
+      "original_topic": 1,
+      "topic_name": "Monitoring & Management",
+      "classification_confidence": 0.1,
+      "detected_services": [
+        "GENERAL"
+      ]
+    },
+    {
+      "topic_number": 7,
+      "question_number": 9,
+      "question_id": "t7_q9",
+      "question_text": "A company wants to classify human genes into 20 categories based on gene characteristics. The company needs an ML algorithm to document how the inner\nmechanism of the model affects the output.\nWhich ML algorithm meets these requirements?",
+      "question_type": "single_choice",
+      "select_count": 1,
+      "options": [
+        [
+          "A",
+          "Decision trees"
+        ],
+        [
+          "B",
+          "Linear regression"
+        ],
+        [
+          "C",
+          "Logistic regression"
+        ],
+        [
+          "D",
+          "Neural networks"
+        ]
+      ],
+      "page_number": 4,
+      "extraction_confidence": 0.8,
+      "format_type": "simple_numbered",
+      "original_topic": 1,
+      "topic_name": "Monitoring & Management",
+      "classification_confidence": 0.032,
+      "detected_services": [
+        "OUTPUT"
+      ]
+    },
+    {
+      "topic_number": 7,
+      "question_number": 10,
+      "question_id": "t7_q10",
+      "question_text": "Which term describes the numerical representations of real-world objects and concepts that AI and natural language processing (NLP) models use to improve\nunderstanding of textual information?",
+      "question_type": "single_choice",
+      "select_count": 1,
+      "options": [
+        [
+          "A",
+          "Embeddings"
+        ],
+        [
+          "B",
+          "Tokens"
+        ],
+        [
+          "C",
+          "Models"
+        ],
+        [
+          "D",
+          "Binaries"
+        ]
+      ],
+      "page_number": 4,
+      "extraction_confidence": 0.8,
+      "format_type": "simple_numbered",
+      "original_topic": 1,
+      "topic_name": "Monitoring & Management",
+      "classification_confidence": 0.1,
+      "detected_services": [
+        "GENERAL"
+      ]
+    },
+    {
+      "topic_number": 5,
+      "question_number": 10,
+      "question_id": "t5_q11",
+      "question_text": "An education provider is building a question and answer application that uses a generative AI model to explain complex concepts. The education provider wants to\nautomatically change the style of the model response depending on who is asking the question. The education provider will give the model the age range of the\nuser who has asked the question.\nWhich solution meets these requirements with the LEAST implementation effort?",
+      "question_type": "single_choice",
+      "select_count": 1,
+      "options": [
+        [
+          "A",
+          "Fine-tune the model by using additional training data that is representative of the various age ranges that the application will support."
+        ],
+        [
+          "B",
+          "Add a role description to the prompt context that instructs the model of the age range that the response should target."
+        ],
+        [
+          "C",
+          "Use chain-of-thought reasoning to deduce the correct style and complexity for a response suitable for that user."
+        ],
+        [
+          "D",
+          "Summarize the response text depending on the age of the user so that younger users receive shorter responses."
+        ]
+      ],
+      "page_number": 4,
+      "extraction_confidence": 1.0,
+      "format_type": "simple_numbered",
+      "original_topic": 1,
+      "topic_name": "Security & Identity",
+      "classification_confidence": 0.029,
+      "detected_services": [
+        "USER"
+      ]
+    },
+    {
+      "topic_number": 7,
+      "question_number": 15,
+      "question_id": "t7_q12",
+      "question_text": "A company is using the Generative AI Security Scoping Matrix to assess security responsibilities for its solutions. The company has identified four different solution\nscopes based on the matrix.\nWhich solution scope gives the company the MOST ownership of security responsibilities?",
+      "question_type": "single_choice",
+      "select_count": 1,
+      "options": [
+        [
+          "A",
+          "Using a third-party enterprise application that has embedded generative AI features."
+        ],
+        [
+          "B",
+          "Building an application by using an existing third-party generative AI foundation model (FM)."
+        ],
+        [
+          "C",
+          "Refining an existing third-party generative AI foundation model (FM) by fine-tuning the model by using data specific to the business."
+        ],
+        [
+          "D",
+          "Building and training a generative AI model from scratch by using specific data that a customer owns."
+        ]
+      ],
+      "page_number": 5,
+      "extraction_confidence": 1.0,
+      "format_type": "simple_numbered",
+      "original_topic": 1,
+      "topic_name": "Monitoring & Management",
+      "classification_confidence": 0.1,
+      "detected_services": [
+        "GENERAL"
+      ]
+    },
+    {
+      "topic_number": 2,
+      "question_number": 18,
+      "question_id": "t2_q13",
+      "question_text": "Which AWS feature records details about ML instance data for governance and reporting?",
+      "question_type": "single_choice",
+      "select_count": 1,
+      "options": [
+        [
+          "A",
+          "Amazon SageMaker Model Cards"
+        ],
+        [
+          "B",
+          "Amazon SageMaker Debugger"
+        ],
+        [
+          "C",
+          "Amazon SageMaker Model Monitor"
+        ],
+        [
+          "D",
+          "Amazon SageMaker JumpStart"
+        ]
+      ],
+      "page_number": 5,
+      "extraction_confidence": 1.0,
+      "format_type": "simple_numbered",
+      "original_topic": 1,
+      "topic_name": "Compute Services",
+      "classification_confidence": 0.03,
+      "detected_services": [
+        "INSTANCE"
+      ]
+    },
+    {
+      "topic_number": 7,
+      "question_number": 23,
+      "question_id": "t7_q14",
+      "question_text": "A company built a deep learning model for object detection and deployed the model to production.\nWhich AI process occurs when the model analyzes a new image to identify objects?",
+      "question_type": "single_choice",
+      "select_count": 1,
+      "options": [
+        [
+          "A",
+          "Training"
+        ],
+        [
+          "B",
+          "Inference"
+        ],
+        [
+          "C",
+          "Model deployment"
+        ],
+        [
+          "D",
+          "Bias correction"
+        ]
+      ],
+      "page_number": 5,
+      "extraction_confidence": 0.8,
+      "format_type": "simple_numbered",
+      "original_topic": 1,
+      "topic_name": "Monitoring & Management",
+      "classification_confidence": 0.1,
+      "detected_services": [
+        "GENERAL"
+      ]
+    },
+    {
+      "topic_number": 1,
+      "question_number": 28,
+      "question_id": "t1_q15",
+      "question_text": "A company wants to develop a large language model (LLM) application by using Amazon Bedrock and customer data that is uploaded to Amazon S3. The\ncompany's security policy states that each team can access data for only the team's own customers.\nWhich solution will meet these requirements?",
+      "question_type": "single_choice",
+      "select_count": 1,
+      "options": [
+        [
+          "A",
+          "Create an Amazon Bedrock custom service role for each team that has access to only the team's customer data."
+        ],
+        [
+          "B",
+          "Create a custom service role that has Amazon S3 acces"
+        ],
+        [
+          "C",
+          "Ask teams to specify the customer name on each Amazon Bedrock request."
+        ],
+        [
+          "D",
+          "Redact personal data in Amazon S3. Update the S3 bucket policy to allow team access to customer data."
+        ],
+        [
+          "E",
+          "Create one Amazon Bedrock role that has full Amazon S3 acces"
+        ]
+      ],
+      "page_number": 5,
+      "extraction_confidence": 1.0,
+      "format_type": "simple_numbered",
+      "original_topic": 1,
+      "topic_name": "Storage Services",
+      "classification_confidence": 0.034,
+      "detected_services": [
+        "S3"
+      ]
+    },
+    {
+      "topic_number": 7,
+      "question_number": 32,
+      "question_id": "t7_q16",
+      "question_text": "A company deployed an AI/ML solution to help customer service agents respond to frequently asked questions. The questions can change over time. The\ncompany wants to give customer service agents the ability to ask questions and receive automatically generated answers to common customer questions. Which\nstrategy will meet these requirements MOST cost-effectively?",
+      "question_type": "single_choice",
+      "select_count": 1,
+      "options": [
+        [
+          "A",
+          "Fine-tune the model regularly."
+        ],
+        [
+          "B",
+          "Train the model by using context data."
+        ],
+        [
+          "C",
+          "Pre-train and benchmark the model by using context data."
+        ],
+        [
+          "D",
+          "Use Retrieval Augmented Generation (RAG) with prompt engineering techniques."
+        ]
+      ],
+      "page_number": 6,
+      "extraction_confidence": 1.0,
+      "format_type": "simple_numbered",
+      "original_topic": 1,
+      "topic_name": "Monitoring & Management",
+      "classification_confidence": 0.032,
+      "detected_services": [
+        "COST"
+      ]
+    },
+    {
+      "topic_number": 7,
+      "question_number": 33,
+      "question_id": "t7_q17",
+      "question_text": "A company has built an image classification model to predict plant diseases from photos of plant leaves. The company wants to evaluate how many images the\nmodel classified correctly.\nWhich evaluation metric should the company use to measure the model's performance?",
+      "question_type": "single_choice",
+      "select_count": 1,
+      "options": [
+        [
+          "A",
+          "R-squared score"
+        ],
+        [
+          "B",
+          "Accuracy"
+        ],
+        [
+          "C",
+          "Root mean squared error (RMSE)"
+        ],
+        [
+          "D",
+          "Learning rate"
+        ]
+      ],
+      "page_number": 6,
+      "extraction_confidence": 0.8,
+      "format_type": "simple_numbered",
+      "original_topic": 1,
+      "topic_name": "Monitoring & Management",
+      "classification_confidence": 0.032,
+      "detected_services": [
+        "METRIC"
+      ]
+    },
+    {
+      "topic_number": 7,
+      "question_number": 36,
+      "question_id": "t7_q18",
+      "question_text": "A company wants to use generative AI to increase developer productivity and software\ndevelopment. The company wants to use Amazon Q Developer.\nWhat can Amazon Q Developer do to help the company meet these requirements?",
+      "question_type": "single_choice",
+      "select_count": 1,
+      "options": [
+        [
+          "A",
+          "Create software snippets, reference tracking, and open-source license tracking."
+        ],
+        [
+          "B",
+          "Run an application without provisioning or managing servers."
+        ],
+        [
+          "C",
+          "Enable voice commands for coding and providing natural language search."
+        ],
+        [
+          "D",
+          "Convert audio files to text documents by using ML models."
+        ]
+      ],
+      "page_number": 6,
+      "extraction_confidence": 1.0,
+      "format_type": "simple_numbered",
+      "original_topic": 1,
+      "topic_name": "Monitoring & Management",
+      "classification_confidence": 0.1,
+      "detected_services": [
+        "GENERAL"
+      ]
+    },
+    {
+      "topic_number": 7,
+      "question_number": 40,
+      "question_id": "t7_q19",
+      "question_text": "Which feature of Amazon OpenSearch Service gives companies the ability to build vector database applications?",
+      "question_type": "single_choice",
+      "select_count": 1,
+      "options": [
+        [
+          "A",
+          "Integration with Amazon S3 for object storage"
+        ],
+        [
+          "B",
+          "Support for geospatial indexing and queries"
+        ],
+        [
+          "C",
+          "Scalable index management and nearest neighbor search capability"
+        ],
+        [
+          "D",
+          "Ability to perform real-time analysis on streaming data"
+        ]
+      ],
+      "page_number": 7,
+      "extraction_confidence": 1.0,
+      "format_type": "simple_numbered",
+      "original_topic": 1,
+      "topic_name": "Monitoring & Management",
+      "classification_confidence": 0.1,
+      "detected_services": [
+        "GENERAL"
+      ]
+    },
+    {
+      "topic_number": 7,
+      "question_number": 45,
+      "question_id": "t7_q20",
+      "question_text": "A company is using a pre-trained large language model (LLM) to build a chatbot for product recommendations. The company needs the LLM outputs to be short\nand written in a specific language.\nWhich solution will align the LLM response quality with the company's expectations?",
+      "question_type": "single_choice",
+      "select_count": 1,
+      "options": [
+        [
+          "A",
+          "Adjust the prompt."
+        ],
+        [
+          "B",
+          "Choose an LLM of a different size."
+        ],
+        [
+          "C",
+          "Increase the temperature."
+        ],
+        [
+          "D",
+          "Increase the Top K value."
+        ]
+      ],
+      "page_number": 7,
+      "extraction_confidence": 1.0,
+      "format_type": "simple_numbered",
+      "original_topic": 1,
+      "topic_name": "Monitoring & Management",
+      "classification_confidence": 0.1,
+      "detected_services": [
+        "GENERAL"
+      ]
+    },
+    {
+      "topic_number": 7,
+      "question_number": 49,
+      "question_id": "t7_q21",
+      "question_text": "A company is building an ML model to analyze archived data. The company must perform inference on large datasets that are multiple GBs in size. The company\ndoes not need to access the model predictions immediately.\nWhich Amazon SageMaker inference option will meet these requirements?",
+      "question_type": "single_choice",
+      "select_count": 1,
+      "options": [
+        [
+          "A",
+          "Batch transform"
+        ],
+        [
+          "B",
+          "Real-time inference"
+        ],
+        [
+          "C",
+          "Serverless inference"
+        ],
+        [
+          "D",
+          "Asynchronous inference"
+        ]
+      ],
+      "page_number": 7,
+      "extraction_confidence": 0.8,
+      "format_type": "simple_numbered",
+      "original_topic": 1,
+      "topic_name": "Monitoring & Management",
+      "classification_confidence": 0.1,
+      "detected_services": [
+        "GENERAL"
+      ]
+    },
+    {
+      "topic_number": 7,
+      "question_number": 54,
+      "question_id": "t7_q22",
+      "question_text": "A company wants to develop an educational game where users answer questions such as the following: \"A jar contains six red, four green, and three yellow\nmarbles. What is the probability of choosing a green marble from the jar?\"\nWhich solution meets these requirements with the LEAST operational overhead?",
+      "question_type": "single_choice",
+      "select_count": 1,
+      "options": [
+        [
+          "A",
+          "Use supervised learning to create a regression model that will predict probability."
+        ],
+        [
+          "B",
+          "Use reinforcement learning to train a model to return the probability."
+        ],
+        [
+          "C",
+          "Use code that will calculate probability by using simple rules and computations."
+        ],
+        [
+          "D",
+          "Use unsupervised learning to create a model that will estimate probability density."
+        ]
+      ],
+      "page_number": 8,
+      "extraction_confidence": 1.0,
+      "format_type": "simple_numbered",
+      "original_topic": 1,
+      "topic_name": "Monitoring & Management",
+      "classification_confidence": 0.1,
+      "detected_services": [
+        "GENERAL"
+      ]
+    },
+    {
+      "topic_number": 5,
+      "question_number": 57,
+      "question_id": "t5_q23",
+      "question_text": "A pharmaceutical company wants to analyze user reviews of new medications and provide a concise overview for each medication. Which solution meets these\nrequirements?",
+      "question_type": "single_choice",
+      "select_count": 1,
+      "options": [
+        [
+          "A",
+          "Create a time-series forecasting model to analyze the medication reviews by using Amazon Personalize."
+        ],
+        [
+          "B",
+          "Create medication review summaries by using Amazon Bedrock large language models (LLMs)."
+        ],
+        [
+          "C",
+          "Create a classification model that categorizes medications into different groups by using Amazon SageMaker."
+        ],
+        [
+          "D",
+          "Create medication review summaries by using Amazon Rekognition."
+        ]
+      ],
+      "page_number": 8,
+      "extraction_confidence": 1.0,
+      "format_type": "simple_numbered",
+      "original_topic": 1,
+      "topic_name": "Security & Identity",
+      "classification_confidence": 0.029,
+      "detected_services": [
+        "USER"
+      ]
+    },
+    {
+      "topic_number": 7,
+      "question_number": 62,
+      "question_id": "t7_q24",
+      "question_text": "A company is building a solution to generate images for protective eyewear. The solution must have high accuracy and must minimize the risk of incorrect\nannotations.\nWhich solution will meet these requirements?",
+      "question_type": "single_choice",
+      "select_count": 1,
+      "options": [
+        [
+          "A",
+          "Human-in-the-loop validation by using Amazon SageMaker Ground Truth Plus"
+        ],
+        [
+          "B",
+          "Data augmentation by using an Amazon Bedrock knowledge base"
+        ],
+        [
+          "C",
+          "Image recognition by using Amazon Rekognition"
+        ],
+        [
+          "D",
+          "Data summarization by using Amazon QuickSight"
+        ]
+      ],
+      "page_number": 8,
+      "extraction_confidence": 1.0,
+      "format_type": "simple_numbered",
+      "original_topic": 1,
+      "topic_name": "Monitoring & Management",
+      "classification_confidence": 0.1,
+      "detected_services": [
+        "GENERAL"
+      ]
+    },
+    {
+      "topic_number": 7,
+      "question_number": 69,
+      "question_id": "t7_q25",
+      "question_text": "Which option is a benefit of using Amazon SageMaker Model Cards to document AI models?",
+      "question_type": "single_choice",
+      "select_count": 1,
+      "options": [
+        [
+          "A",
+          "Providing a visually appealing summary of a model's capabilities."
+        ],
+        [
+          "B",
+          "Standardizing information about a model's purpose, performance, and limitations."
+        ],
+        [
+          "C",
+          "Reducing the overall computational requirements of a model."
+        ],
+        [
+          "D",
+          "Physically storing models for archival purposes."
+        ]
+      ],
+      "page_number": 9,
+      "extraction_confidence": 1.0,
+      "format_type": "simple_numbered",
+      "original_topic": 1,
+      "topic_name": "Monitoring & Management",
+      "classification_confidence": 0.1,
+      "detected_services": [
+        "GENERAL"
+      ]
+    },
+    {
+      "topic_number": 7,
+      "question_number": 70,
+      "question_id": "t7_q26",
+      "question_text": "A company makes forecasts each quarter to decide how to optimize operations to meet expected demand. The company uses ML models to make these\nforecasts.\nAn AI practitioner is writing a report about the trained ML models to provide transparency and explainability to company stakeholders.\nWhat should the AI practitioner include in the report to meet the transparency and explainability requirements?",
+      "question_type": "single_choice",
+      "select_count": 1,
+      "options": [
+        [
+          "A",
+          "Code for model training"
+        ],
+        [
+          "B",
+          "Partial dependence plots (PDPs)"
+        ],
+        [
+          "C",
+          "Sample data for training"
+        ],
+        [
+          "D",
+          "Model convergence tables"
+        ]
+      ],
+      "page_number": 9,
+      "extraction_confidence": 1.0,
+      "format_type": "simple_numbered",
+      "original_topic": 1,
+      "topic_name": "Monitoring & Management",
+      "classification_confidence": 0.1,
+      "detected_services": [
+        "GENERAL"
+      ]
+    }
+  ],
+  "classification_report": {
+    "summary": {
+      "total_questions": 26,
+      "successfully_classified": 26,
+      "average_confidence": 0.079,
+      "topics_created": 4
+    },
+    "topic_breakdown": {
+      "Topic 7": {
+        "name": "Monitoring & Management",
+        "count": 22,
+        "percentage": 84.6
+      },
+      "Topic 5": {
+        "name": "Security & Identity",
+        "count": 2,
+        "percentage": 7.7
+      },
+      "Topic 2": {
+        "name": "Compute Services",
+        "count": 1,
+        "percentage": 3.8
+      },
+      "Topic 1": {
+        "name": "Storage Services",
+        "count": 1,
+        "percentage": 3.8
+      }
+    },
+    "quality_metrics": {
+      "high_confidence_count": 0,
+      "medium_confidence_count": 0,
+      "low_confidence_count": 26
+    },
+    "review_needed": [
+      {
+        "question_number": 1,
+        "topic_assigned": 7,
+        "confidence": 0.1,
+        "services": [
+          "GENERAL"
+        ],
+        "preview": "A company wants to use a large language model (LLM) on Amazon Bedrock for sentiment analysis. The co"
+      },
+      {
+        "question_number": 2,
+        "topic_assigned": 7,
+        "confidence": 0.1,
+        "services": [
+          "GENERAL"
+        ],
+        "preview": "A company has developed an ML model for image classification. The company wants to deploy the model "
+      },
+      {
+        "question_number": 3,
+        "topic_assigned": 7,
+        "confidence": 0.03225806451612903,
+        "services": [
+          "METRIC"
+        ],
+        "preview": "An AI practitioner has built a deep learning model to classify the types of materials in images. The"
+      },
+      {
+        "question_number": 4,
+        "topic_assigned": 7,
+        "confidence": 0.1,
+        "services": [
+          "GENERAL"
+        ],
+        "preview": "A company uses a foundation model (FM) from Amazon Bedrock for an AI search tool. The company wants "
+      },
+      {
+        "question_number": 5,
+        "topic_assigned": 7,
+        "confidence": 0.1,
+        "services": [
+          "GENERAL"
+        ],
+        "preview": "A company has a foundation model (FM) that was customized by using Amazon Bedrock to answer customer"
+      },
+      {
+        "question_number": 6,
+        "topic_assigned": 7,
+        "confidence": 0.1,
+        "services": [
+          "GENERAL"
+        ],
+        "preview": "How can companies use large language models (LLMs) securely on Amazon Bedrock?"
+      },
+      {
+        "question_number": 7,
+        "topic_assigned": 7,
+        "confidence": 0.1,
+        "services": [
+          "GENERAL"
+        ],
+        "preview": "Which strategy evaluates the accuracy of a foundation model (FM) that is used in image classificatio"
+      },
+      {
+        "question_number": 8,
+        "topic_assigned": 7,
+        "confidence": 0.1,
+        "services": [
+          "GENERAL"
+        ],
+        "preview": "A company built an AI-powered resume screening system. The company used a large dataset to train the"
+      },
+      {
+        "question_number": 9,
+        "topic_assigned": 7,
+        "confidence": 0.03225806451612903,
+        "services": [
+          "OUTPUT"
+        ],
+        "preview": "A company wants to classify human genes into 20 categories based on gene characteristics. The compan"
+      },
+      {
+        "question_number": 10,
+        "topic_assigned": 7,
+        "confidence": 0.1,
+        "services": [
+          "GENERAL"
+        ],
+        "preview": "Which term describes the numerical representations of real-world objects and concepts that AI and na"
+      },
+      {
+        "question_number": 10,
+        "topic_assigned": 5,
+        "confidence": 0.02857142857142857,
+        "services": [
+          "USER"
+        ],
+        "preview": "An education provider is building a question and answer application that uses a generative AI model "
+      },
+      {
+        "question_number": 15,
+        "topic_assigned": 7,
+        "confidence": 0.1,
+        "services": [
+          "GENERAL"
+        ],
+        "preview": "A company is using the Generative AI Security Scoping Matrix to assess security responsibilities for"
+      },
+      {
+        "question_number": 18,
+        "topic_assigned": 2,
+        "confidence": 0.030303030303030304,
+        "services": [
+          "INSTANCE"
+        ],
+        "preview": "Which AWS feature records details about ML instance data for governance and reporting?"
+      },
+      {
+        "question_number": 23,
+        "topic_assigned": 7,
+        "confidence": 0.1,
+        "services": [
+          "GENERAL"
+        ],
+        "preview": "A company built a deep learning model for object detection and deployed the model to production.\nWhi"
+      },
+      {
+        "question_number": 28,
+        "topic_assigned": 1,
+        "confidence": 0.034482758620689655,
+        "services": [
+          "S3"
+        ],
+        "preview": "A company wants to develop a large language model (LLM) application by using Amazon Bedrock and cust"
+      },
+      {
+        "question_number": 32,
+        "topic_assigned": 7,
+        "confidence": 0.03225806451612903,
+        "services": [
+          "COST"
+        ],
+        "preview": "A company deployed an AI/ML solution to help customer service agents respond to frequently asked que"
+      },
+      {
+        "question_number": 33,
+        "topic_assigned": 7,
+        "confidence": 0.03225806451612903,
+        "services": [
+          "METRIC"
+        ],
+        "preview": "A company has built an image classification model to predict plant diseases from photos of plant lea"
+      },
+      {
+        "question_number": 36,
+        "topic_assigned": 7,
+        "confidence": 0.1,
+        "services": [
+          "GENERAL"
+        ],
+        "preview": "A company wants to use generative AI to increase developer productivity and software\ndevelopment. Th"
+      },
+      {
+        "question_number": 40,
+        "topic_assigned": 7,
+        "confidence": 0.1,
+        "services": [
+          "GENERAL"
+        ],
+        "preview": "Which feature of Amazon OpenSearch Service gives companies the ability to build vector database appl"
+      },
+      {
+        "question_number": 45,
+        "topic_assigned": 7,
+        "confidence": 0.1,
+        "services": [
+          "GENERAL"
+        ],
+        "preview": "A company is using a pre-trained large language model (LLM) to build a chatbot for product recommend"
+      },
+      {
+        "question_number": 49,
+        "topic_assigned": 7,
+        "confidence": 0.1,
+        "services": [
+          "GENERAL"
+        ],
+        "preview": "A company is building an ML model to analyze archived data. The company must perform inference on la"
+      },
+      {
+        "question_number": 54,
+        "topic_assigned": 7,
+        "confidence": 0.1,
+        "services": [
+          "GENERAL"
+        ],
+        "preview": "A company wants to develop an educational game where users answer questions such as the following: \""
+      },
+      {
+        "question_number": 57,
+        "topic_assigned": 5,
+        "confidence": 0.02857142857142857,
+        "services": [
+          "USER"
+        ],
+        "preview": "A pharmaceutical company wants to analyze user reviews of new medications and provide a concise over"
+      },
+      {
+        "question_number": 62,
+        "topic_assigned": 7,
+        "confidence": 0.1,
+        "services": [
+          "GENERAL"
+        ],
+        "preview": "A company is building a solution to generate images for protective eyewear. The solution must have h"
+      },
+      {
+        "question_number": 69,
+        "topic_assigned": 7,
+        "confidence": 0.1,
+        "services": [
+          "GENERAL"
+        ],
+        "preview": "Which option is a benefit of using Amazon SageMaker Model Cards to document AI models?"
+      },
+      {
+        "question_number": 70,
+        "topic_assigned": 7,
+        "confidence": 0.1,
+        "services": [
+          "GENERAL"
+        ],
+        "preview": "A company makes forecasts each quarter to decide how to optimize operations to meet expected demand."
+      }
+    ],
+    "errors": []
+  }
+}

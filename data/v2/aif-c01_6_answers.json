@@ -1,0 +1,1338 @@
+{
+  "metadata": {
+    "parsing_date": "2025-08-11T19:40:50.109058",
+    "source_pdf": "docs/exam-material/aif-c01_6.pdf",
+    "source_questions": "data/v2/aif-c01_6_classified.json",
+    "detected_format": "simple_numbered",
+    "total_questions": 26,
+    "answers_extracted": 26,
+    "extraction_success_rate": 1.0,
+    "letter_extraction_success_rate": 1.0,
+    "index_mapping_success_rate": 1.0,
+    "average_confidence": 0.035,
+    "fuzzy_match_fallbacks": 0,
+    "manual_review_flagged": 26,
+    "confidence_distribution": {
+      "high": 0,
+      "medium": 0,
+      "low": 26
+    },
+    "extraction_methods": {
+      "pattern_1": 26
+    }
+  },
+  "answers": [
+    {
+      "question_id": "t7_q1",
+      "question_number": 1,
+      "raw_answer_text": "B",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        1
+      ],
+      "validation_confidence": 0.0,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "The context window determines how much information can fit into a single prompt when using a large language model (LLM) like those on Amazon Bedrock. ? Context Window: ? Why Option B is Correct: ? Why Other Options are Incorrect:",
+      "keywords": [],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t7_q2",
+      "question_number": 2,
+      "raw_answer_text": "A",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        0
+      ],
+      "validation_confidence": 0.031746031746031744,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "Amazon SageMaker Serverless Inference is the correct solution for deploying an ML model to production in a way that allows a web application to use the model without the need to manage the underlying infrastructure. ? Amazon SageMaker Serverless Inference provides a fully managed environment for deploying machine learning models. It automatically provisions, scales, and manages the infrastructure required to host the model, removing the need for the company to manage servers or other underlying infrastructure. ? Why Option A is Correct: ? Why Other Options are Incorrect: Thus, A is the correct answer, as it aligns with the requirement of deploying an ML model without managing any underlying infrastructure.",
+      "keywords": [],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t7_q3",
+      "question_number": 3,
+      "raw_answer_text": "A",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        0
+      ],
+      "validation_confidence": 0.11764705882352941,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "A confusion matrix is the correct metric for evaluating the performance of a classification model, such as the deep learning model built to classify types of materials in images. ? Confusion Matrix: ? Why Option A is Correct: ? Why Other Options are Incorrect:",
+      "keywords": [],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t7_q4",
+      "question_number": 4,
+      "raw_answer_text": "A",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        0
+      ],
+      "validation_confidence": 0.028985507246376812,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "Providing labeled data with both a prompt field and a completion field is the correct strategy for fine-tuning a foundation model (FM) on Amazon Bedrock. ? Fine-Tuning Strategy: ? Why Option A is Correct: ? Why Other Options are Incorrect: Passing Certification Exams Made Easy visit - https://www.surepassexam.com Recommend!! Get the Full AIF-C01 dumps in VCE and PDF From SurePassExam https://www.surepassexam.com/AIF-C01-exam-dumps.html (97",
+      "keywords": [],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t7_q5",
+      "question_number": 5,
+      "raw_answer_text": "A",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        0
+      ],
+      "validation_confidence": 0.0,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "Amazon S3 is the optimal choice for storing and uploading datasets used for machine learning model validation and training. It offers scalable, durable, and secure storage, making it ideal for holding datasets required by Amazon Bedrock for validation purposes. ? Option A (Correct): \"Amazon S3\": This is the correct answer because Amazon S3 is widely used for storing large datasets that are accessed by machine learning models, including those in Amazon Bedrock. ? Option B: \"Amazon Elastic Block Store (Amazon EBS)\" is incorrect because EBS is a block storage service for use with Amazon EC2, not for directly storing datasets for Amazon Bedrock. ? Option C: \"Amazon Elastic File System (Amazon EFS)\" is incorrect as it is primarily used for file storage with shared access by multiple instances. ? Option D: \"AWS Snowcone\" is incorrect because it is a physical device for offline data transfer, not suitable for directly providing data to Amazon Bedrock. AWS AI Practitioner References: ? Storing...",
+      "keywords": [
+        "S3",
+        "EC2",
+        "EBS"
+      ],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t7_q6",
+      "question_number": 6,
+      "raw_answer_text": "A",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        0
+      ],
+      "validation_confidence": 0.06060606060606061,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "To securely use large language models (LLMs) on Amazon Bedrock, companies should design clear and specific prompts to avoid unintended outputs and ensure proper configuration of AWS Identity and Access Management (IAM) roles and policies with the principle of least privilege. This approach limits access to sensitive resources and minimizes the potential impact of security incidents. ? Option A (Correct): \"Design clear and specific prompts. Configure AWS Identity and Access Management (IAM) roles and policies by using least privilege access\": This is the correct answer as it directly addresses both security practices in prompt design and access management. ? Option B: \"Enable AWS Audit Manager for automatic model evaluation jobs\" is incorrect because Audit Manager is for compliance and auditing, not directly related to secure LLM usage. ? Option C: \"Enable Amazon Bedrock automatic model evaluation jobs\" is incorrect because Bedrock does not provide automatic model evaluation jobs specif...",
+      "keywords": [
+        "IAM",
+        "Config"
+      ],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t7_q7",
+      "question_number": 7,
+      "raw_answer_text": "B",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        1
+      ],
+      "validation_confidence": 0.028985507246376812,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "Measuring the model's accuracy against a predefined benchmark dataset is the correct strategy to evaluate the accuracy of a foundation model (FM) used in image classification tasks. ? Model Accuracy Evaluation: ? Why Option B is Correct: ? Why Other Options are Incorrect:",
+      "keywords": [],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t7_q8",
+      "question_number": 8,
+      "raw_answer_text": "A",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        0
+      ],
+      "validation_confidence": 0.2,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "Fairness refers to the absence of bias in AI models. Using non- representative datasets leads to biased predictions, affecting specific demographics unfairly. Explainability, privacy, and transparency are important but not directly related to this scenario. References: AWS Responsible AI Framework.",
+      "keywords": [],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t7_q9",
+      "question_number": 9,
+      "raw_answer_text": "A",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        0
+      ],
+      "validation_confidence": 0.0,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "Decision trees are an interpretable machine learning algorithm that clearly documents the decision-making process by showing how each input feature affects the output. This transparency is particularly useful when explaining how the model arrives at a certain decision, making it suitable for classifying genes into categories. ? Option A (Correct): \"Decision trees\": This is the correct answer because decision trees provide a clear and interpretable representation of how input features influence the model's output, making it ideal for understanding the inner mechanisms affecting predictions. ? Option B: \"Linear regression\" is incorrect because it is used for regression tasks, not classification. ? Option C: \"Logistic regression\" is incorrect as it does not provide the same level of interpretability in documenting decision-making processes. ? Option D: \"Neural networks\" is incorrect because they are often considered \"black boxes\" and do not easily explain how they arrive at their outputs....",
+      "keywords": [],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t7_q10",
+      "question_number": 10,
+      "raw_answer_text": "A",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        0
+      ],
+      "validation_confidence": 0.0,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "Embeddings are numerical representations of objects (such as words, sentences, or documents) that capture the objects' semantic meanings in a form that AI and NLP models can easily understand. These representations help models improve their understanding of textual information by representing concepts in a continuous vector space. ? Option A (Correct): \"Embeddings\": This is the correct term, as embeddings provide a way for models to learn relationships between different objects in their input space, improving their understanding and processing capabilities. ? Option B: \"Tokens\" are pieces of text used in processing, but they do not capture semantic meanings like embeddings do. ? Option C: \"Models\" are the algorithms that use embeddings and other inputs, not the representations themselves. ? Option D: \"Binaries\" refer to data represented in binary form, which is unrelated to the concept of embeddings. AWS AI Practitioner References: ? Understanding Embeddings in AI and NLP: AWS provides...",
+      "keywords": [
+        "RDS"
+      ],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t5_q11",
+      "question_number": 10,
+      "raw_answer_text": "B",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        1
+      ],
+      "validation_confidence": 0.0,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "Adding a role description to the prompt context is a straightforward way to instruct the generative AI model to adjust its response style based on the user's age range. This method requires minimal implementation effort as it does not involve additional training or complex logic. ? Option B (Correct): \"Add a role description to the prompt context that instructs the model of the age range that the response should target\": This is the correct answer because it involves the least implementation effort while effectively guiding the model to tailor resp",
+      "keywords": [],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t7_q12",
+      "question_number": 15,
+      "raw_answer_text": "D",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        3
+      ],
+      "validation_confidence": 0.0196078431372549,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "Building and training a generative AI model from scratch provides the company with the most ownership and control over security responsibilities. In this scenario, the company is responsible for all aspects of the security of the data, the model, and the infrastructure. ? Option D (Correct): \"Building and training a generative AI model from scratch by using specific data that a customer owns\": This is the correct answer because it involves complete ownership of the model, data, and infrastructure, giving the company the highest level of responsibility for security. ? Option A: \"Using a third-party enterprise application that has embedded generative AI features\" is incorrect as the company has minimal control over the security of the AI features embedded wit",
+      "keywords": [],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t2_q13",
+      "question_number": 18,
+      "raw_answer_text": "A",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        0
+      ],
+      "validation_confidence": 0.0,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "Amazon SageMaker Model Cards provide a centralized and standardized repository for documenting machine learning models. They capture key details such as the model's intended use, training and evaluation datasets, performance metrics, ethical considerations, and other relevant information. This documentation facilitates governance and reporting by ensuring that all stakeholders have access to consistent and comprehensive information about each model. While Amazon SageMaker Debugger is used for real-time debugging and monitoring during training, and Amazon SageMaker Model Monitor tracks deployed models for data and prediction quality, neither offers the comprehensive documentation capabilities of Model Cards. Amazon SageMaker JumpStart provides pre-built models and solutions but does not focus on governance documentation. Reference: Amazon SageMaker Model Cards",
+      "keywords": [
+        "RDS"
+      ],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t7_q14",
+      "question_number": 23,
+      "raw_answer_text": "B",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        1
+      ],
+      "validation_confidence": 0.0,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "Inference is the correct answer because it is the AI process that occurs when a deployed model analyzes new data (such as an image) to make predictions or identify objects. ? Inference: ? Why Option B is Correct: ? Why Other Options are Incorrect:",
+      "keywords": [],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t1_q15",
+      "question_number": 28,
+      "raw_answer_text": "A",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        0
+      ],
+      "validation_confidence": 0.01834862385321101,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "To comply with the company's security policy, which restricts each team to access data for only their own customers, creating an Amazon Bedrock custom service role for each team is the correct solution. ? Custom Service Role Per Team: ? Why Option A is Correct: ? Why Other Options are Incorrect: Thus, A is the correct answer to meet the company's security requirements.",
+      "keywords": [],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t7_q16",
+      "question_number": 32,
+      "raw_answer_text": "D",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        3
+      ],
+      "validation_confidence": 0.025974025974025976,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "RAG combines large pre-trained models with retrieval mechanisms to fetch relevant context from a knowledge base. This approach is cost-effective as it eliminates the need for frequent model retraining while ensuring responses are contextually accurate and up to date. References: AWS RAG Techniques.",
+      "keywords": [],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t7_q17",
+      "question_number": 33,
+      "raw_answer_text": "B",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        1
+      ],
+      "validation_confidence": 0.0,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "Accuracy is the most appropriate metric to measure the performance of an image classification model. It indicates the percentage of correctly classified images out of the total number of images. In the context of classifying plant diseases from images, accuracy will help the company determine how well the model is performing by showing how many images were correctly classified. ? Option B (Correct): \"Accuracy\": This is the correct answer because accuracy measures the proportion of correct predictions made by the model, which is suitable for evaluating the performance of a classification model. ? Option A: \"R-squared score\" is incorrect as it is used for regression analysis, not classification tasks. ? Option C: \"Root mean squared error (RMSE)\" is incorrect because it is also used for regression tasks to measure prediction errors, not for classification accuracy. ? Option D: \"Learning rate\" is incorrect as it is a hyperparameter for training, not a performance metric. AWS AI Practitione...",
+      "keywords": [],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t7_q18",
+      "question_number": 36,
+      "raw_answer_text": "A",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        0
+      ],
+      "validation_confidence": 0.025,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "Amazon Q Developer is a tool designed to assist developers in increasing productivity by generating code snippets, managing reference tracking, and handling open-source license tracking. These features help developers by automating parts of the software development process. ? Option A (Correct): \"Create software snippets, reference tracking, and open- source license tracking\": This is the correct answer because these are key features that help developers streamline and automate tasks, thus improving productivity. ? Option B: \"Run an application without provisioning or managing servers\" is incorrect as it refers to AWS Lambda or AWS Fargate, not Amazon Q Developer. ? Option C: \"Enable voice commands for coding and providing natural language search\" is incorrect because this is not a function of Amazon Q Developer. ? Option D: \"Convert audio files to text documents by using ML models\" is incorrect as this refers to Amazon Transcribe, not Amazon Q Developer. AWS A",
+      "keywords": [
+        "Lambda"
+      ],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t7_q19",
+      "question_number": 40,
+      "raw_answer_text": "C",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        2
+      ],
+      "validation_confidence": 0.03076923076923077,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "Amazon OpenSearch Service (formerly Amazon Elasticsearch Service) has introduced capabilities to support vector search, which allows companies to build vector database applications. This is particularly useful in machine learning, where vector representations (embeddings) of data are often used to capture semantic meaning. Scalable index management and nearest neighbor search capability are the core features enabling vector database functionalities in OpenSearch. The service allows users to index high-dimensional vectors and perform efficient nearest neighbor searches, which are crucial for tasks such as recommendation systems, anomaly detection, and semantic search. Here is why option C is the correct Answer: ? Scalable Index Management: OpenSearch Service supports scalable indexing of vector data. This means you can index a large volume of high-dimensional vectors and manage these indexes in a cost-effective and performance-optimized way. The service leverages underlying AWS infrastr...",
+      "keywords": [],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t7_q20",
+      "question_number": 45,
+      "raw_answer_text": "A",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        0
+      ],
+      "validation_confidence": 0.10526315789473684,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "Adjusting the prompt is the correct solution to align the LLM outputs with the company's expectations for short, specific language responses. ? Adjust the Prompt: ? Why Option A is Correct: ? Why Other Options are Incorrect:",
+      "keywords": [],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t7_q21",
+      "question_number": 49,
+      "raw_answer_text": "A",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        0
+      ],
+      "validation_confidence": 0.125,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "Batch transform in Amazon SageMaker is designed for offline processing of large datasets. It is ideal for scenarios where immediate predictions are not required, and the inference can be done on large datasets that are multiple gigabytes in size. This method processes data in batches, making it suitable for analyzing archived data without the need for real- time access to predictions. ? Option A (Correct): \"Batch transform\": This is the correct answer because batch transform is optimized for handling large datasets and is suitable when immediate access to predictions is not required. ? Option B: \"Real-time inference\" is incorrect because it is used for low-latency, real- time prediction needs, which is not required in this case. ? Option C: \"Serverless inference\" is incorrect because it is designed for small-scale, intermittent inference requests, not for large batch processing. ? Option D: \"Asynchronous inference\" is incorrect because it is used when immediate predictions are required...",
+      "keywords": [],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t7_q22",
+      "question_number": 54,
+      "raw_answer_text": "C",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        2
+      ],
+      "validation_confidence": 0.024691358024691357,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "The problem involves a simple probability calculation that can be handled efficiently by straightforward mathematical rules and computations. Using machine learning techniques would introduce unnecessary complexity and operational overhead. ? Option C (Correct): \"Use code that will calculate probability by using simple rules and computations\": This is the correct answer because it directly solves the problem with minimal overhead, using basic probability rules. ? Option A: \"Use supervised learning to create a regression model\" is incorrect as it overcomplicates the solution for a simple probability problem. ? Option B: \"Use reinforcement learning to train a model\" is incorrect because reinforcement learning is not needed for a simple probability calculation. ? Option D: \"Use unsupervised learning to create a model\" is incorrect",
+      "keywords": [],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t5_q23",
+      "question_number": 57,
+      "raw_answer_text": "B",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        1
+      ],
+      "validation_confidence": 0.02247191011235955,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "Amazon Bedrock provides large language models (LLMs) that are optimized for natural language understanding and text summarization tasks, making it the best choice for creating concise summaries of user reviews. Time-series forecasting, classification, and image analysis (Rekognition) are not suitable for summarizing textual data. References: AWS Bedrock Documentation.",
+      "keywords": [],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t7_q24",
+      "question_number": 62,
+      "raw_answer_text": "A",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        0
+      ],
+      "validation_confidence": 0.0273972602739726,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "Amazon SageMaker Ground Truth Plus is a managed data labeling service that includes human-in-the-loop (HITL) validation. This solution ensures high accuracy by involving human reviewers to validate the annotations and reduce the risk of incorrect annotations. ? Amazon SageMaker Ground Truth Plus: ? Why Option A is Correct: ? Why Other Options are Incorrect: Thus, A is the correct answer for generating high-accuracy images with minimized annotation risks.",
+      "keywords": [],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t7_q25",
+      "question_number": 69,
+      "raw_answer_text": "B",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        1
+      ],
+      "validation_confidence": 0.024691358024691357,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "Amazon SageMaker Model Cards provide a standardized way to document important details about an AI model, such as its purpose, performance, intended usage, and known limitations. This enables transparency and compliance while fostering better communication between stakeholders. It does not store models physically or optimize computational requirements. References: AWS SageMaker Model Cards Documentation.",
+      "keywords": [
+        "RDS"
+      ],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t7_q26",
+      "question_number": 70,
+      "raw_answer_text": "B",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        1
+      ],
+      "validation_confidence": 0.0,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "Partial dependence plots (PDPs) are visual tools used to show the relationship between a feature (or a set of features) in the data and the predicted outcome of a machine learning model. They are highly effective for providing transparency and explainability of the model's behavior to stakeholders by illustrating how different input variables impact the model's predictions. ? Option B (Correct): \"Partial dependence plots (PDPs)\": This is the correct answer because PDPs help to interpret how the model's predictions change with varying values of input features, providing stakeholders with a clearer understanding of the model's decision-making process. ? Option A: \"Code for model training\" is incorrect because providing the raw code for model training may not offer transparency or explainability to non-technical stakeholders. ? Option C: \"Sample data for training\" is incorrect as sample data alone does not explain how the model works or its decisio",
+      "keywords": [],
+      "requires_manual_review": true
+    }
+  ],
+  "manual_review_queue": [
+    {
+      "question_id": "t7_q1",
+      "question_text": "A company wants to use a large language model (LLM) on Amazon Bedrock for sentiment analysis. The co...",
+      "extracted_answer_text": "B",
+      "options": [
+        [
+          "A",
+          "Temperature"
+        ],
+        [
+          "B",
+          "Context window"
+        ],
+        [
+          "C",
+          "Batch size"
+        ],
+        [
+          "D",
+          "Model size"
+        ]
+      ],
+      "proposed_indices": [
+        1
+      ],
+      "confidence": 0.0,
+      "issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "requires_human_validation": true
+    },
+    {
+      "question_id": "t7_q2",
+      "question_text": "A company has developed an ML model for image classification. The company wants to deploy the model ...",
+      "extracted_answer_text": "A",
+      "options": [
+        [
+          "A",
+          "Use Amazon SageMaker Serverless Inference to deploy the model."
+        ],
+        [
+          "B",
+          "Use Amazon CloudFront to deploy the model."
+        ],
+        [
+          "C",
+          "Use Amazon API Gateway to host the model and serve predictions."
+        ],
+        [
+          "D",
+          "Use AWS Batch to host the model and serve predictions."
+        ]
+      ],
+      "proposed_indices": [
+        0
+      ],
+      "confidence": 0.031746031746031744,
+      "issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "requires_human_validation": true
+    },
+    {
+      "question_id": "t7_q3",
+      "question_text": "An AI practitioner has built a deep learning model to classify the types of materials in images. The...",
+      "extracted_answer_text": "A",
+      "options": [
+        [
+          "A",
+          "Confusion matrix"
+        ],
+        [
+          "B",
+          "Correlation matrix"
+        ],
+        [
+          "C",
+          "R2 score"
+        ],
+        [
+          "D",
+          "Mean squared error (MSE)"
+        ]
+      ],
+      "proposed_indices": [
+        0
+      ],
+      "confidence": 0.11764705882352941,
+      "issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "requires_human_validation": true
+    },
+    {
+      "question_id": "t7_q4",
+      "question_text": "A company uses a foundation model (FM) from Amazon Bedrock for an AI search tool. The company wants ...",
+      "extracted_answer_text": "A",
+      "options": [
+        [
+          "A",
+          "Provide labeled data with the prompt field and the completion field."
+        ],
+        [
+          "B",
+          "Prepare the training dataset by creating a .txt file that contains multiple lines in .csv format."
+        ],
+        [
+          "C",
+          "Purchase Provisioned Throughput for Amazon Bedrock."
+        ],
+        [
+          "D",
+          "Train the model on journals and textbooks."
+        ]
+      ],
+      "proposed_indices": [
+        0
+      ],
+      "confidence": 0.028985507246376812,
+      "issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "requires_human_validation": true
+    },
+    {
+      "question_id": "t7_q5",
+      "question_text": "A company has a foundation model (FM) that was customized by using Amazon Bedrock to answer customer...",
+      "extracted_answer_text": "A",
+      "options": [
+        [
+          "A",
+          "Amazon S3"
+        ],
+        [
+          "B",
+          "Amazon Elastic Block Store (Amazon EBS)"
+        ],
+        [
+          "C",
+          "Amazon Elastic File System (Amazon EFS)"
+        ],
+        [
+          "D",
+          "AWS Snowcone"
+        ]
+      ],
+      "proposed_indices": [
+        0
+      ],
+      "confidence": 0.0,
+      "issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "requires_human_validation": true
+    },
+    {
+      "question_id": "t7_q6",
+      "question_text": "How can companies use large language models (LLMs) securely on Amazon Bedrock?...",
+      "extracted_answer_text": "A",
+      "options": [
+        [
+          "A",
+          "Design clear and specific prompt"
+        ],
+        [
+          "B",
+          "Configure AWS Identity and Access Management (IAM) roles and policies by using least privilege access."
+        ],
+        [
+          "C",
+          "Enable AWS Audit Manager for automatic model evaluation jobs."
+        ],
+        [
+          "D",
+          "Enable Amazon Bedrock automatic model evaluation jobs."
+        ],
+        [
+          "E",
+          "Use Amazon CloudWatch Logs to make models explainable and to monitor for bias."
+        ]
+      ],
+      "proposed_indices": [
+        0
+      ],
+      "confidence": 0.06060606060606061,
+      "issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "requires_human_validation": true
+    },
+    {
+      "question_id": "t7_q7",
+      "question_text": "Which strategy evaluates the accuracy of a foundation model (FM) that is used in image classificatio...",
+      "extracted_answer_text": "B",
+      "options": [
+        [
+          "A",
+          "Calculate the total cost of resources used by the model."
+        ],
+        [
+          "B",
+          "Measure the model's accuracy against a predefined benchmark dataset."
+        ],
+        [
+          "C",
+          "Count the number of layers in the neural network."
+        ],
+        [
+          "D",
+          "Assess the color accuracy of images processed by the model."
+        ]
+      ],
+      "proposed_indices": [
+        1
+      ],
+      "confidence": 0.028985507246376812,
+      "issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "requires_human_validation": true
+    },
+    {
+      "question_id": "t7_q8",
+      "question_text": "A company built an AI-powered resume screening system. The company used a large dataset to train the...",
+      "extracted_answer_text": "A",
+      "options": [
+        [
+          "A",
+          "Fairness."
+        ],
+        [
+          "B",
+          "Explainability."
+        ],
+        [
+          "C",
+          "Privacy and security."
+        ],
+        [
+          "D",
+          "Transparency."
+        ]
+      ],
+      "proposed_indices": [
+        0
+      ],
+      "confidence": 0.2,
+      "issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "requires_human_validation": true
+    },
+    {
+      "question_id": "t7_q9",
+      "question_text": "A company wants to classify human genes into 20 categories based on gene characteristics. The compan...",
+      "extracted_answer_text": "A",
+      "options": [
+        [
+          "A",
+          "Decision trees"
+        ],
+        [
+          "B",
+          "Linear regression"
+        ],
+        [
+          "C",
+          "Logistic regression"
+        ],
+        [
+          "D",
+          "Neural networks"
+        ]
+      ],
+      "proposed_indices": [
+        0
+      ],
+      "confidence": 0.0,
+      "issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "requires_human_validation": true
+    },
+    {
+      "question_id": "t7_q10",
+      "question_text": "Which term describes the numerical representations of real-world objects and concepts that AI and na...",
+      "extracted_answer_text": "A",
+      "options": [
+        [
+          "A",
+          "Embeddings"
+        ],
+        [
+          "B",
+          "Tokens"
+        ],
+        [
+          "C",
+          "Models"
+        ],
+        [
+          "D",
+          "Binaries"
+        ]
+      ],
+      "proposed_indices": [
+        0
+      ],
+      "confidence": 0.0,
+      "issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "requires_human_validation": true
+    },
+    {
+      "question_id": "t5_q11",
+      "question_text": "An education provider is building a question and answer application that uses a generative AI model ...",
+      "extracted_answer_text": "B",
+      "options": [
+        [
+          "A",
+          "Fine-tune the model by using additional training data that is representative of the various age ranges that the application will support."
+        ],
+        [
+          "B",
+          "Add a role description to the prompt context that instructs the model of the age range that the response should target."
+        ],
+        [
+          "C",
+          "Use chain-of-thought reasoning to deduce the correct style and complexity for a response suitable for that user."
+        ],
+        [
+          "D",
+          "Summarize the response text depending on the age of the user so that younger users receive shorter responses."
+        ]
+      ],
+      "proposed_indices": [
+        1
+      ],
+      "confidence": 0.0,
+      "issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "requires_human_validation": true
+    },
+    {
+      "question_id": "t7_q12",
+      "question_text": "A company is using the Generative AI Security Scoping Matrix to assess security responsibilities for...",
+      "extracted_answer_text": "D",
+      "options": [
+        [
+          "A",
+          "Using a third-party enterprise application that has embedded generative AI features."
+        ],
+        [
+          "B",
+          "Building an application by using an existing third-party generative AI foundation model (FM)."
+        ],
+        [
+          "C",
+          "Refining an existing third-party generative AI foundation model (FM) by fine-tuning the model by using data specific to the business."
+        ],
+        [
+          "D",
+          "Building and training a generative AI model from scratch by using specific data that a customer owns."
+        ]
+      ],
+      "proposed_indices": [
+        3
+      ],
+      "confidence": 0.0196078431372549,
+      "issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "requires_human_validation": true
+    },
+    {
+      "question_id": "t2_q13",
+      "question_text": "Which AWS feature records details about ML instance data for governance and reporting?...",
+      "extracted_answer_text": "A",
+      "options": [
+        [
+          "A",
+          "Amazon SageMaker Model Cards"
+        ],
+        [
+          "B",
+          "Amazon SageMaker Debugger"
+        ],
+        [
+          "C",
+          "Amazon SageMaker Model Monitor"
+        ],
+        [
+          "D",
+          "Amazon SageMaker JumpStart"
+        ]
+      ],
+      "proposed_indices": [
+        0
+      ],
+      "confidence": 0.0,
+      "issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "requires_human_validation": true
+    },
+    {
+      "question_id": "t7_q14",
+      "question_text": "A company built a deep learning model for object detection and deployed the model to production.\nWhi...",
+      "extracted_answer_text": "B",
+      "options": [
+        [
+          "A",
+          "Training"
+        ],
+        [
+          "B",
+          "Inference"
+        ],
+        [
+          "C",
+          "Model deployment"
+        ],
+        [
+          "D",
+          "Bias correction"
+        ]
+      ],
+      "proposed_indices": [
+        1
+      ],
+      "confidence": 0.0,
+      "issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "requires_human_validation": true
+    },
+    {
+      "question_id": "t1_q15",
+      "question_text": "A company wants to develop a large language model (LLM) application by using Amazon Bedrock and cust...",
+      "extracted_answer_text": "A",
+      "options": [
+        [
+          "A",
+          "Create an Amazon Bedrock custom service role for each team that has access to only the team's customer data."
+        ],
+        [
+          "B",
+          "Create a custom service role that has Amazon S3 acces"
+        ],
+        [
+          "C",
+          "Ask teams to specify the customer name on each Amazon Bedrock request."
+        ],
+        [
+          "D",
+          "Redact personal data in Amazon S3. Update the S3 bucket policy to allow team access to customer data."
+        ],
+        [
+          "E",
+          "Create one Amazon Bedrock role that has full Amazon S3 acces"
+        ]
+      ],
+      "proposed_indices": [
+        0
+      ],
+      "confidence": 0.01834862385321101,
+      "issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "requires_human_validation": true
+    },
+    {
+      "question_id": "t7_q16",
+      "question_text": "A company deployed an AI/ML solution to help customer service agents respond to frequently asked que...",
+      "extracted_answer_text": "D",
+      "options": [
+        [
+          "A",
+          "Fine-tune the model regularly."
+        ],
+        [
+          "B",
+          "Train the model by using context data."
+        ],
+        [
+          "C",
+          "Pre-train and benchmark the model by using context data."
+        ],
+        [
+          "D",
+          "Use Retrieval Augmented Generation (RAG) with prompt engineering techniques."
+        ]
+      ],
+      "proposed_indices": [
+        3
+      ],
+      "confidence": 0.025974025974025976,
+      "issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "requires_human_validation": true
+    },
+    {
+      "question_id": "t7_q17",
+      "question_text": "A company has built an image classification model to predict plant diseases from photos of plant lea...",
+      "extracted_answer_text": "B",
+      "options": [
+        [
+          "A",
+          "R-squared score"
+        ],
+        [
+          "B",
+          "Accuracy"
+        ],
+        [
+          "C",
+          "Root mean squared error (RMSE)"
+        ],
+        [
+          "D",
+          "Learning rate"
+        ]
+      ],
+      "proposed_indices": [
+        1
+      ],
+      "confidence": 0.0,
+      "issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "requires_human_validation": true
+    },
+    {
+      "question_id": "t7_q18",
+      "question_text": "A company wants to use generative AI to increase developer productivity and software\ndevelopment. Th...",
+      "extracted_answer_text": "A",
+      "options": [
+        [
+          "A",
+          "Create software snippets, reference tracking, and open-source license tracking."
+        ],
+        [
+          "B",
+          "Run an application without provisioning or managing servers."
+        ],
+        [
+          "C",
+          "Enable voice commands for coding and providing natural language search."
+        ],
+        [
+          "D",
+          "Convert audio files to text documents by using ML models."
+        ]
+      ],
+      "proposed_indices": [
+        0
+      ],
+      "confidence": 0.025,
+      "issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "requires_human_validation": true
+    },
+    {
+      "question_id": "t7_q19",
+      "question_text": "Which feature of Amazon OpenSearch Service gives companies the ability to build vector database appl...",
+      "extracted_answer_text": "C",
+      "options": [
+        [
+          "A",
+          "Integration with Amazon S3 for object storage"
+        ],
+        [
+          "B",
+          "Support for geospatial indexing and queries"
+        ],
+        [
+          "C",
+          "Scalable index management and nearest neighbor search capability"
+        ],
+        [
+          "D",
+          "Ability to perform real-time analysis on streaming data"
+        ]
+      ],
+      "proposed_indices": [
+        2
+      ],
+      "confidence": 0.03076923076923077,
+      "issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "requires_human_validation": true
+    },
+    {
+      "question_id": "t7_q20",
+      "question_text": "A company is using a pre-trained large language model (LLM) to build a chatbot for product recommend...",
+      "extracted_answer_text": "A",
+      "options": [
+        [
+          "A",
+          "Adjust the prompt."
+        ],
+        [
+          "B",
+          "Choose an LLM of a different size."
+        ],
+        [
+          "C",
+          "Increase the temperature."
+        ],
+        [
+          "D",
+          "Increase the Top K value."
+        ]
+      ],
+      "proposed_indices": [
+        0
+      ],
+      "confidence": 0.10526315789473684,
+      "issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "requires_human_validation": true
+    },
+    {
+      "question_id": "t7_q21",
+      "question_text": "A company is building an ML model to analyze archived data. The company must perform inference on la...",
+      "extracted_answer_text": "A",
+      "options": [
+        [
+          "A",
+          "Batch transform"
+        ],
+        [
+          "B",
+          "Real-time inference"
+        ],
+        [
+          "C",
+          "Serverless inference"
+        ],
+        [
+          "D",
+          "Asynchronous inference"
+        ]
+      ],
+      "proposed_indices": [
+        0
+      ],
+      "confidence": 0.125,
+      "issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "requires_human_validation": true
+    },
+    {
+      "question_id": "t7_q22",
+      "question_text": "A company wants to develop an educational game where users answer questions such as the following: \"...",
+      "extracted_answer_text": "C",
+      "options": [
+        [
+          "A",
+          "Use supervised learning to create a regression model that will predict probability."
+        ],
+        [
+          "B",
+          "Use reinforcement learning to train a model to return the probability."
+        ],
+        [
+          "C",
+          "Use code that will calculate probability by using simple rules and computations."
+        ],
+        [
+          "D",
+          "Use unsupervised learning to create a model that will estimate probability density."
+        ]
+      ],
+      "proposed_indices": [
+        2
+      ],
+      "confidence": 0.024691358024691357,
+      "issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "requires_human_validation": true
+    },
+    {
+      "question_id": "t5_q23",
+      "question_text": "A pharmaceutical company wants to analyze user reviews of new medications and provide a concise over...",
+      "extracted_answer_text": "B",
+      "options": [
+        [
+          "A",
+          "Create a time-series forecasting model to analyze the medication reviews by using Amazon Personalize."
+        ],
+        [
+          "B",
+          "Create medication review summaries by using Amazon Bedrock large language models (LLMs)."
+        ],
+        [
+          "C",
+          "Create a classification model that categorizes medications into different groups by using Amazon SageMaker."
+        ],
+        [
+          "D",
+          "Create medication review summaries by using Amazon Rekognition."
+        ]
+      ],
+      "proposed_indices": [
+        1
+      ],
+      "confidence": 0.02247191011235955,
+      "issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "requires_human_validation": true
+    },
+    {
+      "question_id": "t7_q24",
+      "question_text": "A company is building a solution to generate images for protective eyewear. The solution must have h...",
+      "extracted_answer_text": "A",
+      "options": [
+        [
+          "A",
+          "Human-in-the-loop validation by using Amazon SageMaker Ground Truth Plus"
+        ],
+        [
+          "B",
+          "Data augmentation by using an Amazon Bedrock knowledge base"
+        ],
+        [
+          "C",
+          "Image recognition by using Amazon Rekognition"
+        ],
+        [
+          "D",
+          "Data summarization by using Amazon QuickSight"
+        ]
+      ],
+      "proposed_indices": [
+        0
+      ],
+      "confidence": 0.0273972602739726,
+      "issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "requires_human_validation": true
+    },
+    {
+      "question_id": "t7_q25",
+      "question_text": "Which option is a benefit of using Amazon SageMaker Model Cards to document AI models?...",
+      "extracted_answer_text": "B",
+      "options": [
+        [
+          "A",
+          "Providing a visually appealing summary of a model's capabilities."
+        ],
+        [
+          "B",
+          "Standardizing information about a model's purpose, performance, and limitations."
+        ],
+        [
+          "C",
+          "Reducing the overall computational requirements of a model."
+        ],
+        [
+          "D",
+          "Physically storing models for archival purposes."
+        ]
+      ],
+      "proposed_indices": [
+        1
+      ],
+      "confidence": 0.024691358024691357,
+      "issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "requires_human_validation": true
+    },
+    {
+      "question_id": "t7_q26",
+      "question_text": "A company makes forecasts each quarter to decide how to optimize operations to meet expected demand....",
+      "extracted_answer_text": "B",
+      "options": [
+        [
+          "A",
+          "Code for model training"
+        ],
+        [
+          "B",
+          "Partial dependence plots (PDPs)"
+        ],
+        [
+          "C",
+          "Sample data for training"
+        ],
+        [
+          "D",
+          "Model convergence tables"
+        ]
+      ],
+      "proposed_indices": [
+        1
+      ],
+      "confidence": 0.0,
+      "issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "requires_human_validation": true
+    }
+  ],
+  "processing_report": {
+    "success_rates": {
+      "extraction": 1.0,
+      "letter_extraction": 1.0,
+      "index_mapping": 1.0
+    },
+    "validation_failures": [],
+    "processing_errors": [],
+    "method_distribution": {
+      "pattern_1": 26
+    },
+    "requires_manual_review": 26
+  }
+}

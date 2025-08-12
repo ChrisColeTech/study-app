@@ -137,6 +137,13 @@ export class ApiGatewayConstruct extends Construct {
           proxy: true,
           allowTestInvoke: !config.isProduction,
         }));
+
+        // Phase 22: Adaptive sessions endpoint
+        const adaptiveResource = apiResource.addResource('adaptive');
+        adaptiveResource.addMethod('POST', new cdk.aws_apigateway.LambdaIntegration(lambda, {
+          proxy: true,
+          allowTestInvoke: !config.isProduction,
+        }));
       }
 
       // Special handling for providers - add cache/refresh sub-resource
@@ -149,11 +156,26 @@ export class ApiGatewayConstruct extends Construct {
         }));
       }
 
-      // Special handling for analytics - Phase 22 implementation
+      // Special handling for analytics - Phase 23, 24, 25 implementation
       if (resource === 'analytics') {
-        // Progress analytics endpoint
+        // Phase 23: Progress analytics endpoint
         const progressResource = apiResource.addResource('progress');
         progressResource.addMethod('GET', new cdk.aws_apigateway.LambdaIntegration(lambda, {
+          proxy: true,
+          allowTestInvoke: !config.isProduction,
+        }));
+
+        // Phase 24: Session analytics endpoint
+        const sessionsResource = apiResource.addResource('sessions');
+        const sessionIdResource = sessionsResource.addResource('{id}');
+        sessionIdResource.addMethod('GET', new cdk.aws_apigateway.LambdaIntegration(lambda, {
+          proxy: true,
+          allowTestInvoke: !config.isProduction,
+        }));
+
+        // Phase 25: Performance analytics endpoint
+        const performanceResource = apiResource.addResource('performance');
+        performanceResource.addMethod('GET', new cdk.aws_apigateway.LambdaIntegration(lambda, {
           proxy: true,
           allowTestInvoke: !config.isProduction,
         }));

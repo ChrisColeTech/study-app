@@ -1,0 +1,1504 @@
+{
+  "metadata": {
+    "parsing_date": "2025-08-11T19:40:44.789687",
+    "source_pdf": "docs/exam-material/aif-c01_3.pdf",
+    "source_questions": "data/v2/aif-c01_3_classified.json",
+    "detected_format": "simple_numbered",
+    "total_questions": 29,
+    "answers_extracted": 29,
+    "extraction_success_rate": 1.0,
+    "letter_extraction_success_rate": 1.0,
+    "index_mapping_success_rate": 1.0,
+    "average_confidence": 0.038,
+    "fuzzy_match_fallbacks": 0,
+    "manual_review_flagged": 29,
+    "confidence_distribution": {
+      "high": 0,
+      "medium": 0,
+      "low": 29
+    },
+    "extraction_methods": {
+      "pattern_1": 29
+    }
+  },
+  "answers": [
+    {
+      "question_id": "t7_q1",
+      "question_number": 1,
+      "raw_answer_text": "B",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        1
+      ],
+      "validation_confidence": 0.044444444444444446,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "Amazon Bedrock provides an option to enable invocation logging to capture and store the input and output data of the models used. This is essential for monitoring and auditing purposes, particularly when handling customer data. ? Option B (Correct): \"Enable invocation logging in Amazon Bedrock\": This is the correct answer as it directly enables the logging of all model invocations, ensuring transparency and traceability. ? Option A: \"Configure AWS CloudTrail\" is incorrect because CloudTrail logs API calls but does not provide specific logging for model inputs and outputs. ? Option C: \"Configure AWS Audit Manager\" is incorrect as Audit Manager is used for compliance reporting, not specific invocation logging for AI models. ? Option D: \"Configure model invocation logging in Amazon EventBridge\" is incorrect as EventBridge is for event-driven architectures, not specifically designed for logging AI model inputs and outputs. AWS AI Practitioner References: ? Amaz",
+      "keywords": [
+        "CloudTrail",
+        "Config"
+      ],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t7_q2",
+      "question_number": 2,
+      "raw_answer_text": "D",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        3
+      ],
+      "validation_confidence": 0.1111111111111111,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "BERT-based models (Bidirectional Encoder Representations from Transformers) are suitable for tasks that involve understanding the context of words in a sentence and suggesting missing words. These models use bidirectional training, which considers the context from both directions (left and right of the missing word) to predict the appropriate word to fill in the gaps. ? BERT-based Models: ? Why Option D is Correct: ? Why Other Options are Incorrect:",
+      "keywords": [
+        "RDS"
+      ],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t7_q3",
+      "question_number": 3,
+      "raw_answer_text": "A",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        0
+      ],
+      "validation_confidence": 0.028985507246376812,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "Providing labeled data with both a prompt field and a completion field is the correct strategy for fine-tuning a foundation model (FM) on Amazon Bedrock. ? Fine-Tuning Strategy: ? Why Option A is Correct: ? Why Other Options are Incorrect:",
+      "keywords": [],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t7_q4",
+      "question_number": 4,
+      "raw_answer_text": "C",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        2
+      ],
+      "validation_confidence": 0.02564102564102564,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "Experimenting and refining the prompt is the best approach to ensure that the chatbot using a foundation model (FM) produces responses that adhere to the The Leader of IT Certification visit - https://www.certleader.com 100% Valid and Newest Version AIF-C01 Questions & Answers shared by Certleader https://www.certleader.com/AIF-C01-dumps.html (97 Q&As) company's tone. ? Prompt Engineering: ? Why Option C is Correct: ? Why Other Options are Incorrect:",
+      "keywords": [],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t7_q5",
+      "question_number": 5,
+      "raw_answer_text": "A",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        0
+      ],
+      "validation_confidence": 0.07142857142857142,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "A multi-modal embedding model is the correct type of foundation model (FM) for powering a search application that handles queries containing both text and images. ? Multi-Modal Embedding Model: ? Why Option A is Correct: ? Why Other Options are Incorrect:",
+      "keywords": [],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t7_q6",
+      "question_number": 6,
+      "raw_answer_text": "A",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        0
+      ],
+      "validation_confidence": 0.2,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "Fairness refers to the absence of bias in AI models. Using non- representative datasets leads to biased predictions, affecting specific demographics unfairly. Explainability, privacy, and transparency are important but not directly related to this scenario. References: AWS Responsible AI Framework.",
+      "keywords": [],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t7_q7",
+      "question_number": 7,
+      "raw_answer_text": "B",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        1
+      ],
+      "validation_confidence": 0.0,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "Domain adaptation fine-tuning involves training a foundation model (FM) further using a specific dataset that includes domain-specific terminology and content, such as scientific terms in research papers. This process allows the model to better understand and handle complex terminology, improving its performance on specialized tasks. ? Option B (Correct): \"Use domain adaptation fine-tuning to adapt the FM to complex scientific terms\": This is the correct answer because fine-tuning the model on domain-specific data helps it learn and adapt to the specific language and terms used in the research papers, resulting in better performance. ? Option A: \"Use few-shot prompting to define how the FM can answer the questions\" is incorrect because while few-shot prompting can help in certain scenarios, it is le",
+      "keywords": [],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t7_q8",
+      "question_number": 8,
+      "raw_answer_text": "A",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        0
+      ],
+      "validation_confidence": 0.01652892561983471,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "Using Amazon Bedrock with large language models (LLMs) allows for efficient utilization of AI to answer queries based on context provided in product manuals. To achieve this cost- effectively, the company should avoid unnecessary use of resources. ? Option A (Correct): \"Use prompt engineering to add one PDF file as context to the user prompt when the prompt is submitted to Amazon Bedrock\": This is the most cost-effective solution. By using prompt engineering, only the relevant content from one PDF file is adde",
+      "keywords": [],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t7_q9",
+      "question_number": 9,
+      "raw_answer_text": "B",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        1
+      ],
+      "validation_confidence": 0.0,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "Inference is the correct answer because it is the AI process that occurs when a deployed model analyzes new data (such as an image) to make predictions or identify objects. ? Inference: ? Why Option B is Correct: ? Why Other Options are Incorrect:",
+      "keywords": [],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t7_q10",
+      "question_number": 10,
+      "raw_answer_text": "A",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        0
+      ],
+      "validation_confidence": 0.031746031746031744,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "To achieve the lowest latency possible for inference on edge devices, deploying optimized small language models (SLMs) is the most effective solution. SLMs require fewer resources and have faster inference times, making them ideal for deployment on edge devices where processing power and memory are limited. ? Option A (Correct): \"Deploy optimized small language models (SLMs) on edge devices\": This is the correct answer because SLMs provide fast inference with low latency, which is crucial for edge deployments. ? Option B: \"Deploy optimized large language models (LLMs) on edge devices\" is incorrect because LLMs are resource-intensive and may not perform well on edge devices due to their size and computational demands. ? Option C: \"Incorporate a centralized small language model (SLM) API for asynchronous communication with edge devices\" is incorrect because it introduces network latency due to the need for communication",
+      "keywords": [],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t7_q11",
+      "question_number": 10,
+      "raw_answer_text": "C",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        2
+      ],
+      "validation_confidence": 0.0,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "Amazon SageMaker's DeepAR is a supervised learning algorithm designed for forecasting scalar (one-dimensional) time series data. Time series data consists of The Leader of IT Certification visit - https://www.certleader.com 100% Valid and Newest Version AIF-C01 Questions & Answers shared by Certleader https://www.certleader.com/AIF-C01-dumps.html (97 Q&As) sequences of data points indexed in time order, typically with consistent intervals between them. In the context of a retail store aiming to predict product demand, relevant time series data might include historical sales figures, inventory levels, or related metrics recorded over regular time intervals (e.g., daily or weekly). By training the DeepAR model on this historical time series data, the store can generate forecasts for future product demand. This capability is particularly useful for inventory management, staffing, and supply chain optimization. Other data types, such as text, image, or binary data, are not suitable for tim...",
+      "keywords": [],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t7_q12",
+      "question_number": 13,
+      "raw_answer_text": "A",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        0
+      ],
+      "validation_confidence": 0.0273972602739726,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "Creating a prompt template that teaches the LLM to detect attack patterns is the most effective way to reduce the risk of the model being manipulated through prompt engineering. ? Prompt Templates for Security: ? Why Option A is Correct: ? Why Other Options are Incorrect:",
+      "keywords": [],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t7_q13",
+      "question_number": 15,
+      "raw_answer_text": "A",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        0
+      ],
+      "validation_confidence": 0.0425531914893617,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "To implement a large language model (LLM) responsibly, the firm should focus on fairness and mitigating bias, which are critical for ethical AI deployment. ? A. Include Fairness Metrics for Model Evaluation: ? C. Modify the Training Data to Mitigate Bias: ? Why Other Options are Incorrect:",
+      "keywords": [],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t7_q14",
+      "question_number": 17,
+      "raw_answer_text": "B",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        1
+      ],
+      "validation_confidence": 0.0,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "Reinforcement learning allows a model to learn and improve over time based on feedback from its environment. In this case, the chatbot can improve its responses by being rewarded for positive customer feedback, which aligns well with the goal of self- improvement based on past interactions and new information. ? Option B (Correct): \"Reinforcement learning with rewards for positive customer feedback\": This is the correct answer as reinforcement learning enables the chatbot to learn from feedback and adapt its behavior accordingly, providing self- improvement capabilities. ? Option A: \"Supervised learning with a manually curated dataset\" is incorrect because it does not support continuous learning from new interactions. ? Option C: \"Unsupervised learning to find clusters of similar customer inquiries\" is incorrect because unsupervised learning does not provide a mechanism for improving responses based on feedback. ? Option D: \"Supervise",
+      "keywords": [
+        "RDS"
+      ],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t5_q15",
+      "question_number": 21,
+      "raw_answer_text": "B",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        1
+      ],
+      "validation_confidence": 0.0,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "To comply with multiple regulatory frameworks, the company must ensure data protection and threat detection. Data protection involves safeguarding sensitive customer information, while threat detection identifies and mitigates security threats to the application. ? Option C (Correct): \"Data protection\": This is correct because data protection is critical for compliance with privacy and security regulations. ? Option B (Correct): \"Threat detection\": This is correct because detecting and mitigating threats is essential to maintaining the security posture required for regulatory compliance. ? Option A: \"Auto scaling inference endpoints\" is incorrect because auto-scaling does not directly relate to regulatory compliance. ? Option D: \"Cost optimization\" is incorrect because it is focused on managing expenses, not compliance. ? Option E: \"Loosely coupled microservices\" is incorrect because this architectural approach does not directly address compliance requirements. AWS AI Practitioner Refe...",
+      "keywords": [
+        "Auto Scaling"
+      ],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t5_q16",
+      "question_number": 25,
+      "raw_answer_text": "B",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        1
+      ],
+      "validation_confidence": 0.0,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "AWS CloudTrail is a service that enables governance, compliance, and operational and risk auditing of your AWS account. It tracks API calls and identifies unauthorized access attempts to AWS resources, including Amazon Bedrock. ? AWS CloudTrail: ? Why Option B is Correct: ? Why Other Options are Incorrect: Thus, B is the correct answer for identifying unauthorized users attempting to access Amazon Bedrock.",
+      "keywords": [
+        "CloudTrail"
+      ],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t7_q17",
+      "question_number": 26,
+      "raw_answer_text": "A",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        0
+      ],
+      "validation_confidence": 0.0,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "When a model is trained on a dataset containing confidential or sensitive data, the model may inadvertently learn patterns from this data, which could then be reflected in its inference responses. To ensure that a model does not generate responses based on confidential data, the most effective approach is to remove the confidential data from the training dataset and then retrain the model. Explanation of Each Option: ? Option A (Correct): \"Delete the custom model. Remove the confidential data from the training dataset. Retrain the custom model.\"This option is",
+      "keywords": [],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t7_q18",
+      "question_number": 28,
+      "raw_answer_text": "A",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        0
+      ],
+      "validation_confidence": 0.06451612903225806,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "Creating a prompt template that teaches the LLM to detect attack patterns is the most effective way to reduce the risk of the model being manipulated through prompt engineering. ? Prompt Templates for Security: ? Why Option A is Correct: ? Why Other Options are Incorrect:",
+      "keywords": [],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t7_q19",
+      "question_number": 30,
+      "raw_answer_text": "B",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        1
+      ],
+      "validation_confidence": 0.0,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "Generative AI models are used to create new content based on existing data. One common use case is generating photorealistic images from text descriptions, which is particularly useful in digital marketing, where visual content is key to engaging potential customers. ? Option B (Correct): \"Creating photorealistic images from text descriptions for digital marketing\": This is the correct answer because generative AI models, like those offered by Amazon Bedrock, can create images based on text descriptions, making them highly valuable for generating marketing materials. ? Option A: \"Improving network security by using intrusion detection systems\" is incorrect because this is a use case for traditional machine learning models, not generative AI. ? Option C: \"Enhancing database performance by using optimized indexing\" is incorrect as it is unrelated to generative AI. ? Option D: \"Analyzing financial data to forecast stock market trends\" is incorrect because it typically involves predictive ...",
+      "keywords": [],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t7_q20",
+      "question_number": 35,
+      "raw_answer_text": "D",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        3
+      ],
+      "validation_confidence": 0.0392156862745098,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "Amazon SageMaker Canvas is a visual, no-code machine learning interface that allows users to build machine learning models without having any coding experience or knowledge of machine learning algorithms. It enables users to analyze internal and external data, and make predictions using a guided interface. ? Option D (Correct): \"Import the data into Amazon SageMaker Canvas. Build ML models and demand forecast predictions by selecting the values in the data from SageMaker Canvas\": This is the correct answer because SageMaker",
+      "keywords": [],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t1_q21",
+      "question_number": 39,
+      "raw_answer_text": "A",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        0
+      ],
+      "validation_confidence": 0.125,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "Amazon Textract is a service that automatically extracts text and data from scanned documents, including PDFs. It is the best choice for converting resumes from PDF format to plain text for further processing. ? Amazon Textract: ? Why Option A is Correct: ? Why Other Options are Incorrect:",
+      "keywords": [],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t7_q22",
+      "question_number": 43,
+      "raw_answer_text": "B",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        1
+      ],
+      "validation_confidence": 0.0,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "To determine customer sentiments based on written customer reviews, the company can use Amazon Comprehend and Amazon Bedrock. ? Amazon Comprehend: ? Amazon Bedrock: The Leader of IT Certification visit - https://www.certleader.com 100% Valid and Newest Version AIF-C01 Questions & Answers shared by Certleader https://www.certleader.com/AIF-C01-dumps.html (97 Q&As) ? Why Other Options are Incorrect:",
+      "keywords": [],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t7_q23",
+      "question_number": 44,
+      "raw_answer_text": "C",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        2
+      ],
+      "validation_confidence": 0.05405405405405406,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "An anomaly detection system is suitable for identifying unusual patterns or behaviors, such as suspicious IP addresses, which might indicate a potential threat. ? Anomaly Detection: ? Why Option C is Correct: ? Why Other Options are Incorrect: Thus, C is the correct answer for detecting suspicious IP addresses.",
+      "keywords": [],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t7_q24",
+      "question_number": 45,
+      "raw_answer_text": "B",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        1
+      ],
+      "validation_confidence": 0.0,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "Transfer learning is the correct strategy for adapting pre-trained models for new, related tasks without creating models from scratch. ? Transfer Learning: ? Why Option B is Correct: ? Why Other Options are Incorrect:",
+      "keywords": [],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t7_q25",
+      "question_number": 47,
+      "raw_answer_text": "A",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        0
+      ],
+      "validation_confidence": 0.05128205128205128,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "BLEU (Bilingual Evaluation Understudy) is a metric used to evaluate the accuracy of machine-generated translations by comparing them against reference translations. It is commonly used for translation tasks to measure how close the generated output is to professional human translations. ? Option A (Correct): \"Bilingual Evaluation Understudy (BLEU)\": This is the correct answer because BLEU is specifically designed to evaluate the quality of translations, making it suitable for the company's use case. ? Option B: \"Root mean squared error (RMSE)\" is incorrect because RMSE is used for regression tasks to measure prediction errors, not translation quality. ? Option C: \"Recall-Oriented Understudy for Gisting Evaluation (ROUGE)\" is incorrect as it is used to evaluate text summarization, not translation. ? Option D: \"F1 score\" is incorrect because it is typically used for classification tasks, not for evaluating translation accuracy. AWS AI Practitioner References: ? Model Evaluation Metr",
+      "keywords": [],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t7_q26",
+      "question_number": 48,
+      "raw_answer_text": "A",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        0
+      ],
+      "validation_confidence": 0.043478260869565216,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "To build an AI model responsibly and minimize bias, it is essential to ensure fairness and transparency throughout the model development and deployment process. This involves detecting and mitigating data imbalances and thoroughly evaluating the model's behavior to understand its impact on different groups. ? Option A (Correct): \"Detect imbalances or disparities in the data\": This is correct because identifying and addressing data imbalances or disparities is a critical step in reducing bias. AWS provides tools like Amazon SageMaker Clarify to detect bias during data preprocessing and model training. The Leader of IT Certification visit - https://www.certleader.com 100% Valid and Newest Version AIF-C01 Questions & Answers shared by Certleader https://www",
+      "keywords": [],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t7_q27",
+      "question_number": 53,
+      "raw_answer_text": "A",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        0
+      ],
+      "validation_confidence": 0.05405405405405406,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "Generative adversarial networks (GANs) are a type of deep learning model used for generating synthetic data based on existing datasets. GANs consist of two neural networks (a generator and a discriminator) that work together to create realistic data. ? Option A (Correct): \"Generative adversarial network (GAN)\": This is the correct answer because GANs are specifically designed for generating synthetic data that closely resembles the real data they are trained on. ? Option B: \"XGBoost\" is a gradient boosting algorithm for classification and regression tasks, not for generating synthetic data. ? Option C: \"Residual neural network\" is primarily used for improving the performance of deep networks, not for generating synthetic data. ? Option D: \"WaveNet\" is a model architecture designed for generating raw audio waveforms, not synthetic data in general. AWS AI Practitioner References: ? GANs on AWS for Synthetic Data Generation: AWS supports the use of GANs for creating synthetic datasets, wh...",
+      "keywords": [],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t7_q28",
+      "question_number": 55,
+      "raw_answer_text": "A",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        0
+      ],
+      "validation_confidence": 0.04878048780487805,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "Data augmentation for imbalanced classes is the correct technique to address bias in input data affecting image generation. ? Data Augmentation for Imbalanced Classes: ? Why Option A is Correct: ? Why Other Options are Incorrect:",
+      "keywords": [],
+      "requires_manual_review": true
+    },
+    {
+      "question_id": "t1_q29",
+      "question_number": 60,
+      "raw_answer_text": "A",
+      "extraction_method": "pattern_1",
+      "correct_answers": [
+        0
+      ],
+      "validation_confidence": 0.017857142857142856,
+      "mapping_issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "explanation": "Amazon Bedrock needs the appropriate IAM role with permission to access and decrypt data stored in Amazon S3. If the data is encrypted with Amazon S3 managed keys (SSE- S3), the role that Amazon Bedrock assumes must have the required permissions to access and decrypt the encrypted data. ? Option A (Correct): \"Ensure that the role that Amazon Bedrock assumes has permission to decrypt data with the correct encryption key\": This is the correct solution as it ensures that the AI model can access the encrypted data securely without changing the encryption settings or compromising data security. ? Option B: \"Set the access permissions for the S3 buckets to allow public access\" is incorrect because it violates security best practices by exposing s",
+      "keywords": [
+        "S3",
+        "IAM"
+      ],
+      "requires_manual_review": true
+    }
+  ],
+  "manual_review_queue": [
+    {
+      "question_id": "t7_q1",
+      "question_text": "An AI practitioner is using an Amazon Bedrock base model to summarize session chats from the custome...",
+      "extracted_answer_text": "B",
+      "options": [
+        [
+          "A",
+          "Configure AWS CloudTrail as the logs destination for the model."
+        ],
+        [
+          "B",
+          "Enable invocation logging in Amazon Bedrock."
+        ],
+        [
+          "C",
+          "Configure AWS Audit Manager as the logs destination for the model."
+        ],
+        [
+          "D",
+          "Configure model invocation logging in Amazon EventBridge."
+        ]
+      ],
+      "proposed_indices": [
+        1
+      ],
+      "confidence": 0.044444444444444446,
+      "issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "requires_human_validation": true
+    },
+    {
+      "question_id": "t7_q2",
+      "question_text": "A company has documents that are missing some words because of a database error. The company wants t...",
+      "extracted_answer_text": "D",
+      "options": [
+        [
+          "A",
+          "Topic modeling"
+        ],
+        [
+          "B",
+          "Clustering models"
+        ],
+        [
+          "C",
+          "Prescriptive ML models"
+        ],
+        [
+          "D",
+          "BERT-based models"
+        ]
+      ],
+      "proposed_indices": [
+        3
+      ],
+      "confidence": 0.1111111111111111,
+      "issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "requires_human_validation": true
+    },
+    {
+      "question_id": "t7_q3",
+      "question_text": "A company uses a foundation model (FM) from Amazon Bedrock for an AI search tool. The company wants ...",
+      "extracted_answer_text": "A",
+      "options": [
+        [
+          "A",
+          "Provide labeled data with the prompt field and the completion field."
+        ],
+        [
+          "B",
+          "Prepare the training dataset by creating a .txt file that contains multiple lines in .csv format."
+        ],
+        [
+          "C",
+          "Purchase Provisioned Throughput for Amazon Bedrock."
+        ],
+        [
+          "D",
+          "Train the model on journals and textbooks."
+        ]
+      ],
+      "proposed_indices": [
+        0
+      ],
+      "confidence": 0.028985507246376812,
+      "issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "requires_human_validation": true
+    },
+    {
+      "question_id": "t7_q4",
+      "question_text": "A company wants to make a chatbot to help customers. The chatbot will help solve technical problems ...",
+      "extracted_answer_text": "C",
+      "options": [
+        [
+          "A",
+          "Set a low limit on the number of tokens the FM can produce."
+        ],
+        [
+          "B",
+          "Use batch inferencing to process detailed responses."
+        ],
+        [
+          "C",
+          "Experiment and refine the prompt until the FM produces the desired responses."
+        ],
+        [
+          "D",
+          "Define a higher number for the temperature parameter."
+        ]
+      ],
+      "proposed_indices": [
+        2
+      ],
+      "confidence": 0.02564102564102564,
+      "issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "requires_human_validation": true
+    },
+    {
+      "question_id": "t7_q5",
+      "question_text": "An AI practitioner wants to use a foundation model (FM) to design a search application. The search a...",
+      "extracted_answer_text": "A",
+      "options": [
+        [
+          "A",
+          "Multi-modal embedding model"
+        ],
+        [
+          "B",
+          "Text embedding model"
+        ],
+        [
+          "C",
+          "Multi-modal generation model"
+        ],
+        [
+          "D",
+          "Image generation model"
+        ]
+      ],
+      "proposed_indices": [
+        0
+      ],
+      "confidence": 0.07142857142857142,
+      "issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "requires_human_validation": true
+    },
+    {
+      "question_id": "t7_q6",
+      "question_text": "A company built an AI-powered resume screening system. The company used a large dataset to train the...",
+      "extracted_answer_text": "A",
+      "options": [
+        [
+          "A",
+          "Fairness."
+        ],
+        [
+          "B",
+          "Explainability."
+        ],
+        [
+          "C",
+          "Privacy and security."
+        ],
+        [
+          "D",
+          "Transparency."
+        ]
+      ],
+      "proposed_indices": [
+        0
+      ],
+      "confidence": 0.2,
+      "issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "requires_human_validation": true
+    },
+    {
+      "question_id": "t7_q7",
+      "question_text": "A research company implemented a chatbot by using a foundation model (FM) from Amazon Bedrock. The c...",
+      "extracted_answer_text": "B",
+      "options": [
+        [
+          "A",
+          "Use few-shot prompting to define how the FM can answer the questions."
+        ],
+        [
+          "B",
+          "Use domain adaptation fine-tuning to adapt the FM to complex scientific terms."
+        ],
+        [
+          "C",
+          "Change the FM inference parameters."
+        ],
+        [
+          "D",
+          "Clean the research paper data to remove complex scientific terms."
+        ]
+      ],
+      "proposed_indices": [
+        1
+      ],
+      "confidence": 0.0,
+      "issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "requires_human_validation": true
+    },
+    {
+      "question_id": "t7_q8",
+      "question_text": "A company wants to use large language models (LLMs) with Amazon Bedrock to develop a chat interface ...",
+      "extracted_answer_text": "A",
+      "options": [
+        [
+          "A",
+          "Use prompt engineering to add one PDF file as context to the user prompt when the prompt is submitted to Amazon Bedrock."
+        ],
+        [
+          "B",
+          "Use prompt engineering to add all the PDF files as context to the user prompt when the prompt is submitted to Amazon Bedrock."
+        ],
+        [
+          "C",
+          "Use all the PDF documents to fine-tune a model with Amazon Bedroc"
+        ],
+        [
+          "D",
+          "Use the fine- tuned model to process user prompts."
+        ],
+        [
+          "E",
+          "Upload PDF documents to an Amazon Bedrock knowledge bas"
+        ]
+      ],
+      "proposed_indices": [
+        0
+      ],
+      "confidence": 0.01652892561983471,
+      "issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "requires_human_validation": true
+    },
+    {
+      "question_id": "t7_q9",
+      "question_text": "A company built a deep learning model for object detection and deployed the model to production.\nWhi...",
+      "extracted_answer_text": "B",
+      "options": [
+        [
+          "A",
+          "Training"
+        ],
+        [
+          "B",
+          "Inference"
+        ],
+        [
+          "C",
+          "Model deployment"
+        ],
+        [
+          "D",
+          "Bias correction"
+        ]
+      ],
+      "proposed_indices": [
+        1
+      ],
+      "confidence": 0.0,
+      "issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "requires_human_validation": true
+    },
+    {
+      "question_id": "t7_q10",
+      "question_text": "A company wants to use language models to create an application for inference on edge devices. The i...",
+      "extracted_answer_text": "A",
+      "options": [
+        [
+          "A",
+          "Deploy optimized small language models (SLMs) on edge devices."
+        ],
+        [
+          "B",
+          "Deploy optimized large language models (LLMs) on edge devices."
+        ],
+        [
+          "C",
+          "Incorporate a centralized small language model (SLM) API for asynchronous communication with edge devices."
+        ],
+        [
+          "D",
+          "Incorporate a centralized large language model (LLM) API for asynchronous communication with edge devices."
+        ]
+      ],
+      "proposed_indices": [
+        0
+      ],
+      "confidence": 0.031746031746031744,
+      "issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "requires_human_validation": true
+    },
+    {
+      "question_id": "t7_q11",
+      "question_text": "A retail store wants to predict the demand for a specific product for the next few weeks by using th...",
+      "extracted_answer_text": "C",
+      "options": [
+        [
+          "A",
+          "Text data"
+        ],
+        [
+          "B",
+          "Image data"
+        ],
+        [
+          "C",
+          "Time series data"
+        ],
+        [
+          "D",
+          "Binary data"
+        ]
+      ],
+      "proposed_indices": [
+        2
+      ],
+      "confidence": 0.0,
+      "issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "requires_human_validation": true
+    },
+    {
+      "question_id": "t7_q12",
+      "question_text": "A company wants to use a large language model (LLM) to develop a conversational agent. The company n...",
+      "extracted_answer_text": "A",
+      "options": [
+        [
+          "A",
+          "Create a prompt template that teaches the LLM to detect attack patterns."
+        ],
+        [
+          "B",
+          "Increase the temperature parameter on invocation requests to the LLM."
+        ],
+        [
+          "C",
+          "Avoid using LLMs that are not listed in Amazon SageMaker."
+        ],
+        [
+          "D",
+          "Decrease the number of input tokens on invocations of the LLM."
+        ]
+      ],
+      "proposed_indices": [
+        0
+      ],
+      "confidence": 0.0273972602739726,
+      "issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "requires_human_validation": true
+    },
+    {
+      "question_id": "t7_q13",
+      "question_text": "An accounting firm wants to implement a large language model (LLM) to automate document processing. ...",
+      "extracted_answer_text": "A",
+      "options": [
+        [
+          "A",
+          "Include fairness metrics for model evaluation."
+        ],
+        [
+          "B",
+          "Adjust the temperature parameter of the model."
+        ],
+        [
+          "C",
+          "Modify the training data to mitigate bias."
+        ],
+        [
+          "D",
+          "Avoid overfitting on the training data."
+        ],
+        [
+          "E",
+          "Apply prompt engineering techniques."
+        ]
+      ],
+      "proposed_indices": [
+        0
+      ],
+      "confidence": 0.0425531914893617,
+      "issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "requires_human_validation": true
+    },
+    {
+      "question_id": "t7_q14",
+      "question_text": "A company is building a customer service chatbot. The company wants the chatbot to improve its respo...",
+      "extracted_answer_text": "B",
+      "options": [
+        [
+          "A",
+          "Supervised learning with a manually curated dataset of good responses and bad responses"
+        ],
+        [
+          "B",
+          "Reinforcement learning with rewards for positive customer feedback"
+        ],
+        [
+          "C",
+          "Unsupervised learning to find clusters of similar customer inquiries"
+        ],
+        [
+          "D",
+          "Supervised learning with a continuously updated FAQ database"
+        ]
+      ],
+      "proposed_indices": [
+        1
+      ],
+      "confidence": 0.0,
+      "issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "requires_human_validation": true
+    },
+    {
+      "question_id": "t5_q15",
+      "question_text": "A company wants to deploy a conversational chatbot to answer customer questions. The chatbot is base...",
+      "extracted_answer_text": "B",
+      "options": [
+        [
+          "A",
+          "Auto scaling inference endpoints"
+        ],
+        [
+          "B",
+          "Threat detection"
+        ],
+        [
+          "C",
+          "Data protection"
+        ],
+        [
+          "D",
+          "Cost optimization"
+        ],
+        [
+          "E",
+          "Loosely coupled microservices"
+        ]
+      ],
+      "proposed_indices": [
+        1
+      ],
+      "confidence": 0.0,
+      "issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "requires_human_validation": true
+    },
+    {
+      "question_id": "t5_q16",
+      "question_text": "A security company is using Amazon Bedrock to run foundation models (FMs). The company wants to ensu...",
+      "extracted_answer_text": "B",
+      "options": [
+        [
+          "A",
+          "AWS Audit Manager"
+        ],
+        [
+          "B",
+          "AWS CloudTrail"
+        ],
+        [
+          "C",
+          "Amazon Fraud Detector"
+        ],
+        [
+          "D",
+          "AWS Trusted Advisor"
+        ]
+      ],
+      "proposed_indices": [
+        1
+      ],
+      "confidence": 0.0,
+      "issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "requires_human_validation": true
+    },
+    {
+      "question_id": "t7_q17",
+      "question_text": "An AI practitioner trained a custom model on Amazon Bedrock by using a training dataset that contain...",
+      "extracted_answer_text": "A",
+      "options": [
+        [
+          "A",
+          "Delete the custom mode"
+        ],
+        [
+          "B",
+          "Remove the confidential data from the training datase"
+        ],
+        [
+          "C",
+          "Retrain the custom model."
+        ],
+        [
+          "D",
+          "Mask the confidential data in the inference responses by using dynamic data masking."
+        ],
+        [
+          "E",
+          "Encrypt the confidential data in the inference responses by using Amazon SageMaker."
+        ]
+      ],
+      "proposed_indices": [
+        0
+      ],
+      "confidence": 0.0,
+      "issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "requires_human_validation": true
+    },
+    {
+      "question_id": "t7_q18",
+      "question_text": "A company wants to use a large language model (LLM) on Amazon Bedrock for sentiment analysis. The co...",
+      "extracted_answer_text": "A",
+      "options": [
+        [
+          "A",
+          "Decrease the temperature value"
+        ],
+        [
+          "B",
+          "Increase the temperature value"
+        ],
+        [
+          "C",
+          "Decrease the length of output tokens"
+        ],
+        [
+          "D",
+          "Increase the maximum generation length"
+        ]
+      ],
+      "proposed_indices": [
+        0
+      ],
+      "confidence": 0.06451612903225806,
+      "issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "requires_human_validation": true
+    },
+    {
+      "question_id": "t7_q19",
+      "question_text": "Which option is a use case for generative AI models?...",
+      "extracted_answer_text": "B",
+      "options": [
+        [
+          "A",
+          "Improving network security by using intrusion detection systems"
+        ],
+        [
+          "B",
+          "Creating photorealistic images from text descriptions for digital marketing"
+        ],
+        [
+          "C",
+          "Enhancing database performance by using optimized indexing"
+        ],
+        [
+          "D",
+          "Analyzing financial data to forecast stock market trends"
+        ]
+      ],
+      "proposed_indices": [
+        1
+      ],
+      "confidence": 0.0,
+      "issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "requires_human_validation": true
+    },
+    {
+      "question_id": "t7_q20",
+      "question_text": "A digital devices company wants to predict customer demand for memory hardware. The company does not...",
+      "extracted_answer_text": "D",
+      "options": [
+        [
+          "A",
+          "Store the data in Amazon S3. Create ML models and demand forecast predictions by using Amazon SageMaker built-in algorithms that use the data from"
+        ],
+        [
+          "B",
+          "Import the data into Amazon SageMaker Data Wrangle"
+        ],
+        [
+          "C",
+          "Create ML models and demand forecast predictions by using SageMaker built-in algorithms."
+        ],
+        [
+          "D",
+          "Import the data into Amazon SageMaker Data Wrangle"
+        ],
+        [
+          "E",
+          "Build ML models and demand forecast predictions by using an Amazon Personalize Trending-Now recipe."
+        ]
+      ],
+      "proposed_indices": [
+        3
+      ],
+      "confidence": 0.0392156862745098,
+      "issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "requires_human_validation": true
+    },
+    {
+      "question_id": "t1_q21",
+      "question_text": "A company manually reviews all submitted resumes in PDF format. As the company grows, the company ex...",
+      "extracted_answer_text": "A",
+      "options": [
+        [
+          "A",
+          "Amazon Textract"
+        ],
+        [
+          "B",
+          "Amazon Personalize"
+        ],
+        [
+          "C",
+          "Amazon Lex"
+        ],
+        [
+          "D",
+          "Amazon Transcribe"
+        ]
+      ],
+      "proposed_indices": [
+        0
+      ],
+      "confidence": 0.125,
+      "issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "requires_human_validation": true
+    },
+    {
+      "question_id": "t7_q22",
+      "question_text": "An e-commerce company wants to build a solution to determine customer sentiments based on written cu...",
+      "extracted_answer_text": "B",
+      "options": [
+        [
+          "A",
+          "Amazon Lex"
+        ],
+        [
+          "B",
+          "Amazon Comprehend"
+        ],
+        [
+          "C",
+          "Amazon Polly"
+        ],
+        [
+          "D",
+          "Amazon Bedrock"
+        ],
+        [
+          "E",
+          "Amazon Rekognition"
+        ]
+      ],
+      "proposed_indices": [
+        1
+      ],
+      "confidence": 0.0,
+      "issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "requires_human_validation": true
+    },
+    {
+      "question_id": "t7_q23",
+      "question_text": "A company wants to use AI to protect its application from threats. The AI solution needs to check if...",
+      "extracted_answer_text": "C",
+      "options": [
+        [
+          "A",
+          "Build a speech recognition system."
+        ],
+        [
+          "B",
+          "Create a natural language processing (NLP) named entity recognition system."
+        ],
+        [
+          "C",
+          "Develop an anomaly detection system."
+        ],
+        [
+          "D",
+          "Create a fraud forecasting system."
+        ]
+      ],
+      "proposed_indices": [
+        2
+      ],
+      "confidence": 0.05405405405405406,
+      "issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "requires_human_validation": true
+    },
+    {
+      "question_id": "t7_q24",
+      "question_text": "A company is using domain-specific models. The company wants to avoid creating new models from the b...",
+      "extracted_answer_text": "B",
+      "options": [
+        [
+          "A",
+          "Increase the number of epochs."
+        ],
+        [
+          "B",
+          "Use transfer learning."
+        ],
+        [
+          "C",
+          "Decrease the number of epochs."
+        ],
+        [
+          "D",
+          "Use unsupervised learning."
+        ]
+      ],
+      "proposed_indices": [
+        1
+      ],
+      "confidence": 0.0,
+      "issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "requires_human_validation": true
+    },
+    {
+      "question_id": "t7_q25",
+      "question_text": "A company has built a solution by using generative AI. The solution uses large language models (LLMs...",
+      "extracted_answer_text": "A",
+      "options": [
+        [
+          "A",
+          "Bilingual Evaluation Understudy (BLEU)"
+        ],
+        [
+          "B",
+          "Root mean squared error (RMSE)"
+        ],
+        [
+          "C",
+          "Recall-Oriented Understudy for Gisting Evaluation (ROUGE)"
+        ],
+        [
+          "D",
+          "F1 score"
+        ]
+      ],
+      "proposed_indices": [
+        0
+      ],
+      "confidence": 0.05128205128205128,
+      "issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "requires_human_validation": true
+    },
+    {
+      "question_id": "t7_q26",
+      "question_text": "A loan company is building a generative AI-based solution to offer new applicants discounts based on...",
+      "extracted_answer_text": "A",
+      "options": [
+        [
+          "A",
+          "Detect imbalances or disparities in the data."
+        ],
+        [
+          "B",
+          "Ensure that the model runs frequently."
+        ],
+        [
+          "C",
+          "Evaluate the model's behavior so that the company can provide transparency to stakeholders."
+        ],
+        [
+          "D",
+          "Use the Recall-Oriented Understudy for Gisting Evaluation (ROUGE) technique to ensure that the model is 100% accurate."
+        ],
+        [
+          "E",
+          "Ensure that the model's inference time is within the accepted limits."
+        ]
+      ],
+      "proposed_indices": [
+        0
+      ],
+      "confidence": 0.043478260869565216,
+      "issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "requires_human_validation": true
+    },
+    {
+      "question_id": "t7_q27",
+      "question_text": "A company is building an application that needs to generate synthetic data that is based on existing...",
+      "extracted_answer_text": "A",
+      "options": [
+        [
+          "A",
+          "Generative adversarial network (GAN)"
+        ],
+        [
+          "B",
+          "XGBoost"
+        ],
+        [
+          "C",
+          "Residual neural network"
+        ],
+        [
+          "D",
+          "WaveNet"
+        ]
+      ],
+      "proposed_indices": [
+        0
+      ],
+      "confidence": 0.05405405405405406,
+      "issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "requires_human_validation": true
+    },
+    {
+      "question_id": "t7_q28",
+      "question_text": "An AI practitioner is building a model to generate images of humans in various professions. The AI p...",
+      "extracted_answer_text": "A",
+      "options": [
+        [
+          "A",
+          "Data augmentation for imbalanced classes"
+        ],
+        [
+          "B",
+          "Model monitoring for class distribution"
+        ],
+        [
+          "C",
+          "Retrieval Augmented Generation (RAG)"
+        ],
+        [
+          "D",
+          "Watermark detection for images"
+        ]
+      ],
+      "proposed_indices": [
+        0
+      ],
+      "confidence": 0.04878048780487805,
+      "issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "requires_human_validation": true
+    },
+    {
+      "question_id": "t1_q29",
+      "question_text": "A company wants to create a chatbot by using a foundation model (FM) on Amazon Bedrock. The FM needs...",
+      "extracted_answer_text": "A",
+      "options": [
+        [
+          "A",
+          "Ensure that the role that Amazon Bedrock assumes has permission to decrypt data withthe correct encryption key."
+        ],
+        [
+          "B",
+          "Set the access permissions for the S3 buckets to allow public access to enable access over the internet."
+        ],
+        [
+          "C",
+          "Use prompt engineering techniques to tell the model to look for information in Amazon S3."
+        ],
+        [
+          "D",
+          "Ensure that the S3 data does not contain sensitive information."
+        ]
+      ],
+      "proposed_indices": [
+        0
+      ],
+      "confidence": 0.017857142857142856,
+      "issues": [
+        "Low similarity between extracted answer and selected options"
+      ],
+      "mapping_method": "letter_mapping",
+      "requires_human_validation": true
+    }
+  ],
+  "processing_report": {
+    "success_rates": {
+      "extraction": 1.0,
+      "letter_extraction": 1.0,
+      "index_mapping": 1.0
+    },
+    "validation_failures": [],
+    "processing_errors": [],
+    "method_distribution": {
+      "pattern_1": 29
+    },
+    "requires_manual_review": 29
+  }
+}
