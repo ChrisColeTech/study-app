@@ -28,20 +28,25 @@ export type { IHealthRepository, IDetailedHealthRepository } from '../shared/typ
 export class HealthRepository implements IHealthRepository, IDetailedHealthRepository {
   private dynamoClient: DynamoDBClient;
   private s3Client: S3Client;
-  private lambdaClient: LambdaClient;
-  private cloudwatchClient: CloudWatchLogsClient;
   private config: ServiceConfig;
   private logger = createLogger({ component: 'HealthRepository' });
-  private dnsLookup = promisify(dns.lookup);
+
+  // Helper services for specialized concerns
+  private healthMonitoring: HealthMonitoringService;
+  private connectivityTester: HealthConnectivityTester;
+  private configurationValidator: HealthConfigurationValidator;
+  private metricsCollector: HealthMetricsCollector;
 
   constructor(dynamoClient: DynamoDBClient, s3Client: S3Client, config: ServiceConfig) {
     this.dynamoClient = dynamoClient;
     this.s3Client = s3Client;
     this.config = config;
     
-    // Initialize additional clients for detailed diagnostics
-    this.lambdaClient = new LambdaClient({ region: this.config.region });
-    this.cloudwatchClient = new CloudWatchLogsClient({ region: this.config.region });
+    // Initialize helper services with proper dependencies
+    this.healthMonitoring = new HealthMonitoringService(this.config);
+    this.connectivityTester = new HealthConnectivityTester(this.dynamoClient, this.config);
+    this.configurationValidator = new HealthConfigurationValidator(this.config);
+    this.metricsCollector = new HealthMetricsCollector(this);
   }
 
   /**
@@ -303,6 +308,55 @@ export class HealthRepository implements IHealthRepository, IDetailedHealthRepos
     }
   }
 
+  // Delegate to specialized health monitoring service
+  async checkLambdaHealth(): Promise<LambdaDiagnostics> {
+    return this.healthMonitoring.checkLambdaHealth();
+  }
+
+  async checkCloudWatchHealth(): Promise<CloudWatchDiagnostics> {
+    return this.healthMonitoring.checkCloudWatchHealth();
+  }
+
+  async getSystemMetrics(): Promise<SystemResourceUsage> {
+    return this.healthMonitoring.getSystemMetrics();
+  }
+
+  // Delegate to connectivity tester
+  async testConnectivity(): Promise<{ internet: boolean; aws: boolean; dns: boolean }> {
+    return this.connectivityTester.testConnectivity();
+  }
+
+  // Delegate to configuration validator
+  async validateConfiguration(): Promise<{ valid: boolean; errors?: string[]; warnings?: string[] }> {
+    return this.configurationValidator.validateConfiguration();
+  }
+
+  // Delegate to metrics collector
+  async getPerformanceMetrics(service?: string): Promise<PerformanceMetrics> {
+    return this.metricsCollector.getPerformanceMetrics(service);
+  }
+
+  async getHealthTrends(service?: string, hours = 24): Promise<any[]> {
+    return this.metricsCollector.getHealthTrends(service, hours);
+  }
+}
+
+/**
+ * HealthMonitoringService - Advanced monitoring capabilities
+ * Handles Lambda, CloudWatch diagnostics and system metrics
+ */
+export class HealthMonitoringService {
+  private lambdaClient: LambdaClient;
+  private cloudwatchClient: CloudWatchLogsClient;
+  private config: ServiceConfig;
+  private logger = createLogger({ component: 'HealthMonitoringService' });
+
+  constructor(config: ServiceConfig) {
+    this.config = config;
+    this.lambdaClient = new LambdaClient({ region: this.config.region });
+    this.cloudwatchClient = new CloudWatchLogsClient({ region: this.config.region });
+  }
+
   /**
    * Check Lambda health and get detailed diagnostics
    */
@@ -427,6 +481,22 @@ export class HealthRepository implements IHealthRepository, IDetailedHealthRepos
       }
     };
   }
+}
+
+/**
+ * HealthConnectivityTester - Network and connectivity testing
+ * Handles DNS resolution, AWS connectivity, and internet connectivity tests
+ */
+export class HealthConnectivityTester {
+  private dynamoClient: DynamoDBClient;
+  private config: ServiceConfig;
+  private logger = createLogger({ component: 'HealthConnectivityTester' });
+  private dnsLookup = promisify(dns.lookup);
+
+  constructor(dynamoClient: DynamoDBClient, config: ServiceConfig) {
+    this.dynamoClient = dynamoClient;
+    this.config = config;
+  }
 
   /**
    * Test network connectivity
@@ -486,6 +556,19 @@ export class HealthRepository implements IHealthRepository, IDetailedHealthRepos
       return false;
     }
   }
+}
+
+/**
+ * HealthConfigurationValidator - Configuration validation logic
+ * Handles environment variable validation and configuration checks
+ */
+export class HealthConfigurationValidator {
+  private config: ServiceConfig;
+  private logger = createLogger({ component: 'HealthConfigurationValidator' });
+
+  constructor(config: ServiceConfig) {
+    this.config = config;
+  }
 
   /**
    * Validate system configuration
@@ -535,6 +618,19 @@ export class HealthRepository implements IHealthRepository, IDetailedHealthRepos
       ...(warnings.length > 0 && { warnings })
     };
   }
+}
+
+/**
+ * HealthMetricsCollector - Performance metrics and trend analysis
+ * Handles performance metrics calculation and health trend analysis
+ */
+export class HealthMetricsCollector {
+  private healthRepository: HealthRepository;
+  private logger = createLogger({ component: 'HealthMetricsCollector' });
+
+  constructor(healthRepository: HealthRepository) {
+    this.healthRepository = healthRepository;
+  }
 
   /**
    * Get performance metrics for a service
@@ -547,10 +643,10 @@ export class HealthRepository implements IHealthRepository, IDetailedHealthRepos
     
     try {
       if (service === 'dynamodb' || !service) {
-        await this.checkDynamoDbHealth();
+        await this.healthRepository.checkDynamoDbHealth();
       }
       if (service === 's3' || !service) {
-        await this.checkS3Health();
+        await this.healthRepository.checkS3Health();
       }
       
       const responseTime = Date.now() - startTime;
