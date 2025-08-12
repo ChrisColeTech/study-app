@@ -7,6 +7,228 @@ import { GetGoalsRequest } from '../shared/types/goals.types';
 import { ServiceConfig } from '../shared/service-factory';
 import { createLogger } from '../shared/logger';
 
+/**
+ * Helper class for building DynamoDB query expressions and filtering logic
+ * Extracted from GoalsRepository to follow SRP (Single Responsibility Principle)
+ */
+class GoalsQueryBuilder {
+  /**
+   * Build comprehensive filter expression for goals query
+   */
+  buildFilterExpression(filters: GetGoalsRequest): {
+    filterExpression: string;
+    expressionAttributeNames: Record<string, string>;
+    expressionAttributeValues: Record<string, any>;
+  } {
+    const filterConditions: string[] = [];
+    const expressionAttributeNames: Record<string, string> = {};
+    const expressionAttributeValues: Record<string, any> = {};
+
+    // Status filter
+    if (filters.status && filters.status.length > 0) {
+      const statusConditions = filters.status.map((status, index) => {
+        const placeholder = `:status${index}`;
+        expressionAttributeValues[placeholder] = status;
+        return `#status = ${placeholder}`;
+      }).join(' OR ');
+      filterConditions.push(`(${statusConditions})`);
+      expressionAttributeNames['#status'] = 'status';
+    }
+
+    // Type filter
+    if (filters.type && filters.type.length > 0) {
+      const typeConditions = filters.type.map((type, index) => {
+        const placeholder = `:type${index}`;
+        expressionAttributeValues[placeholder] = type;
+        return `#type = ${placeholder}`;
+      }).join(' OR ');
+      filterConditions.push(`(${typeConditions})`);
+      expressionAttributeNames['#type'] = 'type';
+    }
+
+    // Priority filter
+    if (filters.priority && filters.priority.length > 0) {
+      const priorityConditions = filters.priority.map((priority, index) => {
+        const placeholder = `:priority${index}`;
+        expressionAttributeValues[placeholder] = priority;
+        return `priority = ${placeholder}`;
+      }).join(' OR ');
+      filterConditions.push(`(${priorityConditions})`);
+    }
+
+    // Reference filters
+    if (filters.examId) {
+      filterConditions.push('examId = :examId');
+      expressionAttributeValues[':examId'] = filters.examId;
+    }
+
+    if (filters.topicId) {
+      filterConditions.push('topicId = :topicId');
+      expressionAttributeValues[':topicId'] = filters.topicId;
+    }
+
+    if (filters.providerId) {
+      filterConditions.push('providerId = :providerId');
+      expressionAttributeValues[':providerId'] = filters.providerId;
+    }
+
+    // Archived filter
+    if (filters.isArchived !== undefined) {
+      filterConditions.push('isArchived = :isArchived');
+      expressionAttributeValues[':isArchived'] = filters.isArchived;
+    }
+
+    // Search filter (search in title and description)
+    if (filters.search) {
+      const searchTerm = filters.search.toLowerCase();
+      filterConditions.push('(contains(#title, :searchTerm) OR contains(description, :searchTerm))');
+      expressionAttributeNames['#title'] = 'title';
+      expressionAttributeValues[':searchTerm'] = searchTerm;
+    }
+
+    return {
+      filterExpression: filterConditions.length > 0 ? filterConditions.join(' AND ') : '',
+      expressionAttributeNames,
+      expressionAttributeValues
+    };
+  }
+
+  /**
+   * Build query parameters for DynamoDB query
+   */
+  buildQueryParams(
+    tableName: string,
+    indexName: string,
+    userId: string,
+    filters: GetGoalsRequest,
+    filterData: {
+      filterExpression: string;
+      expressionAttributeNames: Record<string, string>;
+      expressionAttributeValues: Record<string, any>;
+    }
+  ): any {
+    const { filterExpression, expressionAttributeNames, expressionAttributeValues } = filterData;
+    
+    // Add userId to expression values
+    expressionAttributeValues[':userId'] = userId;
+
+    const queryParams: any = {
+      TableName: tableName,
+      IndexName: indexName,
+      KeyConditionExpression: 'userId = :userId',
+      ExpressionAttributeValues: expressionAttributeValues,
+      Limit: filters.limit || 50
+    };
+
+    if (Object.keys(expressionAttributeNames).length > 0) {
+      queryParams.ExpressionAttributeNames = expressionAttributeNames;
+    }
+
+    if (filterExpression) {
+      queryParams.FilterExpression = filterExpression;
+    }
+
+    return queryParams;
+  }
+}
+
+/**
+ * Helper class for processing and sorting goals data
+ * Extracted from GoalsRepository to follow SRP (Single Responsibility Principle)
+ */
+class GoalsDataProcessor {
+  /**
+   * Sort goals array based on filter criteria
+   */
+  sortGoals(goals: Goal[], filters: GetGoalsRequest): Goal[] {
+    if (!filters.sortBy) {
+      return goals;
+    }
+
+    return goals.sort((a, b) => {
+      let aValue: any, bValue: any;
+      
+      switch (filters.sortBy) {
+        case 'created':
+          aValue = new Date(a.createdAt).getTime();
+          bValue = new Date(b.createdAt).getTime();
+          break;
+        case 'updated':
+          aValue = new Date(a.updatedAt).getTime();
+          bValue = new Date(b.updatedAt).getTime();
+          break;
+        case 'deadline':
+          aValue = a.deadline ? new Date(a.deadline).getTime() : 0;
+          bValue = b.deadline ? new Date(b.deadline).getTime() : 0;
+          break;
+        case 'priority':
+          const priorityOrder = { 'high': 3, 'medium': 2, 'low': 1 };
+          aValue = priorityOrder[a.priority];
+          bValue = priorityOrder[b.priority];
+          break;
+        case 'progress':
+          aValue = a.progressPercentage;
+          bValue = b.progressPercentage;
+          break;
+        default:
+          aValue = a.createdAt;
+          bValue = b.createdAt;
+      }
+
+      if (filters.sortOrder === 'desc') {
+        return bValue > aValue ? 1 : bValue < aValue ? -1 : 0;
+      } else {
+        return aValue > bValue ? 1 : aValue < bValue ? -1 : 0;
+      }
+    });
+  }
+
+  /**
+   * Apply pagination to sorted goals
+   */
+  applyPagination(goals: Goal[], filters: GetGoalsRequest): Goal[] {
+    const offset = filters.offset || 0;
+    const limit = filters.limit || 50;
+    return goals.slice(offset, offset + limit);
+  }
+}
+
+/**
+ * Helper class for building DynamoDB update expressions
+ * Extracted from GoalsRepository to follow SRP (Single Responsibility Principle)
+ */
+class GoalsUpdateBuilder {
+  /**
+   * Build update expression for DynamoDB UpdateCommand
+   */
+  buildUpdateExpression(updateData: Partial<Goal>): {
+    updateExpression: string;
+    expressionAttributeNames: Record<string, string>;
+    expressionAttributeValues: Record<string, any>;
+  } {
+    const updateExpressions: string[] = [];
+    const expressionAttributeNames: Record<string, string> = {};
+    const expressionAttributeValues: Record<string, any> = {};
+
+    Object.entries(updateData).forEach(([key, value]) => {
+      if (value !== undefined) {
+        const attributeName = `#${key}`;
+        const valueName = `:${key}`;
+        
+        updateExpressions.push(`${attributeName} = ${valueName}`);
+        expressionAttributeNames[attributeName] = key;
+        expressionAttributeValues[valueName] = value;
+      }
+    });
+
+    return {
+      updateExpression: `SET ${updateExpressions.join(', ')}`,
+      expressionAttributeNames,
+      expressionAttributeValues
+    };
+  }
+}
+
 export interface IGoalsRepository {
   create(goal: Goal): Promise<Goal>;
   findById(goalId: string): Promise<Goal | null>;
@@ -21,11 +243,21 @@ export class GoalsRepository implements IGoalsRepository {
   private tableName: string;
   private userIdIndexName: string;
   private logger = createLogger({ component: 'GoalsRepository' });
+  
+  // Helper classes for SRP compliance
+  private queryBuilder: GoalsQueryBuilder;
+  private dataProcessor: GoalsDataProcessor;
+  private updateBuilder: GoalsUpdateBuilder;
 
   constructor(dynamoClient: DynamoDBDocumentClient, config: ServiceConfig) {
     this.docClient = dynamoClient;
     this.tableName = config.tables.goals;
     this.userIdIndexName = 'UserGoalsIndex'; // GSI for querying by userId
+    
+    // Initialize helper classes
+    this.queryBuilder = new GoalsQueryBuilder();
+    this.dataProcessor = new GoalsDataProcessor();
+    this.updateBuilder = new GoalsUpdateBuilder();
   }
 
   /**
@@ -84,111 +316,27 @@ export class GoalsRepository implements IGoalsRepository {
 
   /**
    * Find goals by user ID with optional filtering and pagination
+   * Refactored to use helper classes for SRP compliance
    */
   async findByUserId(userId: string, filters: GetGoalsRequest = {}): Promise<{ goals: Goal[], total: number }> {
     try {
       this.logger.debug('Querying goals by userId', { userId, filters });
 
-      // Build query parameters
-      let filterExpression = '';
-      const expressionAttributeNames: Record<string, string> = {};
-      const expressionAttributeValues: Record<string, any> = {
-        ':userId': userId
-      };
+      // Use GoalsQueryBuilder to build filter expressions
+      const filterData = this.queryBuilder.buildFilterExpression(filters);
+      const queryParams = this.queryBuilder.buildQueryParams(
+        this.tableName,
+        this.userIdIndexName,
+        userId,
+        filters,
+        filterData
+      );
 
-      // Build filter conditions
-      const filterConditions: string[] = [];
-
-      // Status filter
-      if (filters.status && filters.status.length > 0) {
-        const statusConditions = filters.status.map((status, index) => {
-          const placeholder = `:status${index}`;
-          expressionAttributeValues[placeholder] = status;
-          return `#status = ${placeholder}`;
-        }).join(' OR ');
-        filterConditions.push(`(${statusConditions})`);
-        expressionAttributeNames['#status'] = 'status';
-      }
-
-      // Type filter
-      if (filters.type && filters.type.length > 0) {
-        const typeConditions = filters.type.map((type, index) => {
-          const placeholder = `:type${index}`;
-          expressionAttributeValues[placeholder] = type;
-          return `#type = ${placeholder}`;
-        }).join(' OR ');
-        filterConditions.push(`(${typeConditions})`);
-        expressionAttributeNames['#type'] = 'type';
-      }
-
-      // Priority filter
-      if (filters.priority && filters.priority.length > 0) {
-        const priorityConditions = filters.priority.map((priority, index) => {
-          const placeholder = `:priority${index}`;
-          expressionAttributeValues[placeholder] = priority;
-          return `priority = ${placeholder}`;
-        }).join(' OR ');
-        filterConditions.push(`(${priorityConditions})`);
-      }
-
-      // Reference filters
-      if (filters.examId) {
-        filterConditions.push('examId = :examId');
-        expressionAttributeValues[':examId'] = filters.examId;
-      }
-
-      if (filters.topicId) {
-        filterConditions.push('topicId = :topicId');
-        expressionAttributeValues[':topicId'] = filters.topicId;
-      }
-
-      if (filters.providerId) {
-        filterConditions.push('providerId = :providerId');
-        expressionAttributeValues[':providerId'] = filters.providerId;
-      }
-
-      // Archived filter
-      if (filters.isArchived !== undefined) {
-        filterConditions.push('isArchived = :isArchived');
-        expressionAttributeValues[':isArchived'] = filters.isArchived;
-      }
-
-      // Search filter (search in title and description)
-      if (filters.search) {
-        const searchTerm = filters.search.toLowerCase();
-        filterConditions.push('(contains(#title, :searchTerm) OR contains(description, :searchTerm))');
-        expressionAttributeNames['#title'] = 'title';
-        expressionAttributeValues[':searchTerm'] = searchTerm;
-      }
-
-      // Combine filter conditions
-      if (filterConditions.length > 0) {
-        filterExpression = filterConditions.join(' AND ');
-      }
-
-      // Query parameters
-      const queryParams: any = {
-        TableName: this.tableName,
-        IndexName: this.userIdIndexName,
-        KeyConditionExpression: 'userId = :userId',
-        ExpressionAttributeValues: expressionAttributeValues,
-        Limit: filters.limit || 50
-      };
-
-      if (Object.keys(expressionAttributeNames).length > 0) {
-        queryParams.ExpressionAttributeNames = expressionAttributeNames;
-      }
-
-      if (filterExpression) {
-        queryParams.FilterExpression = filterExpression;
-      }
-
-      // Execute query
+      // Execute query with pagination handling
       let allGoals: Goal[] = [];
       let lastEvaluatedKey: any = undefined;
       let totalScanned = 0;
 
-      // Handle pagination and collect all matching items
       do {
         if (lastEvaluatedKey) {
           queryParams.ExclusiveStartKey = lastEvaluatedKey;
@@ -205,50 +353,9 @@ export class GoalsRepository implements IGoalsRepository {
 
       } while (lastEvaluatedKey && allGoals.length < (filters.limit || 50));
 
-      // Sort results if requested
-      if (filters.sortBy) {
-        allGoals.sort((a, b) => {
-          let aValue: any, bValue: any;
-          
-          switch (filters.sortBy) {
-            case 'created':
-              aValue = new Date(a.createdAt).getTime();
-              bValue = new Date(b.createdAt).getTime();
-              break;
-            case 'updated':
-              aValue = new Date(a.updatedAt).getTime();
-              bValue = new Date(b.updatedAt).getTime();
-              break;
-            case 'deadline':
-              aValue = a.deadline ? new Date(a.deadline).getTime() : 0;
-              bValue = b.deadline ? new Date(b.deadline).getTime() : 0;
-              break;
-            case 'priority':
-              const priorityOrder = { 'high': 3, 'medium': 2, 'low': 1 };
-              aValue = priorityOrder[a.priority];
-              bValue = priorityOrder[b.priority];
-              break;
-            case 'progress':
-              aValue = a.progressPercentage;
-              bValue = b.progressPercentage;
-              break;
-            default:
-              aValue = a.createdAt;
-              bValue = b.createdAt;
-          }
-
-          if (filters.sortOrder === 'desc') {
-            return bValue > aValue ? 1 : bValue < aValue ? -1 : 0;
-          } else {
-            return aValue > bValue ? 1 : aValue < bValue ? -1 : 0;
-          }
-        });
-      }
-
-      // Apply offset and limit
-      const offset = filters.offset || 0;
-      const limit = filters.limit || 50;
-      const paginatedGoals = allGoals.slice(offset, offset + limit);
+      // Use GoalsDataProcessor for sorting and pagination
+      const sortedGoals = this.dataProcessor.sortGoals(allGoals, filters);
+      const paginatedGoals = this.dataProcessor.applyPagination(sortedGoals, filters);
 
       this.logger.info('Goals retrieved successfully', { 
         userId,
@@ -271,29 +378,18 @@ export class GoalsRepository implements IGoalsRepository {
 
   /**
    * Update an existing goal
+   * Refactored to use GoalsUpdateBuilder for SRP compliance
    */
   async update(goalId: string, updateData: Partial<Goal>): Promise<Goal> {
     try {
-      // Build update expression
-      const updateExpressions: string[] = [];
-      const expressionAttributeNames: Record<string, string> = {};
-      const expressionAttributeValues: Record<string, any> = {};
-
-      Object.entries(updateData).forEach(([key, value]) => {
-        if (value !== undefined) {
-          const attributeName = `#${key}`;
-          const valueName = `:${key}`;
-          
-          updateExpressions.push(`${attributeName} = ${valueName}`);
-          expressionAttributeNames[attributeName] = key;
-          expressionAttributeValues[valueName] = value;
-        }
-      });
+      // Use GoalsUpdateBuilder to build update expression
+      const { updateExpression, expressionAttributeNames, expressionAttributeValues } = 
+        this.updateBuilder.buildUpdateExpression(updateData);
 
       const result = await this.docClient.send(new UpdateCommand({
         TableName: this.tableName,
         Key: { goalId },
-        UpdateExpression: `SET ${updateExpressions.join(', ')}`,
+        UpdateExpression: updateExpression,
         ExpressionAttributeNames: expressionAttributeNames,
         ExpressionAttributeValues: expressionAttributeValues,
         ReturnValues: 'ALL_NEW',
