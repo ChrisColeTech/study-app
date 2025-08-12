@@ -40,7 +40,58 @@
   - `PHASE_03_HANDLER_ARCHITECTURE_STANDARDIZATION.md` ✅
   - `PHASE_04_HANDLER_DRY_VIOLATION_ELIMINATION.md` (next to be created)
   
-**Summary**: Work on **Objective 4** will involve multiple **steps** and result in **Phase 4** documentation when complete.
+**Summary**: Work on each **Objective** involves multiple **steps** and results in **Phase documentation** when complete.
+
+## 🛠️ IMPLEMENTATION TOOLS & REQUIREMENTS
+
+### **📋 MANDATORY PRE-WORK FOR ALL OBJECTIVES**
+
+**Before beginning ANY objective work, you MUST:**
+
+1. **📖 Read Project Knowledge Base**
+   - **Location**: `/mnt/c/Projects/study-app/docs/summaries/`
+   - **Requirement**: Read ALL relevant project knowledge documents
+   - **Purpose**: Understand existing architecture, patterns, and decisions
+   - **Files to Review**: All `.md` files in summaries directory for context
+
+2. **📚 Read Complete Remediation Plan**
+   - **This Document**: `/mnt/c/Projects/study-app/backend/docs/ARCHITECTURE_VIOLATIONS_REMEDIATION_V2.md`
+   - **Understanding**: Methodology, terminology, success criteria
+   - **Context**: How current objective fits into overall remediation strategy
+
+### **⚡ REQUIRED ANALYSIS TOOLS**
+
+**Use Serena MCP Tools for ALL code analysis and updates:**
+
+- **🎯 Project Activation**: **ALWAYS** activate the `study-app` project first:
+  ```
+  mcp__serena__activate_project: project = "study-app"
+  ```
+  - **CRITICAL**: Use "study-app" (root project), NOT "backend" or other subprojects
+  - This ensures access to correct project memories and context
+  - Verify activation shows study-app specific memories and tools
+
+- **🔍 Code Analysis**: Use `mcp__serena__search_for_pattern`, `mcp__serena__find_symbol`, `mcp__serena__get_symbols_overview`
+- **📊 Code Understanding**: Use `mcp__serena__find_referencing_symbols` to understand dependencies
+- **✏️ Code Updates**: Use `mcp__serena__replace_symbol_body`, `mcp__serena__insert_after_symbol`, etc.
+- **💾 Knowledge Management**: Use `mcp__serena__write_memory`, `mcp__serena__read_memory` for findings
+
+**Benefits of Using Serena Tools:**
+- **Accuracy**: Symbol-level precision prevents errors
+- **Efficiency**: Faster than manual file reading and editing
+- **Context**: Better understanding of code relationships
+- **Consistency**: Standardized approach across all objectives
+
+### **🎯 IMPLEMENTATION APPROACH**
+
+**Required Process for Each Objective:**
+1. **Knowledge Gathering**: Read project summaries + remediation plan
+2. **Tool-Assisted Analysis**: Use Serena MCP tools for code examination
+3. **Systematic Implementation**: Follow 7-step methodology
+4. **Documentation**: Create phase documentation with lessons learned
+5. **Quality Assurance**: Verify all completion criteria
+
+**⚠️ CRITICAL**: Using proper tools and reading project context is mandatory for successful objective completion. This ensures accuracy, maintains consistency, and leverages established architectural knowledge.
 
 ## 📋 REMEDIATION OBJECTIVES - 40 Areas Across 6 Architectural Layers
 
