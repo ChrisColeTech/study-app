@@ -149,6 +149,10 @@ export interface IProfileService {
   calculateAchievements(userId: string): Promise<Achievement[]>;
 }
 
+export interface IAchievementCalculator {
+  calculateAchievements(userId: string, profile: UserProfile): Promise<Achievement[]>;
+}
+
 export interface IProfileRepository {
   findByUserId(userId: string): Promise<UserProfile | null>;
   create(profile: UserProfile): Promise<UserProfile>;

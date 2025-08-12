@@ -40,6 +40,9 @@ export * from './goals.types';
 // Health Types
 export * from './health.types';
 
+// Profile Types
+export * from './profile.types';
+
 // Re-export commonly used AWS Lambda types
 export type {
   APIGatewayProxyEvent,

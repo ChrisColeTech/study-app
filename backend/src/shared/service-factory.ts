@@ -17,7 +17,8 @@ import type { IAnswerProcessor as IAnswerProcessorService } from '../services/an
 import type { ISessionAnalyzer as ISessionAnalyzerService } from '../services/session-analyzer.service';
 import type { IGoalsService } from '../services/goals.service';
 import type { IGoalsProgressTracker } from '../services/goals-progress-tracker.service';
-export type { IAuthService, IUserService, IProviderService, IExamService, ITopicService, IQuestionService, ISessionService, IGoalsService, IGoalsProgressTracker, ISessionOrchestratorService, IAnswerProcessorService, ISessionAnalyzerService };
+import type { IProfileService, IAchievementCalculator } from '../shared/types/profile.types';
+export type { IAuthService, IUserService, IProviderService, IExamService, ITopicService, IQuestionService, ISessionService, IGoalsService, IGoalsProgressTracker, ISessionOrchestratorService, IAnswerProcessorService, ISessionAnalyzerService, IProfileService, IAchievementCalculator };
 
 // Import repository interfaces
 import type { IUserRepository } from '../repositories/user.repository';
@@ -28,8 +29,9 @@ import type { ITopicRepository } from '../repositories/topic.repository';
 import type { IQuestionRepository } from '../repositories/question.repository';
 import type { IGoalsRepository } from '../repositories/goals.repository';
 import type { IHealthRepository } from '../repositories/health.repository';
+import type { IProfileRepository } from '../repositories/profile.repository';
 import type { IAnalyticsRepository } from '../repositories/analytics.repository';
-export type { IUserRepository, ISessionRepository, IProviderRepository, IExamRepository, ITopicRepository, IQuestionRepository, IGoalsRepository, IHealthRepository, IAnalyticsRepository };
+export type { IUserRepository, ISessionRepository, IProviderRepository, IExamRepository, ITopicRepository, IQuestionRepository, IGoalsRepository, IHealthRepository, IProfileRepository, IAnalyticsRepository };
 
 // Import analytics service interface from types
 import type { 
@@ -105,6 +107,7 @@ export class ServiceFactory {
   private _questionRepository: IQuestionRepository | null = null;
   private _goalsRepository: IGoalsRepository | null = null;
   private _healthRepository: IHealthRepository | null = null;
+  private _profileRepository: IProfileRepository | null = null;
   private _analyticsRepository: IAnalyticsRepository | null = null;
 
   // Services (lazy initialized)
@@ -126,6 +129,8 @@ export class ServiceFactory {
   private _goalsService: IGoalsService | null = null;
   private _goalsProgressTracker: IGoalsProgressTracker | null = null;
   private _healthService: IHealthService | null = null;
+  private _profileService: IProfileService | null = null;
+  private _achievementCalculator: IAchievementCalculator | null = null;
 
   private constructor() {
     this.config = this.loadConfig();
@@ -299,6 +304,17 @@ export class ServiceFactory {
       this._healthRepository = new HealthRepository(dynamoClient, this.getS3Client(), this.getConfig());
     }
     return this._healthRepository!;
+  }
+
+  /**
+   * Get Profile Repository
+   */
+  public getProfileRepository(): IProfileRepository {
+    if (!this._profileRepository) {
+      const { ProfileRepository } = require('../repositories/profile.repository');
+      this._profileRepository = new ProfileRepository(this.getDynamoClient(), this.getConfig());
+    }
+    return this._profileRepository!;
   }
 
   // Service getters
@@ -566,6 +582,33 @@ export class ServiceFactory {
   }
 
   /**
+   * Get Achievement Calculator Service
+   */
+  public getAchievementCalculator(): IAchievementCalculator {
+    if (!this._achievementCalculator) {
+      const { AchievementCalculator } = require('../services/achievement-calculator.service');
+      this._achievementCalculator = new AchievementCalculator(
+        this.getProfileRepository()
+      );
+    }
+    return this._achievementCalculator!;
+  }
+
+  /**
+   * Get Profile Service
+   */
+  public getProfileService(): IProfileService {
+    if (!this._profileService) {
+      const { ProfileService } = require('../services/profile.service');
+      this._profileService = new ProfileService(
+        this.getProfileRepository(),
+        this.getAchievementCalculator()
+      );
+    }
+    return this._profileService!;
+  }
+
+  /**
    * Reset all services and clients (useful for testing)
    */
   public reset(): void {
@@ -581,6 +624,7 @@ export class ServiceFactory {
     this._questionRepository = null;
     this._goalsRepository = null;
     this._healthRepository = null;
+    this._profileRepository = null;
     this._analyticsRepository = null;
 
     // Reset services
@@ -602,5 +646,7 @@ export class ServiceFactory {
     this._goalsService = null;
     this._goalsProgressTracker = null;
     this._healthService = null;
+    this._profileService = null;
+    this._achievementCalculator = null;
   }
 }
