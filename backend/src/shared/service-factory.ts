@@ -361,8 +361,20 @@ export class ServiceFactory {
    */
   public getQuestionService(): IQuestionService {
     if (!this._questionService) {
-      const { QuestionService } = require('../services/question.service');
-      this._questionService = new QuestionService(this.getQuestionRepository());
+      const { QuestionService, QuestionSelector, QuestionAnalyzer } = require('../services/question.service');
+      
+      // Create question selector service
+      const questionSelector = new QuestionSelector();
+      
+      // Create question analyzer service (depends on selector)
+      const questionAnalyzer = new QuestionAnalyzer(questionSelector);
+      
+      // Create main question service with dependencies
+      this._questionService = new QuestionService(
+        this.getQuestionRepository(),
+        questionSelector,
+        questionAnalyzer
+      );
     }
     return this._questionService!;
   }
