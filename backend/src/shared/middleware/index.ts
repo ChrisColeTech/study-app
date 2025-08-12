@@ -6,6 +6,18 @@ export {
   ValidationRules
 } from './validation.middleware';
 
+export {
+  SessionValidationSchemas,
+  GoalsValidationSchemas,
+  AnalyticsValidationSchemas,
+  QuestionValidationSchemas,
+  AuthValidationSchemas,
+  ProviderValidationSchemas,
+  ExamValidationSchemas,
+  TopicValidationSchemas,
+  HealthValidationSchemas
+} from './validation-schemas';
+
 export type {
   ValidationRule,
   ValidationSchema,

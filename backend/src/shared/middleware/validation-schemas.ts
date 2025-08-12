@@ -343,3 +343,208 @@ export class QuestionValidationSchemas {
     };
   }
 }
+
+/**
+ * Authentication validation schemas
+ */
+export class AuthValidationSchemas {
+  
+  /**
+   * Schema for user registration request
+   */
+  static registerRequest(): ValidationSchema {
+    return {
+      required: ['email', 'password', 'firstName', 'lastName'],
+      rules: [
+        { field: 'email', validate: ValidationRules.email() },
+        { field: 'password', validate: ValidationRules.stringLength(8, 128) },
+        { field: 'firstName', validate: ValidationRules.stringLength(1, 50) },
+        { field: 'lastName', validate: ValidationRules.stringLength(1, 50) },
+        { field: 'password', validate: ValidationRules.custom((value: string) => {
+          // Enhanced password validation
+          const hasUpperCase = /[A-Z]/.test(value);
+          const hasLowerCase = /[a-z]/.test(value);
+          const hasNumbers = /\d/.test(value);
+          const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(value);
+          
+          if (!hasUpperCase || !hasLowerCase || !hasNumbers || !hasSpecialChar) {
+            return { 
+              isValid: false, 
+              error: 'Password must contain uppercase, lowercase, number, and special character' 
+            };
+          }
+          return { isValid: true };
+        })}
+      ]
+    };
+  }
+
+  /**
+   * Schema for user login request
+   */
+  static loginRequest(): ValidationSchema {
+    return {
+      required: ['email', 'password'],
+      rules: [
+        { field: 'email', validate: ValidationRules.email() },
+        { field: 'password', validate: ValidationRules.stringLength(1, 128) }
+      ]
+    };
+  }
+
+  /**
+   * Schema for refresh token request
+   */
+  static refreshTokenRequest(): ValidationSchema {
+    return {
+      required: ['refreshToken'],
+      rules: [
+        { field: 'refreshToken', validate: ValidationRules.stringLength(1) }
+      ]
+    };
+  }
+}
+
+/**
+ * Provider validation schemas
+ */
+export class ProviderValidationSchemas {
+  
+  /**
+   * Schema for provider ID validation
+   */
+  static providerId(): ValidationSchema {
+    return {
+      required: ['providerId'],
+      rules: [
+        { field: 'providerId', validate: ValidationRules.custom((value: string) => {
+          const validProviders = ['aws', 'azure', 'gcp', 'comptia', 'cisco'];
+          if (!validProviders.includes(value.toLowerCase())) {
+            return { 
+              isValid: false, 
+              error: `Invalid provider. Valid options: ${validProviders.join(', ')}` 
+            };
+          }
+          return { isValid: true };
+        })}
+      ]
+    };
+  }
+
+  /**
+   * Schema for provider query parameters
+   */
+  static providerQuery(): ValidationSchema {
+    return {
+      required: [],
+      rules: [
+        { field: 'includeExams', validate: ValidationRules.boolean() },
+        { field: 'includeStats', validate: ValidationRules.boolean() },
+        { field: 'limit', validate: ValidationRules.numberRange(1, 100) },
+        { field: 'offset', validate: ValidationRules.numberRange(0) }
+      ]
+    };
+  }
+}
+
+/**
+ * Exam validation schemas
+ */
+export class ExamValidationSchemas {
+  
+  /**
+   * Schema for exam ID validation
+   */
+  static examId(): ValidationSchema {
+    return {
+      required: ['examId'],
+      rules: [
+        { field: 'examId', validate: ValidationRules.alphanumericId() }
+      ]
+    };
+  }
+
+  /**
+   * Schema for exam query parameters
+   */
+  static examQuery(): ValidationSchema {
+    return {
+      required: [],
+      rules: [
+        { field: 'providerId', validate: ValidationRules.alphanumericId() },
+        { field: 'includeTopics', validate: ValidationRules.boolean() },
+        { field: 'includeQuestionCount', validate: ValidationRules.boolean() },
+        { field: 'difficulty', validate: ValidationRules.custom((value: string) => {
+          if (!value) return { isValid: true };
+          const validDifficulties = ['beginner', 'intermediate', 'advanced'];
+          if (!validDifficulties.includes(value)) {
+            return { 
+              isValid: false, 
+              error: `Invalid difficulty. Valid options: ${validDifficulties.join(', ')}` 
+            };
+          }
+          return { isValid: true };
+        })},
+        { field: 'limit', validate: ValidationRules.numberRange(1, 100) },
+        { field: 'offset', validate: ValidationRules.numberRange(0) }
+      ]
+    };
+  }
+}
+
+/**
+ * Topic validation schemas
+ */
+export class TopicValidationSchemas {
+  
+  /**
+   * Schema for topic ID validation
+   */
+  static topicId(): ValidationSchema {
+    return {
+      required: ['topicId'],
+      rules: [
+        { field: 'topicId', validate: ValidationRules.alphanumericId() }
+      ]
+    };
+  }
+
+  /**
+   * Schema for topic query parameters
+   */
+  static topicQuery(): ValidationSchema {
+    return {
+      required: [],
+      rules: [
+        { field: 'providerId', validate: ValidationRules.alphanumericId() },
+        { field: 'examId', validate: ValidationRules.alphanumericId() },
+        { field: 'includeQuestionCount', validate: ValidationRules.boolean() },
+        { field: 'includeSubtopics', validate: ValidationRules.boolean() },
+        { field: 'limit', validate: ValidationRules.numberRange(1, 100) },
+        { field: 'offset', validate: ValidationRules.numberRange(0) }
+      ]
+    };
+  }
+}
+
+/**
+ * Health check validation schemas
+ */
+export class HealthValidationSchemas {
+  
+  /**
+   * Schema for detailed health check query parameters
+   */
+  static healthQuery(): ValidationSchema {
+    return {
+      required: [],
+      rules: [
+        { field: 'includeDatabase', validate: ValidationRules.boolean() },
+        { field: 'includeStorage', validate: ValidationRules.boolean() },
+        { field: 'includeCache', validate: ValidationRules.boolean() },
+        { field: 'includeExternal', validate: ValidationRules.boolean() },
+        { field: 'timeout', validate: ValidationRules.numberRange(1000, 30000) }
+      ]
+    };
+  }
+}

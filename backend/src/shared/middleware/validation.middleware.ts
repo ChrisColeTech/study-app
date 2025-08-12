@@ -28,8 +28,27 @@ export interface ValidationSchema {
 }
 
 export class ValidationMiddleware {
+  // Performance optimization: Cache validation results for repeated validations
+  private static validationCache = new Map<string, { result: ApiResponse | null; timestamp: number }>();
+  private static readonly CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
   /**
-   * Validate query parameters against schema
+   * Integration point with ParsingMiddleware for seamless validation workflow
+   */
+  static validateParsedRequest(
+    parsedData: any,
+    schema: ValidationSchema,
+    requestType: 'query' | 'body' | 'params'
+  ): { error: ApiResponse | null; data: any } {
+    const validationError = this.validateFields(parsedData, schema, requestType);
+    return {
+      error: validationError,
+      data: parsedData
+    };
+  }
+
+  /**
+   * Enhanced validation with parsing integration for query parameters
    */
   static validateQueryParams(
     context: HandlerContext,
@@ -40,7 +59,7 @@ export class ValidationMiddleware {
   }
 
   /**
-   * Validate request body against schema
+   * Enhanced validation with improved JSON parsing and error handling
    */
   static validateRequestBody(
     context: HandlerContext,
@@ -49,14 +68,7 @@ export class ValidationMiddleware {
     if (!context.event.body) {
       if (schema.required && schema.required.length > 0) {
         return {
-          error: {
-            success: false,
-            error: {
-              code: ERROR_CODES.VALIDATION_ERROR,
-              message: 'Request body is required'
-            },
-            timestamp: new Date().toISOString()
-          },
+          error: this.createStandardErrorResponse('Request body is required', ERROR_CODES.VALIDATION_ERROR),
           data: null
         };
       }
@@ -67,15 +79,9 @@ export class ValidationMiddleware {
     try {
       requestBody = JSON.parse(context.event.body);
     } catch (error) {
+      logger.warn('JSON parsing failed', { error: (error as Error).message });
       return {
-        error: {
-          success: false,
-          error: {
-            code: ERROR_CODES.VALIDATION_ERROR,
-            message: 'Invalid JSON in request body'
-          },
-          timestamp: new Date().toISOString()
-        },
+        error: this.createStandardErrorResponse('Invalid JSON in request body', ERROR_CODES.VALIDATION_ERROR),
         data: null
       };
     }
@@ -88,7 +94,7 @@ export class ValidationMiddleware {
   }
 
   /**
-   * Validate path parameters against schema
+   * Enhanced path parameter validation with better error messages
    */
   static validatePathParams(
     context: HandlerContext,
@@ -99,36 +105,36 @@ export class ValidationMiddleware {
   }
 
   /**
-   * Core validation logic - made public for flexible usage
+   * Core validation logic with performance optimizations and enhanced error handling
    */
   static validateFields(
     fields: Record<string, any>,
     schema: ValidationSchema,
     requestType: 'query' | 'body' | 'params'
   ): ApiResponse | null {
-    // Check required fields
+    // Performance optimization: Check cache for repeated validations
+    const cacheKey = this.generateCacheKey(fields, schema, requestType);
+    const cached = this.getCachedValidation(cacheKey);
+    if (cached !== null) {
+      return cached;
+    }
+
+    // Enhanced required field validation with better error messages
     if (schema.required) {
       for (const requiredField of schema.required) {
-        if (!fields[requiredField] || 
-            (typeof fields[requiredField] === 'string' && fields[requiredField].trim() === '')) {
-          logger.warn('Validation failed: missing required field', {
-            field: requiredField,
+        if (!this.isFieldPresent(fields[requiredField])) {
+          const error = this.createFieldErrorResponse(
+            requiredField, 
+            `${requiredField} is required`, 
             requestType
-          });
-          
-          return {
-            success: false,
-            error: {
-              code: ERROR_CODES.VALIDATION_ERROR,
-              message: `${requiredField} is required`
-            },
-            timestamp: new Date().toISOString()
-          };
+          );
+          this.cacheValidation(cacheKey, error);
+          return error;
         }
       }
     }
 
-    // Validate each field against its rules
+    // Enhanced field validation with context and better error handling
     const validationContext: ValidationContext = {
       allFields: fields,
       requestType
@@ -138,30 +144,190 @@ export class ValidationMiddleware {
       const fieldValue = fields[rule.field];
       
       // Skip validation if field is not present and not required
-      if (fieldValue === undefined || fieldValue === null) {
+      if (!this.isFieldPresent(fieldValue)) {
         continue;
       }
 
-      const result = rule.validate(fieldValue, validationContext);
-      if (!result.isValid) {
-        logger.warn('Validation failed', {
+      try {
+        const result = rule.validate(fieldValue, validationContext);
+        if (!result.isValid) {
+          const error = this.createFieldErrorResponse(
+            rule.field,
+            result.error || `Invalid ${rule.field}`,
+            requestType
+          );
+          this.cacheValidation(cacheKey, error);
+          return error;
+        }
+      } catch (validationError) {
+        logger.error('Validation rule execution failed', {
           field: rule.field,
-          error: result.error,
+          error: (validationError as Error).message,
           requestType
         });
-
-        return {
-          success: false,
-          error: {
-            code: ERROR_CODES.VALIDATION_ERROR,
-            message: result.error || `Invalid ${rule.field}`
-          },
-          timestamp: new Date().toISOString()
-        };
+        const error = this.createFieldErrorResponse(
+          rule.field,
+          `Validation failed for ${rule.field}`,
+          requestType
+        );
+        this.cacheValidation(cacheKey, error);
+        return error;
       }
     }
 
+    // Cache successful validation
+    this.cacheValidation(cacheKey, null);
     return null; // No validation errors
+  }
+
+  /**
+   * Advanced validation for complex nested objects
+   */
+  static validateNestedObject(
+    obj: Record<string, any>,
+    schema: Record<string, ValidationSchema>,
+    requestType: 'query' | 'body' | 'params'
+  ): ApiResponse | null {
+    for (const [key, nestedSchema] of Object.entries(schema)) {
+      if (obj[key]) {
+        const nestedError = this.validateFields(obj[key], nestedSchema, requestType);
+        if (nestedError) {
+          return nestedError;
+        }
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Batch validation for multiple schemas with early termination
+   */
+  static validateMultipleSchemas(
+    data: Record<string, any>,
+    schemas: { schema: ValidationSchema; type: 'query' | 'body' | 'params' }[]
+  ): ApiResponse | null {
+    for (const { schema, type } of schemas) {
+      const error = this.validateFields(data, schema, type);
+      if (error) {
+        return error;
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Performance optimization: Check if field has a meaningful value
+   */
+  private static isFieldPresent(value: any): boolean {
+    return value !== undefined && 
+           value !== null && 
+           !(typeof value === 'string' && value.trim() === '');
+  }
+
+  /**
+   * Generate cache key for validation caching
+   */
+  private static generateCacheKey(
+    fields: Record<string, any>,
+    schema: ValidationSchema,
+    requestType: string
+  ): string {
+    const fieldsKey = JSON.stringify(Object.keys(fields).sort());
+    const schemaKey = `${schema.required?.join(',') || ''}-${schema.rules.length}`;
+    return `${requestType}-${fieldsKey}-${schemaKey}`;
+  }
+
+  /**
+   * Get cached validation result if still valid
+   */
+  private static getCachedValidation(cacheKey: string): ApiResponse | null {
+    const cached = this.validationCache.get(cacheKey);
+    if (cached && (Date.now() - cached.timestamp) < this.CACHE_TTL) {
+      return cached.result;
+    }
+    // Clean up expired cache entry
+    if (cached) {
+      this.validationCache.delete(cacheKey);
+    }
+    return null;
+  }
+
+  /**
+   * Cache validation result for performance
+   */
+  private static cacheValidation(cacheKey: string, result: ApiResponse | null): void {
+    // Limit cache size to prevent memory leaks
+    if (this.validationCache.size > 1000) {
+      const oldestKey = this.validationCache.keys().next().value;
+      if (oldestKey) {
+        this.validationCache.delete(oldestKey);
+      }
+    }
+    
+    this.validationCache.set(cacheKey, {
+      result,
+      timestamp: Date.now()
+    });
+  }
+
+  /**
+   * Standardized error response creation with enhanced context
+   */
+  private static createStandardErrorResponse(
+    message: string,
+    code: string,
+    details?: Record<string, any>
+  ): ApiResponse {
+    return {
+      success: false,
+      error: {
+        code,
+        message,
+        ...(details && { details })
+      },
+      timestamp: new Date().toISOString()
+    };
+  }
+
+  /**
+   * Enhanced field-specific error response with context
+   */
+  private static createFieldErrorResponse(
+    field: string,
+    message: string,
+    requestType: string
+  ): ApiResponse {
+    logger.warn('Validation failed', {
+      field,
+      message,
+      requestType
+    });
+
+    return this.createStandardErrorResponse(
+      message,
+      ERROR_CODES.VALIDATION_ERROR,
+      {
+        field,
+        location: requestType
+      }
+    );
+  }
+
+  /**
+   * Clear validation cache (useful for testing or memory management)
+   */
+  static clearValidationCache(): void {
+    this.validationCache.clear();
+  }
+
+  /**
+   * Get cache statistics for monitoring
+   */
+  static getCacheStats(): { size: number; hitRate: number } {
+    return {
+      size: this.validationCache.size,
+      hitRate: 0 // Simplified for now, could track hits/misses
+    };
   }
 }
 
@@ -411,6 +577,257 @@ export class ValidationRules {
         return { isValid: true };
       } catch {
         return { isValid: false, error: 'Invalid date format' };
+      }
+    };
+  }
+
+  /**
+   * Validate float/decimal number
+   */
+  static float(min?: number, max?: number) {
+    return (value: any): ValidationResult => {
+      const num = typeof value === 'string' ? parseFloat(value) : value;
+      
+      if (isNaN(num) || typeof num !== 'number') {
+        return { isValid: false, error: 'Must be a valid decimal number' };
+      }
+
+      if (min !== undefined && num < min) {
+        return { isValid: false, error: `Must be at least ${min}` };
+      }
+
+      if (max !== undefined && num > max) {
+        return { isValid: false, error: `Must be ${max} or less` };
+      }
+
+      return { isValid: true };
+    };
+  }
+
+  /**
+   * Validate JSON string
+   */
+  static json() {
+    return (value: string): ValidationResult => {
+      if (typeof value !== 'string') {
+        return { isValid: false, error: 'Must be a string' };
+      }
+
+      try {
+        JSON.parse(value);
+        return { isValid: true };
+      } catch {
+        return { isValid: false, error: 'Must be valid JSON' };
+      }
+    };
+  }
+
+  /**
+   * Validate URL format
+   */
+  static url() {
+    return (value: string): ValidationResult => {
+      if (typeof value !== 'string') {
+        return { isValid: false, error: 'Must be a string' };
+      }
+
+      try {
+        new URL(value);
+        return { isValid: true };
+      } catch {
+        return { isValid: false, error: 'Must be a valid URL' };
+      }
+    };
+  }
+
+  /**
+   * Validate phone number format (basic international format)
+   */
+  static phoneNumber() {
+    return (value: string): ValidationResult => {
+      if (typeof value !== 'string') {
+        return { isValid: false, error: 'Must be a string' };
+      }
+
+      const phoneRegex = /^\+?[\d\s\-\(\)]+$/;
+      if (!phoneRegex.test(value) || value.length < 10 || value.length > 20) {
+        return { isValid: false, error: 'Invalid phone number format' };
+      }
+
+      return { isValid: true };
+    };
+  }
+
+  /**
+   * Validate file extension
+   */
+  static fileExtension(allowedExtensions: string[]) {
+    return (value: string): ValidationResult => {
+      if (typeof value !== 'string') {
+        return { isValid: false, error: 'Must be a string' };
+      }
+
+      const extension = value.toLowerCase().split('.').pop();
+      if (!extension || !allowedExtensions.includes(extension)) {
+        return { 
+          isValid: false, 
+          error: `Invalid file extension. Allowed: ${allowedExtensions.join(', ')}` 
+        };
+      }
+
+      return { isValid: true };
+    };
+  }
+
+  /**
+   * Validate IP address (IPv4)
+   */
+  static ipAddress() {
+    return (value: string): ValidationResult => {
+      if (typeof value !== 'string') {
+        return { isValid: false, error: 'Must be a string' };
+      }
+
+      const ipRegex = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+      if (!ipRegex.test(value)) {
+        return { isValid: false, error: 'Invalid IP address format' };
+      }
+
+      return { isValid: true };
+    };
+  }
+
+  /**
+   * Validate hexadecimal color
+   */
+  static hexColor() {
+    return (value: string): ValidationResult => {
+      if (typeof value !== 'string') {
+        return { isValid: false, error: 'Must be a string' };
+      }
+
+      const hexRegex = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/;
+      if (!hexRegex.test(value)) {
+        return { isValid: false, error: 'Invalid hex color format (e.g., #FF0000)' };
+      }
+
+      return { isValid: true };
+    };
+  }
+
+  /**
+   * Validate time format (HH:MM or HH:MM:SS)
+   */
+  static timeFormat() {
+    return (value: string): ValidationResult => {
+      if (typeof value !== 'string') {
+        return { isValid: false, error: 'Must be a string' };
+      }
+
+      const timeRegex = /^([01]?[0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?$/;
+      if (!timeRegex.test(value)) {
+        return { isValid: false, error: 'Invalid time format. Use HH:MM or HH:MM:SS' };
+      }
+
+      return { isValid: true };
+    };
+  }
+
+  /**
+   * Validate credit card number (basic Luhn algorithm)
+   */
+  static creditCard() {
+    return (value: string): ValidationResult => {
+      if (typeof value !== 'string') {
+        return { isValid: false, error: 'Must be a string' };
+      }
+
+      const cleaned = value.replace(/\s+/g, '').replace(/-/g, '');
+      if (!/^\d+$/.test(cleaned) || cleaned.length < 13 || cleaned.length > 19) {
+        return { isValid: false, error: 'Invalid credit card number format' };
+      }
+
+      // Basic Luhn algorithm check
+      let sum = 0;
+      let isEven = false;
+      for (let i = cleaned.length - 1; i >= 0; i--) {
+        let digit = parseInt(cleaned.charAt(i), 10);
+        if (isEven) {
+          digit *= 2;
+          if (digit > 9) {
+            digit -= 9;
+          }
+        }
+        sum += digit;
+        isEven = !isEven;
+      }
+
+      if (sum % 10 !== 0) {
+        return { isValid: false, error: 'Invalid credit card number' };
+      }
+
+      return { isValid: true };
+    };
+  }
+
+  /**
+   * Validate that a field matches another field (e.g., password confirmation)
+   */
+  static matchesField(fieldName: string) {
+    return (value: any, context?: ValidationContext): ValidationResult => {
+      if (!context?.allFields) {
+        return { isValid: false, error: 'Cannot validate field match without context' };
+      }
+
+      const otherValue = context.allFields[fieldName];
+      if (value !== otherValue) {
+        return { isValid: false, error: `Must match ${fieldName}` };
+      }
+
+      return { isValid: true };
+    };
+  }
+
+  /**
+   * Validate geographic coordinates (latitude, longitude)
+   */
+  static coordinates() {
+    return (value: { lat: number; lng: number }): ValidationResult => {
+      if (!value || typeof value !== 'object') {
+        return { isValid: false, error: 'Must be an object with lat and lng properties' };
+      }
+
+      const { lat, lng } = value;
+      if (typeof lat !== 'number' || typeof lng !== 'number') {
+        return { isValid: false, error: 'Latitude and longitude must be numbers' };
+      }
+
+      if (lat < -90 || lat > 90) {
+        return { isValid: false, error: 'Latitude must be between -90 and 90' };
+      }
+
+      if (lng < -180 || lng > 180) {
+        return { isValid: false, error: 'Longitude must be between -180 and 180' };
+      }
+
+      return { isValid: true };
+    };
+  }
+
+  /**
+   * Validate timezone string
+   */
+  static timezone() {
+    return (value: string): ValidationResult => {
+      if (typeof value !== 'string') {
+        return { isValid: false, error: 'Must be a string' };
+      }
+
+      try {
+        Intl.DateTimeFormat(undefined, { timeZone: value });
+        return { isValid: true };
+      } catch {
+        return { isValid: false, error: 'Invalid timezone identifier' };
       }
     };
   }
