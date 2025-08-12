@@ -5,11 +5,12 @@
 > **Status**: Build currently broken with 95 TypeScript errors - must fix immediately
 
 > ⚠️ **IMPORTANT**: The items below are **HIGH-LEVEL OBJECTIVES**, not detailed implementation phases. Each objective requires:
+>
 > - **Code Analysis**: Detailed examination of specific violations and patterns
 > - **Implementation Planning**: Breaking down into specific, actionable tasks
 > - **Technical Design**: Determining the best approach for each refactoring
 > - **Task Creation**: Converting objectives into executable development work
-> 
+>
 > **Only Objectives 1-3 have been fully planned and executed.** All other "objectives" require detailed analysis and planning.
 
 ## 📝 TERMINOLOGY GUIDE
@@ -19,7 +20,6 @@
 - **🎯 Objectives**: High-level goals listed in this document (Objective 1, 2, 3, etc.)
   - These are strategic areas requiring analysis and planning before implementation
   - Most objectives require breaking down into multiple implementation steps
-  
 - **🔧 Steps**: Standard implementation work breakdown for each objective
   - **Step 1: Analysis & Discovery** - Examine code to understand specific issues and patterns
   - **Step 2: Design & Planning** - Determine technical approach and create implementation plan
@@ -28,18 +28,16 @@
   - **Step 5: Documentation & Tracking** - Create lessons learned doc and update remediation plan
   - **Step 6: Git & Deployment Workflow** - Commit, push, and deploy via CI/CD pipeline
   - **Step 7: Quality Assurance Final Check** - Verify all completion requirements are met
-  
 - **✅ Subtasks**: Specific actionable items within each step
   - Each step contains multiple subtasks that must be completed
   - Subtasks are the actual work items that can be checked off
   - Example: Step 1 might have subtasks like "Audit error handling patterns", "Catalog parsing violations", etc.
-  
 - **📚 Phase Documentation**: Completion documentation files (only 3 exist so far)
   - `PHASE_01_BUILD_CRISIS_RESOLUTION.md` ✅
   - `PHASE_02_HANDLER_VALIDATION_EXTRACTION.md` ✅
   - `PHASE_03_HANDLER_ARCHITECTURE_STANDARDIZATION.md` ✅
   - `PHASE_04_HANDLER_DRY_VIOLATION_ELIMINATION.md` (next to be created)
-  
+
 **Summary**: Work on each **Objective** involves multiple **steps** and results in **Phase documentation** when complete.
 
 ## 🛠️ IMPLEMENTATION TOOLS & REQUIREMENTS
@@ -64,9 +62,11 @@
 **Use Serena MCP Tools for ALL code analysis and updates:**
 
 - **🎯 Project Activation**: **ALWAYS** activate the `study-app` project first:
+
   ```
   mcp__serena__activate_project: project = "study-app"
   ```
+
   - **CRITICAL**: Use "study-app" (root project), NOT "backend" or other subprojects
   - This ensures access to correct project memories and context
   - Verify activation shows study-app specific memories and tools
@@ -77,6 +77,7 @@
 - **💾 Knowledge Management**: Use `mcp__serena__write_memory`, `mcp__serena__read_memory` for findings
 
 **Benefits of Using Serena Tools:**
+
 - **Accuracy**: Symbol-level precision prevents errors
 - **Efficiency**: Faster than manual file reading and editing
 - **Context**: Better understanding of code relationships
@@ -85,6 +86,7 @@
 ### **🎯 IMPLEMENTATION APPROACH**
 
 **Required Process for Each Objective:**
+
 1. **Knowledge Gathering**: Read project summaries + remediation plan
 2. **Tool-Assisted Analysis**: Use Serena MCP tools for code examination
 3. **Systematic Implementation**: Follow 7-step methodology
@@ -98,6 +100,7 @@
 **CRITICAL: Agents must complete objectives autonomously without stopping to ask questions.**
 
 **🛭 FIX ALL ISSUES ENCOUNTERED:**
+
 - **Never stop to ask "should I fix this?"** - If you discover issues during your objective work, **FIX THEM**
 - **Scope Boundary**: Fix any issues **within your objective scope** - don't hesitate
 - **Code Issues**: TypeScript errors, interface mismatches, missing methods, type conflicts - **FIX THEM ALL**
@@ -105,6 +108,7 @@
 - **Integration Issues**: If services don't integrate properly, **FIX THE INTEGRATION**
 
 **❗ DO NOT STOP FOR:**
+
 - TypeScript compilation errors - Fix them
 - Missing interface methods - Add them
 - Type mismatches - Resolve them
@@ -112,76 +116,81 @@
 - Integration problems - Solve them
 
 **🎯 COMPLETE ALL 7 STEPS:**
+
 - **Step 5**: Documentation & Tracking - **MANDATORY** update of remediation plan tracking table
 - **Step 6**: Git & Deployment - **MANDATORY** commit ALL changes and push via CI/CD
 - **Step 7**: Quality Assurance - **MANDATORY** verify ALL completion criteria
-
-**⚠️ ONLY ASK QUESTIONS IF:**
-- You need clarification on the **objective scope itself**
-- You discover issues that would affect **OTHER objectives** (cross-objective impact)
-- You encounter **external dependencies** outside the codebase
 
 **🎯 GOAL**: Complete objective with working code, passing build, complete documentation, and updated tracking.
 
 ## 📋 REMEDIATION OBJECTIVES - 40 Areas Across 6 Architectural Layers
 
 ### **🔥 IMMEDIATE CRITICAL OBJECTIVES (1-2)** ✅ **EXECUTED WITH DETAILED PLANNING**
+
 - **Objective 1**: Build Crisis Resolution - Fix 95 TypeScript errors
 - **Objective 2**: Handler Validation Extraction - Remove 500+ lines from handlers
 
 ### **📦 HANDLER LAYER OBJECTIVES (3-4)** ✅ **EXECUTED WITH DETAILED PLANNING**
+
 - **Objective 3**: Handler Architecture Standardization - All handlers <200 lines
-- **Objective 4**: Handler DRY Violation Elimination - Remove 76 repeated patterns *(Requires detailed analysis)*
+- **Objective 4**: Handler DRY Violation Elimination - Remove 76 repeated patterns _(Requires detailed analysis)_
 
 ### **⚡ SERVICE LAYER OBJECTIVES (5-10)** ⚠️ **REQUIRES DETAILED PLANNING**
+
 - **Objective 5**: SessionService Decomposition - 1,512 → 4 services ✅ **COMPLETED**
-- **Objective 6**: AnalyticsService Decomposition - 1,195 → 5 services *(Epic requiring method analysis)*
-- **Objective 7**: QuestionService Decomposition - 732 → 3 services *(Epic requiring responsibility mapping)*
-- **Objective 8**: GoalsService Decomposition - 505 → 2 services *(Epic requiring logic separation)*
-- **Objective 9**: ProfileService Decomposition - 455 → 2 services *(Epic requiring concern identification)*
-- **Objective 10**: Service Architecture Standardization - SRP compliance *(Requires interface design)*
+- **Objective 6**: AnalyticsService Decomposition - 1,195 → 5 services _(Epic requiring method analysis)_
+- **Objective 7**: QuestionService Decomposition - 732 → 3 services _(Epic requiring responsibility mapping)_
+- **Objective 8**: GoalsService Decomposition - 505 → 2 services _(Epic requiring logic separation)_
+- **Objective 9**: ProfileService Decomposition - 455 → 2 services _(Epic requiring concern identification)_
+- **Objective 10**: Service Architecture Standardization - SRP compliance _(Requires interface design)_
 
 ### **🗄️ REPOSITORY LAYER OBJECTIVES (11-16)** ⚠️ **REQUIRES DETAILED PLANNING**
-- **Objective 11**: QuestionRepository Refactor - 595 lines optimization *(Requires query analysis)*
-- **Objective 12**: HealthRepository Refactor - 589 lines optimization *(Requires data access review)*
-- **Objective 13**: AnalyticsRepository Refactor - 529 lines optimization *(Requires domain splitting)*
-- **Objective 14**: TopicRepository Refactor - 524 lines optimization *(Requires query builder extraction)*
-- **Objective 15**: GoalsRepository Refactor - 367 lines optimization *(Requires CRUD standardization)*
-- **Objective 16**: Repository Pattern Standardization - Consistent interfaces *(Requires interface design)*
+
+- **Objective 11**: QuestionRepository Refactor - 595 lines optimization _(Requires query analysis)_
+- **Objective 12**: HealthRepository Refactor - 589 lines optimization _(Requires data access review)_
+- **Objective 13**: AnalyticsRepository Refactor - 529 lines optimization _(Requires domain splitting)_
+- **Objective 14**: TopicRepository Refactor - 524 lines optimization _(Requires query builder extraction)_
+- **Objective 15**: GoalsRepository Refactor - 367 lines optimization _(Requires CRUD standardization)_
+- **Objective 16**: Repository Pattern Standardization - Consistent interfaces _(Requires interface design)_
 
 ### **🏗️ SHARED INFRASTRUCTURE OBJECTIVES (17-23)** ⚠️ **REQUIRES DETAILED PLANNING**
-- **Objective 17**: ServiceFactory Refactor - 454 lines God object fix *(Requires dependency analysis)*
-- **Objective 18**: ErrorHandlingMiddleware Optimization - 399 lines *(Requires error pattern review)*
-- **Objective 19**: ParsingMiddleware Enhancement - 358 lines *(Requires parsing pattern analysis)*
-- **Objective 20**: ValidationMiddleware Integration - 345 lines *(Requires schema integration planning)*
-- **Objective 21**: CrudHandler Optimization - 340 lines *(Requires CRUD pattern review)*
-- **Objective 22**: BaseHandler Enhancement - 313 lines *(Requires base class analysis)*
-- **Objective 23**: Middleware Architecture Review - Integration optimization *(Requires architecture review)*
+
+- **Objective 17**: ServiceFactory Refactor - 454 lines God object fix _(Requires dependency analysis)_
+- **Objective 18**: ErrorHandlingMiddleware Optimization - 399 lines _(Requires error pattern review)_
+- **Objective 19**: ParsingMiddleware Enhancement - 358 lines _(Requires parsing pattern analysis)_
+- **Objective 20**: ValidationMiddleware Integration - 345 lines _(Requires schema integration planning)_
+- **Objective 21**: CrudHandler Optimization - 340 lines _(Requires CRUD pattern review)_
+- **Objective 22**: BaseHandler Enhancement - 313 lines _(Requires base class analysis)_
+- **Objective 23**: Middleware Architecture Review - Integration optimization _(Requires architecture review)_
 
 ### **📝 TYPE SYSTEM OBJECTIVES (24-27)** ⚠️ **REQUIRES DETAILED PLANNING**
-- **Objective 24**: AnalyticsTypes Consolidation - 404 lines simplification *(Requires type analysis)*
-- **Objective 25**: Type Definition Standardization - 1,500+ lines across 12+ files *(Epic requiring type audit)*
-- **Objective 26**: Type Validation Integration - Runtime validation *(Requires validation strategy)*
-- **Objective 27**: API Contract Optimization - Request/response standardization *(Requires API review)*
+
+- **Objective 24**: AnalyticsTypes Consolidation - 404 lines simplification _(Requires type analysis)_
+- **Objective 25**: Type Definition Standardization - 1,500+ lines across 12+ files _(Epic requiring type audit)_
+- **Objective 26**: Type Validation Integration - Runtime validation _(Requires validation strategy)_
+- **Objective 27**: API Contract Optimization - Request/response standardization _(Requires API review)_
 
 ### **🔧 SUPPORTING ARCHITECTURE OBJECTIVES (28-32)** ⚠️ **REQUIRES DETAILED PLANNING**
-- **Objective 28**: Mapper Pattern Implementation - 3 mappers + expansion *(Requires mapper analysis)*
-- **Objective 29**: Filter Architecture Expansion - Filtering infrastructure *(Requires filter pattern design)*
-- **Objective 30**: Validator Integration - Standalone → ValidationMiddleware *(Requires validator migration planning)*
-- **Objective 31**: Utility Function Organization - Utils structure *(Requires utility audit)*
-- **Objective 32**: Configuration Management Enhancement - Config system *(Requires config pattern review)*
+
+- **Objective 28**: Mapper Pattern Implementation - 3 mappers + expansion _(Requires mapper analysis)_
+- **Objective 29**: Filter Architecture Expansion - Filtering infrastructure _(Requires filter pattern design)_
+- **Objective 30**: Validator Integration - Standalone → ValidationMiddleware _(Requires validator migration planning)_
+- **Objective 31**: Utility Function Organization - Utils structure _(Requires utility audit)_
+- **Objective 32**: Configuration Management Enhancement - Config system _(Requires config pattern review)_
 
 ### **🧪 TESTING & QUALITY OBJECTIVES (33-36)** ⚠️ **REQUIRES DETAILED PLANNING**
-- **Objective 33**: Unit Test Expansion - Tests for 17+ decomposed services using Jest/ts-jest *(Epic requiring test strategy)*
-- **Objective 34**: Integration Test Coverage - API Gateway + Lambda integration tests *(Requires integration planning)*
-- **Objective 35**: Endpoint Test Suite Updates - Shell script test coverage for new services *(Requires test script analysis)*
-- **Objective 36**: Test Infrastructure Enhancement - Fixtures and mocks for new architecture *(Requires infrastructure review)*
+
+- **Objective 33**: Unit Test Expansion - Tests for 17+ decomposed services using Jest/ts-jest _(Epic requiring test strategy)_
+- **Objective 34**: Integration Test Coverage - API Gateway + Lambda integration tests _(Requires integration planning)_
+- **Objective 35**: Endpoint Test Suite Updates - Shell script test coverage for new services _(Requires test script analysis)_
+- **Objective 36**: Test Infrastructure Enhancement - Fixtures and mocks for new architecture _(Requires infrastructure review)_
 
 ### **🚀 FINAL INTEGRATION OBJECTIVES (37-40)** ⚠️ **REQUIRES DETAILED PLANNING**
-- **Objective 37**: End-to-End Testing - System integration testing *(Requires E2E test strategy)*
-- **Objective 38**: Performance Optimization - Service communication *(Requires performance analysis)*
-- **Objective 39**: Documentation Update - Architecture documentation *(Requires doc strategy)*
-- **Objective 40**: Deployment Validation - CDK/infrastructure compatibility *(Requires deployment review)*
+
+- **Objective 37**: End-to-End Testing - System integration testing _(Requires E2E test strategy)_
+- **Objective 38**: Performance Optimization - Service communication _(Requires performance analysis)_
+- **Objective 39**: Documentation Update - Architecture documentation _(Requires doc strategy)_
+- **Objective 40**: Deployment Validation - CDK/infrastructure compatibility _(Requires deployment review)_
 
 ## 🔍 Objective 1: REAL Comprehensive Audit Results - COMPLETED ✅
 
@@ -190,8 +199,9 @@
 ### **1.1 Handler Architecture Audit**
 
 **Current Handler Sizes (All exceed 150-line routing limit):**
+
 - **SessionHandler**: 706 lines - CATASTROPHIC (4.7x limit)
-- **GoalsHandler**: 643 lines - CATASTROPHIC (4.3x limit) 
+- **GoalsHandler**: 643 lines - CATASTROPHIC (4.3x limit)
 - **AnalyticsHandler**: 401 lines - MAJOR (2.7x limit)
 - **QuestionHandler**: 362 lines - MAJOR (2.4x limit)
 - **AuthHandler**: 213 lines - Moderate (1.4x limit)
@@ -202,8 +212,9 @@
 - **ProfileHandler**: DISABLED (.disabled file)
 
 **BaseHandler Usage Analysis:**
+
 - ✅ **ALL active handlers now use BaseHandler methods** (`buildSuccessResponse`, `buildErrorResponse`)
-- ❌ **ErrorHandlingMiddleware.create* methods eliminated** (previous violation fixed)
+- ❌ **ErrorHandlingMiddleware.create\* methods eliminated** (previous violation fixed)
 - ⚠️ **Parameter formatting issues remain** (causing 95 TypeScript errors)
 
 ### **1.2 Handler Validation Method Audit (SRP Violations)**
@@ -211,21 +222,25 @@
 **Custom Validation Methods Found (Should be in ValidationMiddleware):**
 
 **SessionHandler (4 validation methods):**
+
 - `validateCreateSessionRequest()`
-- `validateSessionId()` 
+- `validateSessionId()`
 - `validateUpdateSessionRequest()`
 - `validateSubmitAnswerRequest()`
 
 **GoalsHandler (3 validation methods):**
+
 - `validateCreateGoalRequest()` - 95 lines of validation logic
 - `validateUpdateGoalRequest()` - 82 lines of validation logic
 - `validateGoalId()` - UUID validation
 
 **QuestionHandler (2 validation methods):**
+
 - `validateEnumParams()` - Difficulty/type enum validation
 - `validateSearchRequest()` - 80 lines of complex validation
 
 **AnalyticsHandler (2 validation methods):**
+
 - `validateProgressAnalyticsRequest()` - 115 lines of complex validation
 - `isValidISODate()` - Date format validation
 
@@ -236,6 +251,7 @@
 **CATASTROPHIC Services (>1000 lines):**
 
 **SessionService: 1,512 lines** - Multiple responsibilities:
+
 - CRUD operations (createSession, getSession, updateSession, deleteSession)
 - Question orchestration (`getQuestionsForSession`, `getSessionQuestionsWithDetails`)
 - Answer processing (`submitAnswer`, `completeSession`)
@@ -243,6 +259,7 @@
 - **12+ methods mixing CRUD + business logic + algorithms**
 
 **AnalyticsService: 1,195 lines** - Multiple calculation domains:
+
 - Session analytics (`getSessionAnalytics`)
 - Performance analytics (`getPerformanceAnalytics`, `calculatePerformanceTrends`)
 - Progress analytics (`getProgressAnalytics`, `calculateProgressOverview`)
@@ -251,18 +268,21 @@
 - **15+ methods spanning multiple calculation domains**
 
 **MAJOR Services (300-1000 lines):**
+
 - **QuestionService**: 732 lines - CRUD + selection algorithms + filtering
-- **GoalsService**: 505 lines - CRUD + progress tracking + calculations  
+- **GoalsService**: 505 lines - CRUD + progress tracking + calculations
 - **ProfileService**: 455 lines - CRUD + achievements + statistics
 
 ### **1.4 DRY Violations (Verified Counts)**
 
 **Error Handling Duplication:**
+
 - **35 instances** of `ErrorHandlingMiddleware.withErrorHandling` across handlers
 - Identical error context setup in every method
 - Same error processing pattern repeated
 
-**Parsing Pattern Duplication:**  
+**Parsing Pattern Duplication:**
+
 - **41 instances** of `ParsingMiddleware.parse*` calls across handlers
 - Identical parameter parsing logic in every endpoint
 - Same error handling for parsing failures
@@ -272,10 +292,11 @@
 ### **1.5 Current Build Crisis**
 
 **CRITICAL: 95 TypeScript compilation errors**
+
 - **86 errors**: `buildErrorResponse` calls missing required parameters
   - Current: `this.buildErrorResponse(errorCode, message)`
   - Required: `this.buildErrorResponse(message, statusCode, errorCode, details?)`
-- **5 errors**: `buildSuccessResponse` parameter type mismatches  
+- **5 errors**: `buildSuccessResponse` parameter type mismatches
 - **4 errors**: Object passed as string parameter
 
 **Root Cause**: Bulk sed replacements without proper parameter fixing or build testing
@@ -283,6 +304,7 @@
 ### **1.6 Middleware Infrastructure Audit**
 
 **Available Middleware** (underutilized):
+
 - ✅ **ValidationMiddleware**: Complete with schema validation, ValidationRules class
 - ✅ **ParsingMiddleware**: Working parameter parsing
 - ✅ **ErrorHandlingMiddleware**: Fixed integration with BaseHandler
@@ -294,11 +316,12 @@
 
 **CRITICAL**: 95 TypeScript errors must be fixed before any other work can proceed
 
-### **Build Fix Strategy** 
+### **Build Fix Strategy**
+
 1. **Fix validation method parameters** (86 errors):
    - Current: `this.buildErrorResponse(ERROR_CODES.X, message)`
    - Required: `this.buildErrorResponse(message, 400, ERROR_CODES.X)`
-2. **Fix success response parameters** (9 errors):  
+2. **Fix success response parameters** (9 errors):
    - Ensure: `this.buildSuccessResponse(message, data)`
 3. **Test build after each handler fixed**
 4. **Verify 0 compilation errors before moving to next phase**
@@ -308,6 +331,7 @@
 ## 🎯 COMPREHENSIVE REMEDIATION OBJECTIVES (35+ High-Level Areas)
 
 > **IMPLEMENTATION REALITY**: Each objective below represents a significant analysis and planning effort before any code can be written. Most objectives will require:
+>
 > 1. **Discovery Phase**: Analyze current code to understand specific issues
 > 2. **Design Phase**: Determine the best technical approach
 > 3. **Planning Phase**: Break down into specific, executable tasks
@@ -322,9 +346,11 @@
 ### **🔥 FULLY EXECUTED OBJECTIVES** ✅
 
 ### **Objective 1: Build Crisis Resolution** ✅ **COMPLETED WITH DETAILED IMPLEMENTATION**
+
 **Target**: Fix 95 TypeScript compilation errors preventing all development
+
 - ✅ Fix buildErrorResponse parameter order in validation methods (86 errors)
-- ✅ Fix buildSuccessResponse parameter types (9 errors) 
+- ✅ Fix buildSuccessResponse parameter types (9 errors)
 - ✅ Systematic file-by-file fixing with build testing after each file
 
 **📋 Results**: 95 → 0 TypeScript errors, 100% BaseHandler compliance across 8 handlers  
@@ -332,13 +358,16 @@
 **🔑 Key Discovery**: Validation methods identified as prime candidates for Objective 2 extraction
 
 > **Example of Proper Implementation**: This objective was broken down into specific tasks:
+>
 > 1. Audit all buildErrorResponse calls across handlers
 > 2. Fix parameter order file-by-file with build testing
 > 3. Verify zero compilation errors
 > 4. Document lessons learned
 
 ### **Objective 2: Handler Validation Extraction** ✅ **COMPLETED WITH DETAILED IMPLEMENTATION**
+
 **Target**: Remove 500+ lines of business logic from handlers
+
 - Extract 4 validation methods from SessionHandler (validateCreateSessionRequest, validateSessionId, validateUpdateSessionRequest, validateSubmitAnswerRequest)
 - Extract 3 validation methods from GoalsHandler (validateCreateGoalRequest, validateUpdateGoalRequest, validateGoalId)
 - Extract 2 validation methods from QuestionHandler (validateEnumParams, validateSearchRequest)
@@ -346,6 +375,7 @@
 - Move all to existing ValidationMiddleware infrastructure
 
 > **Example of Proper Implementation**: This objective required detailed analysis and planning:
+>
 > 1. Audit all handlers to identify validation methods
 > 2. Design ValidationMiddleware integration approach
 > 3. Create validation schemas for each extracted method
@@ -355,9 +385,11 @@
 ---
 
 ### **Objective 3: Handler Architecture Standardization** ✅ **COMPLETED WITH DETAILED IMPLEMENTATION**
+
 **Target**: Standardize all 9 active handlers to clean routing patterns
+
 - ✅ All 9 handlers standardized with consistent patterns
-- ✅ ValidationMiddleware integration completed across all handlers  
+- ✅ ValidationMiddleware integration completed across all handlers
 - ✅ 2 new validation schemas added for complete coverage
 - ⚠️ **Line count targets require service decomposition** (Objectives 5+ confirmed critical)
 - **Final Results**: SessionHandler(444), GoalsHandler(426), AnalyticsHandler(247), QuestionHandler(240), AuthHandler(201) - 5 compliant handlers <200 lines
@@ -366,9 +398,11 @@
 **🔑 Key Discovery**: Service decomposition (Objectives 5+) essential for <200 line targets; architecture quality prioritized over line count
 
 ### **Objective 4: Handler DRY Violation Elimination** ✅ **COMPLETED**
+
 **Target**: Eliminate 67 instances of repeated patterns across handlers
+
 - ✅ **Eliminate 29 ErrorHandlingMiddleware.withErrorHandling patterns** (100% success)
-- ✅ **Reduce 38 ParsingMiddleware parsing patterns** (28 eliminated, 73% success) 
+- ✅ **Reduce 38 ParsingMiddleware parsing patterns** (28 eliminated, 73% success)
 - ✅ **Create 5 reusable BaseHandler helper methods** for systematic DRY elimination
 - ✅ **85% overall DRY violation elimination** with maintained functionality
 - **Final Results**: 57 helper method usages, 10 legitimate pattern variations preserved
@@ -377,7 +411,9 @@
 **🔑 Key Discovery**: BaseHandler helper method approach provides sustainable DRY elimination across handler layer
 
 ### **Objective 5: SessionService Decomposition (1,512 lines)** ✅ **COMPLETED**
+
 **Target**: Split SessionService into 4 focused services with complete interface alignment
+
 - ✅ **SessionService**: Core CRUD operations (~400 lines)
 - ✅ **SessionOrchestrator**: Question coordination (~300 lines)
 - ✅ **AnswerProcessor**: Answer handling (~519 lines)
@@ -393,6 +429,7 @@
 ### **⚡ REMAINING SERVICE LAYER OBJECTIVES** ⚠️ **EPIC-LEVEL PLANNING REQUIRED**
 
 > **Epic Warning**: Each service decomposition below is a major undertaking requiring:
+>
 > - **Method Analysis**: Understanding what each of 10-15 methods actually does
 > - **Responsibility Mapping**: Determining which methods belong together
 > - **Dependency Analysis**: Understanding how methods call each other
@@ -400,67 +437,89 @@
 > - **Migration Strategy**: Moving methods without breaking functionality
 
 ### **Objective 6: AnalyticsService Decomposition (1,195 lines)** ⚠️ **EPIC - NEXT**
+
 **High-Level Vision**: Split into 5 focused services (~250 lines each)
-- **AnalyticsService**: Core coordination only *(Requires coordination logic identification)*
-- **ProgressAnalyzer**: Progress calculations *(Requires progress algorithm analysis)*
-- **CompetencyAnalyzer**: Competency analysis *(Requires competency logic analysis)*
-- **PerformanceAnalyzer**: Performance analytics *(Requires performance calculation analysis)*
-- **InsightGenerator**: Insights and visualization *(Requires insight algorithm analysis)*
+
+- **AnalyticsService**: Core coordination only _(Requires coordination logic identification)_
+- **ProgressAnalyzer**: Progress calculations _(Requires progress algorithm analysis)_
+- **CompetencyAnalyzer**: Competency analysis _(Requires competency logic analysis)_
+- **PerformanceAnalyzer**: Performance analytics _(Requires performance calculation analysis)_
+- **InsightGenerator**: Insights and visualization _(Requires insight algorithm analysis)_
 
 ### **Objective 7: QuestionService Decomposition (732 lines)** ⚠️ **EPIC**
+
 **High-Level Vision**: Split into 3 focused services (~250 lines each)
-- **QuestionService**: Core CRUD operations *(Requires CRUD identification)*
-- **QuestionSelector**: Selection algorithms and filtering *(Requires algorithm analysis)*
-- **QuestionAnalyzer**: Difficulty calculations and analysis *(Requires analysis logic review)*
+
+- **QuestionService**: Core CRUD operations _(Requires CRUD identification)_
+- **QuestionSelector**: Selection algorithms and filtering _(Requires algorithm analysis)_
+- **QuestionAnalyzer**: Difficulty calculations and analysis _(Requires analysis logic review)_
 
 ### **Objective 8: GoalsService Decomposition (505 lines)** ⚠️ **EPIC**
+
 **High-Level Vision**: Split into 2 focused services (~250 lines each)
-- **GoalsService**: Core CRUD operations *(Requires CRUD identification)*
-- **GoalsProgressTracker**: Progress tracking and milestone calculations *(Requires progress logic analysis)*
+
+- **GoalsService**: Core CRUD operations _(Requires CRUD identification)_
+- **GoalsProgressTracker**: Progress tracking and milestone calculations _(Requires progress logic analysis)_
 
 ### **Objective 9: ProfileService Decomposition (455 lines)** ⚠️ **EPIC**
-**High-Level Vision**: Split into 2 focused services (~225 lines each)  
-- **ProfileService**: Core CRUD operations *(Requires CRUD identification)*
-- **AchievementCalculator**: Achievement calculations and statistics *(Requires achievement logic analysis)*
+
+**High-Level Vision**: Split into 2 focused services (~225 lines each)
+
+- **ProfileService**: Core CRUD operations _(Requires CRUD identification)_
+- **AchievementCalculator**: Achievement calculations and statistics _(Requires achievement logic analysis)_
 
 ### **Objective 10: Service Architecture Standardization** ⚠️ **REQUIRES ARCHITECTURAL PLANNING**
+
 **High-Level Target**: Ensure all services follow SRP and consistent patterns
-- Standardize service interfaces *(Requires interface design phase)*
-- Implement consistent error handling *(Requires error handling strategy)*
-- Establish service communication patterns *(Requires communication architecture design)*
+
+- Standardize service interfaces _(Requires interface design phase)_
+- Implement consistent error handling _(Requires error handling strategy)_
+- Establish service communication patterns _(Requires communication architecture design)_
 
 ---
 
 ### **🗄️ HIGH-LEVEL REPOSITORY LAYER OBJECTIVES** ⚠️ **REQUIRES DETAILED PLANNING**
 
 ### **Objective 11: QuestionRepository Refactor (595 lines)** ⚠️ **REQUIRES DATA ACCESS ANALYSIS**
-**High-Level Target**: Split mixed responsibilities into focused data access *(Requires repository responsibility analysis)*
+
+**High-Level Target**: Split mixed responsibilities into focused data access _(Requires repository responsibility analysis)_
+
 - Separate complex query logic from basic CRUD
 - Extract filtering algorithms to separate classes
 
-### **Objective 12: HealthRepository Refactor (589 lines)** ⚠️ **REQUIRES DATA ACCESS ANALYSIS**  
+### **Objective 12: HealthRepository Refactor (589 lines)** ⚠️ **REQUIRES DATA ACCESS ANALYSIS**
+
 **Target**: Simplify health check data access patterns
+
 - Remove business logic from repository
 - Focus on pure data access
 
 ### **Objective 13: AnalyticsRepository Refactor (529 lines)** ⚠️ **REQUIRES DATA ACCESS ANALYSIS**
+
 **Target**: Split analytics data access by domain
+
 - Session analytics data access
 - Performance analytics data access
 - Progress analytics data access
 
 ### **Objective 14: TopicRepository Refactor (524 lines)** ⚠️ **REQUIRES DATA ACCESS ANALYSIS**
+
 **Target**: Simplify topic data access patterns
+
 - Remove complex query building from repository
 - Extract to query builder classes
 
 ### **Objective 15: GoalsRepository Refactor (367 lines)** ⚠️ **REQUIRES DATA ACCESS ANALYSIS**
+
 **Target**: Standardize goals data access patterns
+
 - Consistent CRUD operations
 - Optimized query patterns
 
 ### **Objective 16: Repository Pattern Standardization** ⚠️ **REQUIRES ARCHITECTURAL PLANNING**
+
 **Target**: Ensure consistent repository interfaces across all 10 repositories
+
 - Standardize CRUD method signatures
 - Implement consistent error handling
 - Establish query pattern standards
@@ -470,43 +529,57 @@
 ### **🏗️ SHARED INFRASTRUCTURE PHASES**
 
 ### **Phase 17: ServiceFactory Refactor (454 lines)**
+
 **Target**: Break down God object into focused factory pattern
+
 - Remove complex instantiation logic
 - Implement dependency injection pattern
 - Separate factory concerns by domain
 
 ### **Phase 18: ErrorHandlingMiddleware Optimization (399 lines)**
-**Target**: Optimize complex error handling infrastructure  
+
+**Target**: Optimize complex error handling infrastructure
+
 - Simplify error processing logic
 - Improve BaseHandler integration
 - Standardize error response patterns
 
 ### **Phase 19: ParsingMiddleware Enhancement (358 lines)**
+
 **Target**: Improve parameter parsing infrastructure
+
 - Add more sophisticated parsing patterns
 - Integrate with validation middleware
 - Optimize performance
 
 ### **Phase 20: ValidationMiddleware Integration (345 lines)**
+
 **Target**: Full integration with extracted handler validation
-- Add all extracted validation schemas  
+
+- Add all extracted validation schemas
 - Optimize validation performance
 - Standardize validation error responses
 
 ### **Phase 21: CrudHandler Optimization (340 lines)**
+
 **Target**: Improve base CRUD functionality
+
 - Standardize CRUD operation patterns
 - Integrate with new service architecture
 - Optimize common operations
 
 ### **Phase 22: BaseHandler Enhancement (313 lines)**
+
 **Target**: Improve handler base class functionality
+
 - Add missing response methods
 - Improve error handling integration
 - Standardize handler patterns
 
 ### **Phase 23: Middleware Architecture Review**
+
 **Target**: Ensure proper middleware integration and performance
+
 - Review middleware execution order
 - Optimize middleware performance
 - Standardize middleware interfaces
@@ -516,25 +589,33 @@
 ### **📝 TYPE SYSTEM PHASES**
 
 ### **Phase 24: AnalyticsTypes Consolidation (404 lines)**
+
 **Target**: Simplify complex analytics type definitions
+
 - Split by analytics domain
 - Remove duplicate type definitions
 - Integrate with validation schemas
 
-### **Phase 25: Type Definition Standardization**  
+### **Phase 25: Type Definition Standardization**
+
 **Target**: Standardize 1,500+ lines across 12+ type files
+
 - Consistent naming conventions
 - Remove duplicate definitions
 - Optimize type hierarchies
 
 ### **Phase 26: Type Validation Integration**
+
 **Target**: Connect type definitions to ValidationMiddleware
+
 - Generate validation schemas from types
 - Ensure type safety at runtime
 - Standardize validation error messages
 
 ### **Phase 27: API Contract Optimization**
+
 **Target**: Standardize request/response patterns across all endpoints
+
 - Consistent API response formats
 - Standardize error response structures
 - Optimize type definitions for API
@@ -544,31 +625,41 @@
 ### **🔧 SUPPORTING ARCHITECTURE PHASES**
 
 ### **Phase 28: Mapper Pattern Implementation**
+
 **Target**: Standardize 3 mapper files and expand pattern
+
 - AuthMapper, ProviderMapper, UserMapper standardization
 - Create mappers for missing domains
 - Implement consistent mapping patterns
 
 ### **Phase 29: Filter Architecture Expansion**
+
 **Target**: Expand provider.filter.ts pattern to all domains
+
 - Create filtering infrastructure
 - Standardize filter patterns
 - Optimize query performance
 
 ### **Phase 30: Validator Integration**
+
 **Target**: Integrate standalone validators into ValidationMiddleware
+
 - Move password.validator.ts and user.validator.ts
 - Standardize validation patterns
 - Remove validation duplication
 
 ### **Phase 31: Utility Function Organization**
+
 **Target**: Organize utility functions into coherent structure
+
 - Audit existing utility functions
 - Create utility organization pattern
 - Standardize utility interfaces
 
 ### **Phase 32: Configuration Management Enhancement**
+
 **Target**: Improve configuration system architecture
+
 - Standardize configuration patterns
 - Implement environment-specific configurations
 - Optimize configuration loading
@@ -578,28 +669,36 @@
 ### **🧪 TESTING & QUALITY PHASES**
 
 ### **Objective 33: Unit Test Expansion** ⚠️ **EPIC REQUIRING TEST STRATEGY**
+
 **Target**: Create comprehensive Jest tests for 17+ decomposed services
+
 - Unit tests for all split services (SessionService → 4 services, AnalyticsService → 5 services, etc.)
 - Mock AWS SDK clients using aws-sdk-client-mock-jest
 - Utilize existing jest.config.js with 80% coverage threshold
-- Follow existing patterns from tests/unit/services/* files
+- Follow existing patterns from tests/unit/services/\* files
 
-### **Objective 34: Integration Test Coverage** ⚠️ **REQUIRES INTEGRATION PLANNING**  
+### **Objective 34: Integration Test Coverage** ⚠️ **REQUIRES INTEGRATION PLANNING**
+
 **Target**: Expand integration test suite for new architecture
+
 - API Gateway + Lambda handler integration tests in tests/integration/
 - Service-repository integration patterns
 - Database interaction tests using DynamoDB mocks
 - S3 integration tests for question data access
 
 ### **Objective 35: Endpoint Test Suite Updates** ⚠️ **REQUIRES TEST SCRIPT ANALYSIS**
-**Target**: Update shell script endpoint tests for new service architecture  
-- Update scripts/test/test-*-endpoints.sh for decomposed services
-- Ensure test fixtures in tests/fixtures/* support new service structure
+
+**Target**: Update shell script endpoint tests for new service architecture
+
+- Update scripts/test/test-\*-endpoints.sh for decomposed services
+- Ensure test fixtures in tests/fixtures/\* support new service structure
 - Maintain comprehensive curl-based API testing
 - Update test-all-endpoints.sh for full service coverage
 
 ### **Objective 36: Test Infrastructure Enhancement** ⚠️ **REQUIRES INFRASTRUCTURE REVIEW**
+
 **Target**: Enhance testing infrastructure for new architecture
+
 - Update test fixtures for decomposed services
 - Expand custom Jest matchers (toBeValidApiResponse, toHaveSuccessResponse, etc.)
 - Improve mock data in tests/mocks/ for new service structure
@@ -610,25 +709,33 @@
 ### **🚀 FINAL INTEGRATION PHASES**
 
 ### **Objective 37: End-to-End Testing** ⚠️ **REQUIRES E2E TEST STRATEGY**
+
 **Target**: Comprehensive system integration testing
+
 - Full request-response cycle testing
 - Performance testing of new architecture
 - Load testing of split services
 
 ### **Phase 38: Performance Optimization**
+
 **Target**: Optimize performance impact of service splitting
+
 - Service communication optimization
 - Database query optimization
 - Memory usage optimization
 
-### **Phase 39: Documentation Update**  
+### **Phase 39: Documentation Update**
+
 **Target**: Complete architecture documentation
+
 - Document new service architecture
 - Update API documentation
 - Create development guidelines
 
 ### **Phase 40: Deployment Validation**
+
 **Target**: Ensure CDK/infrastructure compatibility
+
 - Update infrastructure definitions
 - Test deployment processes
 - Validate production readiness
@@ -638,68 +745,79 @@
 > **Metrics Reality Check**: These metrics represent end-state goals. Each metric requires significant implementation work to achieve.
 
 ### **🔥 Critical Build Metrics** ✅ **ACHIEVED**
+
 - ✅ **Build Status**: 95 → 0 TypeScript compilation errors
-- ✅ **Handler Compliance**: 100% use BaseHandler methods correctly  
+- ✅ **Handler Compliance**: 100% use BaseHandler methods correctly
 - ✅ **Parameter Correctness**: All buildErrorResponse/buildSuccessResponse calls fixed
 
 ### **📦 Handler Layer Metrics**
+
 - ✅ **Handler Sizes**: 9 handlers all under 200 lines (after validation extraction)
 - ✅ **Validation Logic Extraction**: 500+ lines moved to ValidationMiddleware
 - ✅ **DRY Violations**: 76 → 0 repeated patterns across handlers
 - ✅ **SRP Compliance**: Handlers focus only on routing and delegation
 
-### **⚡ Service Layer Metrics** 
+### **⚡ Service Layer Metrics**
+
 - ✅ **Service Count**: 5 monster services → 17+ focused services
 - ✅ **Service Sizes**: All services under 300 lines
 - ✅ **SRP Compliance**: Each service has single, clear responsibility
 - ✅ **Service Architecture**: Proper separation of CRUD, business logic, and algorithms
 
 ### **🗄️ Repository Layer Metrics**
+
 - ✅ **Repository Sizes**: All 10 repositories optimized for data access only
 - ✅ **Query Optimization**: Complex queries extracted to query builder classes
 - ✅ **Repository Patterns**: Consistent CRUD and query interfaces
 - ✅ **Data Access Focus**: Pure data access without business logic
 
 ### **🏗️ Infrastructure Metrics**
+
 - ✅ **Middleware Integration**: Full ValidationMiddleware utilization
 - ✅ **ServiceFactory**: God object → focused factory pattern
 - ✅ **Shared Components**: All infrastructure components under 300 lines
 - ✅ **Architecture Consistency**: Standardized patterns across all layers
 
 ### **📝 Type System Metrics**
+
 - ✅ **Type Definition Organization**: 1,500+ lines properly structured
 - ✅ **Type Validation Integration**: Runtime validation from type definitions
 - ✅ **API Contract Consistency**: Standardized request/response patterns
 - ✅ **Type Safety**: Comprehensive compile-time and runtime type checking
 
 ### **🔧 Supporting Architecture Metrics**
+
 - ✅ **Mapper Pattern**: Consistent mapping across all domains
-- ✅ **Filter Architecture**: Standardized filtering infrastructure  
+- ✅ **Filter Architecture**: Standardized filtering infrastructure
 - ✅ **Validator Integration**: All validation in ValidationMiddleware
 - ✅ **Utility Organization**: Coherent utility function structure
 
 ### **🧪 Quality Assurance Metrics**
+
 - ✅ **Unit Test Coverage**: 80%+ Jest coverage for all decomposed services (jest.config.js threshold)
-- ✅ **Integration Testing**: Complete API Gateway + Lambda handler testing 
+- ✅ **Integration Testing**: Complete API Gateway + Lambda handler testing
 - ✅ **Endpoint Testing**: Full curl-based test suite coverage via shell scripts
 - ✅ **Test Infrastructure**: Enhanced fixtures, mocks, and custom matchers
 
 ### **🚀 Overall Impact Metrics**
 
 #### **Lines of Code Optimization**
+
 - **Total Project**: 18,392 lines properly structured across all layers
 - **Handler Reduction**: ~1,500 lines moved from handlers to middleware
-- **Service Decomposition**: 2,707 monster service lines → 17+ focused services  
+- **Service Decomposition**: 2,707 monster service lines → 17+ focused services
 - **Repository Optimization**: 3,670 repository lines properly structured
 - **Infrastructure Improvement**: 2,800+ infrastructure lines optimized
 
 #### **Architecture Transformation**
+
 - **File Count**: 65 TypeScript files properly organized
 - **Layer Separation**: Clean separation of concerns across all 5+ layers
 - **Pattern Consistency**: Standardized patterns across entire codebase
 - **Code Duplication**: 76 → 0 instances of repeated code
 
 #### **Development Quality Improvements**
+
 - **Build Reliability**: 95 → 0 TypeScript errors with maintained clean builds
 - **Code Maintainability**: SRP compliance across all 40+ classes/services
 - **Developer Experience**: Clear, focused classes under 300 lines each
@@ -711,38 +829,45 @@
 
 ### **Phase Groupings by Priority**
 
-#### **🔥 Critical Foundation** 
+#### **🔥 Critical Foundation**
+
 - **Phase 1**: Build Crisis Resolution (95 errors → 0)
 - **Phase 2**: Handler Validation Extraction (500+ lines)
 - **Phase 3**: Handler Architecture Standardization
 - **Phase 4**: Handler DRY Elimination
 
 #### **⚡ Service Decomposition**
+
 - **Phases 5-10**: Monster Service Splitting (5 → 17+ services)
 - Focus on SessionService, AnalyticsService, QuestionService decomposition
 - Service architecture standardization
 
 #### **🗄️ Repository & Infrastructure**
-- **Phases 11-16**: Repository Layer Refactoring  
+
+- **Phases 11-16**: Repository Layer Refactoring
 - **Phases 17-23**: Shared Infrastructure Optimization
 - Focus on data access layer and middleware improvements
 
 #### **📝 Type System & Architecture**
+
 - **Phases 24-27**: Type System Standardization
 - **Phases 28-32**: Supporting Architecture Implementation
 - Focus on type safety and supporting systems
 
 #### **🧪 Testing & Integration**
+
 - **Phases 33-36**: Comprehensive Testing Implementation
 - **Phases 37-40**: Final Integration & Deployment
 - Focus on quality assurance and production readiness
 
 ### **Project Scope & Approach**
+
 **Objective Count**: 40 distinct objectives across 6 major architectural layers  
 **Complexity Level**: Complete enterprise-grade architectural overhaul  
 **Total Project Size**: 18,392 lines across 65 TypeScript files
 
 ### **Risk Mitigation Strategy**
+
 - **Incremental Builds**: Build testing after every phase
 - **Layer-by-Layer**: Complete each layer before moving to next
 - **Rollback Points**: Maintain working builds at each phase completion
@@ -753,19 +878,22 @@
 **MANDATORY**: Each completed phase must include comprehensive documentation following this standardized process:
 
 #### **1. Lessons Learned Documentation**
+
 **Required for EVERY completed phase**
 
 **Location**: `/mnt/c/Projects/study-app/backend/docs/phases/PHASE_XX_PHASE_NAME.md`
 
 **Naming Convention**:
+
 - `PHASE_01_BUILD_CRISIS_RESOLUTION.md` ✅ (Complete)
-- `PHASE_02_HANDLER_VALIDATION_EXTRACTION.md` ✅ (Complete)  
+- `PHASE_02_HANDLER_VALIDATION_EXTRACTION.md` ✅ (Complete)
 - `PHASE_03_HANDLER_ARCHITECTURE_STANDARDIZATION.md` ✅ (Complete)
 - `PHASE_04_HANDLER_DRY_VIOLATION_ELIMINATION.md` (Next)
 - `PHASE_05_SESSION_SERVICE_DECOMPOSITION.md` (Future)
 - etc.
 
 **Required Sections** (use existing phase docs as templates):
+
 ```markdown
 # Phase X: Phase Name - Lessons Learned
 
@@ -774,56 +902,72 @@
 **Duration**: [Time spent or scope description]
 
 ## 🎯 Phase X Objectives - ACHIEVED/PARTIAL/ISSUES
+
 [List all phase objectives with status]
 
 ## 📊 Quantified Results
+
 [Detailed metrics, before/after comparisons, line counts, etc.]
 
-## 🏗️ Technical Implementation  
+## 🏗️ Technical Implementation
+
 [Key technical changes, code examples, architectural decisions]
 
 ## 🔑 Key Architectural Discoveries
+
 [Important findings, architectural insights, decisions that impact future phases]
 
 ## 📈 Architecture Quality Improvements
+
 [SRP compliance, code quality metrics, technical debt reduction]
 
 ## ⚠️ Challenges and Strategic Insights
+
 [Problems encountered, solutions found, lessons for future phases]
 
 ## 🎯 Best Practices Established
+
 [Patterns, processes, standards established during this phase]
 
 ## 🚀 Impact on Development Workflow
+
 [How this phase improves developer experience, debugging, maintenance]
 
 ## ➡️ Next Phase Preparation
+
 [What this phase enables, dependencies satisfied, readiness assessment]
 
 ## 🏁 Phase X Success Metrics - Status Summary
+
 [Final scorecard of achievements]
 
 ## 🔗 Related Documentation
+
 [Links to other phase docs and architecture plans]
 ```
 
 #### **2. Remediation Plan Updates**
+
 **Required for EVERY completed phase**
 
 **File**: `/mnt/c/Projects/study-app/backend/docs/ARCHITECTURE_VIOLATIONS_REMEDIATION_V2.md`
 
 **Updates Required**:
+
 1. **Phase Status Update**: Change tracking table status from "❌ Not Started" to "✅ **COMPLETED**"
 2. **Phase Description Enhancement**: Add completion summary, results, and key discoveries
 3. **Documentation Reference**: Add link to lessons learned document
 4. **Dependencies Update**: Mark phase as dependency satisfied for dependent phases
 
 **Example Update Pattern**:
+
 ```markdown
 ### **Phase X: Phase Name** ✅ **COMPLETED**
+
 **Target**: [Original target description]
+
 - ✅ [Achievement 1 with metrics]
-- ✅ [Achievement 2 with results]  
+- ✅ [Achievement 2 with results]
 - ⚠️ [Any caveats or discoveries]
 - **Final Results**: [Summary of outcomes]
 
@@ -832,10 +976,11 @@
 ```
 
 #### **3. Quality Assurance Checklist**
+
 **Verify before marking phase complete**:
 
 - ✅ **Build Status**: Zero TypeScript compilation errors
-- ✅ **Testing**: All existing tests pass, new tests added if applicable  
+- ✅ **Testing**: All existing tests pass, new tests added if applicable
 - ✅ **Git Commit**: All phase work committed with descriptive message
 - ✅ **Git Push**: All commits pushed to remote repository for backup
 - ✅ **CI/CD Pipeline**: Pipeline executes successfully (monitor with `gh run watch`)
@@ -847,6 +992,7 @@
 - ✅ **Rollback Point**: Working state with clear commit history
 
 #### **4. Documentation Cross-References**
+
 **Maintain consistent linking between documents**:
 
 - **From Remediation Plan**: Link to `./phases/PHASE_XX_PHASE_NAME.md`
@@ -855,6 +1001,7 @@
 - **Tracking Updates**: Ensure phase tracking table reflects current status
 
 ### **Documentation Quality Standards**
+
 - **Quantified Results**: Always include before/after metrics, line counts, error counts
 - **Technical Depth**: Code examples for key changes, architectural decisions explained
 - **Strategic Insights**: Capture lessons that inform future phase planning
@@ -862,17 +1009,20 @@
 - **Reproducible**: Other developers can understand and replicate the work
 
 ### **🔄 Git Workflow Requirements**
+
 **MANDATORY for every phase completion**:
 
 #### **Commit Standards**
+
 - **Timing**: Commit immediately after successful build verification
 - **Message Format**: `Phase X: [Phase Name] - [Brief summary of key changes]`
 - **Examples**:
   - `Phase 1: Build Crisis Resolution - Fixed 95 TypeScript errors, established BaseHandler compliance`
-  - `Phase 2: Handler Validation Extraction - Moved 456 lines to ValidationMiddleware, added 10 schemas`  
+  - `Phase 2: Handler Validation Extraction - Moved 456 lines to ValidationMiddleware, added 10 schemas`
   - `Phase 3: Handler Architecture Standardization - Standardized all 9 handlers, added error mapping patterns`
 
 #### **Commit Process**
+
 ```bash
 # Verify build is successful
 npm run build
@@ -884,7 +1034,7 @@ git add .
 git commit -m "Phase X: [Phase Name] - [Key achievements and metrics]
 
 - Achievement 1 with quantified results
-- Achievement 2 with metrics  
+- Achievement 2 with metrics
 - Key discovery or architectural decision
 - Zero TypeScript errors maintained"
 
@@ -893,12 +1043,14 @@ git push origin main
 ```
 
 #### **Commit Content Requirements**
+
 - **Code Changes**: All phase-related code modifications
 - **Documentation**: Phase lessons learned document
 - **Plan Updates**: Updated remediation plan with phase completion
 - **Zero Errors**: Only commit when build is completely successful
 
 #### **Deployment and CI/CD Requirements**
+
 **MANDATORY after each phase push**:
 
 - **Never use `cdk deploy`**: Always use CI/CD pipeline for deployments
@@ -908,6 +1060,7 @@ git push origin main
 - **Deployment Verification**: Verify successful deployment through CI/CD before marking phase complete
 
 **Pipeline Monitoring Commands**:
+
 ```bash
 # Push commits
 git push origin main
@@ -922,7 +1075,8 @@ gh run watch <run-id>
 gh run list --limit 1 --json databaseId --jq '.[0].databaseId' | xargs gh run watch
 ```
 
-#### **Backup Strategy**  
+#### **Backup Strategy**
+
 - **Immediate Push**: Push commits immediately after each phase
 - **CI/CD Validation**: Pipeline success confirms deployment readiness
 - **Branch Protection**: Maintain working main branch with clean commit history
@@ -937,58 +1091,60 @@ gh run list --limit 1 --json databaseId --jq '.[0].databaseId' | xargs gh run wa
 
 **⚠️ REALITY CHECK**: "❌ Not Started" means **no analysis or planning has been done**. Each objective requires significant research before any code can be written.
 
-| Objective | Layer | Description | Status | Priority | Dependencies |
-|-----------|-------|-------------|--------|----------|--------------|
-| 1 | 🔥 Critical | Build Crisis Resolution - Fix 95 TypeScript errors | ✅ **COMPLETED** | CRITICAL | None |
-| 2 | 🔥 Critical | Handler Validation Extraction - Remove 500+ lines | ✅ **COMPLETED** | CRITICAL | Objective 1 |
-| 3 | 📦 Handler | Handler Architecture Standardization | ✅ **COMPLETED** | HIGH | Objective 2 |
-| 4 | 📦 Handler | Handler DRY Violation Elimination | ✅ **COMPLETED** | HIGH | Objective 3 |
-| 5 | ⚡ Service | SessionService Decomposition (1,512 → 4 services) | ✅ **COMPLETED** | HIGH | Objective 4 |
-| 6 | ⚡ Service | AnalyticsService Decomposition (1,195 → 5 services) | ❌ **Epic - Needs Analysis** | HIGH | Objective 4 |
-| 7 | ⚡ Service | QuestionService Decomposition (732 → 3 services) | ❌ **Epic - Needs Analysis** | HIGH | Objective 4 |
-| 8 | ⚡ Service | GoalsService Decomposition (505 → 2 services) | ❌ **Epic - Needs Analysis** | HIGH | Objective 4 |
-| 9 | ⚡ Service | ProfileService Decomposition (455 → 2 services) | ❌ **Epic - Needs Analysis** | HIGH | Objective 4 |
-| 10 | ⚡ Service | Service Architecture Standardization | ❌ **Needs Analysis** | MEDIUM | Objectives 5-9 |
-| 11 | 🗄️ Repository | QuestionRepository Refactor (595 lines) | ❌ **Needs Analysis** | MEDIUM | Objective 7 |
-| 12 | 🗄️ Repository | HealthRepository Refactor (589 lines) | ❌ **Needs Analysis** | MEDIUM | Objective 10 |
-| 13 | 🗄️ Repository | AnalyticsRepository Refactor (529 lines) | ❌ **Needs Analysis** | MEDIUM | Objective 6 |
-| 14 | 🗄️ Repository | TopicRepository Refactor (524 lines) | ❌ **Needs Analysis** | MEDIUM | Objective 10 |
-| 15 | 🗄️ Repository | GoalsRepository Refactor (367 lines) | ❌ **Needs Analysis** | MEDIUM | Objective 8 |
-| 16 | 🗄️ Repository | Repository Pattern Standardization | ❌ **Needs Analysis** | MEDIUM | Objectives 11-15 |
-| 17 | 🏗️ Infrastructure | ServiceFactory Refactor (454 lines) | ❌ **Needs Analysis** | MEDIUM | Objective 10 |
-| 18 | 🏗️ Infrastructure | ErrorHandlingMiddleware Optimization (399 lines) | ❌ **Needs Analysis** | MEDIUM | Objective 4 |
-| 19 | 🏗️ Infrastructure | ParsingMiddleware Enhancement (358 lines) | ❌ **Needs Analysis** | MEDIUM | Objective 4 |
-| 20 | 🏗️ Infrastructure | ValidationMiddleware Integration (345 lines) | ❌ **Needs Analysis** | MEDIUM | Objective 2 |
-| 21 | 🏗️ Infrastructure | CrudHandler Optimization (340 lines) | ❌ **Needs Analysis** | MEDIUM | Objective 16 |
-| 22 | 🏗️ Infrastructure | BaseHandler Enhancement (313 lines) | ❌ **Needs Analysis** | MEDIUM | Objective 3 |
-| 23 | 🏗️ Infrastructure | Middleware Architecture Review | ❌ **Needs Analysis** | LOW | Objectives 18-22 |
-| 24 | 📝 Types | AnalyticsTypes Consolidation (404 lines) | ❌ **Needs Analysis** | LOW | Objective 6 |
-| 25 | 📝 Types | Type Definition Standardization (1,500+ lines) | ❌ **Epic - Needs Analysis** | LOW | Objective 23 |
-| 26 | 📝 Types | Type Validation Integration | ❌ **Needs Analysis** | LOW | Objectives 20, 25 |
-| 27 | 📝 Types | API Contract Optimization | ❌ **Needs Analysis** | LOW | Objective 26 |
-| 28 | 🔧 Supporting | Mapper Pattern Implementation | ❌ **Needs Analysis** | LOW | Objective 25 |
-| 29 | 🔧 Supporting | Filter Architecture Expansion | ❌ **Needs Analysis** | LOW | Objective 16 |
-| 30 | 🔧 Supporting | Validator Integration | ❌ **Needs Analysis** | LOW | Objective 20 |
-| 31 | 🔧 Supporting | Utility Function Organization | ❌ **Needs Analysis** | LOW | Objective 25 |
-| 32 | 🔧 Supporting | Configuration Management Enhancement | ❌ **Needs Analysis** | LOW | Objective 23 |
-| 33 | 🧪 Testing | Unit Test Expansion (Jest/ts-jest for 17+ services) | ❌ **Epic - Needs Analysis** | MEDIUM | Objectives 5-10 |
-| 34 | 🧪 Testing | Integration Test Coverage (API Gateway + Lambda) | ❌ **Needs Analysis** | MEDIUM | Objective 33 |
-| 35 | 🧪 Testing | Endpoint Test Suite Updates (Shell scripts) | ❌ **Needs Analysis** | MEDIUM | Objective 16 |
-| 36 | 🧪 Testing | Test Infrastructure Enhancement (Fixtures/mocks) | ❌ **Needs Analysis** | MEDIUM | Objective 27 |
-| 37 | 🚀 Integration | End-to-End Testing | ❌ **Needs Analysis** | LOW | Objectives 33-36 |
-| 38 | 🚀 Integration | Performance Optimization | ❌ **Needs Analysis** | LOW | Objective 37 |
-| 39 | 🚀 Integration | Documentation Update | ❌ **Needs Analysis** | LOW | Objective 32 |
-| 40 | 🚀 Integration | Deployment Validation | ❌ **Needs Analysis** | LOW | Objectives 38-39 |
+| Objective | Layer             | Description                                         | Status                       | Priority | Dependencies      |
+| --------- | ----------------- | --------------------------------------------------- | ---------------------------- | -------- | ----------------- |
+| 1         | 🔥 Critical       | Build Crisis Resolution - Fix 95 TypeScript errors  | ✅ **COMPLETED**             | CRITICAL | None              |
+| 2         | 🔥 Critical       | Handler Validation Extraction - Remove 500+ lines   | ✅ **COMPLETED**             | CRITICAL | Objective 1       |
+| 3         | 📦 Handler        | Handler Architecture Standardization                | ✅ **COMPLETED**             | HIGH     | Objective 2       |
+| 4         | 📦 Handler        | Handler DRY Violation Elimination                   | ✅ **COMPLETED**             | HIGH     | Objective 3       |
+| 5         | ⚡ Service        | SessionService Decomposition (1,512 → 4 services)   | ✅ **COMPLETED**             | HIGH     | Objective 4       |
+| 6         | ⚡ Service        | AnalyticsService Decomposition (1,195 → 5 services) | ❌ **Epic - Needs Analysis** | HIGH     | Objective 4       |
+| 7         | ⚡ Service        | QuestionService Decomposition (732 → 3 services)    | ❌ **Epic - Needs Analysis** | HIGH     | Objective 4       |
+| 8         | ⚡ Service        | GoalsService Decomposition (505 → 2 services)       | ❌ **Epic - Needs Analysis** | HIGH     | Objective 4       |
+| 9         | ⚡ Service        | ProfileService Decomposition (455 → 2 services)     | ❌ **Epic - Needs Analysis** | HIGH     | Objective 4       |
+| 10        | ⚡ Service        | Service Architecture Standardization                | ❌ **Needs Analysis**        | MEDIUM   | Objectives 5-9    |
+| 11        | 🗄️ Repository     | QuestionRepository Refactor (595 lines)             | ❌ **Needs Analysis**        | MEDIUM   | Objective 7       |
+| 12        | 🗄️ Repository     | HealthRepository Refactor (589 lines)               | ❌ **Needs Analysis**        | MEDIUM   | Objective 10      |
+| 13        | 🗄️ Repository     | AnalyticsRepository Refactor (529 lines)            | ❌ **Needs Analysis**        | MEDIUM   | Objective 6       |
+| 14        | 🗄️ Repository     | TopicRepository Refactor (524 lines)                | ❌ **Needs Analysis**        | MEDIUM   | Objective 10      |
+| 15        | 🗄️ Repository     | GoalsRepository Refactor (367 lines)                | ❌ **Needs Analysis**        | MEDIUM   | Objective 8       |
+| 16        | 🗄️ Repository     | Repository Pattern Standardization                  | ❌ **Needs Analysis**        | MEDIUM   | Objectives 11-15  |
+| 17        | 🏗️ Infrastructure | ServiceFactory Refactor (454 lines)                 | ❌ **Needs Analysis**        | MEDIUM   | Objective 10      |
+| 18        | 🏗️ Infrastructure | ErrorHandlingMiddleware Optimization (399 lines)    | ❌ **Needs Analysis**        | MEDIUM   | Objective 4       |
+| 19        | 🏗️ Infrastructure | ParsingMiddleware Enhancement (358 lines)           | ❌ **Needs Analysis**        | MEDIUM   | Objective 4       |
+| 20        | 🏗️ Infrastructure | ValidationMiddleware Integration (345 lines)        | ❌ **Needs Analysis**        | MEDIUM   | Objective 2       |
+| 21        | 🏗️ Infrastructure | CrudHandler Optimization (340 lines)                | ❌ **Needs Analysis**        | MEDIUM   | Objective 16      |
+| 22        | 🏗️ Infrastructure | BaseHandler Enhancement (313 lines)                 | ❌ **Needs Analysis**        | MEDIUM   | Objective 3       |
+| 23        | 🏗️ Infrastructure | Middleware Architecture Review                      | ❌ **Needs Analysis**        | LOW      | Objectives 18-22  |
+| 24        | 📝 Types          | AnalyticsTypes Consolidation (404 lines)            | ❌ **Needs Analysis**        | LOW      | Objective 6       |
+| 25        | 📝 Types          | Type Definition Standardization (1,500+ lines)      | ❌ **Epic - Needs Analysis** | LOW      | Objective 23      |
+| 26        | 📝 Types          | Type Validation Integration                         | ❌ **Needs Analysis**        | LOW      | Objectives 20, 25 |
+| 27        | 📝 Types          | API Contract Optimization                           | ❌ **Needs Analysis**        | LOW      | Objective 26      |
+| 28        | 🔧 Supporting     | Mapper Pattern Implementation                       | ❌ **Needs Analysis**        | LOW      | Objective 25      |
+| 29        | 🔧 Supporting     | Filter Architecture Expansion                       | ❌ **Needs Analysis**        | LOW      | Objective 16      |
+| 30        | 🔧 Supporting     | Validator Integration                               | ❌ **Needs Analysis**        | LOW      | Objective 20      |
+| 31        | 🔧 Supporting     | Utility Function Organization                       | ❌ **Needs Analysis**        | LOW      | Objective 25      |
+| 32        | 🔧 Supporting     | Configuration Management Enhancement                | ❌ **Needs Analysis**        | LOW      | Objective 23      |
+| 33        | 🧪 Testing        | Unit Test Expansion (Jest/ts-jest for 17+ services) | ❌ **Epic - Needs Analysis** | MEDIUM   | Objectives 5-10   |
+| 34        | 🧪 Testing        | Integration Test Coverage (API Gateway + Lambda)    | ❌ **Needs Analysis**        | MEDIUM   | Objective 33      |
+| 35        | 🧪 Testing        | Endpoint Test Suite Updates (Shell scripts)         | ❌ **Needs Analysis**        | MEDIUM   | Objective 16      |
+| 36        | 🧪 Testing        | Test Infrastructure Enhancement (Fixtures/mocks)    | ❌ **Needs Analysis**        | MEDIUM   | Objective 27      |
+| 37        | 🚀 Integration    | End-to-End Testing                                  | ❌ **Needs Analysis**        | LOW      | Objectives 33-36  |
+| 38        | 🚀 Integration    | Performance Optimization                            | ❌ **Needs Analysis**        | LOW      | Objective 37      |
+| 39        | 🚀 Integration    | Documentation Update                                | ❌ **Needs Analysis**        | LOW      | Objective 32      |
+| 40        | 🚀 Integration    | Deployment Validation                               | ❌ **Needs Analysis**        | LOW      | Objectives 38-39  |
 
 ### **Status Legend**
+
 - ✅ **Completed**: Objective fully implemented with lessons learned documentation in `/backend/docs/phases/`
-- 🔄 **In Progress**: Currently being worked on (analysis, design, or implementation)  
+- 🔄 **In Progress**: Currently being worked on (analysis, design, or implementation)
 - ❌ **Needs Analysis**: High-level objective requiring detailed code analysis and planning
 - ❌ **Epic - Needs Analysis**: Major undertaking requiring extensive analysis and design
 - ⏸️ **Blocked**: Waiting for external dependency or issue resolution
 - ⚠️ **Needs Review**: Completed but requires validation
 
 ### **Priority Legend**
+
 - **CRITICAL**: Blocks all other work, must be completed immediately
 - **HIGH**: Core architecture work, needed for service decomposition
 - **MEDIUM**: Important improvements, can be done in parallel with other work
@@ -1000,6 +1156,7 @@ gh run list --limit 1 --json databaseId --jq '.[0].databaseId' | xargs gh run wa
 **IMMEDIATE NEXT ACTION**: **Analyze Objective 4** - Before any coding, need detailed analysis of the 76 DRY violations
 
 **⚠️ OBJECTIVE COMPLETION REALITY**: Each objective completion requires:
+
 1. **🔍 Analysis Phase**: Understand the specific problems and code patterns
 2. **🎨 Design Phase**: Determine the best technical approach
 3. **📋 Planning Phase**: Break down into specific, executable tasks
@@ -1009,6 +1166,7 @@ gh run list --limit 1 --json databaseId --jq '.[0].databaseId' | xargs gh run wa
 7. **🚀 CI/CD Deployment**: Use pipeline deployment (NEVER `cdk deploy`)
 
 **📚 OBJECTIVE COMPLETION REQUIREMENTS**: Each objective completion requires:
+
 1. ✅ **Build Verification**: `npm run build` with zero TypeScript errors
 2. ✅ **Git Commit & Push**: Commit all work with descriptive message and push to remote
 3. ✅ **CI/CD Pipeline**: Monitor with `gh run watch <run-id>` and ensure successful completion
