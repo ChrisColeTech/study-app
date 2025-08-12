@@ -16,7 +16,8 @@ import type { ISessionOrchestrator as ISessionOrchestratorService } from '../ser
 import type { IAnswerProcessor as IAnswerProcessorService } from '../services/answer-processor.service';
 import type { ISessionAnalyzer as ISessionAnalyzerService } from '../services/session-analyzer.service';
 import type { IGoalsService } from '../services/goals.service';
-export type { IAuthService, IUserService, IProviderService, IExamService, ITopicService, IQuestionService, ISessionService, IGoalsService, ISessionOrchestratorService, IAnswerProcessorService, ISessionAnalyzerService };
+import type { IGoalsProgressTracker } from '../services/goals-progress-tracker.service';
+export type { IAuthService, IUserService, IProviderService, IExamService, ITopicService, IQuestionService, ISessionService, IGoalsService, IGoalsProgressTracker, ISessionOrchestratorService, IAnswerProcessorService, ISessionAnalyzerService };
 
 // Import repository interfaces
 import type { IUserRepository } from '../repositories/user.repository';
@@ -123,6 +124,7 @@ export class ServiceFactory {
   private _performanceAnalyzer: IPerformanceAnalyzer | null = null;
   private _insightGenerator: IInsightGenerator | null = null;
   private _goalsService: IGoalsService | null = null;
+  private _goalsProgressTracker: IGoalsProgressTracker | null = null;
   private _healthService: IHealthService | null = null;
 
   private constructor() {
@@ -543,10 +545,24 @@ export class ServiceFactory {
         this.getGoalsRepository(),
         this.getProviderService(),
         this.getExamService(),
-        this.getTopicService()
+        this.getTopicService(),
+        this.getGoalsProgressTracker()
       );
     }
     return this._goalsService!;
+  }
+
+  /**
+   * Get Goals Progress Tracker Service
+   */
+  public getGoalsProgressTracker(): IGoalsProgressTracker {
+    if (!this._goalsProgressTracker) {
+      const { GoalsProgressTracker } = require('../services/goals-progress-tracker.service');
+      this._goalsProgressTracker = new GoalsProgressTracker(
+        this.getGoalsRepository()
+      );
+    }
+    return this._goalsProgressTracker!;
   }
 
   /**
@@ -584,6 +600,7 @@ export class ServiceFactory {
     this._performanceAnalyzer = null;
     this._insightGenerator = null;
     this._goalsService = null;
+    this._goalsProgressTracker = null;
     this._healthService = null;
   }
 }

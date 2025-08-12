@@ -167,3 +167,11 @@ export interface IGoalsService {
   getGoalStats(userId: string): Promise<GoalStats>;
   updateGoalProgress(goalId: string, progress: number): Promise<void>;
 }
+
+/**
+ * Interface for goals progress tracking and analytics service
+ */
+export interface IGoalsProgressTracker {
+  getGoalStats(userId: string): Promise<GoalStats>;
+  updateGoalProgress(goalId: string, progress: number): Promise<void>;
+}
