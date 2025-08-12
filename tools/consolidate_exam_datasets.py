@@ -28,7 +28,7 @@ def consolidate_exam_datasets():
     print("🔄 CONSOLIDATING EXAM DATASETS")
     print("="*60)
     
-    base_dir = Path("/mnt/c/Projects/study-app")
+    base_dir = Path(".")
     source_dir = base_dir / "data/v2/final"
     output_dir = base_dir / "data/v2/consolidated"
     
