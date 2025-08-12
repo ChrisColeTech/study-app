@@ -1,5 +1,7 @@
 // Health check type definitions for detailed system diagnostics
 
+import { IBaseRepository } from './repository.types';
+
 export interface SystemResourceUsage {
   cpu: {
     usage: number;
@@ -251,9 +253,26 @@ export interface IDetailedHealthService extends IHealthService {
 }
 
 // Re-export base interfaces
-export interface IHealthRepository {
+export interface IHealthRepository extends IBaseRepository {
+  /**
+   * Check DynamoDB health status
+   * @returns Promise<ServiceDiagnostics> - DynamoDB health diagnostics
+   * @throws RepositoryError
+   */
   checkDynamoDbHealth(): Promise<ServiceDiagnostics>;
+
+  /**
+   * Check S3 health status  
+   * @returns Promise<ServiceDiagnostics> - S3 health diagnostics
+   * @throws RepositoryError
+   */
   checkS3Health(): Promise<ServiceDiagnostics>;
+
+  /**
+   * Check all AWS services health status
+   * @returns Promise<ServiceDiagnostics[]> - All services health diagnostics
+   * @throws RepositoryError
+   */
   checkAllServices(): Promise<ServiceDiagnostics[]>;
 }
 

@@ -36,12 +36,12 @@ export class GoalsProgressTracker implements IGoalsProgressTracker {
 
       // Calculate statistics
       const totalGoals = allGoals.total;
-      const activeGoals = allGoals.goals.filter(g => g.status === 'active').length;
-      const completedGoals = allGoals.goals.filter(g => g.status === 'completed').length;
+      const activeGoals = allGoals.items.filter(g => g.status === 'active').length;
+      const completedGoals = allGoals.items.filter(g => g.status === 'completed').length;
       const completionRate = totalGoals > 0 ? Math.round((completedGoals / totalGoals) * 100) : 0;
 
       // Calculate average completion time
-      const completedGoalsWithTime = allGoals.goals
+      const completedGoalsWithTime = allGoals.items
         .filter(g => g.status === 'completed' && g.completedAt)
         .map(g => {
           const start = new Date(g.startDate).getTime();
@@ -54,12 +54,12 @@ export class GoalsProgressTracker implements IGoalsProgressTracker {
         : 0;
 
       // Group by type and priority
-      const goalsByType = allGoals.goals.reduce((acc, goal) => {
+      const goalsByType = allGoals.items.reduce((acc, goal) => {
         acc[goal.type] = (acc[goal.type] || 0) + 1;
         return acc;
       }, {} as { [key in GoalType]: number });
 
-      const goalsByPriority = allGoals.goals.reduce((acc, goal) => {
+      const goalsByPriority = allGoals.items.reduce((acc, goal) => {
         acc[goal.priority] = (acc[goal.priority] || 0) + 1;
         return acc;
       }, {} as { [key in GoalPriority]: number });
@@ -67,7 +67,7 @@ export class GoalsProgressTracker implements IGoalsProgressTracker {
       // Get upcoming deadlines (next 7 days)
       const now = new Date();
       const nextWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
-      const upcomingDeadlines = allGoals.goals
+      const upcomingDeadlines = allGoals.items
         .filter(g => g.status === 'active' && g.deadline)
         .filter(g => {
           const deadline = new Date(g.deadline!);
@@ -78,7 +78,7 @@ export class GoalsProgressTracker implements IGoalsProgressTracker {
 
       // Get recent completions (last 30 days)
       const lastMonth = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-      const recentCompletions = allGoals.goals
+      const recentCompletions = allGoals.items
         .filter(g => g.status === 'completed' && g.completedAt)
         .filter(g => new Date(g.completedAt!) >= lastMonth)
         .sort((a, b) => new Date(b.completedAt!).getTime() - new Date(a.completedAt!).getTime())

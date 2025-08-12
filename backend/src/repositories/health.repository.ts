@@ -2,6 +2,8 @@
 
 import { DynamoDBClient, DescribeTableCommand } from '@aws-sdk/client-dynamodb';
 import { S3Client, HeadBucketCommand, ListObjectsV2Command } from '@aws-sdk/client-s3';
+import { BaseRepository } from './base.repository';
+import { RepositoryConfig, DependencyStatus } from '../shared/types/repository.types';
 import { LambdaClient, GetFunctionCommand } from '@aws-sdk/client-lambda';
 import { CloudWatchLogsClient, DescribeLogGroupsCommand } from '@aws-sdk/client-cloudwatch-logs';
 import { ServiceConfig } from '../shared/service-factory';
@@ -25,11 +27,10 @@ import { promisify } from 'util';
 // Re-export interfaces for external use
 export type { IHealthRepository, IDetailedHealthRepository } from '../shared/types/health.types';
 
-export class HealthRepository implements IHealthRepository, IDetailedHealthRepository {
+export class HealthRepository extends BaseRepository implements IHealthRepository, IDetailedHealthRepository {
   private dynamoClient: DynamoDBClient;
   private s3Client: S3Client;
-  private config: ServiceConfig;
-  private logger = createLogger({ component: 'HealthRepository' });
+  protected serviceConfig: ServiceConfig;
 
   // Helper services for specialized concerns
   private healthMonitoring: HealthMonitoringService;
@@ -38,25 +39,108 @@ export class HealthRepository implements IHealthRepository, IDetailedHealthRepos
   private metricsCollector: HealthMetricsCollector;
 
   constructor(dynamoClient: DynamoDBClient, s3Client: S3Client, config: ServiceConfig) {
+    const repositoryConfig: RepositoryConfig = {
+      tables: {
+        users: config.tables?.users || 'users',
+        studySessions: config.tables?.studySessions || 'studySessions',
+        goals: config.tables?.goals || 'goals',
+        userProgress: config.tables?.userProgress || 'userProgress'
+      },
+      s3: {
+        bucketName: config.s3?.bucketName || 'default-bucket'
+      }
+    };
+    super('HealthRepository', repositoryConfig);
+    
     this.dynamoClient = dynamoClient;
     this.s3Client = s3Client;
-    this.config = config;
+    this.serviceConfig = config;
     
     // Initialize helper services with proper dependencies
-    this.healthMonitoring = new HealthMonitoringService(this.config);
-    this.connectivityTester = new HealthConnectivityTester(this.dynamoClient, this.config);
-    this.configurationValidator = new HealthConfigurationValidator(this.config);
+    this.healthMonitoring = new HealthMonitoringService(this.serviceConfig);
+    this.connectivityTester = new HealthConnectivityTester(this.dynamoClient, this.serviceConfig);
+    this.configurationValidator = new HealthConfigurationValidator(this.serviceConfig);
     this.metricsCollector = new HealthMetricsCollector(this);
+  }
+
+  /**
+   * Perform health check operation for repository health status
+   */
+  protected async performHealthCheck(): Promise<void> {
+    // Test DynamoDB connectivity
+    const describeCommand = new DescribeTableCommand({
+      TableName: this.serviceConfig.tables.users
+    });
+    await this.dynamoClient.send(describeCommand);
+
+    // Test S3 connectivity
+    const headBucketCommand = new HeadBucketCommand({
+      Bucket: this.serviceConfig.s3.bucketName
+    });
+    await this.s3Client.send(headBucketCommand);
+  }
+
+  /**
+   * Check dependencies for health status
+   */
+  protected async checkDependencies(): Promise<DependencyStatus[]> {
+    const dependencies: DependencyStatus[] = [];
+
+    // Check DynamoDB dependency
+    try {
+      const startTime = Date.now();
+      const describeCommand = new DescribeTableCommand({
+        TableName: this.config.tables.users
+      });
+      await this.dynamoClient.send(describeCommand);
+      dependencies.push({
+        name: 'DynamoDB',
+        type: 'dynamodb',
+        healthy: true,
+        responseTime: Date.now() - startTime
+      });
+    } catch (error) {
+      dependencies.push({
+        name: 'DynamoDB',
+        type: 'dynamodb',
+        healthy: false,
+        error: (error as Error).message
+      });
+    }
+
+    // Check S3 dependency
+    try {
+      const startTime = Date.now();
+      const headBucketCommand = new HeadBucketCommand({
+        Bucket: this.serviceConfig.s3.bucketName
+      });
+      await this.s3Client.send(headBucketCommand);
+      dependencies.push({
+        name: 'S3',
+        type: 's3',
+        healthy: true,
+        responseTime: Date.now() - startTime
+      });
+    } catch (error) {
+      dependencies.push({
+        name: 'S3',
+        type: 's3',
+        healthy: false,
+        error: (error as Error).message
+      });
+    }
+
+    return dependencies;
   }
 
   /**
    * Check DynamoDB health by describing the Users table
    */
   async checkDynamoDbHealth(): Promise<ServiceDiagnostics> {
-    const startTime = Date.now();
-    
-    try {
-      this.logger.debug('Checking DynamoDB health', { tableName: this.config.tables.users });
+    return this.executeWithErrorHandling('checkDynamoDbHealth', async () => {
+      const startTime = Date.now();
+      
+      this.logger.debug('Checking DynamoDB health', { tableName: this.serviceConfig.tables.users });
 
       const command = new DescribeTableCommand({
         TableName: this.config.tables.users
@@ -73,39 +157,23 @@ export class HealthRepository implements IHealthRepository, IDetailedHealthRepos
         responseTime,
         lastChecked: new Date().toISOString()
       };
-    } catch (error) {
-      const responseTime = Date.now() - startTime;
-      const errorMessage = (error as Error).message;
-      
-      this.logger.error('DynamoDB health check failed', error as Error, { 
-        responseTime,
-        tableName: this.config.tables.users 
-      });
-
-      return {
-        service: 'dynamodb',
-        status: 'unhealthy',
-        responseTime,
-        lastChecked: new Date().toISOString(),
-        error: errorMessage
-      };
-    }
+    });
   }
 
   /**
    * Get detailed DynamoDB diagnostics
    */
   async getDetailedDynamoDbHealth(): Promise<DatabaseDiagnostics> {
-    const startTime = Date.now();
-    
-    try {
+    return this.executeWithErrorHandling('getDetailedDynamoDbHealth', async () => {
+      const startTime = Date.now();
+      
       this.logger.debug('Getting detailed DynamoDB diagnostics');
 
       const tableNames = [
-        this.config.tables.users,
-        this.config.tables.studySessions,
-        this.config.tables.userProgress,
-        this.config.tables.goals
+        this.serviceConfig.tables.users,
+        this.serviceConfig.tables.studySessions,
+        this.serviceConfig.tables.userProgress,
+        this.serviceConfig.tables.goals
       ];
 
       const tables = await Promise.allSettled(
@@ -143,29 +211,20 @@ export class HealthRepository implements IHealthRepository, IDetailedHealthRepos
           })
         }
       };
-    } catch (error) {
-      const responseTime = Date.now() - startTime;
-      return {
-        service: 'dynamodb',
-        status: 'unhealthy',
-        responseTime,
-        lastChecked: new Date().toISOString(),
-        error: (error as Error).message
-      };
-    }
+    });
   }
 
   /**
    * Check S3 health by checking bucket access
    */
   async checkS3Health(): Promise<ServiceDiagnostics> {
-    const startTime = Date.now();
-    
-    try {
-      this.logger.debug('Checking S3 health', { bucketName: this.config.s3.bucketName });
+    return this.executeWithErrorHandling('checkS3Health', async () => {
+      const startTime = Date.now();
+      
+      this.logger.debug('Checking S3 health', { bucketName: this.serviceConfig.s3.bucketName });
 
       const command = new HeadBucketCommand({
-        Bucket: this.config.s3.bucketName
+        Bucket: this.serviceConfig.s3.bucketName
       });
 
       await this.s3Client.send(command);
@@ -179,79 +238,65 @@ export class HealthRepository implements IHealthRepository, IDetailedHealthRepos
         responseTime,
         lastChecked: new Date().toISOString()
       };
-    } catch (error) {
-      const responseTime = Date.now() - startTime;
-      const errorMessage = (error as Error).message;
-      
-      this.logger.error('S3 health check failed', error as Error, { 
-        responseTime,
-        bucketName: this.config.s3.bucketName 
-      });
-
-      return {
-        service: 's3',
-        status: 'unhealthy',
-        responseTime,
-        lastChecked: new Date().toISOString(),
-        error: errorMessage
-      };
-    }
+    });
   }
 
   /**
    * Check all AWS services health
    */
   async checkAllServices(): Promise<ServiceDiagnostics[]> {
-    this.logger.info('Running comprehensive health checks');
-    
-    // Run health checks in parallel for better performance
-    const healthChecks = await Promise.allSettled([
-      this.checkDynamoDbHealth(),
-      this.checkS3Health()
-    ]);
+    return this.executeWithErrorHandling('checkAllServices', async () => {
+      this.logger.info('Running comprehensive health checks');
+      
+      // Run health checks in parallel for better performance
+      const healthChecks = await Promise.allSettled([
+        this.checkDynamoDbHealth(),
+        this.checkS3Health()
+      ]);
 
-    const results: ServiceDiagnostics[] = [];
+      const results: ServiceDiagnostics[] = [];
 
-    healthChecks.forEach((check, index) => {
-      if (check.status === 'fulfilled') {
-        results.push(check.value);
-      } else {
-        // Handle rejected promises
-        const serviceName = index === 0 ? 'dynamodb' : 's3';
-        results.push({
-          service: serviceName,
-          status: 'unhealthy',
-          responseTime: 0,
-          lastChecked: new Date().toISOString(),
-          error: check.reason?.message || 'Health check failed'
-        });
-      }
+      healthChecks.forEach((check, index) => {
+        if (check.status === 'fulfilled') {
+          results.push(check.value);
+        } else {
+          // Handle rejected promises
+          const serviceName = index === 0 ? 'dynamodb' : 's3';
+          results.push({
+            service: serviceName,
+            status: 'unhealthy',
+            responseTime: 0,
+            lastChecked: new Date().toISOString(),
+            error: check.reason?.message || 'Health check failed'
+          });
+        }
+      });
+
+      const healthyServices = results.filter(r => r.status === 'healthy').length;
+      const totalServices = results.length;
+
+      this.logger.info('Health checks completed', { 
+        healthyServices, 
+        totalServices,
+        overallHealth: healthyServices === totalServices ? 'healthy' : 'degraded'
+      });
+
+      return results;
     });
-
-    const healthyServices = results.filter(r => r.status === 'healthy').length;
-    const totalServices = results.length;
-
-    this.logger.info('Health checks completed', { 
-      healthyServices, 
-      totalServices,
-      overallHealth: healthyServices === totalServices ? 'healthy' : 'degraded'
-    });
-
-    return results;
   }
 
   /**
    * Get detailed S3 diagnostics
    */
   async getDetailedS3Health(): Promise<StorageDiagnostics> {
-    const startTime = Date.now();
-    
-    try {
+    return this.executeWithErrorHandling('getDetailedS3Health', async () => {
+      const startTime = Date.now();
+      
       this.logger.debug('Getting detailed S3 diagnostics');
 
       const bucketNames = [
-        this.config.buckets.questionData,
-        this.config.buckets.assets
+        this.serviceConfig.buckets.questionData,
+        this.serviceConfig.buckets.assets
       ];
 
       const buckets = await Promise.allSettled(
@@ -273,7 +318,7 @@ export class HealthRepository implements IHealthRepository, IDetailedHealthRepos
             status: 'ACTIVE',
             objectCount: listResult.KeyCount || 0,
             sizeBytes: listResult.Contents?.reduce((sum, obj) => sum + (obj.Size || 0), 0) || 0,
-            region: this.config.region
+            region: this.serviceConfig.region
           };
         })
       );
@@ -296,48 +341,53 @@ export class HealthRepository implements IHealthRepository, IDetailedHealthRepos
           })
         }
       };
-    } catch (error) {
-      const responseTime = Date.now() - startTime;
-      return {
-        service: 's3',
-        status: 'unhealthy',
-        responseTime,
-        lastChecked: new Date().toISOString(),
-        error: (error as Error).message
-      };
-    }
+    });
   }
 
   // Delegate to specialized health monitoring service
   async checkLambdaHealth(): Promise<LambdaDiagnostics> {
-    return this.healthMonitoring.checkLambdaHealth();
+    return this.executeWithErrorHandling('checkLambdaHealth', async () => {
+      return this.healthMonitoring.checkLambdaHealth();
+    });
   }
 
   async checkCloudWatchHealth(): Promise<CloudWatchDiagnostics> {
-    return this.healthMonitoring.checkCloudWatchHealth();
+    return this.executeWithErrorHandling('checkCloudWatchHealth', async () => {
+      return this.healthMonitoring.checkCloudWatchHealth();
+    });
   }
 
   async getSystemMetrics(): Promise<SystemResourceUsage> {
-    return this.healthMonitoring.getSystemMetrics();
+    return this.executeWithErrorHandling('getSystemMetrics', async () => {
+      return this.healthMonitoring.getSystemMetrics();
+    });
   }
 
   // Delegate to connectivity tester
   async testConnectivity(): Promise<{ internet: boolean; aws: boolean; dns: boolean }> {
-    return this.connectivityTester.testConnectivity();
+    return this.executeWithErrorHandling('testConnectivity', async () => {
+      return this.connectivityTester.testConnectivity();
+    });
   }
 
   // Delegate to configuration validator
   async validateConfiguration(): Promise<{ valid: boolean; errors?: string[]; warnings?: string[] }> {
-    return this.configurationValidator.validateConfiguration();
+    return this.executeWithErrorHandling('validateConfiguration', async () => {
+      return this.configurationValidator.validateConfiguration();
+    });
   }
 
   // Delegate to metrics collector
   async getPerformanceMetrics(service?: string): Promise<PerformanceMetrics> {
-    return this.metricsCollector.getPerformanceMetrics(service);
+    return this.executeWithErrorHandling('getPerformanceMetrics', async () => {
+      return this.metricsCollector.getPerformanceMetrics(service);
+    }, { service });
   }
 
   async getHealthTrends(service?: string, hours = 24): Promise<any[]> {
-    return this.metricsCollector.getHealthTrends(service, hours);
+    return this.executeWithErrorHandling('getHealthTrends', async () => {
+      return this.metricsCollector.getHealthTrends(service, hours);
+    }, { service, hours });
   }
 }
 

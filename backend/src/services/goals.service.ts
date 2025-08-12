@@ -152,7 +152,7 @@ export class GoalsService extends BaseService implements IGoalsService {
       });
 
       return {
-        goals: result.goals,
+        goals: result.items,
         total: result.total,
         limit,
         offset,

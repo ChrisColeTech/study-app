@@ -3,32 +3,51 @@
 import { DynamoDBDocumentClient, PutCommand, GetCommand, QueryCommand, UpdateCommand, DeleteCommand } from '@aws-sdk/lib-dynamodb';
 import { StudySession } from '../shared/types/domain.types';
 import { ServiceConfig } from '../shared/service-factory';
-import { createLogger } from '../shared/logger';
+import { DynamoDBBaseRepository } from './base.repository';
+import { IStandardCrudRepository, IUserScopedRepository, StandardQueryResult } from '../shared/types/repository.types';
 
-export interface ISessionRepository {
-  create(session: StudySession): Promise<StudySession>;
-  findById(sessionId: string): Promise<StudySession | null>;
-  findByUserId(userId: string, limit?: number, lastEvaluatedKey?: any): Promise<{ sessions: StudySession[], lastEvaluatedKey?: any }>;
-  update(sessionId: string, updateData: Partial<StudySession>): Promise<StudySession>;
-  delete(sessionId: string): Promise<boolean>;
-  exists(sessionId: string): Promise<boolean>;
+export interface ISessionRepository extends IStandardCrudRepository<StudySession, StudySession, Partial<StudySession>>, IUserScopedRepository<StudySession> {
+  /**
+   * Find sessions by user ID with pagination - standardized return format
+   * @param userId - User identifier
+   * @param filters - Optional pagination and filtering
+   * @returns Promise<StandardQueryResult<StudySession>> - Paginated results
+   * @throws RepositoryError
+   */
+  findByUserId(userId: string, filters?: { limit?: number; lastEvaluatedKey?: any }): Promise<StandardQueryResult<StudySession>>;
 }
 
-export class SessionRepository implements ISessionRepository {
+export class SessionRepository extends DynamoDBBaseRepository implements ISessionRepository {
   private docClient: DynamoDBDocumentClient;
-  private tableName: string;
-  private logger = createLogger({ component: 'SessionRepository' });
 
   constructor(dynamoClient: DynamoDBDocumentClient, config: ServiceConfig) {
+    super('SessionRepository', config, config.tables.studySessions);
     this.docClient = dynamoClient;
-    this.tableName = config.tables.studySessions;
+  }
+
+  /**
+   * Perform health check operation for DynamoDB connectivity
+   */
+  protected async performHealthCheck(): Promise<void> {
+    await this.docClient.send(new QueryCommand({
+      TableName: this.tableName,
+      IndexName: 'UserIdIndex',
+      KeyConditionExpression: 'userId = :userId',
+      ExpressionAttributeValues: { ':userId': 'health-check-user' },
+      Limit: 1
+    }));
   }
 
   /**
    * Create a new session in the database
    */
   async create(session: StudySession): Promise<StudySession> {
-    try {
+    return this.executeWithErrorHandling('create', async () => {
+      this.validateRequired({ 
+        sessionId: session.sessionId, 
+        userId: session.userId 
+      }, 'create');
+
       await this.docClient.send(new PutCommand({
         TableName: this.tableName,
         Item: session,
@@ -37,27 +56,19 @@ export class SessionRepository implements ISessionRepository {
 
       this.logger.info('Session created successfully', { 
         sessionId: session.sessionId, 
-        ...(session.userId && { userId: session.userId }),
-        examId: session.examId,
-        providerId: session.providerId
+        userId: session.userId 
       });
-      
       return session;
-    } catch (error: any) {
-      if (error.name === 'ConditionalCheckFailedException') {
-        this.logger.warn('Session ID conflict occurred', { sessionId: session.sessionId });
-        throw new Error('Session with this ID already exists');
-      }
-      this.logger.error('Failed to create session', error, { sessionId: session.sessionId });
-      throw new Error('Failed to store session');
-    }
+    }, { sessionId: session.sessionId, userId: session.userId });
   }
 
   /**
    * Find a session by sessionId (primary key)
    */
   async findById(sessionId: string): Promise<StudySession | null> {
-    try {
+    return this.executeWithErrorHandling('findById', async () => {
+      this.validateRequired({ sessionId }, 'findById');
+
       const result = await this.docClient.send(new GetCommand({
         TableName: this.tableName,
         Key: { sessionId }
@@ -67,56 +78,54 @@ export class SessionRepository implements ISessionRepository {
       this.logger.debug('Session lookup by ID', { sessionId, found: !!session });
       
       return session;
-    } catch (error) {
-      this.logger.error('Error finding session by ID', error as Error, { sessionId });
-      return null;
-    }
+    }, { sessionId });
   }
 
   /**
-   * Find sessions by userId using GSI
+   * Find sessions by userId using GSI with pagination
    */
-  async findByUserId(userId: string, limit: number = 50, lastEvaluatedKey?: any): Promise<{ sessions: StudySession[], lastEvaluatedKey?: any }> {
-    try {
-      const queryParams: any = {
+  async findByUserId(userId: string, filters?: { limit?: number; lastEvaluatedKey?: any }): Promise<StandardQueryResult<StudySession>> {
+    return this.executeWithErrorHandling('findByUserId', async () => {
+      this.validateRequired({ userId }, 'findByUserId');
+
+      const limit = filters?.limit || 20;
+      const lastEvaluatedKey = filters?.lastEvaluatedKey;
+
+      const params = {
         TableName: this.tableName,
         IndexName: 'UserIdIndex',
         KeyConditionExpression: 'userId = :userId',
-        ExpressionAttributeValues: {
-          ':userId': userId
-        },
-        ScanIndexForward: false, // Most recent first
-        Limit: limit
+        ExpressionAttributeValues: { ':userId': userId },
+        ScanIndexForward: false, // Sort by newest first
+        ...this.buildPaginationParams(limit, lastEvaluatedKey)
       };
 
-      if (lastEvaluatedKey) {
-        queryParams.ExclusiveStartKey = lastEvaluatedKey;
-      }
+      const result = await this.docClient.send(new QueryCommand(params));
 
-      const result = await this.docClient.send(new QueryCommand(queryParams));
-
-      const sessions = (result.Items || []) as StudySession[];
+      const items = result.Items as StudySession[] || [];
       this.logger.debug('Sessions lookup by userId', { 
         userId, 
-        found: sessions.length,
-        hasMore: !!result.LastEvaluatedKey
+        count: items.length,
+        hasMore: !!result.LastEvaluatedKey 
       });
-      
+
+      // Return standardized format
       return {
-        sessions,
+        items,
+        total: items.length, // Note: DynamoDB doesn't give us total count, would need separate query
+        limit,
         lastEvaluatedKey: result.LastEvaluatedKey
       };
-    } catch (error) {
-      this.logger.error('Error finding sessions by userId', error as Error, { userId });
-      return { sessions: [] };
-    }
+    }, { userId, limit: filters?.limit });
   }
 
   /**
    * Update session information
    */
   async update(sessionId: string, updateData: Partial<StudySession>): Promise<StudySession> {
-    try {
+    return this.executeWithErrorHandling('update', async () => {
+      this.validateRequired({ sessionId }, 'update');
+
       // Build update expression dynamically
       const updateExpressions: string[] = [];
       const expressionAttributeNames: Record<string, string> = {};
@@ -127,42 +136,16 @@ export class SessionRepository implements ISessionRepository {
       expressionAttributeNames['#updatedAt'] = 'updatedAt';
       expressionAttributeValues[':updatedAt'] = new Date().toISOString();
 
-      // Handle specific fields that can be updated
-      if (updateData.status !== undefined) {
-        updateExpressions.push('#status = :status');
-        expressionAttributeNames['#status'] = 'status';
-        expressionAttributeValues[':status'] = updateData.status;
-      }
-
-      if (updateData.currentQuestionIndex !== undefined) {
-        updateExpressions.push('#currentQuestionIndex = :currentQuestionIndex');
-        expressionAttributeNames['#currentQuestionIndex'] = 'currentQuestionIndex';
-        expressionAttributeValues[':currentQuestionIndex'] = updateData.currentQuestionIndex;
-      }
-
-      if (updateData.questions !== undefined) {
-        updateExpressions.push('#questions = :questions');
-        expressionAttributeNames['#questions'] = 'questions';
-        expressionAttributeValues[':questions'] = updateData.questions;
-      }
-
-      if (updateData.correctAnswers !== undefined) {
-        updateExpressions.push('#correctAnswers = :correctAnswers');
-        expressionAttributeNames['#correctAnswers'] = 'correctAnswers';
-        expressionAttributeValues[':correctAnswers'] = updateData.correctAnswers;
-      }
-
-      if (updateData.endTime !== undefined) {
-        updateExpressions.push('#endTime = :endTime');
-        expressionAttributeNames['#endTime'] = 'endTime';
-        expressionAttributeValues[':endTime'] = updateData.endTime;
-      }
-
-      if (updateData.score !== undefined) {
-        updateExpressions.push('#score = :score');
-        expressionAttributeNames['#score'] = 'score';
-        expressionAttributeValues[':score'] = updateData.score;
-      }
+      // Handle other updateable fields
+      Object.entries(updateData).forEach(([key, value]) => {
+        if (key !== 'sessionId' && key !== 'userId' && key !== 'createdAt') {
+          const attributeKey = `#${key}`;
+          const valueKey = `:${key}`;
+          updateExpressions.push(`${attributeKey} = ${valueKey}`);
+          expressionAttributeNames[attributeKey] = key;
+          expressionAttributeValues[valueKey] = value;
+        }
+      });
 
       const result = await this.docClient.send(new UpdateCommand({
         TableName: this.tableName,
@@ -177,48 +160,46 @@ export class SessionRepository implements ISessionRepository {
       const updatedSession = result.Attributes as StudySession;
       this.logger.info('Session updated successfully', { 
         sessionId, 
-        updatedFields: Object.keys(updateData)
+        updatedFields: Object.keys(updateData) 
       });
       
       return updatedSession;
-    } catch (error: any) {
-      if (error.name === 'ConditionalCheckFailedException') {
-        this.logger.warn('Session not found for update', { sessionId });
-        throw new Error('Session not found');
-      }
-      this.logger.error('Failed to update session', error, { sessionId });
-      throw error;
-    }
+    }, { sessionId, updateFields: Object.keys(updateData) });
   }
 
   /**
-   * Delete a session (hard delete)
+   * Delete a session
    */
   async delete(sessionId: string): Promise<boolean> {
-    try {
-      await this.docClient.send(new DeleteCommand({
-        TableName: this.tableName,
-        Key: { sessionId },
-        ConditionExpression: 'attribute_exists(sessionId)'
-      }));
+    return this.executeWithErrorHandling('delete', async () => {
+      this.validateRequired({ sessionId }, 'delete');
 
-      this.logger.info('Session deleted', { sessionId });
-      return true;
-    } catch (error: any) {
-      if (error.name === 'ConditionalCheckFailedException') {
-        this.logger.warn('Session not found for deletion', { sessionId });
-        return false;
+      try {
+        await this.docClient.send(new DeleteCommand({
+          TableName: this.tableName,
+          Key: { sessionId },
+          ConditionExpression: 'attribute_exists(sessionId)'
+        }));
+
+        this.logger.info('Session deleted successfully', { sessionId });
+        return true;
+      } catch (error: any) {
+        if (error.name === 'ConditionalCheckFailedException') {
+          this.logger.warn('Session not found for deletion', { sessionId });
+          return false;
+        }
+        throw error;
       }
-      this.logger.error('Failed to delete session', error, { sessionId });
-      throw error;
-    }
+    }, { sessionId });
   }
 
   /**
    * Check if a session exists
    */
   async exists(sessionId: string): Promise<boolean> {
-    try {
+    return this.executeWithErrorHandling('exists', async () => {
+      this.validateRequired({ sessionId }, 'exists');
+
       const result = await this.docClient.send(new GetCommand({
         TableName: this.tableName,
         Key: { sessionId },
@@ -226,9 +207,6 @@ export class SessionRepository implements ISessionRepository {
       }));
 
       return !!result.Item;
-    } catch (error) {
-      this.logger.error('Error checking session existence', error as Error, { sessionId });
-      return false;
-    }
+    }, { sessionId });
   }
 }

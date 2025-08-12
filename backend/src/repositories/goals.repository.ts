@@ -5,7 +5,8 @@ import { DynamoDBDocumentClient, PutCommand, GetCommand, QueryCommand, UpdateCom
 import { Goal } from '../shared/types/goals.types';
 import { GetGoalsRequest } from '../shared/types/goals.types';
 import { ServiceConfig } from '../shared/service-factory';
-import { createLogger } from '../shared/logger';
+import { DynamoDBBaseRepository } from './base.repository';
+import { IStandardCrudRepository, IUserScopedRepository, StandardQueryResult } from '../shared/types/repository.types';
 
 /**
  * Helper class for building DynamoDB query expressions and filtering logic
@@ -229,20 +230,20 @@ class GoalsUpdateBuilder {
   }
 }
 
-export interface IGoalsRepository {
-  create(goal: Goal): Promise<Goal>;
-  findById(goalId: string): Promise<Goal | null>;
-  findByUserId(userId: string, filters?: GetGoalsRequest): Promise<{ goals: Goal[], total: number }>;
-  update(goalId: string, updateData: Partial<Goal>): Promise<Goal>;
-  delete(goalId: string): Promise<boolean>;
-  exists(goalId: string): Promise<boolean>;
+export interface IGoalsRepository extends IStandardCrudRepository<Goal, Goal, Partial<Goal>>, IUserScopedRepository<Goal, GetGoalsRequest> {
+  /**
+   * Find goals by user ID with standardized filtering and pagination
+   * @param userId - User identifier
+   * @param filters - Optional filtering parameters with GetGoalsRequest structure
+   * @returns Promise<StandardQueryResult<Goal>> - Standardized paginated results
+   * @throws RepositoryError
+   */
+  findByUserId(userId: string, filters?: GetGoalsRequest): Promise<StandardQueryResult<Goal>>;
 }
 
-export class GoalsRepository implements IGoalsRepository {
+export class GoalsRepository extends DynamoDBBaseRepository implements IGoalsRepository {
   private docClient: DynamoDBDocumentClient;
-  private tableName: string;
   private userIdIndexName: string;
-  private logger = createLogger({ component: 'GoalsRepository' });
   
   // Helper classes for SRP compliance
   private queryBuilder: GoalsQueryBuilder;
@@ -250,8 +251,8 @@ export class GoalsRepository implements IGoalsRepository {
   private updateBuilder: GoalsUpdateBuilder;
 
   constructor(dynamoClient: DynamoDBDocumentClient, config: ServiceConfig) {
+    super('GoalsRepository', config, config.tables.goals);
     this.docClient = dynamoClient;
-    this.tableName = config.tables.goals;
     this.userIdIndexName = 'UserGoalsIndex'; // GSI for querying by userId
     
     // Initialize helper classes
@@ -261,40 +262,61 @@ export class GoalsRepository implements IGoalsRepository {
   }
 
   /**
+   * Perform health check operation for DynamoDB connectivity
+   */
+  protected async performHealthCheck(): Promise<void> {
+    await this.docClient.send(new QueryCommand({
+      TableName: this.tableName,
+      IndexName: this.userIdIndexName,
+      KeyConditionExpression: 'userId = :userId',
+      ExpressionAttributeValues: { ':userId': 'health-check-user' },
+      Limit: 1
+    }));
+  }
+
+  /**
    * Create a new goal in the database
    */
   async create(goal: Goal): Promise<Goal> {
-    try {
-      await this.docClient.send(new PutCommand({
-        TableName: this.tableName,
-        Item: goal,
-        ConditionExpression: 'attribute_not_exists(goalId)'
-      }));
-
-      this.logger.info('Goal created successfully', { 
+    return this.executeWithErrorHandling('create', async () => {
+      this.validateRequired({ 
         goalId: goal.goalId, 
         userId: goal.userId,
         type: goal.type,
         targetValue: goal.targetValue
-      });
-      
-      return goal;
-    } catch (error: any) {
-      if (error.name === 'ConditionalCheckFailedException') {
-        this.logger.warn('Goal ID conflict occurred', { goalId: goal.goalId });
-        throw new Error('Goal with this ID already exists');
-      }
+      }, 'create');
 
-      this.logger.error('Failed to create goal', error, { goalId: goal.goalId, userId: goal.userId });
-      throw new Error('Failed to create goal');
-    }
+      try {
+        await this.docClient.send(new PutCommand({
+          TableName: this.tableName,
+          Item: goal,
+          ConditionExpression: 'attribute_not_exists(goalId)'
+        }));
+
+        this.logger.info('Goal created successfully', { 
+          goalId: goal.goalId, 
+          userId: goal.userId,
+          type: goal.type,
+          targetValue: goal.targetValue
+        });
+        
+        return goal;
+      } catch (error: any) {
+        if (error.name === 'ConditionalCheckFailedException') {
+          throw this.createRepositoryError('create', new Error('Goal with this ID already exists'), { goalId: goal.goalId });
+        }
+        throw error;
+      }
+    }, { goalId: goal.goalId, userId: goal.userId });
   }
 
   /**
    * Find a goal by its ID
    */
   async findById(goalId: string): Promise<Goal | null> {
-    try {
+    return this.executeWithErrorHandling('findById', async () => {
+      this.validateRequired({ goalId }, 'findById');
+
       const result = await this.docClient.send(new GetCommand({
         TableName: this.tableName,
         Key: { goalId }
@@ -307,19 +329,17 @@ export class GoalsRepository implements IGoalsRepository {
 
       this.logger.debug('Goal retrieved successfully', { goalId });
       return result.Item as Goal;
-
-    } catch (error) {
-      this.logger.error('Failed to retrieve goal', error as Error, { goalId });
-      throw new Error('Failed to retrieve goal');
-    }
+    }, { goalId });
   }
 
   /**
    * Find goals by user ID with optional filtering and pagination
    * Refactored to use helper classes for SRP compliance
    */
-  async findByUserId(userId: string, filters: GetGoalsRequest = {}): Promise<{ goals: Goal[], total: number }> {
-    try {
+  async findByUserId(userId: string, filters: GetGoalsRequest = {}): Promise<StandardQueryResult<Goal>> {
+    return this.executeWithErrorHandling('findByUserId', async () => {
+      this.validateRequired({ userId }, 'findByUserId');
+      
       this.logger.debug('Querying goals by userId', { userId, filters });
 
       // Use GoalsQueryBuilder to build filter expressions
@@ -365,15 +385,16 @@ export class GoalsRepository implements IGoalsRepository {
         filters
       });
 
+      // Return standardized format
       return {
-        goals: paginatedGoals,
-        total: allGoals.length
+        items: paginatedGoals,
+        total: allGoals.length,
+        limit: filters.limit || 50,
+        offset: filters.offset || 0,
+        lastEvaluatedKey,
+        hasMore: (filters.offset || 0) + paginatedGoals.length < allGoals.length
       };
-
-    } catch (error) {
-      this.logger.error('Failed to query goals by userId', error as Error, { userId, filters });
-      throw new Error('Failed to retrieve goals');
-    }
+    }, { userId, filters });
   }
 
   /**
@@ -381,73 +402,76 @@ export class GoalsRepository implements IGoalsRepository {
    * Refactored to use GoalsUpdateBuilder for SRP compliance
    */
   async update(goalId: string, updateData: Partial<Goal>): Promise<Goal> {
-    try {
+    return this.executeWithErrorHandling('update', async () => {
+      this.validateRequired({ goalId }, 'update');
+
       // Use GoalsUpdateBuilder to build update expression
       const { updateExpression, expressionAttributeNames, expressionAttributeValues } = 
         this.updateBuilder.buildUpdateExpression(updateData);
 
-      const result = await this.docClient.send(new UpdateCommand({
-        TableName: this.tableName,
-        Key: { goalId },
-        UpdateExpression: updateExpression,
-        ExpressionAttributeNames: expressionAttributeNames,
-        ExpressionAttributeValues: expressionAttributeValues,
-        ReturnValues: 'ALL_NEW',
-        ConditionExpression: 'attribute_exists(goalId)'
-      }));
+      try {
+        const result = await this.docClient.send(new UpdateCommand({
+          TableName: this.tableName,
+          Key: { goalId },
+          UpdateExpression: updateExpression,
+          ExpressionAttributeNames: expressionAttributeNames,
+          ExpressionAttributeValues: expressionAttributeValues,
+          ReturnValues: 'ALL_NEW',
+          ConditionExpression: 'attribute_exists(goalId)'
+        }));
 
-      if (!result.Attributes) {
-        throw new Error('Goal not found');
+        if (!result.Attributes) {
+          throw new Error('Goal not found');
+        }
+
+        this.logger.info('Goal updated successfully', { 
+          goalId,
+          updatedFields: Object.keys(updateData)
+        });
+
+        return result.Attributes as Goal;
+      } catch (error: any) {
+        if (error.name === 'ConditionalCheckFailedException') {
+          throw this.createRepositoryError('update', new Error('Goal not found'), { goalId });
+        }
+        throw error;
       }
-
-      this.logger.info('Goal updated successfully', { 
-        goalId,
-        updatedFields: Object.keys(updateData)
-      });
-
-      return result.Attributes as Goal;
-
-    } catch (error: any) {
-      if (error.name === 'ConditionalCheckFailedException') {
-        this.logger.warn('Goal not found for update', { goalId });
-        throw new Error('Goal not found');
-      }
-
-      this.logger.error('Failed to update goal', error, { goalId, updateData });
-      throw new Error('Failed to update goal');
-    }
+    }, { goalId, updateFields: Object.keys(updateData) });
   }
 
   /**
    * Delete a goal
    */
   async delete(goalId: string): Promise<boolean> {
-    try {
-      await this.docClient.send(new DeleteCommand({
-        TableName: this.tableName,
-        Key: { goalId },
-        ConditionExpression: 'attribute_exists(goalId)'
-      }));
+    return this.executeWithErrorHandling('delete', async () => {
+      this.validateRequired({ goalId }, 'delete');
 
-      this.logger.info('Goal deleted successfully', { goalId });
-      return true;
+      try {
+        await this.docClient.send(new DeleteCommand({
+          TableName: this.tableName,
+          Key: { goalId },
+          ConditionExpression: 'attribute_exists(goalId)'
+        }));
 
-    } catch (error: any) {
-      if (error.name === 'ConditionalCheckFailedException') {
-        this.logger.warn('Goal not found for deletion', { goalId });
-        throw new Error('Goal not found');
+        this.logger.info('Goal deleted successfully', { goalId });
+        return true;
+      } catch (error: any) {
+        if (error.name === 'ConditionalCheckFailedException') {
+          this.logger.warn('Goal not found for deletion', { goalId });
+          return false;
+        }
+        throw error;
       }
-
-      this.logger.error('Failed to delete goal', error, { goalId });
-      throw new Error('Failed to delete goal');
-    }
+    }, { goalId });
   }
 
   /**
    * Check if a goal exists
    */
   async exists(goalId: string): Promise<boolean> {
-    try {
+    return this.executeWithErrorHandling('exists', async () => {
+      this.validateRequired({ goalId }, 'exists');
+
       const result = await this.docClient.send(new GetCommand({
         TableName: this.tableName,
         Key: { goalId },
@@ -455,10 +479,6 @@ export class GoalsRepository implements IGoalsRepository {
       }));
 
       return !!result.Item;
-
-    } catch (error) {
-      this.logger.error('Failed to check goal existence', error as Error, { goalId });
-      return false;
-    }
+    }, { goalId });
   }
 }

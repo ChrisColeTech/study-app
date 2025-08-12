@@ -3,6 +3,8 @@
 import { S3Client, GetObjectCommand, ListObjectsV2Command } from '@aws-sdk/client-s3';
 import { Topic } from '../shared/types/topic.types';
 import { ServiceConfig } from '../shared/service-factory';
+import { S3BaseRepository } from './base.repository';
+import { IListRepository } from '../shared/types/repository.types';
 import { createLogger } from '../shared/logger';
 
 interface CacheEntry<T> {
@@ -346,46 +348,88 @@ class TopicDataTransformer {
   }
 }
 
-export interface ITopicRepository {
-  findAll(): Promise<Topic[]>;
+export interface ITopicRepository extends IListRepository<Topic, any> {
+  /**
+   * Find all topics
+   * @param filters - Optional filtering parameters
+   * @returns Promise<Topic[]> - All topics
+   * @throws RepositoryError
+   */
+  findAll(filters?: any): Promise<Topic[]>;
+
+  /**
+   * Find topic by ID
+   * @param topicId - Topic identifier
+   * @returns Promise<Topic | null> - Topic if found
+   * @throws RepositoryError
+   */
   findById(topicId: string): Promise<Topic | null>;
+
+  /**
+   * Find topics by exam
+   * @param examId - Exam identifier
+   * @returns Promise<Topic[]> - Topics for exam
+   * @throws RepositoryError
+   */
   findByExam(examId: string): Promise<Topic[]>;
+
+  /**
+   * Find topics by provider
+   * @param providerId - Provider identifier
+   * @returns Promise<Topic[]> - Topics for provider
+   * @throws RepositoryError
+   */
   findByProvider(providerId: string): Promise<Topic[]>;
+
+  /**
+   * Clear repository cache
+   */
   clearCache(): void;
 }
 
-export class TopicRepository implements ITopicRepository {
+export class TopicRepository extends S3BaseRepository implements ITopicRepository {
   private s3Client: S3Client;
-  private bucketName: string;
-  private logger = createLogger({ component: 'TopicRepository' });
   
   // Helper class instances for delegation
   private cacheManager: TopicCacheManager;
   private dataTransformer: TopicDataTransformer;
+  private metadataGenerator: TopicMetadataGenerator;
   
   constructor(s3Client: S3Client, config: ServiceConfig) {
+    super('TopicRepository', config, config.s3.bucketName);
     this.s3Client = s3Client;
-    this.bucketName = config.s3.bucketName;
     
     // Initialize helper classes
     this.cacheManager = new TopicCacheManager();
     this.dataTransformer = new TopicDataTransformer();
+    this.metadataGenerator = new TopicMetadataGenerator();
+  }
+
+  /**
+   * Perform health check operation for S3 connectivity
+   */
+  protected async performHealthCheck(): Promise<void> {
+    await this.s3Client.send(new ListObjectsV2Command({
+      Bucket: this.bucketName,
+      Prefix: 'questions/',
+      MaxKeys: 1
+    }));
   }
 
   /**
    * Get all topics from S3 (extracted from question files)
    */
   async findAll(): Promise<Topic[]> {
-    const cacheKey = this.cacheManager.generateCacheKey('all');
-    
-    // Check cache first
-    const cached = this.cacheManager.getFromCache<Topic[]>(cacheKey);
-    if (cached) {
-      this.logger.debug('Topics retrieved from cache');
-      return cached;
-    }
+    return this.executeWithErrorHandling('findAll', async () => {
+      const cacheKey = this.cacheManager.generateCacheKey('all');
+      
+      // Check cache first
+      const cached = this.cacheManager.getFromCache<Topic[]>(cacheKey);
+      if (cached) {
+        this.logger.debug('Topics retrieved from cache');
+        return cached;
+      }
 
-    try {
       this.logger.info('Loading all topics from S3', { bucket: this.bucketName });
 
       // List all question files to extract topics from
@@ -435,25 +479,25 @@ export class TopicRepository implements ITopicRepository {
       });
 
       return allTopics;
-    } catch (error) {
-      return this.handleS3Error(error, 'Failed to load topic data');
-    }
+    });
   }
 
   /**
    * Find a specific topic by ID
    */
   async findById(topicId: string): Promise<Topic | null> {
-    const cacheKey = this.cacheManager.generateCacheKey('byId', topicId);
-    
-    // Check cache first
-    const cached = this.cacheManager.getFromCache<Topic>(cacheKey);
-    if (cached) {
-      this.logger.debug('Topic retrieved from cache', { topicId });
-      return cached;
-    }
+    return this.executeWithErrorHandling('findById', async () => {
+      this.validateRequired({ topicId }, 'findById');
+      
+      const cacheKey = this.cacheManager.generateCacheKey('byId', topicId);
+      
+      // Check cache first
+      const cached = this.cacheManager.getFromCache<Topic>(cacheKey);
+      if (cached) {
+        this.logger.debug('Topic retrieved from cache', { topicId });
+        return cached;
+      }
 
-    try {
       // Load all topics and find the specific one
       const allTopics = await this.findAll();
       const topic = allTopics.find(t => t.id === topicId);
@@ -467,26 +511,25 @@ export class TopicRepository implements ITopicRepository {
         this.logger.warn('Topic not found', { topicId });
         return null;
       }
-    } catch (error) {
-      this.logger.error('Failed to find topic by ID', error as Error, { topicId });
-      return null;
-    }
+    }, { topicId });
   }
 
   /**
    * Find topics by exam
    */
   async findByExam(examId: string): Promise<Topic[]> {
-    const cacheKey = this.cacheManager.generateCacheKey('byExam', examId);
-    
-    // Check cache first
-    const cached = this.cacheManager.getFromCache<Topic[]>(cacheKey);
-    if (cached) {
-      this.logger.debug('Topics retrieved from cache', { examId });
-      return cached;
-    }
+    return this.executeWithErrorHandling('findByExam', async () => {
+      this.validateRequired({ examId }, 'findByExam');
+      
+      const cacheKey = this.cacheManager.generateCacheKey('byExam', examId);
+      
+      // Check cache first
+      const cached = this.cacheManager.getFromCache<Topic[]>(cacheKey);
+      if (cached) {
+        this.logger.debug('Topics retrieved from cache', { examId });
+        return cached;
+      }
 
-    try {
       const allTopics = await this.findAll();
       const examTopics = allTopics.filter(topic => topic.examId === examId);
 
@@ -499,26 +542,25 @@ export class TopicRepository implements ITopicRepository {
       });
 
       return examTopics;
-    } catch (error) {
-      this.logger.error('Failed to load topics by exam', error as Error, { examId });
-      return [];
-    }
+    }, { examId });
   }
 
   /**
    * Find topics by provider
    */
   async findByProvider(providerId: string): Promise<Topic[]> {
-    const cacheKey = this.cacheManager.generateCacheKey('byProvider', providerId);
-    
-    // Check cache first
-    const cached = this.cacheManager.getFromCache<Topic[]>(cacheKey);
-    if (cached) {
-      this.logger.debug('Topics retrieved from cache', { providerId });
-      return cached;
-    }
+    return this.executeWithErrorHandling('findByProvider', async () => {
+      this.validateRequired({ providerId }, 'findByProvider');
+      
+      const cacheKey = this.cacheManager.generateCacheKey('byProvider', providerId);
+      
+      // Check cache first
+      const cached = this.cacheManager.getFromCache<Topic[]>(cacheKey);
+      if (cached) {
+        this.logger.debug('Topics retrieved from cache', { providerId });
+        return cached;
+      }
 
-    try {
       this.logger.info('Loading topics by provider from S3', { providerId, bucket: this.bucketName });
 
       // List question files for this provider
@@ -566,10 +608,7 @@ export class TopicRepository implements ITopicRepository {
       });
 
       return topics;
-    } catch (error) {
-      this.logger.error('Failed to load topics by provider from S3', error as Error, { providerId });
-      return [];
-    }
+    }, { providerId });
   }
 
   /**
@@ -577,23 +616,16 @@ export class TopicRepository implements ITopicRepository {
    */
   clearCache(): void {
     this.cacheManager.clearCache();
+    this.logger.info('Topic repository cache cleared');
   }
 
   /**
-   * Handle S3 errors gracefully with consistent error responses
+   * Refresh cache from source
    */
-  private handleS3Error(error: unknown, defaultMessage: string): never {
-    // Handle specific S3 errors gracefully
-    const errorName = (error as any).name;
-    if (errorName === 'NoSuchBucket' || errorName === 'AccessDenied') {
-      this.logger.warn('S3 bucket not accessible - returning empty results', { 
-        bucket: this.bucketName,
-        error: (error as Error).message 
-      });
-      return [] as never;
-    }
-    
-    this.logger.error(defaultMessage, error as Error);
-    throw new Error(defaultMessage);
+  async refreshCache(): Promise<void> {
+    return this.executeWithErrorHandling('refreshCache', async () => {
+      this.clearCache();
+      this.logger.info('Topic repository cache refreshed');
+    });
   }
 }

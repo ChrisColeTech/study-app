@@ -1,5 +1,7 @@
 // User profile management types - Phase 26
 
+import { IStandardCrudRepository } from './repository.types';
+
 export interface UserProfile {
   userId: string;
   email: string;
@@ -153,11 +155,30 @@ export interface IAchievementCalculator {
   calculateAchievements(userId: string, profile: UserProfile): Promise<Achievement[]>;
 }
 
-export interface IProfileRepository {
+export interface IProfileRepository extends IStandardCrudRepository<UserProfile, UserProfile, Partial<UserProfile>> {
+  /**
+   * Find profile by user ID (business identifier)
+   * @param userId - User identifier
+   * @returns Promise<UserProfile | null> - User profile if found
+   * @throws RepositoryError
+   */
   findByUserId(userId: string): Promise<UserProfile | null>;
-  create(profile: UserProfile): Promise<UserProfile>;
-  update(userId: string, updates: Partial<UserProfile>): Promise<UserProfile>;
-  delete(userId: string): Promise<void>;
+
+  /**
+   * Update profile statistics
+   * @param userId - User identifier
+   * @param stats - Statistics to update
+   * @returns Promise<void>
+   * @throws RepositoryError
+   */
   updateStatistics(userId: string, stats: Partial<ProfileStatistics>): Promise<void>;
+
+  /**
+   * Add achievement to profile
+   * @param userId - User identifier
+   * @param achievement - Achievement to add
+   * @returns Promise<void>
+   * @throws RepositoryError
+   */
   addAchievement(userId: string, achievement: Achievement): Promise<void>;
 }
