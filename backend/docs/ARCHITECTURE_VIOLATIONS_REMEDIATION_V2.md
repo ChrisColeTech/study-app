@@ -680,6 +680,8 @@
 - ✅ **Testing**: All existing tests pass, new tests added if applicable  
 - ✅ **Git Commit**: All phase work committed with descriptive message
 - ✅ **Git Push**: All commits pushed to remote repository for backup
+- ✅ **CI/CD Pipeline**: Pipeline executes successfully (monitor with `gh run watch`)
+- ✅ **Deployment Success**: CI/CD deployment completes without errors
 - ✅ **Metrics Captured**: Quantified before/after results documented
 - ✅ **Lessons Learned**: Complete documentation created in phases folder
 - ✅ **Remediation Plan**: Phase marked complete with results summary
@@ -738,8 +740,33 @@ git push origin main
 - **Plan Updates**: Updated remediation plan with phase completion
 - **Zero Errors**: Only commit when build is completely successful
 
+#### **Deployment and CI/CD Requirements**
+**MANDATORY after each phase push**:
+
+- **Never use `cdk deploy`**: Always use CI/CD pipeline for deployments
+- **Monitor CI/CD Pipeline**: Use `gh run watch` to monitor pipeline execution
+- **Pipeline Success Required**: Ensure CI/CD pipeline completes successfully
+- **Fix Build Failures**: Address any CI/CD build failures immediately
+- **Deployment Verification**: Verify successful deployment through CI/CD before marking phase complete
+
+**Pipeline Monitoring Commands**:
+```bash
+# Push commits
+git push origin main
+
+# Check recent pipeline runs to get run ID
+gh run list --limit 5
+
+# Monitor specific CI/CD pipeline execution (use run ID from list)
+gh run watch <run-id>
+
+# Alternative: Monitor most recent run
+gh run list --limit 1 --json databaseId --jq '.[0].databaseId' | xargs gh run watch
+```
+
 #### **Backup Strategy**  
 - **Immediate Push**: Push commits immediately after each phase
+- **CI/CD Validation**: Pipeline success confirms deployment readiness
 - **Branch Protection**: Maintain working main branch with clean commit history
 - **Rollback Points**: Each phase commit serves as rollback point for issues
 - **Remote Backup**: Ensure all work is backed up to remote repository
@@ -814,6 +841,8 @@ git push origin main
 **📚 PHASE COMPLETION REQUIREMENTS**: Each phase completion requires:
 1. ✅ **Build Verification**: `npm run build` with zero TypeScript errors
 2. ✅ **Git Commit & Push**: Commit all work with descriptive message and push to remote
-3. ✅ **Lessons Learned**: Document in `/backend/docs/phases/PHASE_XX_NAME.md`
-4. ✅ **Plan Update**: Tracking table update (❌ → ✅ **COMPLETED**) with results summary
-5. ✅ **Documentation Link**: Add reference to lessons learned in phase description
+3. ✅ **CI/CD Pipeline**: Monitor with `gh run watch <run-id>` and ensure successful completion
+4. ✅ **Deployment Success**: Verify CI/CD deployment completes without errors (NEVER use `cdk deploy`)
+5. ✅ **Lessons Learned**: Document in `/backend/docs/phases/PHASE_XX_NAME.md`
+6. ✅ **Plan Update**: Tracking table update (❌ → ✅ **COMPLETED**) with results summary
+7. ✅ **Documentation Link**: Add reference to lessons learned in phase description
