@@ -87,63 +87,29 @@ export interface ServiceConfig {
 }
 
 /**
- * ServiceFactory class for dependency injection and service management
- * Implements singleton pattern with lazy initialization
+ * Base factory for AWS clients and configuration management
+ * Provides foundation infrastructure for domain-specific factories
  */
-export class ServiceFactory {
-  private static instance: ServiceFactory;
+export class InfrastructureFactory {
+  private static instance: InfrastructureFactory;
   private config: ServiceConfig;
   
   // AWS Clients (lazy initialized)
   private _dynamoClient: DynamoDBDocumentClient | null = null;
   private _s3Client: S3Client | null = null;
 
-  // Repositories (lazy initialized)
-  private _userRepository: IUserRepository | null = null;
-  private _sessionRepository: ISessionRepository | null = null;
-  private _providerRepository: IProviderRepository | null = null;
-  private _examRepository: IExamRepository | null = null;
-  private _topicRepository: ITopicRepository | null = null;
-  private _questionRepository: IQuestionRepository | null = null;
-  private _goalsRepository: IGoalsRepository | null = null;
-  private _healthRepository: IHealthRepository | null = null;
-  private _profileRepository: IProfileRepository | null = null;
-  private _analyticsRepository: IAnalyticsRepository | null = null;
-
-  // Services (lazy initialized)
-  private _authService: IAuthService | null = null;
-  private _userService: IUserService | null = null;
-  private _providerService: IProviderService | null = null;
-  private _examService: IExamService | null = null;
-  private _topicService: ITopicService | null = null;
-  private _questionService: IQuestionService | null = null;
-  private _sessionService: ISessionService | null = null;
-  private _sessionOrchestrator: ISessionOrchestratorService | null = null;
-  private _answerProcessor: IAnswerProcessorService | null = null;
-  private _sessionAnalyzer: ISessionAnalyzerService | null = null;
-  private _analyticsService: IAnalyticsService | null = null;
-  private _progressAnalyzer: IProgressAnalyzer | null = null;
-  private _competencyAnalyzer: ICompetencyAnalyzer | null = null;
-  private _performanceAnalyzer: IPerformanceAnalyzer | null = null;
-  private _insightGenerator: IInsightGenerator | null = null;
-  private _goalsService: IGoalsService | null = null;
-  private _goalsProgressTracker: IGoalsProgressTracker | null = null;
-  private _healthService: IHealthService | null = null;
-  private _profileService: IProfileService | null = null;
-  private _achievementCalculator: IAchievementCalculator | null = null;
-
   private constructor() {
     this.config = this.loadConfig();
   }
 
   /**
-   * Get ServiceFactory singleton instance
+   * Get InfrastructureFactory singleton instance
    */
-  public static getInstance(): ServiceFactory {
-    if (!ServiceFactory.instance) {
-      ServiceFactory.instance = new ServiceFactory();
+  public static getInstance(): InfrastructureFactory {
+    if (!InfrastructureFactory.instance) {
+      InfrastructureFactory.instance = new InfrastructureFactory();
     }
-    return ServiceFactory.instance;
+    return InfrastructureFactory.instance;
   }
 
   /**
@@ -212,7 +178,43 @@ export class ServiceFactory {
     return this.config;
   }
 
-  // Repository getters
+  /**
+   * Reset all clients (useful for testing)
+   */
+  public reset(): void {
+    this._dynamoClient = null;
+    this._s3Client = null;
+  }
+}
+
+/**
+ * Authentication domain factory
+ * Manages user authentication and user management services
+ */
+export class AuthenticationFactory {
+  private static instance: AuthenticationFactory;
+  private infrastructureFactory: InfrastructureFactory;
+  
+  // Repositories (lazy initialized)
+  private _userRepository: IUserRepository | null = null;
+
+  // Services (lazy initialized)
+  private _authService: IAuthService | null = null;
+  private _userService: IUserService | null = null;
+
+  private constructor() {
+    this.infrastructureFactory = InfrastructureFactory.getInstance();
+  }
+
+  /**
+   * Get AuthenticationFactory singleton instance
+   */
+  public static getInstance(): AuthenticationFactory {
+    if (!AuthenticationFactory.instance) {
+      AuthenticationFactory.instance = new AuthenticationFactory();
+    }
+    return AuthenticationFactory.instance;
+  }
 
   /**
    * Get User Repository
@@ -220,114 +222,12 @@ export class ServiceFactory {
   public getUserRepository(): IUserRepository {
     if (!this._userRepository) {
       const { UserRepository } = require('../repositories/user.repository');
-      this._userRepository = new UserRepository(this.getDynamoClient(), this.getConfig());
+      this._userRepository = new UserRepository(
+        this.infrastructureFactory.getDynamoClient(), 
+        this.infrastructureFactory.getConfig()
+      );
     }
     return this._userRepository!;
-  }
-
-  /**
-   * Get Session Repository
-   */
-  public getSessionRepository(): ISessionRepository {
-    if (!this._sessionRepository) {
-      const { SessionRepository } = require('../repositories/session.repository');
-      this._sessionRepository = new SessionRepository(this.getDynamoClient(), this.getConfig());
-    }
-    return this._sessionRepository!;
-  }
-
-  /**
-   * Get Provider Repository
-   */
-  public getProviderRepository(): IProviderRepository {
-    if (!this._providerRepository) {
-      const { ProviderRepository } = require('../repositories/provider.repository');
-      this._providerRepository = new ProviderRepository(this.getS3Client(), this.getConfig());
-    }
-    return this._providerRepository!;
-  }
-
-  /**
-   * Get Exam Repository
-   */
-  public getExamRepository(): IExamRepository {
-    if (!this._examRepository) {
-      const { ExamRepository } = require('../repositories/exam.repository');
-      this._examRepository = new ExamRepository(this.getS3Client(), this.getConfig());
-    }
-    return this._examRepository!;
-  }
-
-  /**
-   * Get Topic Repository
-   */
-  public getTopicRepository(): ITopicRepository {
-    if (!this._topicRepository) {
-      const { TopicRepository } = require('../repositories/topic.repository');
-      this._topicRepository = new TopicRepository(this.getS3Client(), this.getConfig());
-    }
-    return this._topicRepository!;
-  }
-
-  /**
-   * Get Question Repository
-   */
-  public getQuestionRepository(): IQuestionRepository {
-    if (!this._questionRepository) {
-      const { QuestionRepository } = require('../repositories/question.repository');
-      this._questionRepository = new QuestionRepository(this.getS3Client(), this.getConfig());
-    }
-    return this._questionRepository!;
-  }
-
-  /**
-   * Get Goals Repository
-   */
-  public getGoalsRepository(): IGoalsRepository {
-    if (!this._goalsRepository) {
-      const { GoalsRepository } = require('../repositories/goals.repository');
-      this._goalsRepository = new GoalsRepository(this.getDynamoClient(), this.getConfig());
-    }
-    return this._goalsRepository!;
-  }
-
-  /**
-   * Get Health Repository
-   */
-  public getHealthRepository(): IHealthRepository {
-    if (!this._healthRepository) {
-      const { HealthRepository } = require('../repositories/health.repository');
-      // Health repository needs the raw DynamoDB client for DescribeTableCommand
-      const dynamoClient = new DynamoDBClient({
-        region: this.config.region,
-      });
-      this._healthRepository = new HealthRepository(dynamoClient, this.getS3Client(), this.getConfig());
-    }
-    return this._healthRepository!;
-  }
-
-  /**
-   * Get Profile Repository
-   */
-  public getProfileRepository(): IProfileRepository {
-    if (!this._profileRepository) {
-      const { ProfileRepository } = require('../repositories/profile.repository');
-      this._profileRepository = new ProfileRepository(this.getDynamoClient(), this.getConfig());
-    }
-    return this._profileRepository!;
-  }
-
-  // Service getters
-  
-  /**
-   * Get Auth Service
-   */
-  public getAuthService(): IAuthService {
-    if (!this._authService) {
-      const { AuthService } = require('../services/auth.service');
-      this._authService = new AuthService(this.getUserService());
-    }
-    return this._authService!;
   }
 
   /**
@@ -340,6 +240,140 @@ export class ServiceFactory {
     }
     return this._userService!;
   }
+
+  /**
+   * Get Auth Service
+   */
+  public getAuthService(): IAuthService {
+    if (!this._authService) {
+      const { AuthService } = require('../services/auth.service');
+      this._authService = new AuthService(this.getUserService());
+    }
+    return this._authService!;
+  }
+
+  /**
+   * Reset all services and repositories (useful for testing)
+   */
+  public reset(): void {
+    this._userRepository = null;
+    this._userService = null;
+    this._authService = null;
+  }
+}
+
+/**
+ * Study domain factory
+ * Manages study sessions, questions, and related repositories/services
+ */
+export class StudyFactory {
+  private static instance: StudyFactory;
+  private infrastructureFactory: InfrastructureFactory;
+  
+  // Repositories (lazy initialized)
+  private _sessionRepository: ISessionRepository | null = null;
+  private _providerRepository: IProviderRepository | null = null;
+  private _examRepository: IExamRepository | null = null;
+  private _topicRepository: ITopicRepository | null = null;
+  private _questionRepository: IQuestionRepository | null = null;
+
+  // Services (lazy initialized)
+  private _providerService: IProviderService | null = null;
+  private _examService: IExamService | null = null;
+  private _topicService: ITopicService | null = null;
+  private _questionService: IQuestionService | null = null;
+  private _sessionService: ISessionService | null = null;
+  private _sessionOrchestrator: ISessionOrchestratorService | null = null;
+  private _answerProcessor: IAnswerProcessorService | null = null;
+  private _sessionAnalyzer: ISessionAnalyzerService | null = null;
+
+  private constructor() {
+    this.infrastructureFactory = InfrastructureFactory.getInstance();
+  }
+
+  /**
+   * Get StudyFactory singleton instance
+   */
+  public static getInstance(): StudyFactory {
+    if (!StudyFactory.instance) {
+      StudyFactory.instance = new StudyFactory();
+    }
+    return StudyFactory.instance;
+  }
+
+  // Repository getters
+
+  /**
+   * Get Session Repository
+   */
+  public getSessionRepository(): ISessionRepository {
+    if (!this._sessionRepository) {
+      const { SessionRepository } = require('../repositories/session.repository');
+      this._sessionRepository = new SessionRepository(
+        this.infrastructureFactory.getDynamoClient(), 
+        this.infrastructureFactory.getConfig()
+      );
+    }
+    return this._sessionRepository!;
+  }
+
+  /**
+   * Get Provider Repository
+   */
+  public getProviderRepository(): IProviderRepository {
+    if (!this._providerRepository) {
+      const { ProviderRepository } = require('../repositories/provider.repository');
+      this._providerRepository = new ProviderRepository(
+        this.infrastructureFactory.getS3Client(), 
+        this.infrastructureFactory.getConfig()
+      );
+    }
+    return this._providerRepository!;
+  }
+
+  /**
+   * Get Exam Repository
+   */
+  public getExamRepository(): IExamRepository {
+    if (!this._examRepository) {
+      const { ExamRepository } = require('../repositories/exam.repository');
+      this._examRepository = new ExamRepository(
+        this.infrastructureFactory.getS3Client(), 
+        this.infrastructureFactory.getConfig()
+      );
+    }
+    return this._examRepository!;
+  }
+
+  /**
+   * Get Topic Repository
+   */
+  public getTopicRepository(): ITopicRepository {
+    if (!this._topicRepository) {
+      const { TopicRepository } = require('../repositories/topic.repository');
+      this._topicRepository = new TopicRepository(
+        this.infrastructureFactory.getS3Client(), 
+        this.infrastructureFactory.getConfig()
+      );
+    }
+    return this._topicRepository!;
+  }
+
+  /**
+   * Get Question Repository
+   */
+  public getQuestionRepository(): IQuestionRepository {
+    if (!this._questionRepository) {
+      const { QuestionRepository } = require('../repositories/question.repository');
+      this._questionRepository = new QuestionRepository(
+        this.infrastructureFactory.getS3Client(), 
+        this.infrastructureFactory.getConfig()
+      );
+    }
+    return this._questionRepository!;
+  }
+
+  // Service getters
 
   /**
    * Get Provider Service
@@ -398,25 +432,6 @@ export class ServiceFactory {
   }
 
   /**
-   * Get Session Service
-   */
-  public getSessionService(): ISessionService {
-    if (!this._sessionService) {
-      const { SessionService } = require('../services/session.service');
-      this._sessionService = new SessionService(
-        this.getSessionRepository(),
-        this.getSessionOrchestrator(),
-        this.getAnswerProcessor(),
-        this.getProviderService(),
-        this.getExamService(),
-        this.getTopicService(),
-        this.getQuestionService()
-      );
-    }
-    return this._sessionService!;
-  }
-
-  /**
    * Get Session Orchestrator Service
    */
   public getSessionOrchestrator(): ISessionOrchestratorService {
@@ -430,6 +445,17 @@ export class ServiceFactory {
       );
     }
     return this._sessionOrchestrator!;
+  }
+
+  /**
+   * Get Session Analyzer Service
+   */
+  public getSessionAnalyzer(): ISessionAnalyzerService {
+    if (!this._sessionAnalyzer) {
+      const { SessionAnalyzer } = require('../services/session-analyzer.service');
+      this._sessionAnalyzer = new SessionAnalyzer();
+    }
+    return this._sessionAnalyzer!;
   }
 
   /**
@@ -450,25 +476,77 @@ export class ServiceFactory {
   }
 
   /**
-   * Get Session Analyzer Service
+   * Get Session Service
    */
-  public getSessionAnalyzer(): ISessionAnalyzerService {
-    if (!this._sessionAnalyzer) {
-      const { SessionAnalyzer } = require('../services/session-analyzer.service');
-      this._sessionAnalyzer = new SessionAnalyzer();
+  public getSessionService(): ISessionService {
+    if (!this._sessionService) {
+      const { SessionService } = require('../services/session.service');
+      this._sessionService = new SessionService(
+        this.getSessionRepository(),
+        this.getSessionOrchestrator(),
+        this.getAnswerProcessor(),
+        this.getProviderService(),
+        this.getExamService(),
+        this.getTopicService(),
+        this.getQuestionService()
+      );
     }
-    return this._sessionAnalyzer!;
+    return this._sessionService!;
   }
 
   /**
-   * Get Health Service
+   * Reset all services and repositories (useful for testing)
    */
-  public getHealthService(): IHealthService {
-    if (!this._healthService) {
-      const { HealthService } = require('../services/health.service');
-      this._healthService = new HealthService(this.getHealthRepository());
+  public reset(): void {
+    // Reset repositories
+    this._sessionRepository = null;
+    this._providerRepository = null;
+    this._examRepository = null;
+    this._topicRepository = null;
+    this._questionRepository = null;
+
+    // Reset services
+    this._providerService = null;
+    this._examService = null;
+    this._topicService = null;
+    this._questionService = null;
+    this._sessionService = null;
+    this._sessionOrchestrator = null;
+    this._answerProcessor = null;
+    this._sessionAnalyzer = null;
+  }
+}
+
+/**
+ * Analytics domain factory
+ * Manages analytics services and repositories for performance tracking
+ */
+export class AnalyticsFactory {
+  private static instance: AnalyticsFactory;
+  private infrastructureFactory: InfrastructureFactory;
+  
+  // Repositories (lazy initialized)
+  private _analyticsRepository: IAnalyticsRepository | null = null;
+
+  // Services (lazy initialized)
+  private _analyticsService: IAnalyticsService | null = null;
+  private _progressAnalyzer: IProgressAnalyzer | null = null;
+  private _competencyAnalyzer: ICompetencyAnalyzer | null = null;
+  private _performanceAnalyzer: IPerformanceAnalyzer | null = null;
+  private _insightGenerator: IInsightGenerator | null = null;
+
+  private constructor() {
+    this.infrastructureFactory = InfrastructureFactory.getInstance();
+  }
+
+  /**
+   * Get AnalyticsFactory singleton instance
+   */
+  public static getInstance(): AnalyticsFactory {
+    if (!AnalyticsFactory.instance) {
+      AnalyticsFactory.instance = new AnalyticsFactory();
     }
-    return this._healthService!;
+    return AnalyticsFactory.instance;
   }
 
   /**
@@ -477,26 +555,12 @@ export class ServiceFactory {
   public getAnalyticsRepository(): IAnalyticsRepository {
     if (!this._analyticsRepository) {
       const { AnalyticsRepository } = require('../repositories/analytics.repository');
-      this._analyticsRepository = new AnalyticsRepository(this.getDynamoClient(), this.getConfig());
-    }
-    return this._analyticsRepository!;
-  }
-
-  /**
-   * Get Analytics Service
-   */
-  public getAnalyticsService(): IAnalyticsService {
-    if (!this._analyticsService) {
-      const { AnalyticsService } = require('../services/analytics.service');
-      this._analyticsService = new AnalyticsService(
-        this.getAnalyticsRepository(),
-        this.getProgressAnalyzer(),
-        this.getCompetencyAnalyzer(),
-        this.getPerformanceAnalyzer(),
-        this.getInsightGenerator()
+      this._analyticsRepository = new AnalyticsRepository(
+        this.infrastructureFactory.getDynamoClient(), 
+        this.infrastructureFactory.getConfig()
       );
     }
-    return this._analyticsService!;
+    return this._analyticsRepository!;
   }
 
   /**
@@ -552,20 +616,78 @@ export class ServiceFactory {
   }
 
   /**
-   * Get Goals Service
+   * Get Analytics Service
    */
-  public getGoalsService(): IGoalsService {
-    if (!this._goalsService) {
-      const { GoalsService } = require('../services/goals.service');
-      this._goalsService = new GoalsService(
-        this.getGoalsRepository(),
-        this.getProviderService(),
-        this.getExamService(),
-        this.getTopicService(),
-        this.getGoalsProgressTracker()
+  public getAnalyticsService(): IAnalyticsService {
+    if (!this._analyticsService) {
+      const { AnalyticsService } = require('../services/analytics.service');
+      this._analyticsService = new AnalyticsService(
+        this.getAnalyticsRepository(),
+        this.getProgressAnalyzer(),
+        this.getCompetencyAnalyzer(),
+        this.getPerformanceAnalyzer(),
+        this.getInsightGenerator()
       );
     }
-    return this._goalsService!;
+    return this._analyticsService!;
+  }
+
+  /**
+   * Reset all services and repositories (useful for testing)
+   */
+  public reset(): void {
+    this._analyticsRepository = null;
+    this._analyticsService = null;
+    this._progressAnalyzer = null;
+    this._competencyAnalyzer = null;
+    this._performanceAnalyzer = null;
+    this._insightGenerator = null;
+  }
+}
+
+/**
+ * Goals domain factory
+ * Manages goals and progress tracking services
+ */
+export class GoalsFactory {
+  private static instance: GoalsFactory;
+  private infrastructureFactory: InfrastructureFactory;
+  private studyFactory: StudyFactory;
+  
+  // Repositories (lazy initialized)
+  private _goalsRepository: IGoalsRepository | null = null;
+
+  // Services (lazy initialized)
+  private _goalsService: IGoalsService | null = null;
+  private _goalsProgressTracker: IGoalsProgressTracker | null = null;
+
+  private constructor() {
+    this.infrastructureFactory = InfrastructureFactory.getInstance();
+    this.studyFactory = StudyFactory.getInstance();
+  }
+
+  /**
+   * Get GoalsFactory singleton instance
+   */
+  public static getInstance(): GoalsFactory {
+    if (!GoalsFactory.instance) {
+      GoalsFactory.instance = new GoalsFactory();
+    }
+    return GoalsFactory.instance;
+  }
+
+  /**
+   * Get Goals Repository
+   */
+  public getGoalsRepository(): IGoalsRepository {
+    if (!this._goalsRepository) {
+      const { GoalsRepository } = require('../repositories/goals.repository');
+      this._goalsRepository = new GoalsRepository(
+        this.infrastructureFactory.getDynamoClient(), 
+        this.infrastructureFactory.getConfig()
+      );
+    }
+    return this._goalsRepository!;
   }
 
   /**
@@ -579,6 +701,76 @@ export class ServiceFactory {
       );
     }
     return this._goalsProgressTracker!;
+  }
+
+  /**
+   * Get Goals Service
+   */
+  public getGoalsService(): IGoalsService {
+    if (!this._goalsService) {
+      const { GoalsService } = require('../services/goals.service');
+      this._goalsService = new GoalsService(
+        this.getGoalsRepository(),
+        this.studyFactory.getProviderService(),
+        this.studyFactory.getExamService(),
+        this.studyFactory.getTopicService(),
+        this.getGoalsProgressTracker()
+      );
+    }
+    return this._goalsService!;
+  }
+
+  /**
+   * Reset all services and repositories (useful for testing)
+   */
+  public reset(): void {
+    this._goalsRepository = null;
+    this._goalsService = null;
+    this._goalsProgressTracker = null;
+  }
+}
+
+/**
+ * Profile domain factory
+ * Manages user profiles and achievement calculations
+ */
+export class ProfileFactory {
+  private static instance: ProfileFactory;
+  private infrastructureFactory: InfrastructureFactory;
+  
+  // Repositories (lazy initialized)
+  private _profileRepository: IProfileRepository | null = null;
+
+  // Services (lazy initialized)
+  private _profileService: IProfileService | null = null;
+  private _achievementCalculator: IAchievementCalculator | null = null;
+
+  private constructor() {
+    this.infrastructureFactory = InfrastructureFactory.getInstance();
+  }
+
+  /**
+   * Get ProfileFactory singleton instance
+   */
+  public static getInstance(): ProfileFactory {
+    if (!ProfileFactory.instance) {
+      ProfileFactory.instance = new ProfileFactory();
+    }
+    return ProfileFactory.instance;
+  }
+
+  /**
+   * Get Profile Repository
+   */
+  public getProfileRepository(): IProfileRepository {
+    if (!this._profileRepository) {
+      const { ProfileRepository } = require('../repositories/profile.repository');
+      this._profileRepository = new ProfileRepository(
+        this.infrastructureFactory.getDynamoClient(), 
+        this.infrastructureFactory.getConfig()
+      );
+    }
+    return this._profileRepository!;
   }
 
   /**
@@ -609,44 +801,373 @@ export class ServiceFactory {
   }
 
   /**
+   * Reset all services and repositories (useful for testing)
+   */
+  public reset(): void {
+    this._profileRepository = null;
+    this._profileService = null;
+    this._achievementCalculator = null;
+  }
+}
+
+/**
+ * Health domain factory
+ * Manages health monitoring and system diagnostics
+ */
+export class HealthFactory {
+  private static instance: HealthFactory;
+  private infrastructureFactory: InfrastructureFactory;
+  
+  // Repositories (lazy initialized)
+  private _healthRepository: IHealthRepository | null = null;
+
+  // Services (lazy initialized)
+  private _healthService: IHealthService | null = null;
+
+  private constructor() {
+    this.infrastructureFactory = InfrastructureFactory.getInstance();
+  }
+
+  /**
+   * Get HealthFactory singleton instance
+   */
+  public static getInstance(): HealthFactory {
+    if (!HealthFactory.instance) {
+      HealthFactory.instance = new HealthFactory();
+    }
+    return HealthFactory.instance;
+  }
+
+  /**
+   * Get Health Repository
+   */
+  public getHealthRepository(): IHealthRepository {
+    if (!this._healthRepository) {
+      const { HealthRepository } = require('../repositories/health.repository');
+      // Health repository needs the raw DynamoDB client for DescribeTableCommand
+      const dynamoClient = new DynamoDBClient({
+        region: this.infrastructureFactory.getConfig().region,
+      });
+      this._healthRepository = new HealthRepository(
+        dynamoClient, 
+        this.infrastructureFactory.getS3Client(), 
+        this.infrastructureFactory.getConfig()
+      );
+    }
+    return this._healthRepository!;
+  }
+
+  /**
+   * Get Health Service
+   */
+  public getHealthService(): IHealthService {
+    if (!this._healthService) {
+      const { HealthService } = require('../services/health.service');
+      this._healthService = new HealthService(this.getHealthRepository());
+    }
+    return this._healthService!;
+  }
+
+  /**
+   * Reset all services and repositories (useful for testing)
+   */
+  public reset(): void {
+    this._healthRepository = null;
+    this._healthService = null;
+  }
+}
+
+/**
+ * Main ServiceFactory class - orchestrates domain-specific factories
+ * Maintains backward compatibility while delegating to focused factories
+ */
+export class ServiceFactory {
+  private static instance: ServiceFactory;
+  
+  // Domain-specific factories
+  private infrastructureFactory: InfrastructureFactory;
+  private authenticationFactory: AuthenticationFactory;
+  private studyFactory: StudyFactory;
+  private analyticsFactory: AnalyticsFactory;
+  private goalsFactory: GoalsFactory;
+  private profileFactory: ProfileFactory;
+  private healthFactory: HealthFactory;
+
+  private constructor() {
+    this.infrastructureFactory = InfrastructureFactory.getInstance();
+    this.authenticationFactory = AuthenticationFactory.getInstance();
+    this.studyFactory = StudyFactory.getInstance();
+    this.analyticsFactory = AnalyticsFactory.getInstance();
+    this.goalsFactory = GoalsFactory.getInstance();
+    this.profileFactory = ProfileFactory.getInstance();
+    this.healthFactory = HealthFactory.getInstance();
+  }
+
+  /**
+   * Get ServiceFactory singleton instance
+   */
+  public static getInstance(): ServiceFactory {
+    if (!ServiceFactory.instance) {
+      ServiceFactory.instance = new ServiceFactory();
+    }
+    return ServiceFactory.instance;
+  }
+
+  // Infrastructure delegation methods
+
+  /**
+   * Get DynamoDB Document Client
+   */
+  public getDynamoClient(): DynamoDBDocumentClient {
+    return this.infrastructureFactory.getDynamoClient();
+  }
+
+  /**
+   * Get S3 Client
+   */
+  public getS3Client(): S3Client {
+    return this.infrastructureFactory.getS3Client();
+  }
+
+  /**
+   * Get configuration
+   */
+  public getConfig(): ServiceConfig {
+    return this.infrastructureFactory.getConfig();
+  }
+
+  // Authentication domain delegation
+
+  /**
+   * Get User Repository
+   */
+  public getUserRepository(): IUserRepository {
+    return this.authenticationFactory.getUserRepository();
+  }
+
+  /**
+   * Get User Service
+   */
+  public getUserService(): IUserService {
+    return this.authenticationFactory.getUserService();
+  }
+
+  /**
+   * Get Auth Service
+   */
+  public getAuthService(): IAuthService {
+    return this.authenticationFactory.getAuthService();
+  }
+
+  // Study domain delegation
+
+  /**
+   * Get Session Repository
+   */
+  public getSessionRepository(): ISessionRepository {
+    return this.studyFactory.getSessionRepository();
+  }
+
+  /**
+   * Get Provider Repository
+   */
+  public getProviderRepository(): IProviderRepository {
+    return this.studyFactory.getProviderRepository();
+  }
+
+  /**
+   * Get Exam Repository
+   */
+  public getExamRepository(): IExamRepository {
+    return this.studyFactory.getExamRepository();
+  }
+
+  /**
+   * Get Topic Repository
+   */
+  public getTopicRepository(): ITopicRepository {
+    return this.studyFactory.getTopicRepository();
+  }
+
+  /**
+   * Get Question Repository
+   */
+  public getQuestionRepository(): IQuestionRepository {
+    return this.studyFactory.getQuestionRepository();
+  }
+
+  /**
+   * Get Provider Service
+   */
+  public getProviderService(): IProviderService {
+    return this.studyFactory.getProviderService();
+  }
+
+  /**
+   * Get Exam Service
+   */
+  public getExamService(): IExamService {
+    return this.studyFactory.getExamService();
+  }
+
+  /**
+   * Get Topic Service
+   */
+  public getTopicService(): ITopicService {
+    return this.studyFactory.getTopicService();
+  }
+
+  /**
+   * Get Question Service
+   */
+  public getQuestionService(): IQuestionService {
+    return this.studyFactory.getQuestionService();
+  }
+
+  /**
+   * Get Session Service
+   */
+  public getSessionService(): ISessionService {
+    return this.studyFactory.getSessionService();
+  }
+
+  /**
+   * Get Session Orchestrator Service
+   */
+  public getSessionOrchestrator(): ISessionOrchestratorService {
+    return this.studyFactory.getSessionOrchestrator();
+  }
+
+  /**
+   * Get Answer Processor Service
+   */
+  public getAnswerProcessor(): IAnswerProcessorService {
+    return this.studyFactory.getAnswerProcessor();
+  }
+
+  /**
+   * Get Session Analyzer Service
+   */
+  public getSessionAnalyzer(): ISessionAnalyzerService {
+    return this.studyFactory.getSessionAnalyzer();
+  }
+
+  // Analytics domain delegation
+
+  /**
+   * Get Analytics Repository
+   */
+  public getAnalyticsRepository(): IAnalyticsRepository {
+    return this.analyticsFactory.getAnalyticsRepository();
+  }
+
+  /**
+   * Get Analytics Service
+   */
+  public getAnalyticsService(): IAnalyticsService {
+    return this.analyticsFactory.getAnalyticsService();
+  }
+
+  /**
+   * Get Progress Analyzer Service
+   */
+  public getProgressAnalyzer(): IProgressAnalyzer {
+    return this.analyticsFactory.getProgressAnalyzer();
+  }
+
+  /**
+   * Get Competency Analyzer Service
+   */
+  public getCompetencyAnalyzer(): ICompetencyAnalyzer {
+    return this.analyticsFactory.getCompetencyAnalyzer();
+  }
+
+  /**
+   * Get Performance Analyzer Service
+   */
+  public getPerformanceAnalyzer(): IPerformanceAnalyzer {
+    return this.analyticsFactory.getPerformanceAnalyzer();
+  }
+
+  /**
+   * Get Insight Generator Service
+   */
+  public getInsightGenerator(): IInsightGenerator {
+    return this.analyticsFactory.getInsightGenerator();
+  }
+
+  // Goals domain delegation
+
+  /**
+   * Get Goals Repository
+   */
+  public getGoalsRepository(): IGoalsRepository {
+    return this.goalsFactory.getGoalsRepository();
+  }
+
+  /**
+   * Get Goals Service
+   */
+  public getGoalsService(): IGoalsService {
+    return this.goalsFactory.getGoalsService();
+  }
+
+  /**
+   * Get Goals Progress Tracker Service
+   */
+  public getGoalsProgressTracker(): IGoalsProgressTracker {
+    return this.goalsFactory.getGoalsProgressTracker();
+  }
+
+  // Profile domain delegation
+
+  /**
+   * Get Profile Repository
+   */
+  public getProfileRepository(): IProfileRepository {
+    return this.profileFactory.getProfileRepository();
+  }
+
+  /**
+   * Get Profile Service
+   */
+  public getProfileService(): IProfileService {
+    return this.profileFactory.getProfileService();
+  }
+
+  /**
+   * Get Achievement Calculator Service
+   */
+  public getAchievementCalculator(): IAchievementCalculator {
+    return this.profileFactory.getAchievementCalculator();
+  }
+
+  // Health domain delegation
+
+  /**
+   * Get Health Repository
+   */
+  public getHealthRepository(): IHealthRepository {
+    return this.healthFactory.getHealthRepository();
+  }
+
+  /**
+   * Get Health Service
+   */
+  public getHealthService(): IHealthService {
+    return this.healthFactory.getHealthService();
+  }
+
+  /**
    * Reset all services and clients (useful for testing)
    */
   public reset(): void {
-    this._dynamoClient = null;
-    this._s3Client = null;
-    
-    // Reset repositories
-    this._userRepository = null;
-    this._sessionRepository = null;
-    this._providerRepository = null;
-    this._examRepository = null;
-    this._topicRepository = null;
-    this._questionRepository = null;
-    this._goalsRepository = null;
-    this._healthRepository = null;
-    this._profileRepository = null;
-    this._analyticsRepository = null;
-
-    // Reset services
-    this._authService = null;
-    this._userService = null;
-    this._providerService = null;
-    this._examService = null;
-    this._topicService = null;
-    this._questionService = null;
-    this._sessionService = null;
-    this._sessionOrchestrator = null;
-    this._answerProcessor = null;
-    this._sessionAnalyzer = null;
-    this._analyticsService = null;
-    this._progressAnalyzer = null;
-    this._competencyAnalyzer = null;
-    this._performanceAnalyzer = null;
-    this._insightGenerator = null;
-    this._goalsService = null;
-    this._goalsProgressTracker = null;
-    this._healthService = null;
-    this._profileService = null;
-    this._achievementCalculator = null;
+    this.infrastructureFactory.reset();
+    this.authenticationFactory.reset();
+    this.studyFactory.reset();
+    this.analyticsFactory.reset();
+    this.goalsFactory.reset();
+    this.profileFactory.reset();
+    this.healthFactory.reset();
   }
 }
