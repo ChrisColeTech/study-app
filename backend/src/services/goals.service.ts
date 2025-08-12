@@ -26,12 +26,12 @@ import { IProviderService } from './provider.service';
 import { IExamService } from './exam.service';
 import { ITopicService } from './topic.service';
 import { createLogger } from '../shared/logger';
+import { BaseService } from '../shared/base-service';
 
 // Re-export the interface for ServiceFactory
 export type { IGoalsService };
 
-export class GoalsService implements IGoalsService {
-  private logger = createLogger({ component: 'GoalsService' });
+export class GoalsService extends BaseService implements IGoalsService {
 
   constructor(
     private goalsRepository: IGoalsRepository,
@@ -39,82 +39,89 @@ export class GoalsService implements IGoalsService {
     private examService: IExamService,
     private topicService: ITopicService,
     private goalsProgressTracker: IGoalsProgressTracker
-  ) {}
+  ) {
+    super();
+  }
 
   /**
    * Create a new goal for a user
    */
   async createGoal(userId: string, request: CreateGoalRequest): Promise<CreateGoalResponse> {
-    this.logger.info('Creating new goal', { 
-      userId, 
-      type: request.type,
-      targetType: request.targetType,
-      title: request.title 
-    });
+    return this.executeWithErrorHandling(
+      async () => {
+        this.validateRequired(userId, 'userId');
+        this.validateRequired(request, 'request');
+        
+        // Validate the request
+        await this.validateGoalRequest(request);
 
-    try {
-      // Validate the request
-      await this.validateGoalRequest(request);
+        // Generate goal ID and timestamps
+        const goalId = uuidv4();
+        const now = new Date().toISOString();
 
-      // Generate goal ID and timestamps
-      const goalId = uuidv4();
-      const now = new Date().toISOString();
+        // Process milestones
+        const milestones: GoalMilestone[] = (request.milestones || []).map((milestone, index) => ({
+          milestoneId: uuidv4(),
+          ...milestone,
+          isCompleted: false,
+          order: index
+        }));
 
-      // Process milestones
-      const milestones: GoalMilestone[] = (request.milestones || []).map((milestone, index) => ({
-        milestoneId: uuidv4(),
-        ...milestone,
-        isCompleted: false,
-        order: index
-      }));
+        // Process reminders
+        const reminders: GoalReminder[] = (request.reminders || []).map(reminder => ({
+          reminderId: uuidv4(),
+          ...reminder
+        }));
 
-      // Process reminders
-      const reminders: GoalReminder[] = (request.reminders || []).map(reminder => ({
-        reminderId: uuidv4(),
-        ...reminder
-      }));
+        // Create goal object
+        const goal: Goal = {
+          goalId,
+          userId,
+          title: request.title,
+          ...(request.description && { description: request.description }),
+          type: request.type,
+          priority: request.priority,
+          status: 'active',
+          targetType: request.targetType,
+          targetValue: request.targetValue,
+          currentValue: 0,
+          ...(request.examId && { examId: request.examId }),
+          ...(request.topicId && { topicId: request.topicId }),
+          ...(request.providerId && { providerId: request.providerId }),
+          ...(request.deadline && { deadline: request.deadline }),
+          startDate: now,
+          createdAt: now,
+          updatedAt: now,
+          progressPercentage: 0,
+          milestones,
+          reminders,
+          isArchived: false
+        };
 
-      // Create goal object
-      const goal: Goal = {
-        goalId,
+        // Store goal using repository
+        const createdGoal = await this.goalsRepository.create(goal);
+
+        this.logSuccess('Goal created successfully', { 
+          goalId: createdGoal.goalId,
+          userId,
+          type: createdGoal.type,
+          targetValue: createdGoal.targetValue,
+          title: createdGoal.title
+        });
+
+        return { goal: createdGoal };
+      },
+      {
+        operation: 'create goal',
+        entityType: 'Goal',
         userId,
-        title: request.title,
-        ...(request.description && { description: request.description }),
-        type: request.type,
-        priority: request.priority,
-        status: 'active',
-        targetType: request.targetType,
-        targetValue: request.targetValue,
-        currentValue: 0,
-        ...(request.examId && { examId: request.examId }),
-        ...(request.topicId && { topicId: request.topicId }),
-        ...(request.providerId && { providerId: request.providerId }),
-        ...(request.deadline && { deadline: request.deadline }),
-        startDate: now,
-        createdAt: now,
-        updatedAt: now,
-        progressPercentage: 0,
-        milestones,
-        reminders,
-        isArchived: false
-      };
-
-      // Store goal using repository
-      const createdGoal = await this.goalsRepository.create(goal);
-
-      this.logger.info('Goal created successfully', { 
-        goalId: createdGoal.goalId,
-        userId,
-        type: createdGoal.type,
-        targetValue: createdGoal.targetValue
-      });
-
-      return { goal: createdGoal };
-
-    } catch (error) {
-      this.logger.error('Failed to create goal', error as Error, { userId, request });
-      throw error;
-    }
+        requestData: {
+          type: request.type,
+          targetType: request.targetType,
+          title: request.title
+        }
+      }
+    );
   }
 
   /**

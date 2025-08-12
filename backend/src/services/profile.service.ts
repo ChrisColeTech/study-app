@@ -15,13 +15,14 @@ import {
   StudyHeatmapData
 } from '../shared/types/profile.types';
 import { createLogger } from '../shared/logger';
+import { BaseService } from '../shared/base-service';
 
-export class ProfileService implements IProfileService {
-  private logger = createLogger({ service: 'ProfileService' });
+export class ProfileService extends BaseService implements IProfileService {
   private profileRepository: IProfileRepository;
   private achievementCalculator: IAchievementCalculator;
 
   constructor(profileRepository: IProfileRepository, achievementCalculator: IAchievementCalculator) {
+    super();
     this.profileRepository = profileRepository;
     this.achievementCalculator = achievementCalculator;
   }

@@ -15,14 +15,15 @@ import { IProviderRepository } from '../repositories/provider.repository';
 import { ProviderFilter } from '../filters/provider.filter';
 import { ProviderMapper } from '../mappers/provider.mapper';
 import { createLogger } from '../shared/logger';
+import { BaseService } from '../shared/base-service';
 
 // Re-export the interface for ServiceFactory
 export type { IProviderService };
 
-export class ProviderService implements IProviderService {
-  private logger = createLogger({ component: 'ProviderService' });
-
-  constructor(private providerRepository: IProviderRepository) {}
+export class ProviderService extends BaseService implements IProviderService {
+  constructor(private providerRepository: IProviderRepository) {
+    super();
+  }
 
   /**
    * Get all providers with optional filtering

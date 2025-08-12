@@ -10,14 +10,15 @@ import {
 } from '../shared/types/topic.types';
 import { ITopicRepository } from '../repositories/topic.repository';
 import { createLogger } from '../shared/logger';
+import { BaseService } from '../shared/base-service';
 
 // Re-export the interface for ServiceFactory
 export type { ITopicService };
 
-export class TopicService implements ITopicService {
-  private logger = createLogger({ component: 'TopicService' });
-
-  constructor(private topicRepository: ITopicRepository) {}
+export class TopicService extends BaseService implements ITopicService {
+  constructor(private topicRepository: ITopicRepository) {
+    super();
+  }
 
   /**
    * Get all topics with optional filtering

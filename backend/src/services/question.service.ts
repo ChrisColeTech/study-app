@@ -18,72 +18,70 @@ import {
 } from '../shared/types/question.types';
 import { IQuestionRepository } from '../repositories/question.repository';
 import { createLogger } from '../shared/logger';
+import { BaseService } from '../shared/base-service';
 
 // Re-export the interface for ServiceFactory
 export type { IQuestionService };
 
-export class QuestionService implements IQuestionService {
-  private logger = createLogger({ component: 'QuestionService' });
+export class QuestionService extends BaseService implements IQuestionService {
 
   constructor(
     private questionRepository: IQuestionRepository,
     private questionSelector: QuestionSelector,
     private questionAnalyzer: QuestionAnalyzer
-  ) {}
+  ) {
+    super();
+  }
 
   /**
    * Get questions with comprehensive filtering
    */
   async getQuestions(request: GetQuestionsRequest): Promise<GetQuestionsResponse> {
-    this.logger.info('Getting questions', { 
-      provider: request.provider,
-      exam: request.exam,
-      topic: request.topic,
-      difficulty: request.difficulty,
-      type: request.type,
-      search: request.search,
-      limit: request.limit,
-      offset: request.offset
-    });
+    return this.executeWithErrorHandling(
+      async () => {
+        this.validateRequired(request, 'request');
+        
+        // Get questions based on provider/exam filters using repository
+        let allQuestions: Question[] = [];
 
-    try {
-      // Get questions based on provider/exam filters using repository
-      let allQuestions: Question[] = [];
+        if (request.provider && request.exam) {
+          // Load questions for specific provider/exam
+          allQuestions = await this.questionRepository.findByExam(request.provider, request.exam);
+        } else if (request.provider) {
+          // Load questions for all exams in provider
+          allQuestions = await this.questionRepository.findByProvider(request.provider);
+        } else {
+          // No provider specified - return empty array for now since we have no data loaded
+          // This allows the endpoint to work correctly and return proper empty response
+          this.logWarning('No provider/exam filters specified - returning empty results', {});
+          allQuestions = [];
+        }
 
-      if (request.provider && request.exam) {
-        // Load questions for specific provider/exam
-        allQuestions = await this.questionRepository.findByExam(request.provider, request.exam);
-      } else if (request.provider) {
-        // Load questions for all exams in provider
-        allQuestions = await this.questionRepository.findByProvider(request.provider);
-      } else {
-        // No provider specified - return empty array for now since we have no data loaded
-        // This allows the endpoint to work correctly and return proper empty response
-        this.logger.warn('No provider/exam filters specified - returning empty results');
-        allQuestions = [];
-      }
+        // Delegate filtering and processing to QuestionSelector
+        const result = await this.questionSelector.selectQuestions(allQuestions, request);
 
-      // Delegate filtering and processing to QuestionSelector
-      const result = await this.questionSelector.selectQuestions(allQuestions, request);
-
-      this.logger.info('Questions retrieved successfully', { 
-        total: result.total,
-        returned: result.questions.length,
-        filters: {
+        this.logSuccess('Questions retrieved successfully', { 
+          total: result.total,
+          returned: result.questions.length,
           provider: request.provider,
           exam: request.exam,
           topic: request.topic,
           difficulty: request.difficulty,
           type: request.type
+        });
+
+        return result;
+      },
+      {
+        operation: 'get questions',
+        entityType: 'Question',
+        requestData: {
+          provider: request.provider,
+          exam: request.exam,
+          limit: request.limit
         }
-      });
-
-      return result;
-
-    } catch (error) {
-      this.logger.error('Failed to get questions', error as Error);
-      throw new Error('Failed to retrieve questions');
-    }
+      }
+    );
   }
 
   /**
@@ -91,41 +89,38 @@ export class QuestionService implements IQuestionService {
    * Phase 13: Question Details Feature
    */
   async getQuestion(request: GetQuestionRequest): Promise<GetQuestionResponse> {
-    this.logger.info('Getting question by ID', { 
-      questionId: request.questionId,
-      includeExplanation: request.includeExplanation,
-      includeMetadata: request.includeMetadata
-    });
+    return this.executeWithErrorHandling(
+      async () => {
+        this.validateRequired(request, 'request');
+        this.validateRequired(request.questionId, 'questionId');
+        
+        // Get question from repository
+        const question = await this.questionRepository.findById(request.questionId);
+        const validatedQuestion = this.validateEntityExists(question, 'Question', request.questionId);
 
-    try {
-      // Get question from repository
-      const question = await this.questionRepository.findById(request.questionId);
-      
-      if (!question) {
-        this.logger.warn('Question not found', { questionId: request.questionId });
-        throw new Error(`Question not found: ${request.questionId}`);
+        // Process question output using QuestionSelector
+        const processedQuestion = this.questionSelector.processQuestionOutput(validatedQuestion, request);
+        
+        this.logSuccess('Question retrieved successfully', { 
+          questionId: request.questionId,
+          providerId: processedQuestion.providerId,
+          examId: processedQuestion.examId,
+          includeExplanation: request.includeExplanation,
+          includeMetadata: request.includeMetadata
+        });
+
+        return { question: processedQuestion };
+      },
+      {
+        operation: 'get question',
+        entityType: 'Question',
+        entityId: request.questionId,
+        requestData: {
+          includeExplanation: request.includeExplanation,
+          includeMetadata: request.includeMetadata
+        }
       }
-
-      // Process question output using QuestionSelector
-      const processedQuestion = this.questionSelector.processQuestionOutput(question, request);
-      
-      this.logger.info('Question retrieved successfully', { 
-        questionId: request.questionId,
-        providerId: processedQuestion.providerId,
-        examId: processedQuestion.examId
-      });
-
-      return { question: processedQuestion };
-
-    } catch (error) {
-      this.logger.error('Failed to get question', error as Error, { questionId: request.questionId });
-      
-      if ((error as Error).message.includes('not found')) {
-        throw error; // Re-throw not found errors as-is
-      }
-      
-      throw new Error(`Failed to retrieve question: ${request.questionId}`);
-    }
+    );
   }
 
   /**
@@ -133,76 +128,77 @@ export class QuestionService implements IQuestionService {
    * Phase 14: Question Search Feature
    */
   async searchQuestions(request: SearchQuestionsRequest): Promise<SearchQuestionsResponse> {
-    this.logger.info('Searching questions', { 
-      query: request.query,
-      provider: request.provider,
-      exam: request.exam,
-      topic: request.topic,
-      difficulty: request.difficulty,
-      type: request.type,
-      tags: request.tags,
-      sortBy: request.sortBy,
-      limit: request.limit,
-      offset: request.offset
-    });
+    return this.executeWithErrorHandling(
+      async () => {
+        this.validateRequired(request, 'request');
+        this.validateRequired(request.query, 'query');
+        
+        const startTime = Date.now();
 
-    const startTime = Date.now();
+        // Use repository search if available, otherwise fall back to manual search
+        let searchResults: Question[];
+        
+        if (request.provider && request.exam) {
+          // Use repository search method for better performance
+          searchResults = await this.questionRepository.searchQuestions(
+            request.query, 
+            request.provider, 
+            request.exam
+          );
+        } else if (request.provider) {
+          searchResults = await this.questionRepository.searchQuestions(
+            request.query, 
+            request.provider
+          );
+        } else {
+          searchResults = await this.questionRepository.searchQuestions(request.query);
+        }
 
-    try {
-      // Use repository search if available, otherwise fall back to manual search
-      let searchResults: Question[];
-      
-      if (request.provider && request.exam) {
-        // Use repository search method for better performance
-        searchResults = await this.questionRepository.searchQuestions(
-          request.query, 
-          request.provider, 
-          request.exam
-        );
-      } else if (request.provider) {
-        searchResults = await this.questionRepository.searchQuestions(
-          request.query, 
-          request.provider
-        );
-      } else {
-        searchResults = await this.questionRepository.searchQuestions(request.query);
+        // Delegate search processing to QuestionAnalyzer
+        const result = await this.questionAnalyzer.performAdvancedSearch(searchResults, request, startTime);
+
+        this.logSuccess('Questions searched successfully', { 
+          query: request.query,
+          total: result.total,
+          returned: result.questions.length,
+          searchTime: result.searchTime,
+          averageScore: result.questions.length > 0 
+            ? result.questions.reduce((sum, r) => sum + r.relevanceScore, 0) / result.questions.length 
+            : 0,
+          provider: request.provider,
+          exam: request.exam
+        });
+
+        return result;
+      },
+      {
+        operation: 'search questions',
+        entityType: 'Question',
+        requestData: {
+          query: request.query,
+          provider: request.provider,
+          exam: request.exam,
+          limit: request.limit
+        }
       }
-
-      // Delegate search processing to QuestionAnalyzer
-      const result = await this.questionAnalyzer.performAdvancedSearch(searchResults, request, startTime);
-
-      this.logger.info('Questions searched successfully', { 
-        query: request.query,
-        total: result.total,
-        returned: result.questions.length,
-        searchTime: result.searchTime,
-        averageScore: result.questions.length > 0 
-          ? result.questions.reduce((sum, r) => sum + r.relevanceScore, 0) / result.questions.length 
-          : 0
-      });
-
-      return result;
-
-    } catch (error) {
-      this.logger.error('Failed to search questions', error as Error);
-      throw new Error('Failed to search questions');
-    }
+    );
   }
 
   /**
    * Refresh question cache (admin operation)
    */
   async refreshCache(): Promise<void> {
-    this.logger.info('Refreshing question cache');
-
-    try {
-      this.questionRepository.clearCache();
-      
-      this.logger.info('Question cache refreshed successfully');
-    } catch (error) {
-      this.logger.error('Failed to refresh question cache', error as Error);
-      throw error;
-    }
+    return this.executeWithErrorHandling(
+      async () => {
+        this.questionRepository.clearCache();
+        
+        this.logSuccess('Question cache refreshed successfully', {});
+      },
+      {
+        operation: 'refresh question cache',
+        entityType: 'QuestionCache'
+      }
+    );
   }
 }
 

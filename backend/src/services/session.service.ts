@@ -40,12 +40,12 @@ import { IExamService } from './exam.service';
 import { ITopicService } from './topic.service';
 import { IQuestionService } from './question.service';
 import { createLogger } from '../shared/logger';
+import { BaseService } from '../shared/base-service';
 
 // Re-export the interface for ServiceFactory
 export type { ISessionService };
 
-export class SessionService implements ISessionService {
-  private logger = createLogger({ component: 'SessionService' });
+export class SessionService extends BaseService implements ISessionService {
 
   constructor(
     private sessionRepository: ISessionRepository,
@@ -55,7 +55,9 @@ export class SessionService implements ISessionService {
     private examService: IExamService,
     private topicService: ITopicService,
     private questionService: IQuestionService
-  ) {}
+  ) {
+    super();
+  }
 
   /**
    * Create a new study session with configuration

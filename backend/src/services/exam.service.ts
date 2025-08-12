@@ -11,11 +11,12 @@ import {
 } from '../shared/types/exam.types';
 import { IExamRepository } from '../repositories/exam.repository';
 import { createLogger } from '../shared/logger';
+import { BaseService } from '../shared/base-service';
 
-export class ExamService implements IExamService {
-  private logger = createLogger({ component: 'ExamService' });
-
-  constructor(private examRepository: IExamRepository) {}
+export class ExamService extends BaseService implements IExamService {
+  constructor(private examRepository: IExamRepository) {
+    super();
+  }
 
   /**
    * Get all exams with optional filtering
