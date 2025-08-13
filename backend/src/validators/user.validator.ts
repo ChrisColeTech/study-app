@@ -10,24 +10,24 @@ export interface UserValidationResult {
 
 export class UserValidator {
   /**
-   * Validate email format using standard regex
+   * Validate email format using ValidationRulesLibrary standard
+   * Eliminates duplication with ValidationRules.email()
    */
   static validateEmail(email: string): UserValidationResult {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    // Use centralized email validation to eliminate duplication
+    const { validateEmail } = require('../shared/middleware/validation.rules-library');
+    const emailValidator = validateEmail();
+    const result = emailValidator(email);
 
-    if (!email) {
-      return { isValid: false, errors: ['Email is required'] };
-    }
-
-    if (!emailRegex.test(email)) {
-      return { isValid: false, errors: ['Invalid email format'] };
-    }
-
-    return { isValid: true, errors: [] };
+    return {
+      isValid: result.isValid,
+      errors: result.isValid ? [] : [result.error!],
+    };
   }
 
   /**
    * Validate name field (firstName or lastName)
+   * Uses ValidationRulesLibrary for consistent string length validation
    */
   static validateName(name: string, fieldName: string): UserValidationResult {
     const errors: string[] = [];
@@ -37,8 +37,13 @@ export class UserValidator {
       return { isValid: false, errors };
     }
 
-    if (name.trim().length > 50) {
-      errors.push(`${fieldName} must be 50 characters or less`);
+    // Use centralized string length validation
+    const { validateStringLength } = require('../shared/middleware/validation.rules-library');
+    const lengthValidator = validateStringLength(1, 50);
+    const lengthResult = lengthValidator(name.trim());
+
+    if (!lengthResult.isValid) {
+      errors.push(`${fieldName}: ${lengthResult.error}`);
     }
 
     // Validate name contains only letters, spaces, hyphens, and apostrophes
@@ -131,5 +136,64 @@ export class UserValidator {
     if (!result.isValid) {
       throw new Error(result.errors[0]); // Throw first error for backward compatibility
     }
+  }
+
+  /**
+   * ValidationMiddleware-compatible email validation function
+   */
+  static getEmailValidationFunction() {
+    return (email: string): { isValid: boolean; error?: string } => {
+      const result = this.validateEmail(email);
+      
+      return {
+        isValid: result.isValid,
+        error: result.isValid ? undefined : result.errors[0],
+      };
+    };
+  }
+
+  /**
+   * ValidationMiddleware-compatible name validation function
+   */
+  static getNameValidationFunction(fieldName: string) {
+    return (name: string): { isValid: boolean; error?: string } => {
+      const result = this.validateName(name, fieldName);
+      
+      return {
+        isValid: result.isValid,
+        error: result.isValid ? undefined : result.errors[0],
+      };
+    };
+  }
+
+  /**
+   * Create validation rules compatible with ValidationMiddleware schema system
+   */
+  static createEmailValidationRule(field: string = 'email') {
+    return {
+      field,
+      validate: this.getEmailValidationFunction(),
+    };
+  }
+
+  /**
+   * Create validation rules for name fields
+   */
+  static createNameValidationRule(field: string, displayName: string) {
+    return {
+      field,
+      validate: this.getNameValidationFunction(displayName),
+    };
+  }
+
+  /**
+   * Create complete user creation validation rules
+   */
+  static createUserCreationRules() {
+    return [
+      this.createEmailValidationRule('email'),
+      this.createNameValidationRule('firstName', 'First name'),
+      this.createNameValidationRule('lastName', 'Last name'),
+    ];
   }
 }

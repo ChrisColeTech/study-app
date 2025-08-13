@@ -19,7 +19,7 @@ import {
   ErrorHandlingMiddleware,
   ErrorContexts,
   ValidationMiddleware,
-  ValidationRules,
+  ValidationRulesLibrary,
   AuthMiddleware,
   AuthConfigs,
   AuthenticatedContext,

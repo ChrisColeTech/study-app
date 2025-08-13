@@ -18,7 +18,7 @@ import {
 import {
   ParsingMiddleware,
   ValidationMiddleware,
-  ValidationRules,
+  ValidationRulesLibrary,
   ErrorHandlingMiddleware,
   AuthMiddleware,
   ErrorContexts,

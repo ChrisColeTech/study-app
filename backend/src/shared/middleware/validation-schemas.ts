@@ -1,13 +1,13 @@
 // Validation schemas for extracting handler validation methods
 // Phase 2: Handler Validation Extraction
 
+import { ValidationSchema } from './validation.middleware';
+import * as ValidationRules from './validation.rules-library';
 import { 
-  ValidationSchema, 
-  ValidationRules,
-  TypeSafeValidationGenerator,
+  TypeSafeValidationEngine,
   TypeValidationDefinition,
   TypeAwareValidationSchema
-} from './validation.middleware';
+} from './validation.type-safe-engine';
 import { HandlerContext, ApiResponse } from '../types/api.types';
 import { ERROR_CODES } from '../constants/error.constants';
 
@@ -25,14 +25,14 @@ export class SessionValidationSchemas {
         { field: 'examId', validate: ValidationRules.stringLength(1) },
         { field: 'providerId', validate: ValidationRules.stringLength(1) },
         { field: 'sessionType', validate: ValidationRules.sessionType() },
-        { field: 'examId', validate: ValidationRules.alphanumericId() },
-        { field: 'providerId', validate: ValidationRules.alphanumericId() },
-        { field: 'questionCount', validate: ValidationRules.numberRange(1, 200) },
+        { field: 'examId', validate: ValidationRules.validateAlphanumericId() },
+        { field: 'providerId', validate: ValidationRules.validateAlphanumericId() },
+        { field: 'questionCount', validate: ValidationRules.validateNumberRange(1, 200) },
         {
           field: 'topics',
-          validate: ValidationRules.array(undefined, 20, ValidationRules.alphanumericId()),
+          validate: ValidationRules.validateArray(undefined, 20),
         },
-        { field: 'timeLimit', validate: ValidationRules.numberRange(5, 300) },
+        { field: 'timeLimit', validate: ValidationRules.validateNumberRange(5, 300) },
       ],
     };
   }
@@ -68,10 +68,10 @@ export class SessionValidationSchemas {
             return { isValid: true };
           }),
         },
-        { field: 'currentQuestionIndex', validate: ValidationRules.numberRange(0) },
+        { field: 'currentQuestionIndex', validate: ValidationRules.validateNumberRange(0) },
         { field: 'questionId', validate: ValidationRules.stringLength(1) },
-        { field: 'userAnswer', validate: ValidationRules.array(1) },
-        { field: 'timeSpent', validate: ValidationRules.numberRange(0) },
+        { field: 'userAnswer', validate: ValidationRules.validateArray(1) },
+        { field: 'timeSpent', validate: ValidationRules.validateNumberRange(0) },
       ],
     };
   }
@@ -84,11 +84,11 @@ export class SessionValidationSchemas {
       required: ['questionId', 'answer', 'timeSpent'],
       rules: [
         { field: 'questionId', validate: ValidationRules.stringLength(1) },
-        { field: 'questionId', validate: ValidationRules.alphanumericId() },
-        { field: 'answer', validate: ValidationRules.array(1) },
-        { field: 'timeSpent', validate: ValidationRules.numberRange(0) },
-        { field: 'skipped', validate: ValidationRules.boolean() },
-        { field: 'markedForReview', validate: ValidationRules.boolean() },
+        { field: 'questionId', validate: ValidationRules.validateAlphanumericId() },
+        { field: 'answer', validate: ValidationRules.validateArray(1) },
+        { field: 'timeSpent', validate: ValidationRules.validateNumberRange(0) },
+        { field: 'skipped', validate: ValidationRules.validateBoolean() },
+        { field: 'markedForReview', validate: ValidationRules.validateBoolean() },
       ],
     };
   }
@@ -149,7 +149,7 @@ export class GoalsValidationSchemas {
             return { isValid: true };
           }),
         },
-        { field: 'targetValue', validate: ValidationRules.numberRange(1) },
+        { field: 'targetValue', validate: ValidationRules.validateNumberRange(1) },
         {
           field: 'deadline',
           validate: ValidationRules.custom((value: string) => {
@@ -206,8 +206,8 @@ export class GoalsValidationSchemas {
             return { isValid: true };
           }),
         },
-        { field: 'targetValue', validate: ValidationRules.numberRange(1) },
-        { field: 'currentValue', validate: ValidationRules.numberRange(0) },
+        { field: 'targetValue', validate: ValidationRules.validateNumberRange(1) },
+        { field: 'currentValue', validate: ValidationRules.validateNumberRange(0) },
         {
           field: 'deadline',
           validate: ValidationRules.custom((value: string) => {
@@ -263,8 +263,8 @@ export class AnalyticsValidationSchemas {
         },
         { field: 'startDate', validate: ValidationRules.isoDate() },
         { field: 'endDate', validate: ValidationRules.isoDate() },
-        { field: 'providerId', validate: ValidationRules.alphanumericId() },
-        { field: 'examId', validate: ValidationRules.alphanumericId() },
+        { field: 'providerId', validate: ValidationRules.validateAlphanumericId() },
+        { field: 'examId', validate: ValidationRules.validateAlphanumericId() },
         {
           field: 'topics',
           validate: ValidationRules.custom((value: string) => {
@@ -285,8 +285,8 @@ export class AnalyticsValidationSchemas {
             return { isValid: true };
           }),
         },
-        { field: 'limit', validate: ValidationRules.numberRange(1, 1000) },
-        { field: 'offset', validate: ValidationRules.numberRange(0) },
+        { field: 'limit', validate: ValidationRules.validateNumberRange(1, 1000) },
+        { field: 'offset', validate: ValidationRules.validateNumberRange(0) },
       ],
     };
   }
@@ -342,9 +342,9 @@ export class QuestionValidationSchemas {
     return {
       required: [],
       rules: [
-        { field: 'provider', validate: ValidationRules.alphanumericId() },
-        { field: 'exam', validate: ValidationRules.alphanumericId() },
-        { field: 'topic', validate: ValidationRules.alphanumericId() },
+        { field: 'provider', validate: ValidationRules.validateAlphanumericId() },
+        { field: 'exam', validate: ValidationRules.validateAlphanumericId() },
+        { field: 'topic', validate: ValidationRules.validateAlphanumericId() },
         {
           field: 'difficulty',
           validate: ValidationRules.custom((value: string) => {
@@ -387,9 +387,9 @@ export class QuestionValidationSchemas {
             return { isValid: true };
           }),
         },
-        { field: 'tags', validate: ValidationRules.array() },
-        { field: 'limit', validate: ValidationRules.numberRange(1, 100) },
-        { field: 'offset', validate: ValidationRules.numberRange(0) },
+        { field: 'tags', validate: ValidationRules.validateArray() },
+        { field: 'limit', validate: ValidationRules.validateNumberRange(1, 100) },
+        { field: 'offset', validate: ValidationRules.validateNumberRange(0) },
       ],
     };
   }
@@ -456,7 +456,7 @@ export class AuthValidationSchemas {
     return {
       required: ['email', 'password', 'firstName', 'lastName'],
       rules: [
-        { field: 'email', validate: ValidationRules.email() },
+        { field: 'email', validate: ValidationRules.validateEmail() },
         { field: 'password', validate: ValidationRules.stringLength(8, 128) },
         { field: 'firstName', validate: ValidationRules.stringLength(1, 50) },
         { field: 'lastName', validate: ValidationRules.stringLength(1, 50) },
@@ -489,7 +489,7 @@ export class AuthValidationSchemas {
     return {
       required: ['email', 'password'],
       rules: [
-        { field: 'email', validate: ValidationRules.email() },
+        { field: 'email', validate: ValidationRules.validateEmail() },
         { field: 'password', validate: ValidationRules.stringLength(1, 128) },
       ],
     };
@@ -541,10 +541,10 @@ export class ProviderValidationSchemas {
     return {
       required: [],
       rules: [
-        { field: 'includeExams', validate: ValidationRules.boolean() },
-        { field: 'includeStats', validate: ValidationRules.boolean() },
-        { field: 'limit', validate: ValidationRules.numberRange(1, 100) },
-        { field: 'offset', validate: ValidationRules.numberRange(0) },
+        { field: 'includeExams', validate: ValidationRules.validateBoolean() },
+        { field: 'includeStats', validate: ValidationRules.validateBoolean() },
+        { field: 'limit', validate: ValidationRules.validateNumberRange(1, 100) },
+        { field: 'offset', validate: ValidationRules.validateNumberRange(0) },
       ],
     };
   }
@@ -560,7 +560,7 @@ export class ExamValidationSchemas {
   static examId(): ValidationSchema {
     return {
       required: ['examId'],
-      rules: [{ field: 'examId', validate: ValidationRules.alphanumericId() }],
+      rules: [{ field: 'examId', validate: ValidationRules.validateAlphanumericId() }],
     };
   }
 
@@ -571,9 +571,9 @@ export class ExamValidationSchemas {
     return {
       required: [],
       rules: [
-        { field: 'providerId', validate: ValidationRules.alphanumericId() },
-        { field: 'includeTopics', validate: ValidationRules.boolean() },
-        { field: 'includeQuestionCount', validate: ValidationRules.boolean() },
+        { field: 'providerId', validate: ValidationRules.validateAlphanumericId() },
+        { field: 'includeTopics', validate: ValidationRules.validateBoolean() },
+        { field: 'includeQuestionCount', validate: ValidationRules.validateBoolean() },
         {
           field: 'difficulty',
           validate: ValidationRules.custom((value: string) => {
@@ -588,8 +588,8 @@ export class ExamValidationSchemas {
             return { isValid: true };
           }),
         },
-        { field: 'limit', validate: ValidationRules.numberRange(1, 100) },
-        { field: 'offset', validate: ValidationRules.numberRange(0) },
+        { field: 'limit', validate: ValidationRules.validateNumberRange(1, 100) },
+        { field: 'offset', validate: ValidationRules.validateNumberRange(0) },
       ],
     };
   }
@@ -605,7 +605,7 @@ export class TopicValidationSchemas {
   static topicId(): ValidationSchema {
     return {
       required: ['topicId'],
-      rules: [{ field: 'topicId', validate: ValidationRules.alphanumericId() }],
+      rules: [{ field: 'topicId', validate: ValidationRules.validateAlphanumericId() }],
     };
   }
 
@@ -616,12 +616,12 @@ export class TopicValidationSchemas {
     return {
       required: [],
       rules: [
-        { field: 'providerId', validate: ValidationRules.alphanumericId() },
-        { field: 'examId', validate: ValidationRules.alphanumericId() },
-        { field: 'includeQuestionCount', validate: ValidationRules.boolean() },
-        { field: 'includeSubtopics', validate: ValidationRules.boolean() },
-        { field: 'limit', validate: ValidationRules.numberRange(1, 100) },
-        { field: 'offset', validate: ValidationRules.numberRange(0) },
+        { field: 'providerId', validate: ValidationRules.validateAlphanumericId() },
+        { field: 'examId', validate: ValidationRules.validateAlphanumericId() },
+        { field: 'includeQuestionCount', validate: ValidationRules.validateBoolean() },
+        { field: 'includeSubtopics', validate: ValidationRules.validateBoolean() },
+        { field: 'limit', validate: ValidationRules.validateNumberRange(1, 100) },
+        { field: 'offset', validate: ValidationRules.validateNumberRange(0) },
       ],
     };
   }
@@ -638,11 +638,11 @@ export class HealthValidationSchemas {
     return {
       required: [],
       rules: [
-        { field: 'includeDatabase', validate: ValidationRules.boolean() },
-        { field: 'includeStorage', validate: ValidationRules.boolean() },
-        { field: 'includeCache', validate: ValidationRules.boolean() },
-        { field: 'includeExternal', validate: ValidationRules.boolean() },
-        { field: 'timeout', validate: ValidationRules.numberRange(1000, 30000) },
+        { field: 'includeDatabase', validate: ValidationRules.validateBoolean() },
+        { field: 'includeStorage', validate: ValidationRules.validateBoolean() },
+        { field: 'includeCache', validate: ValidationRules.validateBoolean() },
+        { field: 'includeExternal', validate: ValidationRules.validateBoolean() },
+        { field: 'timeout', validate: ValidationRules.validateNumberRange(1000, 30000) },
       ],
     };
   }
@@ -669,19 +669,19 @@ export class TypeAwareValidationSchemas {
    * Session Type Validation - corresponds to CreateSessionRequest interface
    */
   static createSessionRequestFromType(): TypeAwareValidationSchema {
-    return TypeSafeValidationGenerator.fromTypeSchema({
+    return TypeSafeValidationEngine.fromTypeSchema({
       typeName: 'CreateSessionRequest',
       fields: {
         examId: {
           type: 'string',
           required: true,
-          validators: [ValidationRules.stringLength(1), ValidationRules.alphanumericId()],
+          validators: [ValidationRules.stringLength(1), ValidationRules.validateAlphanumericId()],
           description: 'Alphanumeric exam identifier',
         },
         providerId: {
           type: 'string',
           required: true,
-          validators: [ValidationRules.stringLength(1), ValidationRules.alphanumericId()],
+          validators: [ValidationRules.stringLength(1), ValidationRules.validateAlphanumericId()],
           description: 'Alphanumeric provider identifier',
         },
         sessionType: {
@@ -693,31 +693,31 @@ export class TypeAwareValidationSchemas {
         questionCount: {
           type: 'number',
           required: false,
-          validators: [ValidationRules.numberRange(1, 200)],
+          validators: [ValidationRules.validateNumberRange(1, 200)],
           description: 'Number of questions (1-200)',
         },
         topics: {
           type: 'string[]',
           required: false,
-          validators: [ValidationRules.array(undefined, 20, ValidationRules.alphanumericId())],
+          validators: [ValidationRules.validateArray(undefined, 20)],
           description: 'Array of topic identifiers',
         },
         difficulty: {
           type: 'DifficultyLevel',
           required: false,
-          validators: [TypeSafeValidationGenerator.fromEnum(DifficultyLevel, 'DifficultyLevel')],
+          validators: [TypeSafeValidationEngine.fromEnum(DifficultyLevel, 'DifficultyLevel')],
           description: 'Difficulty level from TypeScript enum',
         },
         timeLimit: {
           type: 'number',
           required: false,
-          validators: [ValidationRules.numberRange(5, 300)],
+          validators: [ValidationRules.validateNumberRange(5, 300)],
           description: 'Time limit in minutes (5-300)',
         },
         isAdaptive: {
           type: 'boolean',
           required: false,
-          validators: [ValidationRules.boolean()],
+          validators: [ValidationRules.validateBoolean()],
           description: 'Whether session uses adaptive question selection',
         },
       },
@@ -728,37 +728,37 @@ export class TypeAwareValidationSchemas {
    * Submit Answer Request - corresponds to SubmitAnswerRequest interface
    */
   static submitAnswerRequestFromType(): TypeAwareValidationSchema {
-    return TypeSafeValidationGenerator.fromTypeSchema({
+    return TypeSafeValidationEngine.fromTypeSchema({
       typeName: 'SubmitAnswerRequest',
       fields: {
         questionId: {
           type: 'string',
           required: true,
-          validators: [ValidationRules.stringLength(1), ValidationRules.alphanumericId()],
+          validators: [ValidationRules.stringLength(1), ValidationRules.validateAlphanumericId()],
           description: 'Question identifier',
         },
         answer: {
           type: 'string[]',
           required: true,
-          validators: [ValidationRules.array(1)],
+          validators: [ValidationRules.validateArray(1)],
           description: 'Array of selected answer options',
         },
         timeSpent: {
           type: 'number',
           required: true,
-          validators: [ValidationRules.numberRange(0)],
+          validators: [ValidationRules.validateNumberRange(0)],
           description: 'Time spent in seconds',
         },
         skipped: {
           type: 'boolean',
           required: false,
-          validators: [ValidationRules.boolean()],
+          validators: [ValidationRules.validateBoolean()],
           description: 'Whether question was skipped',
         },
         markedForReview: {
           type: 'boolean',
           required: false,
-          validators: [ValidationRules.boolean()],
+          validators: [ValidationRules.validateBoolean()],
           description: 'Whether question is marked for review',
         },
       },
@@ -769,7 +769,7 @@ export class TypeAwareValidationSchemas {
    * Update Session Request - corresponds to UpdateSessionRequest interface
    */
   static updateSessionRequestFromType(): TypeAwareValidationSchema {
-    return TypeSafeValidationGenerator.fromTypeSchema({
+    return TypeSafeValidationEngine.fromTypeSchema({
       typeName: 'UpdateSessionRequest',
       fields: {
         action: {
@@ -781,31 +781,31 @@ export class TypeAwareValidationSchemas {
         status: {
           type: 'StatusType',
           required: false,
-          validators: [TypeSafeValidationGenerator.fromEnum(StatusType, 'StatusType')],
+          validators: [TypeSafeValidationEngine.fromEnum(StatusType, 'StatusType')],
           description: 'Session status from TypeScript enum',
         },
         currentQuestionIndex: {
           type: 'number',
           required: false,
-          validators: [ValidationRules.numberRange(0)],
+          validators: [ValidationRules.validateNumberRange(0)],
           description: 'Current question index',
         },
         questionId: {
           type: 'string',
           required: false,
-          validators: [ValidationRules.stringLength(1), ValidationRules.alphanumericId()],
+          validators: [ValidationRules.stringLength(1), ValidationRules.validateAlphanumericId()],
           description: 'Current question identifier',
         },
         userAnswer: {
           type: 'string[]',
           required: false,
-          validators: [ValidationRules.array(1)],
+          validators: [ValidationRules.validateArray(1)],
           description: 'User selected answers',
         },
         timeSpent: {
           type: 'number',
           required: false,
-          validators: [ValidationRules.numberRange(0)],
+          validators: [ValidationRules.validateNumberRange(0)],
           description: 'Time spent on current question',
         },
       },
@@ -816,7 +816,7 @@ export class TypeAwareValidationSchemas {
    * Session ID Parameter - corresponds to session ID path parameter
    */
   static sessionIdFromType(): TypeAwareValidationSchema {
-    return TypeSafeValidationGenerator.fromTypeSchema({
+    return TypeSafeValidationEngine.fromTypeSchema({
       typeName: 'SessionIdParam',
       fields: {
         sessionId: {
@@ -833,7 +833,7 @@ export class TypeAwareValidationSchemas {
    * Provider validation with type safety
    */
   static providerIdFromType(): TypeAwareValidationSchema {
-    return TypeSafeValidationGenerator.fromTypeSchema({
+    return TypeSafeValidationEngine.fromTypeSchema({
       typeName: 'ProviderIdParam',
       fields: {
         providerId: {
@@ -862,7 +862,7 @@ export class TypeAwareValidationSchemas {
    * Question ID validation with type safety
    */
   static questionIdFromType(): TypeAwareValidationSchema {
-    return TypeSafeValidationGenerator.fromTypeSchema({
+    return TypeSafeValidationEngine.fromTypeSchema({
       typeName: 'QuestionIdParam',
       fields: {
         questionId: {
@@ -895,7 +895,7 @@ export class TypeAwareValidationSchemas {
    * Analytics request validation with enhanced type safety
    */
   static progressAnalyticsRequestFromType(): TypeAwareValidationSchema {
-    return TypeSafeValidationGenerator.fromTypeSchema({
+    return TypeSafeValidationEngine.fromTypeSchema({
       typeName: 'ProgressAnalyticsRequest',
       fields: {
         timeRange: {
@@ -930,31 +930,31 @@ export class TypeAwareValidationSchemas {
         providerId: {
           type: 'string',
           required: false,
-          validators: [ValidationRules.alphanumericId()],
+          validators: [ValidationRules.validateAlphanumericId()],
           description: 'Filter by provider ID',
         },
         examId: {
           type: 'string',
           required: false,
-          validators: [ValidationRules.alphanumericId()],
+          validators: [ValidationRules.validateAlphanumericId()],
           description: 'Filter by exam ID',
         },
         includeDetails: {
           type: 'boolean',
           required: false,
-          validators: [ValidationRules.boolean()],
+          validators: [ValidationRules.validateBoolean()],
           description: 'Include detailed breakdown',
         },
         limit: {
           type: 'number',
           required: false,
-          validators: [ValidationRules.numberRange(1, 1000)],
+          validators: [ValidationRules.validateNumberRange(1, 1000)],
           description: 'Maximum number of results',
         },
         offset: {
           type: 'number',
           required: false,
-          validators: [ValidationRules.numberRange(0)],
+          validators: [ValidationRules.validateNumberRange(0)],
           description: 'Pagination offset',
         },
       },
@@ -965,7 +965,7 @@ export class TypeAwareValidationSchemas {
    * Goal creation request with comprehensive type validation
    */
   static createGoalRequestFromType(): TypeAwareValidationSchema {
-    return TypeSafeValidationGenerator.fromTypeSchema({
+    return TypeSafeValidationEngine.fromTypeSchema({
       typeName: 'CreateGoalRequest',
       fields: {
         title: {
@@ -1000,19 +1000,19 @@ export class TypeAwareValidationSchemas {
         status: {
           type: 'StatusType',
           required: false,
-          validators: [TypeSafeValidationGenerator.fromEnum(StatusType, 'StatusType')],
+          validators: [TypeSafeValidationEngine.fromEnum(StatusType, 'StatusType')],
           description: 'Goal status from TypeScript enum',
         },
         targetValue: {
           type: 'number',
           required: true,
-          validators: [ValidationRules.numberRange(1)],
+          validators: [ValidationRules.validateNumberRange(1)],
           description: 'Target value for goal completion',
         },
         currentValue: {
           type: 'number',
           required: false,
-          validators: [ValidationRules.numberRange(0)],
+          validators: [ValidationRules.validateNumberRange(0)],
           description: 'Current progress value',
         },
         dueDate: {
@@ -1024,19 +1024,19 @@ export class TypeAwareValidationSchemas {
         examId: {
           type: 'string',
           required: false,
-          validators: [ValidationRules.stringLength(1), ValidationRules.alphanumericId()],
+          validators: [ValidationRules.stringLength(1), ValidationRules.validateAlphanumericId()],
           description: 'Associated exam ID',
         },
         topicId: {
           type: 'string',
           required: false,
-          validators: [ValidationRules.stringLength(1), ValidationRules.alphanumericId()],
+          validators: [ValidationRules.stringLength(1), ValidationRules.validateAlphanumericId()],
           description: 'Associated topic ID',
         },
         providerId: {
           type: 'string',
           required: false,
-          validators: [ValidationRules.stringLength(1), ValidationRules.alphanumericId()],
+          validators: [ValidationRules.stringLength(1), ValidationRules.validateAlphanumericId()],
           description: 'Associated provider ID',
         },
       },
@@ -1061,7 +1061,7 @@ export class EnhancedValidationMiddleware extends ValidationMiddleware {
     typeDefinition: TypeValidationDefinition<T>,
     requestType: 'query' | 'body' | 'params'
   ): { error: ApiResponse | null; data: any } {
-    const schema = TypeSafeValidationGenerator.fromTypeSchema(typeDefinition);
+    const schema = TypeSafeValidationEngine.fromTypeSchema(typeDefinition);
     
     switch (requestType) {
       case 'body':

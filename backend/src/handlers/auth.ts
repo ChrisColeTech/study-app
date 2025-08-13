@@ -13,7 +13,7 @@ import { LoginRequest } from '../shared/types/auth.types';
 import {
   ParsingMiddleware,
   ValidationMiddleware,
-  ValidationRules,
+  ValidationRulesLibrary,
   ErrorHandlingMiddleware,
   AuthMiddleware,
   ErrorContexts,

@@ -9,6 +9,7 @@ export interface PasswordValidationResult {
 export class PasswordValidator {
   /**
    * Comprehensive password strength validation
+   * Compatible with ValidationMiddleware system
    */
   static validate(password: string): PasswordValidationResult {
     const errors: string[] = [];
@@ -63,5 +64,37 @@ export class PasswordValidator {
     if (!result.isValid) {
       throw new Error(result.errors[0]); // Throw first error for backward compatibility
     }
+  }
+
+  /**
+   * ValidationMiddleware-compatible validation function
+   * Returns ValidationResult format expected by ValidationMiddleware
+   */
+  static getValidationFunction() {
+    return (password: string): { isValid: boolean; error?: string } => {
+      const result = this.validate(password);
+      
+      return {
+        isValid: result.isValid,
+        error: result.isValid ? undefined : result.errors[0],
+      };
+    };
+  }
+
+  /**
+   * Create validation rule compatible with ValidationMiddleware schema system
+   */
+  static createValidationRule(field: string = 'password') {
+    return {
+      field,
+      validate: this.getValidationFunction(),
+    };
+  }
+
+  /**
+   * Get all password validation errors for comprehensive reporting
+   */
+  static getAllErrors(password: string): string[] {
+    return this.validate(password).errors;
   }
 }
