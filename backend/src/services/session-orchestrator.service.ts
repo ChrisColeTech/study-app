@@ -1,7 +1,7 @@
 // Session Orchestrator Service - Phase 5: SessionService Decomposition
 // Handles question coordination, session configuration, and selection algorithms
 
-import { StudySession, Question } from '../shared/types/domain.types';
+import { StudySession, Question, DifficultyLevel } from '../shared/types/domain.types';
 import {
   CreateSessionRequest,
   QuestionResponse,
@@ -273,16 +273,11 @@ export class SessionOrchestrator implements ISessionOrchestrator {
       providerId: q.providerId,
       examId: q.examId,
       topicId: q.topicId || '',
-      text: q.questionText,
-      options:
-        q.options?.map((optText, index) => ({
-          id: index.toString(),
-          text: optText,
-          isCorrect: q.correctAnswer === index,
-        })) || [],
-      correctAnswer: [q.correctAnswer.toString()],
+      questionText: q.questionText,
+      options: q.options || [],
+      correctAnswer: q.correctAnswer || [],
       explanation: q.explanation || '',
-      difficulty: this.mapDifficulty(q.difficulty),
+      difficulty: q.difficulty || DifficultyLevel.MEDIUM,
       tags: q.tags || [],
       createdAt: q.createdAt || new Date().toISOString(),
       updatedAt: q.updatedAt || new Date().toISOString(),

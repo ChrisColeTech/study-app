@@ -24,6 +24,7 @@ import {
 import {
   StudySession,
   Question,
+  StatusType,
 } from '../shared/types/domain.types';
 import {
   ISessionRepository,
@@ -102,7 +103,7 @@ export class SessionService extends BaseService implements ISessionService {
         examId: request.examId,
         providerId: request.providerId,
         startTime: now,
-        status: 'active',
+        status: StatusType.ACTIVE,
         questions: sessionQuestions.map(q => ({
           questionId: q.questionId,
           correctAnswer: q.correctAnswer || [],
@@ -221,11 +222,11 @@ export class SessionService extends BaseService implements ISessionService {
       // Handle different update actions
       switch (request.action) {
         case 'pause':
-          updatedSession.status = 'paused';
+          updatedSession.status = StatusType.PAUSED;
           break;
 
         case 'resume':
-          updatedSession.status = 'active';
+          updatedSession.status = StatusType.ACTIVE;
           break;
 
         case 'next':
@@ -337,14 +338,14 @@ export class SessionService extends BaseService implements ISessionService {
       }
 
       // Don't allow deletion of completed sessions - they are archived for analytics
-      if (session.status === 'completed') {
+      if (session.status === StatusType.COMPLETED) {
         throw new Error('Cannot delete completed sessions - they are archived for analytics');
       }
 
       // For active/paused sessions, mark as abandoned instead of hard delete
-      if (session.status === 'active' || session.status === 'paused') {
+      if (session.status === StatusType.ACTIVE || session.status === StatusType.PAUSED) {
         await this.sessionRepository.update(sessionId, {
-          status: 'abandoned',
+          status: StatusType.ABANDONED,
           updatedAt: new Date().toISOString(),
         });
 
@@ -471,7 +472,7 @@ export class SessionService extends BaseService implements ISessionService {
     request: UpdateSessionRequest,
     existingSession: StudySession
   ): void {
-    if (existingSession.status === 'completed') {
+    if (existingSession.status === StatusType.COMPLETED) {
       throw new Error('Cannot update completed session');
     }
 

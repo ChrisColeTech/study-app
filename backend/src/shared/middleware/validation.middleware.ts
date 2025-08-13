@@ -22,9 +22,16 @@ export interface ValidationResult {
   error?: string;
 }
 
+export type ValidationFunction = (value: any, context?: ValidationContext) => ValidationResult;
+
 export interface ValidationSchema {
   rules: ValidationRule[];
   required?: string[];
+  metadata?: {
+    typeName?: string;
+    generatedAt?: string;
+    version?: string;
+  };
 }
 
 export class ValidationMiddleware {
@@ -848,6 +855,334 @@ export class ValidationRules {
       } catch {
         return { isValid: false, error: 'Invalid timezone identifier' };
       }
+    };
+  }
+}
+
+/**
+ * Type-safe validation generator that creates runtime validation schemas from TypeScript types
+ * Bridges compile-time type definitions with runtime validation
+ */
+export class TypeSafeValidationGenerator {
+  /**
+   * Generate validation schema from TypeScript interface structure
+   * Provides type-aware validation that corresponds to actual type definitions
+   */
+  static fromTypeSchema<T extends Record<string, any>>(
+    typeDefinition: TypeValidationDefinition<T>
+  ): ValidationSchema {
+    const rules: ValidationRule[] = [];
+    const required: string[] = [];
+
+    for (const [field, definition] of Object.entries(typeDefinition.fields)) {
+      if (definition.required) {
+        required.push(field);
+      }
+
+      // Add field validation rule with type-aware validation
+      rules.push({
+        field,
+        validate: this.createTypeAwareValidator(field, definition, typeDefinition.typeName),
+      });
+    }
+
+    return {
+      required,
+      rules,
+      metadata: {
+        typeName: typeDefinition.typeName,
+        generatedAt: new Date().toISOString(),
+        version: '1.0.0',
+      },
+    };
+  }
+
+  /**
+   * Create type-aware validator that references the original TypeScript type
+   */
+  private static createTypeAwareValidator(
+    fieldName: string,
+    definition: FieldValidationDefinition,
+    typeName: string
+  ): ValidationFunction {
+    return (value: any, context?: ValidationContext): ValidationResult => {
+      try {
+        // Apply all validators for this field
+        for (const validator of definition.validators) {
+          const result = validator(value);
+          if (!result.isValid) {
+            const typeInfo: {
+              fieldName: string;
+              fieldType: string;
+              typeName: string;
+              expectedFormat?: string;
+            } = {
+              fieldName,
+              fieldType: definition.type,
+              typeName,
+            };
+            
+            if (definition.description) {
+              typeInfo.expectedFormat = definition.description;
+            }
+            
+            return {
+              isValid: false,
+              error: this.enhanceErrorWithTypeInfo(result.error || 'Validation failed', typeInfo),
+            };
+          }
+        }
+
+        return { isValid: true };
+      } catch (error) {
+        logger.error('Type-aware validation failed', {
+          field: fieldName,
+          type: definition.type,
+          typeName,
+          error: (error as Error).message,
+        });
+
+        const typeInfo: {
+          fieldName: string;
+          fieldType: string;
+          typeName: string;
+          expectedFormat?: string;
+        } = {
+          fieldName,
+          fieldType: definition.type,
+          typeName,
+        };
+        
+        if (definition.description) {
+          typeInfo.expectedFormat = definition.description;
+        }
+        
+        return {
+          isValid: false,
+          error: this.enhanceErrorWithTypeInfo('Validation error occurred', typeInfo),
+        };
+      }
+    };
+  }
+
+  /**
+   * Enhance error messages with type information for better developer experience
+   */
+  private static enhanceErrorWithTypeInfo(
+    baseError: string,
+    typeInfo: {
+      fieldName: string;
+      fieldType: string;
+      typeName: string;
+      expectedFormat?: string;
+    }
+  ): string {
+    const { fieldName, fieldType, typeName, expectedFormat } = typeInfo;
+    
+    let enhancedError = `${baseError} (Field: ${fieldName}, Type: ${fieldType})`;
+    
+    if (expectedFormat) {
+      enhancedError += ` - Expected: ${expectedFormat}`;
+    }
+    
+    enhancedError += ` - From TypeScript interface: ${typeName}`;
+    
+    return enhancedError;
+  }
+
+  /**
+   * Generate enum-aware validator that uses actual TypeScript enum values
+   */
+  static fromEnum<T extends Record<string, string>>(
+    enumObject: T,
+    enumName: string
+  ): ValidationFunction {
+    return (value: any): ValidationResult => {
+      if (typeof value !== 'string') {
+        return {
+          isValid: false,
+          error: `Expected string value for enum ${enumName}`,
+        };
+      }
+
+      const enumValues = Object.values(enumObject);
+      if (!enumValues.includes(value)) {
+        return {
+          isValid: false,
+          error: `Invalid ${enumName}. Valid values: ${enumValues.join(', ')} (from TypeScript enum)`,
+        };
+      }
+
+      return { isValid: true };
+    };
+  }
+
+  /**
+   * Generate interface-aware validator that validates object structure against TypeScript interface
+   */
+  static fromInterface<T extends Record<string, any>>(
+    interfaceDefinition: InterfaceValidationDefinition<T>
+  ): ValidationFunction {
+    return (value: any): ValidationResult => {
+      if (!value || typeof value !== 'object') {
+        return {
+          isValid: false,
+          error: `Expected object matching interface ${interfaceDefinition.interfaceName}`,
+        };
+      }
+
+      // Validate each field according to interface definition
+      for (const [fieldName, fieldDef] of Object.entries(interfaceDefinition.fields)) {
+        const fieldValue = value[fieldName];
+        
+        if (fieldDef.required && (fieldValue === undefined || fieldValue === null)) {
+          return {
+            isValid: false,
+            error: `Required field '${fieldName}' missing (from interface ${interfaceDefinition.interfaceName})`,
+          };
+        }
+
+        if (fieldValue !== undefined) {
+          for (const validator of fieldDef.validators) {
+            const result = validator(fieldValue);
+            if (!result.isValid) {
+              return {
+                isValid: false,
+                error: `Field '${fieldName}' validation failed: ${result.error} (from interface ${interfaceDefinition.interfaceName})`,
+              };
+            }
+          }
+        }
+      }
+
+      return { isValid: true };
+    };
+  }
+}
+
+/**
+ * Type definitions for type-safe validation configuration
+ */
+export interface TypeValidationDefinition<T extends Record<string, any>> {
+  typeName: string;
+  fields: {
+    [K in keyof T]: FieldValidationDefinition;
+  };
+}
+
+export interface FieldValidationDefinition {
+  type: string;
+  required: boolean;
+  validators: ValidationFunction[];
+  description?: string;
+}
+
+export interface InterfaceValidationDefinition<T extends Record<string, any>> {
+  interfaceName: string;
+  fields: {
+    [K in keyof T]: FieldValidationDefinition;
+  };
+}
+
+/**
+ * Enhanced validation schema with type metadata
+ */
+export interface TypeAwareValidationSchema extends ValidationSchema {
+  metadata?: {
+    typeName?: string;
+    generatedAt?: string;
+    version?: string;
+  };
+}
+
+/**
+ * Type-safe validation decorators for runtime validation
+ */
+export class TypeSafeValidators {
+  /**
+   * Decorator that validates request against TypeScript type definition
+   */
+  static validateType<T extends Record<string, any>>(
+    typeDefinition: TypeValidationDefinition<T>
+  ) {
+    return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+      const originalMethod = descriptor.value;
+      
+      descriptor.value = async function (...args: any[]) {
+        const context = args[0] as HandlerContext;
+        
+        // Generate validation schema from type definition
+        const schema = TypeSafeValidationGenerator.fromTypeSchema(typeDefinition);
+        
+        // Validate request body against schema
+        const validationResult = ValidationMiddleware.validateRequestBody(context, schema);
+        if (validationResult.error) {
+          return validationResult.error;
+        }
+        
+        // Call original method with validated data
+        return originalMethod.apply(this, args);
+      };
+      
+      return descriptor;
+    };
+  }
+
+  /**
+   * Decorator that validates query parameters against TypeScript type
+   */
+  static validateQueryType<T extends Record<string, any>>(
+    typeDefinition: TypeValidationDefinition<T>
+  ) {
+    return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+      const originalMethod = descriptor.value;
+      
+      descriptor.value = async function (...args: any[]) {
+        const context = args[0] as HandlerContext;
+        
+        // Generate validation schema from type definition
+        const schema = TypeSafeValidationGenerator.fromTypeSchema(typeDefinition);
+        
+        // Validate query parameters against schema
+        const validationError = ValidationMiddleware.validateQueryParams(context, schema);
+        if (validationError) {
+          return validationError;
+        }
+        
+        // Call original method with validated data
+        return originalMethod.apply(this, args);
+      };
+      
+      return descriptor;
+    };
+  }
+
+  /**
+   * Decorator that validates path parameters against TypeScript type
+   */
+  static validatePathType<T extends Record<string, any>>(
+    typeDefinition: TypeValidationDefinition<T>
+  ) {
+    return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+      const originalMethod = descriptor.value;
+      
+      descriptor.value = async function (...args: any[]) {
+        const context = args[0] as HandlerContext;
+        
+        // Generate validation schema from type definition
+        const schema = TypeSafeValidationGenerator.fromTypeSchema(typeDefinition);
+        
+        // Validate path parameters against schema
+        const validationError = ValidationMiddleware.validatePathParams(context, schema);
+        if (validationError) {
+          return validationError;
+        }
+        
+        // Call original method with validated data
+        return originalMethod.apply(this, args);
+      };
+      
+      return descriptor;
     };
   }
 }

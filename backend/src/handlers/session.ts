@@ -24,7 +24,7 @@ import {
   AuthConfigs,
   AuthenticatedContext,
 } from '../shared/middleware';
-import { SessionValidationSchemas } from '../shared/middleware/validation-schemas';
+import { SessionValidationSchemas, TypeAwareValidationSchemas } from '../shared/middleware/validation-schemas';
 
 export class SessionHandler extends BaseHandler {
   private serviceFactory: ServiceFactory;
@@ -159,12 +159,12 @@ export class SessionHandler extends BaseHandler {
    * Create a new study session - Enhanced with optimized middleware integration
    */
   private async createSession(context: HandlerContext): Promise<ApiResponse> {
-    // Use optimized middleware pattern for write operations
+    // Use type-aware validation that corresponds to CreateSessionRequest interface
     return this.executeWithMiddleware(
       context,
       'write', // Pattern: parsing + validation + error handling
       {
-        body: SessionValidationSchemas.createSessionRequest(),
+        body: TypeAwareValidationSchemas.createSessionRequestFromType(),
       },
       async () => {
         const requestBody = context.parsedData?.body as CreateSessionRequest;
@@ -172,12 +172,13 @@ export class SessionHandler extends BaseHandler {
         const sessionService = this.serviceFactory.getSessionService();
         const result = await sessionService.createSession(requestBody);
 
-        this.logger.info('Session created successfully', {
+        this.logger.info('Session created successfully with type-safe validation', {
           requestId: context.requestId,
           sessionId: result.session.sessionId,
           totalQuestions: result.session.totalQuestions,
           providerId: result.session.providerId,
           examId: result.session.examId,
+          validationType: 'CreateSessionRequest',
         });
 
         return result;
@@ -223,56 +224,33 @@ export class SessionHandler extends BaseHandler {
    * Update an existing study session - now clean and focused
    */
   private async updateSession(context: HandlerContext): Promise<ApiResponse> {
-    // No authentication required - sessions work independently (auth association in Phase 30)
-
-    // Parse path parameters using middleware
-    const { data: pathParams, error: parseError } = await this.parsePathParamsOrError(context);
-    if (parseError) return parseError;
-
-    // Parse and validate request body using middleware
-    const { data: requestBody, error: bodyParseError } =
-      ParsingMiddleware.parseRequestBody<UpdateSessionRequest>(context, true);
-    if (bodyParseError) return bodyParseError;
-
-    // Validate session ID using standardized helper
-    const sessionIdValidation = this.validateSessionId(pathParams);
-    if (sessionIdValidation) return sessionIdValidation;
-
-    // Validate update request using ValidationMiddleware
-    const updateValidation = ValidationMiddleware.validateFields(
-      requestBody,
-      SessionValidationSchemas.updateSessionRequest(),
-      'body'
-    );
-    if (updateValidation) return updateValidation;
-
-    // Business logic only - delegate error handling to middleware
-    const { result, error } = await this.executeServiceOrError(
-      async () => {
-        const sessionService = this.serviceFactory.getSessionService();
-        return await sessionService.updateSession(pathParams.id, requestBody!);
-      },
+    // Use type-aware validation that corresponds to UpdateSessionRequest interface
+    return this.executeWithMiddleware(
+      context,
+      'write', // Pattern: parsing + validation + error handling
       {
-        requestId: context.requestId,
-        operation: ErrorContexts.Session.UPDATE,
-        additionalInfo: {
-          sessionId: pathParams.id,
-          action: requestBody!.action,
-        },
+        path: TypeAwareValidationSchemas.sessionIdFromType(),
+        body: TypeAwareValidationSchemas.updateSessionRequestFromType(),
+      },
+      async () => {
+        const pathParams = context.parsedData?.path!;
+        const requestBody = context.parsedData?.body as UpdateSessionRequest;
+        
+        const sessionService = this.serviceFactory.getSessionService();
+        const result = await sessionService.updateSession(pathParams.id, requestBody);
+
+        this.logger.info('Session updated successfully with type-safe validation', {
+          requestId: context.requestId,
+          sessionId: result.session.sessionId,
+          status: result.session.status,
+          currentQuestion: result.progress.currentQuestion,
+          action: requestBody.action,
+          validationType: 'UpdateSessionRequest',
+        });
+
+        return result;
       }
     );
-
-    if (error) return error;
-
-    this.logger.info('Session updated successfully', {
-      requestId: context.requestId,
-      sessionId: result!.session.sessionId,
-      status: result!.session.status,
-      currentQuestion: result!.progress.currentQuestion,
-      action: requestBody!.action,
-    });
-
-    return this.buildSuccessResponse('Session updated successfully', result);
   }
 
   /**
@@ -319,13 +297,13 @@ export class SessionHandler extends BaseHandler {
    * Submit answer for a question in a session - Enhanced with optimized middleware integration
    */
   private async submitAnswer(context: HandlerContext): Promise<ApiResponse> {
-    // Use optimized middleware pattern for write operations with path validation
+    // Use type-aware validation that corresponds to SubmitAnswerRequest interface
     return this.executeWithMiddleware(
       context,
       'write', // Pattern: parsing + validation + error handling
       {
-        path: SessionValidationSchemas.sessionId(),
-        body: SessionValidationSchemas.submitAnswerRequest(),
+        path: TypeAwareValidationSchemas.sessionIdFromType(),
+        body: TypeAwareValidationSchemas.submitAnswerRequestFromType(),
       },
       async () => {
         const pathParams = context.parsedData?.path!;
@@ -334,13 +312,14 @@ export class SessionHandler extends BaseHandler {
         const sessionService = this.serviceFactory.getSessionService();
         const result = await sessionService.submitAnswer(pathParams.id, requestBody);
 
-        this.logger.info('Answer submitted successfully', {
+        this.logger.info('Answer submitted successfully with type-safe validation', {
           requestId: context.requestId,
           sessionId: pathParams.id,
           questionId: requestBody.questionId,
           isCorrect: result.feedback.isCorrect,
           score: result.feedback.score,
           sessionStatus: result.session.status,
+          validationType: 'SubmitAnswerRequest',
         });
 
         return result;

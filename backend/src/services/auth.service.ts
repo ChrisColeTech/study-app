@@ -78,6 +78,10 @@ export class AuthService extends BaseService implements IAuthService {
         }
 
         // Verify password using dedicated service
+        if (!user.passwordHash) {
+          throw new Error('User password hash is missing');
+        }
+        
         const isPasswordValid = await this.passwordService.verifyPassword(
           loginData.password,
           user.passwordHash

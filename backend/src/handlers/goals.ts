@@ -19,7 +19,7 @@ import {
   AuthConfigs,
   AuthenticatedContext,
 } from '../shared/middleware';
-import { GoalsValidationSchemas } from '../shared/middleware/validation-schemas';
+import { GoalsValidationSchemas, TypeAwareValidationSchemas } from '../shared/middleware/validation-schemas';
 
 export class GoalsHandler extends BaseHandler {
   private serviceFactory: ServiceFactory;
@@ -132,10 +132,10 @@ export class GoalsHandler extends BaseHandler {
     const userIdValidation = this.validateUserIdFromBody(requestBody!);
     if (userIdValidation) return userIdValidation;
 
-    // Validate using comprehensive schema (replaces validateCreateGoalRequest)
+    // Validate using type-aware schema that corresponds to CreateGoalRequest interface
     const validationResult = ValidationMiddleware.validateRequestBody(
       context,
-      GoalsValidationSchemas.createGoalRequest()
+      TypeAwareValidationSchemas.createGoalRequestFromType()
     );
     if (validationResult.error) return validationResult.error;
 
@@ -153,18 +153,20 @@ export class GoalsHandler extends BaseHandler {
           type: requestBody!.type,
           targetType: requestBody!.targetType,
           targetValue: requestBody!.targetValue,
+          validationType: 'CreateGoalRequest',
         },
       }
     );
 
     if (error) return error;
 
-    this.logger.info('Goal created successfully', {
+    this.logger.info('Goal created successfully with type-safe validation', {
       requestId: context.requestId,
       userId: requestBody!.userId,
       goalId: result!.goal.goalId,
       type: result!.goal.type,
       targetValue: result!.goal.targetValue,
+      validationType: 'CreateGoalRequest',
     });
 
     return this.buildSuccessResponse('Goal created successfully', result);

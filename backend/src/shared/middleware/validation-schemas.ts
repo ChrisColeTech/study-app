@@ -1,7 +1,15 @@
 // Validation schemas for extracting handler validation methods
 // Phase 2: Handler Validation Extraction
 
-import { ValidationSchema, ValidationRules } from './validation.middleware';
+import { 
+  ValidationSchema, 
+  ValidationRules,
+  TypeSafeValidationGenerator,
+  TypeValidationDefinition,
+  TypeAwareValidationSchema
+} from './validation.middleware';
+import { HandlerContext, ApiResponse } from '../types/api.types';
+import { ERROR_CODES } from '../constants/error.constants';
 
 /**
  * Session validation schemas
@@ -637,5 +645,494 @@ export class HealthValidationSchemas {
         { field: 'timeout', validate: ValidationRules.numberRange(1000, 30000) },
       ],
     };
+  }
+}
+
+/**
+ * TYPE-SAFE VALIDATION SCHEMAS
+ * Generated from TypeScript type definitions to ensure runtime validation matches compile-time types
+ * This section bridges the gap between TypeScript interfaces and runtime validation
+ */
+
+import { 
+  DifficultyLevel, 
+  StatusType,
+} from '../types/domain.types';
+
+/**
+ * Type-aware validation schemas that correspond to TypeScript interfaces
+ * These schemas are generated from actual type definitions to ensure consistency
+ */
+export class TypeAwareValidationSchemas {
+  
+  /**
+   * Session Type Validation - corresponds to CreateSessionRequest interface
+   */
+  static createSessionRequestFromType(): TypeAwareValidationSchema {
+    return TypeSafeValidationGenerator.fromTypeSchema({
+      typeName: 'CreateSessionRequest',
+      fields: {
+        examId: {
+          type: 'string',
+          required: true,
+          validators: [ValidationRules.stringLength(1), ValidationRules.alphanumericId()],
+          description: 'Alphanumeric exam identifier',
+        },
+        providerId: {
+          type: 'string',
+          required: true,
+          validators: [ValidationRules.stringLength(1), ValidationRules.alphanumericId()],
+          description: 'Alphanumeric provider identifier',
+        },
+        sessionType: {
+          type: "'practice' | 'exam' | 'review'",
+          required: true,
+          validators: [ValidationRules.enumValue({ PRACTICE: 'practice', EXAM: 'exam', REVIEW: 'review' }, true)],
+          description: 'Session type enum value',
+        },
+        questionCount: {
+          type: 'number',
+          required: false,
+          validators: [ValidationRules.numberRange(1, 200)],
+          description: 'Number of questions (1-200)',
+        },
+        topics: {
+          type: 'string[]',
+          required: false,
+          validators: [ValidationRules.array(undefined, 20, ValidationRules.alphanumericId())],
+          description: 'Array of topic identifiers',
+        },
+        difficulty: {
+          type: 'DifficultyLevel',
+          required: false,
+          validators: [TypeSafeValidationGenerator.fromEnum(DifficultyLevel, 'DifficultyLevel')],
+          description: 'Difficulty level from TypeScript enum',
+        },
+        timeLimit: {
+          type: 'number',
+          required: false,
+          validators: [ValidationRules.numberRange(5, 300)],
+          description: 'Time limit in minutes (5-300)',
+        },
+        isAdaptive: {
+          type: 'boolean',
+          required: false,
+          validators: [ValidationRules.boolean()],
+          description: 'Whether session uses adaptive question selection',
+        },
+      },
+    });
+  }
+
+  /**
+   * Submit Answer Request - corresponds to SubmitAnswerRequest interface
+   */
+  static submitAnswerRequestFromType(): TypeAwareValidationSchema {
+    return TypeSafeValidationGenerator.fromTypeSchema({
+      typeName: 'SubmitAnswerRequest',
+      fields: {
+        questionId: {
+          type: 'string',
+          required: true,
+          validators: [ValidationRules.stringLength(1), ValidationRules.alphanumericId()],
+          description: 'Question identifier',
+        },
+        answer: {
+          type: 'string[]',
+          required: true,
+          validators: [ValidationRules.array(1)],
+          description: 'Array of selected answer options',
+        },
+        timeSpent: {
+          type: 'number',
+          required: true,
+          validators: [ValidationRules.numberRange(0)],
+          description: 'Time spent in seconds',
+        },
+        skipped: {
+          type: 'boolean',
+          required: false,
+          validators: [ValidationRules.boolean()],
+          description: 'Whether question was skipped',
+        },
+        markedForReview: {
+          type: 'boolean',
+          required: false,
+          validators: [ValidationRules.boolean()],
+          description: 'Whether question is marked for review',
+        },
+      },
+    });
+  }
+
+  /**
+   * Update Session Request - corresponds to UpdateSessionRequest interface
+   */
+  static updateSessionRequestFromType(): TypeAwareValidationSchema {
+    return TypeSafeValidationGenerator.fromTypeSchema({
+      typeName: 'UpdateSessionRequest',
+      fields: {
+        action: {
+          type: "'pause' | 'resume' | 'next' | 'previous' | 'answer' | 'mark_for_review' | 'complete'",
+          required: true,
+          validators: [ValidationRules.sessionAction()],
+          description: 'Session action type',
+        },
+        status: {
+          type: 'StatusType',
+          required: false,
+          validators: [TypeSafeValidationGenerator.fromEnum(StatusType, 'StatusType')],
+          description: 'Session status from TypeScript enum',
+        },
+        currentQuestionIndex: {
+          type: 'number',
+          required: false,
+          validators: [ValidationRules.numberRange(0)],
+          description: 'Current question index',
+        },
+        questionId: {
+          type: 'string',
+          required: false,
+          validators: [ValidationRules.stringLength(1), ValidationRules.alphanumericId()],
+          description: 'Current question identifier',
+        },
+        userAnswer: {
+          type: 'string[]',
+          required: false,
+          validators: [ValidationRules.array(1)],
+          description: 'User selected answers',
+        },
+        timeSpent: {
+          type: 'number',
+          required: false,
+          validators: [ValidationRules.numberRange(0)],
+          description: 'Time spent on current question',
+        },
+      },
+    });
+  }
+
+  /**
+   * Session ID Parameter - corresponds to session ID path parameter
+   */
+  static sessionIdFromType(): TypeAwareValidationSchema {
+    return TypeSafeValidationGenerator.fromTypeSchema({
+      typeName: 'SessionIdParam',
+      fields: {
+        sessionId: {
+          type: 'string',
+          required: true,
+          validators: [ValidationRules.uuid()],
+          description: 'UUID session identifier',
+        },
+      },
+    });
+  }
+
+  /**
+   * Provider validation with type safety
+   */
+  static providerIdFromType(): TypeAwareValidationSchema {
+    return TypeSafeValidationGenerator.fromTypeSchema({
+      typeName: 'ProviderIdParam',
+      fields: {
+        providerId: {
+          type: 'string',
+          required: true,
+          validators: [
+            ValidationRules.stringLength(1),
+            ValidationRules.custom((value: string) => {
+              const validProviderIds = ['aws', 'azure', 'gcp', 'comptia', 'cisco'];
+              if (!validProviderIds.includes(value.toLowerCase())) {
+                return {
+                  isValid: false,
+                  error: `Invalid provider. Valid options: ${validProviderIds.join(', ')}`,
+                };
+              }
+              return { isValid: true };
+            }),
+          ],
+          description: 'Valid certification provider identifier',
+        },
+      },
+    });
+  }
+
+  /**
+   * Question ID validation with type safety
+   */
+  static questionIdFromType(): TypeAwareValidationSchema {
+    return TypeSafeValidationGenerator.fromTypeSchema({
+      typeName: 'QuestionIdParam',
+      fields: {
+        questionId: {
+          type: 'string',
+          required: true,
+          validators: [
+            ValidationRules.stringLength(1),
+            ValidationRules.custom((value: string) => {
+              // Question ID format: providerId-examId-questionNumber or UUID
+              const isUuid = /^[a-f0-9-]{36}$/.test(value);
+              const isCompositeId = /^[a-zA-Z0-9_-]+-[a-zA-Z0-9_-]+-\d+$/.test(value);
+              
+              if (!isUuid && !isCompositeId) {
+                return {
+                  isValid: false,
+                  error: 'Question ID must be either UUID format or composite format (provider-exam-number)',
+                };
+              }
+              
+              return { isValid: true };
+            }),
+          ],
+          description: 'Question identifier (UUID or composite format)',
+        },
+      },
+    });
+  }
+
+  /**
+   * Analytics request validation with enhanced type safety
+   */
+  static progressAnalyticsRequestFromType(): TypeAwareValidationSchema {
+    return TypeSafeValidationGenerator.fromTypeSchema({
+      typeName: 'ProgressAnalyticsRequest',
+      fields: {
+        timeRange: {
+          type: "'week' | 'month' | 'quarter' | 'year' | 'all'",
+          required: false,
+          validators: [
+            ValidationRules.custom((value: string) => {
+              const validRanges = ['week', 'month', 'quarter', 'year', 'all'];
+              if (value && !validRanges.includes(value)) {
+                return {
+                  isValid: false,
+                  error: `Invalid time range. Valid options: ${validRanges.join(', ')}`,
+                };
+              }
+              return { isValid: true };
+            }),
+          ],
+          description: 'Analytics time range',
+        },
+        startDate: {
+          type: 'string',
+          required: false,
+          validators: [ValidationRules.isoDate()],
+          description: 'ISO date string for start date',
+        },
+        endDate: {
+          type: 'string',
+          required: false,
+          validators: [ValidationRules.isoDate()],
+          description: 'ISO date string for end date',
+        },
+        providerId: {
+          type: 'string',
+          required: false,
+          validators: [ValidationRules.alphanumericId()],
+          description: 'Filter by provider ID',
+        },
+        examId: {
+          type: 'string',
+          required: false,
+          validators: [ValidationRules.alphanumericId()],
+          description: 'Filter by exam ID',
+        },
+        includeDetails: {
+          type: 'boolean',
+          required: false,
+          validators: [ValidationRules.boolean()],
+          description: 'Include detailed breakdown',
+        },
+        limit: {
+          type: 'number',
+          required: false,
+          validators: [ValidationRules.numberRange(1, 1000)],
+          description: 'Maximum number of results',
+        },
+        offset: {
+          type: 'number',
+          required: false,
+          validators: [ValidationRules.numberRange(0)],
+          description: 'Pagination offset',
+        },
+      },
+    });
+  }
+
+  /**
+   * Goal creation request with comprehensive type validation
+   */
+  static createGoalRequestFromType(): TypeAwareValidationSchema {
+    return TypeSafeValidationGenerator.fromTypeSchema({
+      typeName: 'CreateGoalRequest',
+      fields: {
+        title: {
+          type: 'string',
+          required: true,
+          validators: [ValidationRules.stringLength(1, 200)],
+          description: 'Goal title (1-200 characters)',
+        },
+        description: {
+          type: 'string',
+          required: false,
+          validators: [ValidationRules.stringLength(0, 1000)],
+          description: 'Goal description (up to 1000 characters)',
+        },
+        type: {
+          type: "'exam_completion' | 'score_achievement' | 'topic_mastery' | 'streak_maintenance'",
+          required: true,
+          validators: [
+            ValidationRules.custom((value: string) => {
+              const validTypes = ['exam_completion', 'score_achievement', 'topic_mastery', 'streak_maintenance'];
+              if (!validTypes.includes(value)) {
+                return {
+                  isValid: false,
+                  error: `Invalid goal type. Valid options: ${validTypes.join(', ')}`,
+                };
+              }
+              return { isValid: true };
+            }),
+          ],
+          description: 'Goal type enum',
+        },
+        status: {
+          type: 'StatusType',
+          required: false,
+          validators: [TypeSafeValidationGenerator.fromEnum(StatusType, 'StatusType')],
+          description: 'Goal status from TypeScript enum',
+        },
+        targetValue: {
+          type: 'number',
+          required: true,
+          validators: [ValidationRules.numberRange(1)],
+          description: 'Target value for goal completion',
+        },
+        currentValue: {
+          type: 'number',
+          required: false,
+          validators: [ValidationRules.numberRange(0)],
+          description: 'Current progress value',
+        },
+        dueDate: {
+          type: 'string',
+          required: false,
+          validators: [ValidationRules.isoDate()],
+          description: 'Goal due date (ISO format)',
+        },
+        examId: {
+          type: 'string',
+          required: false,
+          validators: [ValidationRules.stringLength(1), ValidationRules.alphanumericId()],
+          description: 'Associated exam ID',
+        },
+        topicId: {
+          type: 'string',
+          required: false,
+          validators: [ValidationRules.stringLength(1), ValidationRules.alphanumericId()],
+          description: 'Associated topic ID',
+        },
+        providerId: {
+          type: 'string',
+          required: false,
+          validators: [ValidationRules.stringLength(1), ValidationRules.alphanumericId()],
+          description: 'Associated provider ID',
+        },
+      },
+    });
+  }
+}
+
+// Add ValidationMiddleware import
+import { ValidationMiddleware } from './validation.middleware';
+
+/**
+ * Enhanced middleware integration with type-aware validation
+ * Provides seamless integration between TypeScript types and runtime validation
+ */
+export class EnhancedValidationMiddleware extends ValidationMiddleware {
+  
+  /**
+   * Validate request with type-aware schema
+   */
+  static validateWithTypeSchema<T extends Record<string, any>>(
+    context: HandlerContext,
+    typeDefinition: TypeValidationDefinition<T>,
+    requestType: 'query' | 'body' | 'params'
+  ): { error: ApiResponse | null; data: any } {
+    const schema = TypeSafeValidationGenerator.fromTypeSchema(typeDefinition);
+    
+    switch (requestType) {
+      case 'body':
+        return ValidationMiddleware.validateRequestBody(context, schema);
+      case 'query':
+        const queryError = ValidationMiddleware.validateQueryParams(context, schema);
+        return { 
+          error: queryError, 
+          data: queryError ? null : context.event.queryStringParameters 
+        };
+      case 'params':
+        const paramError = ValidationMiddleware.validatePathParams(context, schema);
+        return { 
+          error: paramError, 
+          data: paramError ? null : context.event.pathParameters 
+        };
+      default:
+        return { 
+          error: {
+            success: false,
+            error: {
+              code: ERROR_CODES.VALIDATION_ERROR,
+              message: 'Invalid request type for validation'
+            },
+            timestamp: new Date().toISOString(),
+          }, 
+          data: null 
+        };
+    }
+  }
+
+  /**
+   * Validate multiple request parts with type schemas
+   */
+  static validateMultipleTypeSafely(
+    context: HandlerContext,
+    validations: {
+      body?: TypeValidationDefinition<any>;
+      query?: TypeValidationDefinition<any>;
+      params?: TypeValidationDefinition<any>;
+    }
+  ): { error: ApiResponse | null; data: { body?: any; query?: any; params?: any } } {
+    const data: { body?: any; query?: any; params?: any } = {};
+
+    // Validate body
+    if (validations.body) {
+      const bodyResult = this.validateWithTypeSchema(context, validations.body, 'body');
+      if (bodyResult.error) {
+        return { error: bodyResult.error, data: {} };
+      }
+      data.body = bodyResult.data;
+    }
+
+    // Validate query parameters
+    if (validations.query) {
+      const queryResult = this.validateWithTypeSchema(context, validations.query, 'query');
+      if (queryResult.error) {
+        return { error: queryResult.error, data: {} };
+      }
+      data.query = queryResult.data;
+    }
+
+    // Validate path parameters
+    if (validations.params) {
+      const paramsResult = this.validateWithTypeSchema(context, validations.params, 'params');
+      if (paramsResult.error) {
+        return { error: paramsResult.error, data: {} };
+      }
+      data.params = paramsResult.data;
+    }
+
+    return { error: null, data };
   }
 }

@@ -2,7 +2,7 @@
 // Handles answer submission, scoring, and session completion logic
 
 import { v4 as uuidv4 } from 'uuid';
-import { StudySession, SessionQuestion, Question } from '../shared/types/domain.types';
+import { StudySession, SessionQuestion, Question, DifficultyLevel, StatusType } from '../shared/types/domain.types';
 import {
   SubmitAnswerRequest,
   SubmitAnswerResponse,
@@ -23,40 +23,33 @@ import { Question as ServiceQuestion } from '../shared/types/question.types';
 export class AnswerProcessor implements IAnswerProcessor {
   private logger = createLogger({ component: 'AnswerProcessor' });
 
-  /**
-   * Transform ServiceQuestion (from question.types.ts) to domain Question (from domain.types.ts)
-   */
-  private transformServiceQuestion(serviceQuestion: ServiceQuestion): Question {
-    return {
-      questionId: serviceQuestion.questionId,
-      providerId: serviceQuestion.providerId,
-      examId: serviceQuestion.examId,
-      topicId: serviceQuestion.topicId || '',
-      text: serviceQuestion.questionText,
-      options: serviceQuestion.options.map((optText, index) => ({
-        id: index.toString(),
-        text: optText,
-        isCorrect: serviceQuestion.correctAnswer === index,
-      })),
-      correctAnswer: [serviceQuestion.correctAnswer.toString()],
-      explanation: serviceQuestion.explanation || '',
-      difficulty: this.mapDifficulty(serviceQuestion.difficulty),
-      tags: serviceQuestion.tags || [],
-      createdAt: serviceQuestion.createdAt || new Date().toISOString(),
-      updatedAt: serviceQuestion.updatedAt || new Date().toISOString(),
-    };
-  }
 
   /**
    * Map QuestionDifficulty to domain difficulty format
    */
-  private mapDifficulty(difficulty: any): 'easy' | 'medium' | 'hard' {
+  private mapDifficulty(difficulty: any): DifficultyLevel {
     if (typeof difficulty === 'string') {
       const lower = difficulty.toLowerCase();
-      if (lower === 'easy' || lower === 'beginner') return 'easy';
-      if (lower === 'medium' || lower === 'intermediate') return 'medium';
-      if (lower === 'hard' || lower === 'advanced' || lower === 'difficult') return 'hard';
+      if (lower === 'easy' || lower === 'beginner') return DifficultyLevel.EASY;
+      if (lower === 'medium' || lower === 'intermediate') return DifficultyLevel.MEDIUM;
+      if (lower === 'hard' || lower === 'advanced' || lower === 'difficult') return DifficultyLevel.HARD;
     }
+    return DifficultyLevel.MEDIUM; // default
+  }
+
+  /**
+   * Map DifficultyLevel enum to string literal for API responses
+   */
+  private mapDifficultyToString(difficulty: DifficultyLevel | string): 'easy' | 'medium' | 'hard' {
+    if (typeof difficulty === 'string') {
+      const lower = difficulty.toLowerCase();
+      if (lower === 'easy' || lower === 'beginner' || lower === DifficultyLevel.EASY) return 'easy';
+      if (lower === 'medium' || lower === 'intermediate' || lower === DifficultyLevel.MEDIUM) return 'medium';
+      if (lower === 'hard' || lower === 'advanced' || lower === 'difficult' || lower === DifficultyLevel.HARD) return 'hard';
+    }
+    if (difficulty === DifficultyLevel.EASY) return 'easy';
+    if (difficulty === DifficultyLevel.MEDIUM) return 'medium';
+    if (difficulty === DifficultyLevel.HARD) return 'hard';
     return 'medium'; // default
   }
 
@@ -92,7 +85,7 @@ export class AnswerProcessor implements IAnswerProcessor {
         throw new Error(`Session not found: ${sessionId}`);
       }
 
-      if (session.status !== 'active') {
+      if (session.status !== StatusType.ACTIVE) {
         throw new Error(`Cannot submit answer for session with status: ${session.status}`);
       }
 
@@ -110,7 +103,7 @@ export class AnswerProcessor implements IAnswerProcessor {
       if (!serviceQuestionDetails) {
         throw new Error(`Question details not found: ${request.questionId}`);
       }
-      const questionDetails = this.transformServiceQuestion(serviceQuestionDetails);
+      const questionDetails = serviceQuestionDetails;
 
       // Step 4: Calculate answer correctness and score
       const isCorrect = this.calculateAnswerCorrectness(
@@ -166,7 +159,7 @@ export class AnswerProcessor implements IAnswerProcessor {
         explanation: questionDetails.explanation,
         score,
         timeSpent: request.timeSpent,
-        questionDifficulty: questionDetails.difficulty,
+        questionDifficulty: this.mapDifficultyToString(questionDetails.difficulty),
         topicId: questionDetails.topicId,
         topicName: topic?.name || 'Unknown Topic',
       };
@@ -198,7 +191,7 @@ export class AnswerProcessor implements IAnswerProcessor {
             })),
             topicId: nextQuestionDetails.topicId || '',
             topicName: nextTopic?.name || 'Unknown Topic',
-            difficulty: this.mapDifficulty(nextQuestionDetails.difficulty),
+            difficulty: this.mapDifficultyToString(nextQuestionDetails.difficulty),
             timeAllowed: this.calculateTimeAllowed(nextQuestionDetails.difficulty),
             markedForReview: nextSessionQuestion.markedForReview,
           };
@@ -257,22 +250,29 @@ export class AnswerProcessor implements IAnswerProcessor {
    */
   private calculateQuestionScore(
     isCorrect: boolean,
-    difficulty: string,
+    difficulty: DifficultyLevel | string,
     timeSpent: number
   ): number {
     if (!isCorrect) return 0;
+
+    // Convert enum to string for lookup
+    const difficultyStr = String(difficulty).toLowerCase();
 
     // Base points by difficulty
     const basePoints = {
       easy: 1,
       medium: 2,
       hard: 3,
+      beginner: 1,
+      intermediate: 2,
+      advanced: 3,
+      expert: 3,
     };
 
-    const points = basePoints[difficulty as keyof typeof basePoints] || 2;
+    const points = basePoints[difficultyStr as keyof typeof basePoints] || 2;
 
     // Time bonus: up to 50% bonus for fast answers
-    const expectedTime = this.calculateTimeAllowed(difficulty);
+    const expectedTime = this.calculateTimeAllowed(difficultyStr);
     const timeFactor = Math.max(0.5, Math.min(1.5, expectedTime / timeSpent));
 
     return Math.round(points * timeFactor);
@@ -306,11 +306,11 @@ export class AnswerProcessor implements IAnswerProcessor {
         throw new Error(`Session not found: ${sessionId}`);
       }
 
-      if (session.status === 'completed') {
+      if (session.status === StatusType.COMPLETED) {
         throw new Error('Session is already completed');
       }
 
-      if (session.status === 'abandoned') {
+      if (session.status === StatusType.ABANDONED) {
         throw new Error('Cannot complete abandoned session');
       }
 
@@ -325,7 +325,7 @@ export class AnswerProcessor implements IAnswerProcessor {
       // Step 3: Update session status to completed
       const completedAt = new Date().toISOString();
       const completedSession = await this.sessionRepository.update(sessionId, {
-        status: 'completed',
+        status: StatusType.COMPLETED,
         endTime: completedAt,
       });
 
@@ -380,7 +380,7 @@ export class AnswerProcessor implements IAnswerProcessor {
         if (!questionData) {
           throw new Error(`Question not found for completion: ${sessionQuestion.questionId}`);
         }
-        return this.transformServiceQuestion(questionData);
+        return questionData;
       })
     );
 
@@ -530,13 +530,20 @@ export class AnswerProcessor implements IAnswerProcessor {
   /**
    * Calculate time allowed for question based on difficulty
    */
-  private calculateTimeAllowed(difficulty: string): number {
-    switch (difficulty) {
+  private calculateTimeAllowed(difficulty: DifficultyLevel | string): number {
+    // Convert enum to string for lookup
+    const difficultyStr = String(difficulty).toLowerCase();
+    
+    switch (difficultyStr) {
       case 'easy':
+      case 'beginner':
         return 60; // 1 minute
       case 'medium':
+      case 'intermediate':
         return 90; // 1.5 minutes
       case 'hard':
+      case 'advanced':
+      case 'expert':
         return 120; // 2 minutes
       default:
         return 90; // Default to medium

@@ -198,6 +198,7 @@ export interface GetProviderResponse {
 export interface IProviderService {
   getProviders(request: GetProvidersRequest): Promise<GetProvidersResponse>;
   getProvider(request: GetProviderRequest): Promise<GetProviderResponse>;
+  refreshCache(): Promise<void>;
 }
 
 // =======================================================

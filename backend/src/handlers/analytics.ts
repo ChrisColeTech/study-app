@@ -14,7 +14,7 @@ import {
   ErrorContexts,
   ValidationMiddleware,
 } from '../shared/middleware';
-import { AnalyticsValidationSchemas } from '../shared/middleware/validation-schemas';
+import { AnalyticsValidationSchemas, TypeAwareValidationSchemas } from '../shared/middleware/validation-schemas';
 
 export class AnalyticsHandler extends BaseHandler {
   private serviceFactory: ServiceFactory;
@@ -66,10 +66,10 @@ export class AnalyticsHandler extends BaseHandler {
     const { data: queryParams, error: parseError } = await this.parseQueryParamsOrError(context);
     if (parseError) return parseError;
 
-    // Validate and build analytics request using ValidationMiddleware (replaces validateProgressAnalyticsRequest)
+    // Validate using type-aware schema that corresponds to ProgressAnalyticsRequest interface
     const validationResult = ValidationMiddleware.validateFields(
       queryParams,
-      AnalyticsValidationSchemas.progressAnalyticsRequest(),
+      TypeAwareValidationSchemas.progressAnalyticsRequestFromType(),
       'query'
     );
     if (validationResult) return validationResult;
@@ -100,19 +100,21 @@ export class AnalyticsHandler extends BaseHandler {
           providerId: analyticsRequest.providerId,
           examId: analyticsRequest.examId,
           topicCount: analyticsRequest.topics?.length || 0,
+          validationType: 'ProgressAnalyticsRequest',
         },
       }
     );
 
     if (error) return error;
 
-    this.logger.info('Progress analytics retrieved successfully', {
+    this.logger.info('Progress analytics retrieved successfully with type-safe validation', {
       requestId: context.requestId,
       totalSessions: result!.metadata.totalSessions,
       dataPoints: result!.metadata.dataPoints,
       timeframe: result!.metadata.timeframe,
       overallAccuracy: result!.data.overview.overallAccuracy,
       topicCount: result!.data.competencyData.topicCompetencies.length,
+      validationType: 'ProgressAnalyticsRequest',
     });
 
     return this.buildSuccessResponse('Progress analytics retrieved successfully', result);

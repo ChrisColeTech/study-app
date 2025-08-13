@@ -238,33 +238,33 @@ export class CorsConfig {
     // Override origins from environment variable
     if (process.env.CORS_ALLOWED_ORIGINS) {
       const origins = process.env.CORS_ALLOWED_ORIGINS.split(',').map(o => o.trim());
-      CorsConfig.config.origins.patterns = origins;
+      (CorsConfig.config.origins as any).patterns = origins;
     }
 
     // Override credentials setting
     if (process.env.CORS_ALLOW_CREDENTIALS !== undefined) {
-      CorsConfig.config.origins.allowCredentials = process.env.CORS_ALLOW_CREDENTIALS === 'true';
+      (CorsConfig.config.origins as any).allowCredentials = process.env.CORS_ALLOW_CREDENTIALS === 'true';
     }
 
     // Override methods
     if (process.env.CORS_ALLOWED_METHODS) {
       const methods = process.env.CORS_ALLOWED_METHODS.split(',').map(m => m.trim().toUpperCase());
-      CorsConfig.config.methods.allowed = methods;
+      (CorsConfig.config.methods as any).allowed = methods;
     }
 
     // Override headers
     if (process.env.CORS_ALLOWED_HEADERS) {
       const headers = process.env.CORS_ALLOWED_HEADERS.split(',').map(h => h.trim());
-      CorsConfig.config.headers.allowed = headers;
+      (CorsConfig.config.headers as any).allowed = headers;
     }
 
     // Override security settings
     if (process.env.CORS_STRICT_ORIGIN_CHECK !== undefined) {
-      CorsConfig.config.security.strictOriginCheck = process.env.CORS_STRICT_ORIGIN_CHECK === 'true';
+      (CorsConfig.config.security as any).strictOriginCheck = process.env.CORS_STRICT_ORIGIN_CHECK === 'true';
     }
 
     if (process.env.CORS_REQUIRE_HTTPS !== undefined) {
-      CorsConfig.config.security.requireHttps = process.env.CORS_REQUIRE_HTTPS === 'true';
+      (CorsConfig.config.security as any).requireHttps = process.env.CORS_REQUIRE_HTTPS === 'true';
     }
   }
 

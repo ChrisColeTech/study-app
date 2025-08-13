@@ -11,6 +11,7 @@ import {
 import {
   StudySession,
   Question,
+  DifficultyLevel,
 } from '../shared/types/domain.types';
 import {
   ISessionRepository,
@@ -218,13 +219,13 @@ export class SessionAnalyzer implements ISessionAnalyzer {
 
       return {
         questionId: sessionQuestion.questionId,
-        questionText: question?.text || 'Question text not available',
+        questionText: question?.questionText || 'Question text not available',
         userAnswer: sessionQuestion.userAnswer || [],
         correctAnswer: sessionQuestion.correctAnswer || [],
         isCorrect: sessionQuestion.isCorrect || false,
         timeSpent: sessionQuestion.timeSpent,
         score,
-        difficulty: question?.difficulty || 'medium',
+        difficulty: this.mapDifficultyToString(question?.difficulty) || 'medium',
         topicId: question?.topicId || 'unknown',
         topicName: `Topic ${question?.topicId || 'Unknown'}`,
         explanation: question?.explanation || 'No explanation available',
@@ -523,6 +524,27 @@ export class SessionAnalyzer implements ISessionAnalyzer {
     } else {
       return 'Keep studying! Every practice session is a step forward. Focus on understanding the concepts better.';
     }
+  }
+
+  /**
+   * Map DifficultyLevel enum to string literal for API responses
+   */
+  private mapDifficultyToString(difficulty: DifficultyLevel | string | undefined): 'easy' | 'medium' | 'hard' {
+    if (!difficulty) return 'medium';
+    
+    if (typeof difficulty === 'string') {
+      const lower = difficulty.toLowerCase();
+      if (lower === 'easy' || lower === 'beginner') return 'easy';
+      if (lower === 'medium' || lower === 'intermediate') return 'medium';
+      if (lower === 'hard' || lower === 'advanced' || lower === 'difficult') return 'hard';
+    }
+    
+    const diffStr = String(difficulty).toLowerCase();
+    if (diffStr === 'easy' || diffStr === 'beginner') return 'easy';
+    if (diffStr === 'medium' || diffStr === 'intermediate') return 'medium';
+    if (diffStr === 'hard' || diffStr === 'advanced' || diffStr === 'difficult') return 'hard';
+    
+    return 'medium'; // default
   }
 }
 

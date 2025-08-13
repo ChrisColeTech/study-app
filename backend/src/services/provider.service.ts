@@ -76,15 +76,20 @@ export class ProviderService extends BaseService implements IProviderService {
     this.logger.info('Getting provider', { providerId: request.id });
 
     try {
-      const provider = await this.providerRepository.findById(request.id);
+      const providerId = request.id || request.providerId;
+      if (!providerId) {
+        throw new Error('Provider ID is required');
+      }
+      
+      const provider = await this.providerRepository.findById(providerId);
 
       if (!provider) {
-        throw new Error(`Provider not found: ${request.id}`);
+        throw new Error(`Provider not found: ${providerId}`);
       }
 
       // Check if provider is active (unless explicitly including inactive)
       if (provider.status !== ProviderStatusEnum.ACTIVE && !request.includeInactive) {
-        throw new Error(`Provider not found: ${request.id}`);
+        throw new Error(`Provider not found: ${providerId}`);
       }
 
       // Create response using dedicated mapper

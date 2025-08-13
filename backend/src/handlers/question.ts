@@ -25,7 +25,7 @@ import {
   AuthMiddleware,
   AuthConfigs,
 } from '../shared/middleware';
-import { QuestionValidationSchemas } from '../shared/middleware/validation-schemas';
+import { QuestionValidationSchemas, TypeAwareValidationSchemas } from '../shared/middleware/validation-schemas';
 
 export class QuestionHandler extends BaseHandler {
   private serviceFactory: ServiceFactory;
@@ -134,10 +134,10 @@ export class QuestionHandler extends BaseHandler {
     const { data: pathParams, error: parseError } = await this.parsePathParamsOrError(context);
     if (parseError) return parseError;
 
-    // Validate question ID using ValidationMiddleware (replaces inline validation)
+    // Validate question ID using type-aware schema that corresponds to QuestionIdParam interface
     const questionIdValidation = ValidationMiddleware.validateFields(
       { questionId: pathParams.id },
-      QuestionValidationSchemas.questionId(),
+      TypeAwareValidationSchemas.questionIdFromType(),
       'params'
     );
     if (questionIdValidation) return questionIdValidation;
@@ -164,17 +164,21 @@ export class QuestionHandler extends BaseHandler {
       {
         requestId: context.requestId,
         operation: ErrorContexts.Question.GET,
-        additionalInfo: { questionId: request.questionId },
+        additionalInfo: { 
+          questionId: request.questionId,
+          validationType: 'QuestionIdParam',
+        },
       }
     );
 
     if (error) return error;
 
-    this.logger.info('Question retrieved successfully', {
+    this.logger.info('Question retrieved successfully with type-safe validation', {
       requestId: context.requestId,
       questionId: result!.question.questionId,
       providerId: result!.question.providerId,
       examId: result!.question.examId,
+      validationType: 'QuestionIdParam',
     });
 
     return this.buildSuccessResponse('Question retrieved successfully', result);

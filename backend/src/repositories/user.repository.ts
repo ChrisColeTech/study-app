@@ -14,6 +14,7 @@ import {
   UpdateUserRequest,
   UserResponse,
 } from '../shared/types/user.types';
+import { DifficultyLevel } from '../shared/types/domain.types';
 import { ServiceConfig } from '../shared/service-factory';
 import { DynamoDBBaseRepository } from './base.repository';
 import { IStandardCrudRepository } from '../shared/types/repository.types';
@@ -88,6 +89,14 @@ export class UserRepository extends DynamoDBBaseRepository implements IUserRepos
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
           isActive: true,
+          preferences: {
+            studyMode: 'practice',
+            difficulty: DifficultyLevel.MEDIUM,
+            timePerQuestion: 60,
+            showExplanations: true,
+            shuffleQuestions: false,
+            shuffleAnswers: false
+          }
         };
 
         try {

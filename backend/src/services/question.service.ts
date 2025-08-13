@@ -3,6 +3,7 @@
 
 import {
   Question,
+  EnhancedQuestion,
   GetQuestionsRequest,
   GetQuestionsResponse,
   GetQuestionRequest,
@@ -219,6 +220,27 @@ export class QuestionService extends BaseService implements IQuestionService {
       }
     );
   }
+
+  /**
+   * Convert Question to EnhancedQuestion with default metadata and type
+   */
+  private toEnhancedQuestion(question: Question): EnhancedQuestion {
+    return {
+      ...question,
+      type: QuestionType.MULTIPLE_CHOICE, // Default type
+      metadata: {
+        createdAt: question.createdAt,
+        updatedAt: question.updatedAt,
+        version: question.version || 1,
+        reviewStatus: 'APPROVED' as any, // Default to approved
+        language: 'en',
+        estimatedTime: 60,
+        skillLevel: 'intermediate',
+        bloomsLevel: 'UNDERSTAND' as any, // Default blooms level
+        cognitiveLoad: 'MEDIUM' as any // Default cognitive load
+      }
+    };
+  }
 }
 
 /**
@@ -252,19 +274,21 @@ export class QuestionSelector {
     // Strip explanations if not requested
     if (!request.includeExplanations) {
       paginatedQuestions.forEach(q => {
-        delete q.explanation;
+        q.explanation = '';
       });
     }
 
-    // Strip metadata if not requested
+    // Convert to EnhancedQuestions and strip metadata if not requested
+    const enhancedQuestions = paginatedQuestions.map(q => this.createEnhancedQuestion(q));
+    
     if (!request.includeMetadata) {
-      paginatedQuestions.forEach(q => {
-        q.metadata = {};
+      enhancedQuestions.forEach(q => {
+        q.metadata = {} as any;
       });
     }
 
     return {
-      questions: paginatedQuestions,
+      questions: enhancedQuestions,
       total,
       filters,
       pagination: {
@@ -278,20 +302,20 @@ export class QuestionSelector {
   /**
    * Process question output based on request flags
    */
-  processQuestionOutput(question: Question, request: GetQuestionRequest): Question {
-    const processedQuestion = { ...question };
+  processQuestionOutput(question: Question, request: GetQuestionRequest): EnhancedQuestion {
+    const enhancedQuestion = this.createEnhancedQuestion(question);
 
     // Strip explanation if not requested (default true for details endpoint)
     if (request.includeExplanation === false) {
-      delete processedQuestion.explanation;
+      enhancedQuestion.explanation = '';
     }
 
     // Strip metadata if not requested (default true for details endpoint)
     if (request.includeMetadata === false) {
-      processedQuestion.metadata = {};
+      enhancedQuestion.metadata = {} as any;
     }
 
-    return processedQuestion;
+    return enhancedQuestion;
   }
 
   /**
@@ -310,9 +334,9 @@ export class QuestionSelector {
       filtered = filtered.filter(q => q.difficulty === request.difficulty);
     }
 
-    // Filter by type
+    // Filter by type (base Questions don't have type, so assume default)
     if (request.type) {
-      filtered = filtered.filter(q => q.type === request.type);
+      filtered = filtered.filter(q => (q as any).type === request.type || request.type === QuestionType.MULTIPLE_CHOICE);
     }
 
     // Filter by tags
@@ -339,9 +363,9 @@ export class QuestionSelector {
       filtered = filtered.filter(q => q.difficulty === request.difficulty);
     }
 
-    // Filter by type
+    // Filter by type (base Questions don't have type, so assume default)
     if (request.type) {
-      filtered = filtered.filter(q => q.type === request.type);
+      filtered = filtered.filter(q => (q as any).type === request.type || request.type === QuestionType.MULTIPLE_CHOICE);
     }
 
     // Filter by tags
@@ -379,7 +403,7 @@ export class QuestionSelector {
     const exams = [...new Set(questions.map(q => q.examId))];
     const topics = [...new Set(questions.map(q => q.topicId).filter(Boolean) as string[])];
     const difficulties = [...new Set(questions.map(q => q.difficulty))];
-    const types = [...new Set(questions.map(q => q.type))];
+    const types = [...new Set(questions.map(q => (q as any).type || QuestionType.MULTIPLE_CHOICE))];
     const tags = [...new Set(questions.flatMap(q => q.tags || []))];
 
     return {
@@ -389,6 +413,27 @@ export class QuestionSelector {
       difficulties,
       types,
       tags: tags.sort(),
+    };
+  }
+
+  /**
+   * Convert Question to EnhancedQuestion with default metadata and type
+   */
+  private createEnhancedQuestion(question: Question): EnhancedQuestion {
+    return {
+      ...question,
+      type: QuestionType.MULTIPLE_CHOICE, // Default type
+      metadata: {
+        createdAt: question.createdAt,
+        updatedAt: question.updatedAt,
+        version: question.version || 1,
+        reviewStatus: 'APPROVED' as any, // Default to approved
+        language: 'en',
+        estimatedTime: 60,
+        skillLevel: 'intermediate',
+        bloomsLevel: 'UNDERSTAND' as any, // Default blooms level
+        cognitiveLoad: 'MEDIUM' as any // Default cognitive load
+      }
     };
   }
 }
@@ -438,7 +483,7 @@ export class QuestionAnalyzer {
     // Strip explanations if not requested
     if (!request.includeExplanations) {
       paginatedResults.forEach(result => {
-        delete result.explanation;
+        result.explanation = '';
         if (result.highlights) {
           delete result.highlights.explanation;
         }
@@ -448,7 +493,7 @@ export class QuestionAnalyzer {
     // Strip metadata if not requested
     if (!request.includeMetadata) {
       paginatedResults.forEach(result => {
-        result.metadata = {};
+        result.metadata = {} as any;
       });
     }
 
@@ -490,6 +535,18 @@ export class QuestionAnalyzer {
       if (score > 0) {
         const result: SearchQuestionResult = {
           ...question,
+          type: QuestionType.MULTIPLE_CHOICE, // Default type
+          metadata: {
+            createdAt: question.createdAt,
+            updatedAt: question.updatedAt,
+            version: question.version || 1,
+            reviewStatus: 'APPROVED' as any,
+            language: 'en',
+            estimatedTime: 60,
+            skillLevel: 'intermediate',
+            bloomsLevel: 'UNDERSTAND' as any,
+            cognitiveLoad: 'MEDIUM' as any
+          },
           relevanceScore: score,
         };
 
@@ -517,14 +574,14 @@ export class QuestionAnalyzer {
 
       case SearchSortOption.DIFFICULTY_ASC:
         return results.sort((a, b) => {
-          const difficultyOrder = { beginner: 0, intermediate: 1, advanced: 2, expert: 3 };
-          return (difficultyOrder[a.difficulty] || 1) - (difficultyOrder[b.difficulty] || 1);
+          const difficultyOrder: { [key: string]: number } = { easy: 0, medium: 1, hard: 2, beginner: 0, intermediate: 1, advanced: 2, expert: 3 };
+          return (difficultyOrder[String(a.difficulty).toLowerCase()] || 1) - (difficultyOrder[String(b.difficulty).toLowerCase()] || 1);
         });
 
       case SearchSortOption.DIFFICULTY_DESC:
         return results.sort((a, b) => {
-          const difficultyOrder = { beginner: 0, intermediate: 1, advanced: 2, expert: 3 };
-          return (difficultyOrder[b.difficulty] || 1) - (difficultyOrder[a.difficulty] || 1);
+          const difficultyOrder: { [key: string]: number } = { easy: 0, medium: 1, hard: 2, beginner: 0, intermediate: 1, advanced: 2, expert: 3 };
+          return (difficultyOrder[String(b.difficulty).toLowerCase()] || 1) - (difficultyOrder[String(a.difficulty).toLowerCase()] || 1);
         });
 
       case SearchSortOption.CREATED_ASC:

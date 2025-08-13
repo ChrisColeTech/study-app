@@ -59,10 +59,8 @@ export class QuestionDataTransformer {
           correctAnswer: correctAnswerIndex,
           explanation: studyItem.explanation || studyItem.answer || '',
           difficulty: difficulty as any,
-          type: 'multiple_choice' as any,
           tags: studyItem.tags || [],
           topicId: topic,
-          metadata: studyItem.study_metadata || studyItem.metadata || {},
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         };
