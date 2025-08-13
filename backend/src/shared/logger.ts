@@ -15,8 +15,8 @@ export interface LogContext {
   [key: string]: unknown;
 }
 
-export type LogError = 
-  | Error 
+export type LogError =
+  | Error
   | { name?: string; message: string; stack?: string; [key: string]: unknown }
   | string
   | unknown;
@@ -133,7 +133,9 @@ export const logger = new Logger(
 
 // Factory function for creating context-specific loggers
 export function createLogger(context: LogContext = {}): Logger {
-  const logLevel = process.env.LOG_LEVEL ? LogLevel[process.env.LOG_LEVEL as keyof typeof LogLevel] : LogLevel.INFO;
+  const logLevel = process.env.LOG_LEVEL
+    ? LogLevel[process.env.LOG_LEVEL as keyof typeof LogLevel]
+    : LogLevel.INFO;
   return new Logger(logLevel, {
     functionName: process.env.AWS_LAMBDA_FUNCTION_NAME || 'unknown',
     version: process.env.AWS_LAMBDA_FUNCTION_VERSION || '1.0.0',

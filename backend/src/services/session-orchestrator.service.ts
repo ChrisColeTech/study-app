@@ -1,16 +1,13 @@
 // Session Orchestrator Service - Phase 5: SessionService Decomposition
 // Handles question coordination, session configuration, and selection algorithms
 
-import { 
-  StudySession,
-  Question
-} from '../shared/types/domain.types';
+import { StudySession, Question } from '../shared/types/domain.types';
 import {
   CreateSessionRequest,
   QuestionResponse,
   SessionQuestionOption,
   SessionProgress,
-  ISessionOrchestrator
+  ISessionOrchestrator,
 } from '../shared/types/session.types';
 import { IProviderService } from './provider.service';
 import { IExamService } from './exam.service';
@@ -34,20 +31,20 @@ export class SessionOrchestrator implements ISessionOrchestrator {
    * Phase 15: Session Creation Feature
    */
   async getQuestionsForSession(request: CreateSessionRequest): Promise<Question[]> {
-    this.logger.info('Getting questions for session', { 
+    this.logger.info('Getting questions for session', {
       examId: request.examId,
       providerId: request.providerId,
       sessionType: request.sessionType,
       questionCount: request.questionCount,
       topics: request.topics,
-      difficulty: request.difficulty
+      difficulty: request.difficulty,
     });
 
     try {
       // Step 1: Get all questions for the specified exam
       const questionsResponse = await this.questionService.getQuestions({ exam: request.examId });
       const allQuestions = questionsResponse.questions;
-      
+
       if (allQuestions.length === 0) {
         throw new Error(`No questions found for examId: ${request.examId}`);
       }
@@ -61,36 +58,35 @@ export class SessionOrchestrator implements ISessionOrchestrator {
 
       // Step 3: Filter by topics if specified
       if (request.topics && request.topics.length > 0) {
-        filteredQuestions = filteredQuestions.filter(q => 
-          q.topicId && request.topics!.includes(q.topicId)
+        filteredQuestions = filteredQuestions.filter(
+          q => q.topicId && request.topics!.includes(q.topicId)
         );
       }
 
       // Step 4: Filter by difficulty if specified
       if (request.difficulty) {
-        filteredQuestions = filteredQuestions.filter(q => 
-          this.mapDifficulty(q.difficulty) === request.difficulty
+        filteredQuestions = filteredQuestions.filter(
+          q => this.mapDifficulty(q.difficulty) === request.difficulty
         );
       }
 
       // Step 5: Convert to domain Question type and validate
       const questions = filteredQuestions.map(q => this.mapQuestionToDomainType(q));
 
-      this.logger.info('Questions retrieved successfully', { 
+      this.logger.info('Questions retrieved successfully', {
         totalQuestions: allQuestions.length,
         filteredQuestions: questions.length,
         filters: {
           topics: request.topics,
-          difficulty: request.difficulty
-        }
+          difficulty: request.difficulty,
+        },
       });
 
       return questions;
-
     } catch (error) {
-      this.logger.error('Error getting questions for session', { 
+      this.logger.error('Error getting questions for session', {
         error: error instanceof Error ? error.message : String(error),
-        request 
+        request,
       });
       throw error;
     }
@@ -101,53 +97,59 @@ export class SessionOrchestrator implements ISessionOrchestrator {
    * Phase 15: Session Creation Feature
    */
   async getSessionQuestionsWithDetails(session: StudySession): Promise<QuestionResponse[]> {
-    this.logger.info('Getting session questions with details', { 
+    this.logger.info('Getting session questions with details', {
       sessionId: session.sessionId,
-      questionCount: session.questions.length 
+      questionCount: session.questions.length,
     });
 
     try {
       const questionDetails = await Promise.all(
-        session.questions.map(async (sessionQuestion) => {
-          const questionResponse = await this.questionService.getQuestion({ questionId: sessionQuestion.questionId });
+        session.questions.map(async sessionQuestion => {
+          const questionResponse = await this.questionService.getQuestion({
+            questionId: sessionQuestion.questionId,
+          });
           const questionData = questionResponse.question;
-          
+
           if (!questionData) {
             throw new Error(`Question not found: ${sessionQuestion.questionId}`);
           }
 
           // Get topic name
-          const topicResponse = await this.topicService.getTopic({ id: questionData.topicId || '' });
+          const topicResponse = await this.topicService.getTopic({
+            id: questionData.topicId || '',
+          });
           const topic = topicResponse.topic;
           const topicName = topic?.name || 'Unknown Topic';
 
           return {
             questionId: questionData.questionId,
             text: questionData.questionText,
-            options: questionData.options.map((optText, index) => ({
-              id: index.toString(),
-              text: optText
-            }) as SessionQuestionOption),
+            options: questionData.options.map(
+              (optText, index) =>
+                ({
+                  id: index.toString(),
+                  text: optText,
+                }) as SessionQuestionOption
+            ),
             topicId: questionData.topicId || '',
             topicName,
             difficulty: this.mapDifficulty(questionData.difficulty),
             timeAllowed: this.calculateTimeAllowed(questionData.difficulty),
-            markedForReview: sessionQuestion.markedForReview
+            markedForReview: sessionQuestion.markedForReview,
           } as QuestionResponse;
         })
       );
 
-      this.logger.info('Session questions with details retrieved successfully', { 
+      this.logger.info('Session questions with details retrieved successfully', {
         sessionId: session.sessionId,
-        detailsCount: questionDetails.length 
+        detailsCount: questionDetails.length,
       });
 
       return questionDetails;
-
     } catch (error) {
-      this.logger.error('Error getting session questions with details', { 
+      this.logger.error('Error getting session questions with details', {
         error: error instanceof Error ? error.message : String(error),
-        sessionId: session.sessionId 
+        sessionId: session.sessionId,
       });
       throw error;
     }
@@ -158,21 +160,20 @@ export class SessionOrchestrator implements ISessionOrchestrator {
    * Phase 15: Session Creation Feature
    */
   selectSessionQuestions(questions: Question[], count: number): Question[] {
-    this.logger.info('Selecting session questions', { 
+    this.logger.info('Selecting session questions', {
       availableQuestions: questions.length,
-      requestedCount: count 
+      requestedCount: count,
     });
 
     if (questions.length === 0) {
       return [];
     }
 
-    const selectedQuestions = count >= questions.length 
-      ? [...questions]
-      : this.selectRandomQuestions(questions, count);
+    const selectedQuestions =
+      count >= questions.length ? [...questions] : this.selectRandomQuestions(questions, count);
 
-    this.logger.info('Session questions selected', { 
-      selectedCount: selectedQuestions.length 
+    this.logger.info('Session questions selected', {
+      selectedCount: selectedQuestions.length,
     });
 
     return selectedQuestions;
@@ -183,9 +184,9 @@ export class SessionOrchestrator implements ISessionOrchestrator {
    * Phase 22: Adaptive Sessions Feature
    */
   selectAdaptiveQuestions(questions: Question[], count: number): Question[] {
-    this.logger.info('Selecting adaptive session questions', { 
+    this.logger.info('Selecting adaptive session questions', {
       availableQuestions: questions.length,
-      requestedCount: count 
+      requestedCount: count,
     });
 
     if (questions.length === 0) {
@@ -212,19 +213,19 @@ export class SessionOrchestrator implements ISessionOrchestrator {
     // If we don't have enough questions in specific difficulties, fill from all questions
     if (selectedQuestions.length < count) {
       const remainingCount = count - selectedQuestions.length;
-      const remainingQuestions = questions.filter(q => 
-        !selectedQuestions.some(selected => selected.questionId === q.questionId)
+      const remainingQuestions = questions.filter(
+        q => !selectedQuestions.some(selected => selected.questionId === q.questionId)
       );
       selectedQuestions.push(...this.selectRandomQuestions(remainingQuestions, remainingCount));
     }
 
-    this.logger.info('Adaptive session questions selected', { 
+    this.logger.info('Adaptive session questions selected', {
       selectedCount: selectedQuestions.length,
       distribution: {
         easy: selectedQuestions.filter(q => q.difficulty === 'easy').length,
         medium: selectedQuestions.filter(q => q.difficulty === 'medium').length,
-        hard: selectedQuestions.filter(q => q.difficulty === 'hard').length
-      }
+        hard: selectedQuestions.filter(q => q.difficulty === 'hard').length,
+      },
     });
 
     return selectedQuestions.slice(0, count);
@@ -254,7 +255,7 @@ export class SessionOrchestrator implements ISessionOrchestrator {
       answeredQuestions,
       correctAnswers,
       timeElapsed,
-      accuracy
+      accuracy,
     };
 
     this.logger.debug('Session progress calculated', { progress });
@@ -273,17 +274,18 @@ export class SessionOrchestrator implements ISessionOrchestrator {
       examId: q.examId,
       topicId: q.topicId || '',
       text: q.questionText,
-      options: q.options?.map((optText, index) => ({
-        id: index.toString(),
-        text: optText,
-        isCorrect: q.correctAnswer === index
-      })) || [],
+      options:
+        q.options?.map((optText, index) => ({
+          id: index.toString(),
+          text: optText,
+          isCorrect: q.correctAnswer === index,
+        })) || [],
       correctAnswer: [q.correctAnswer.toString()],
       explanation: q.explanation || '',
       difficulty: this.mapDifficulty(q.difficulty),
       tags: q.tags || [],
       createdAt: q.createdAt || new Date().toISOString(),
-      updatedAt: q.updatedAt || new Date().toISOString()
+      updatedAt: q.updatedAt || new Date().toISOString(),
     };
   }
 
@@ -324,10 +326,14 @@ export class SessionOrchestrator implements ISessionOrchestrator {
    */
   private calculateTimeAllowed(difficulty: string): number {
     switch (difficulty) {
-      case 'easy': return 60;    // 1 minute
-      case 'medium': return 90;  // 1.5 minutes
-      case 'hard': return 120;   // 2 minutes
-      default: return 90;        // Default to medium
+      case 'easy':
+        return 60; // 1 minute
+      case 'medium':
+        return 90; // 1.5 minutes
+      case 'hard':
+        return 120; // 2 minutes
+      default:
+        return 90; // Default to medium
     }
   }
 }

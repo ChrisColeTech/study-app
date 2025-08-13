@@ -18,7 +18,22 @@ import type { ISessionAnalyzer as ISessionAnalyzerService } from '../services/se
 import type { IGoalsService } from '../services/goals.service';
 import type { IGoalsProgressTracker } from '../services/goals-progress-tracker.service';
 import type { IProfileService, IAchievementCalculator } from '../shared/types/profile.types';
-export type { IAuthService, IUserService, IProviderService, IExamService, ITopicService, IQuestionService, ISessionService, IGoalsService, IGoalsProgressTracker, ISessionOrchestratorService, IAnswerProcessorService, ISessionAnalyzerService, IProfileService, IAchievementCalculator };
+export type {
+  IAuthService,
+  IUserService,
+  IProviderService,
+  IExamService,
+  ITopicService,
+  IQuestionService,
+  ISessionService,
+  IGoalsService,
+  IGoalsProgressTracker,
+  ISessionOrchestratorService,
+  IAnswerProcessorService,
+  ISessionAnalyzerService,
+  IProfileService,
+  IAchievementCalculator,
+};
 
 // Import repository interfaces
 import type { IUserRepository } from '../repositories/user.repository';
@@ -31,17 +46,34 @@ import type { IGoalsRepository } from '../repositories/goals.repository';
 import type { IHealthRepository } from '../repositories/health.repository';
 import type { IProfileRepository } from '../repositories/profile.repository';
 import type { IAnalyticsRepository } from '../repositories/analytics.repository';
-export type { IUserRepository, ISessionRepository, IProviderRepository, IExamRepository, ITopicRepository, IQuestionRepository, IGoalsRepository, IHealthRepository, IProfileRepository, IAnalyticsRepository };
+export type {
+  IUserRepository,
+  ISessionRepository,
+  IProviderRepository,
+  IExamRepository,
+  ITopicRepository,
+  IQuestionRepository,
+  IGoalsRepository,
+  IHealthRepository,
+  IProfileRepository,
+  IAnalyticsRepository,
+};
 
 // Import analytics service interface from types
-import type { 
+import type {
   IAnalyticsService,
   IProgressAnalyzer,
   ICompetencyAnalyzer,
   IPerformanceAnalyzer,
-  IInsightGenerator
+  IInsightGenerator,
 } from '../shared/types/analytics.types';
-export type { IAnalyticsService, IProgressAnalyzer, ICompetencyAnalyzer, IPerformanceAnalyzer, IInsightGenerator };
+export type {
+  IAnalyticsService,
+  IProgressAnalyzer,
+  ICompetencyAnalyzer,
+  IPerformanceAnalyzer,
+  IInsightGenerator,
+};
 
 export interface IHealthService {
   checkHealth(): Promise<{
@@ -93,7 +125,7 @@ export interface ServiceConfig {
 export class InfrastructureFactory {
   private static instance: InfrastructureFactory;
   private config: ServiceConfig;
-  
+
   // AWS Clients (lazy initialized)
   private _dynamoClient: DynamoDBDocumentClient | null = null;
   private _s3Client: S3Client | null = null;
@@ -144,7 +176,7 @@ export class InfrastructureFactory {
       const client = new DynamoDBClient({
         region: this.config.region,
       });
-      
+
       this._dynamoClient = DynamoDBDocumentClient.from(client, {
         marshallOptions: {
           convertEmptyValues: false,
@@ -194,7 +226,7 @@ export class InfrastructureFactory {
 export class AuthenticationFactory {
   private static instance: AuthenticationFactory;
   private infrastructureFactory: InfrastructureFactory;
-  
+
   // Repositories (lazy initialized)
   private _userRepository: IUserRepository | null = null;
 
@@ -223,7 +255,7 @@ export class AuthenticationFactory {
     if (!this._userRepository) {
       const { UserRepository } = require('../repositories/user.repository');
       this._userRepository = new UserRepository(
-        this.infrastructureFactory.getDynamoClient(), 
+        this.infrastructureFactory.getDynamoClient(),
         this.infrastructureFactory.getConfig()
       );
     }
@@ -269,7 +301,7 @@ export class AuthenticationFactory {
 export class StudyFactory {
   private static instance: StudyFactory;
   private infrastructureFactory: InfrastructureFactory;
-  
+
   // Repositories (lazy initialized)
   private _sessionRepository: ISessionRepository | null = null;
   private _providerRepository: IProviderRepository | null = null;
@@ -310,7 +342,7 @@ export class StudyFactory {
     if (!this._sessionRepository) {
       const { SessionRepository } = require('../repositories/session.repository');
       this._sessionRepository = new SessionRepository(
-        this.infrastructureFactory.getDynamoClient(), 
+        this.infrastructureFactory.getDynamoClient(),
         this.infrastructureFactory.getConfig()
       );
     }
@@ -324,7 +356,7 @@ export class StudyFactory {
     if (!this._providerRepository) {
       const { ProviderRepository } = require('../repositories/provider.repository');
       this._providerRepository = new ProviderRepository(
-        this.infrastructureFactory.getS3Client(), 
+        this.infrastructureFactory.getS3Client(),
         this.infrastructureFactory.getConfig()
       );
     }
@@ -338,7 +370,7 @@ export class StudyFactory {
     if (!this._examRepository) {
       const { ExamRepository } = require('../repositories/exam.repository');
       this._examRepository = new ExamRepository(
-        this.infrastructureFactory.getS3Client(), 
+        this.infrastructureFactory.getS3Client(),
         this.infrastructureFactory.getConfig()
       );
     }
@@ -352,7 +384,7 @@ export class StudyFactory {
     if (!this._topicRepository) {
       const { TopicRepository } = require('../repositories/topic.repository');
       this._topicRepository = new TopicRepository(
-        this.infrastructureFactory.getS3Client(), 
+        this.infrastructureFactory.getS3Client(),
         this.infrastructureFactory.getConfig()
       );
     }
@@ -366,7 +398,7 @@ export class StudyFactory {
     if (!this._questionRepository) {
       const { QuestionRepository } = require('../repositories/question.repository');
       this._questionRepository = new QuestionRepository(
-        this.infrastructureFactory.getS3Client(), 
+        this.infrastructureFactory.getS3Client(),
         this.infrastructureFactory.getConfig()
       );
     }
@@ -413,14 +445,18 @@ export class StudyFactory {
    */
   public getQuestionService(): IQuestionService {
     if (!this._questionService) {
-      const { QuestionService, QuestionSelector, QuestionAnalyzer } = require('../services/question.service');
-      
+      const {
+        QuestionService,
+        QuestionSelector,
+        QuestionAnalyzer,
+      } = require('../services/question.service');
+
       // Create question selector service
       const questionSelector = new QuestionSelector();
-      
+
       // Create question analyzer service (depends on selector)
       const questionAnalyzer = new QuestionAnalyzer(questionSelector);
-      
+
       // Create main question service with dependencies
       this._questionService = new QuestionService(
         this.getQuestionRepository(),
@@ -524,7 +560,7 @@ export class StudyFactory {
 export class AnalyticsFactory {
   private static instance: AnalyticsFactory;
   private infrastructureFactory: InfrastructureFactory;
-  
+
   // Repositories (lazy initialized)
   private _analyticsRepository: IAnalyticsRepository | null = null;
 
@@ -556,7 +592,7 @@ export class AnalyticsFactory {
     if (!this._analyticsRepository) {
       const { AnalyticsRepository } = require('../repositories/analytics.repository');
       this._analyticsRepository = new AnalyticsRepository(
-        this.infrastructureFactory.getDynamoClient(), 
+        this.infrastructureFactory.getDynamoClient(),
         this.infrastructureFactory.getConfig()
       );
     }
@@ -569,9 +605,7 @@ export class AnalyticsFactory {
   public getProgressAnalyzer(): IProgressAnalyzer {
     if (!this._progressAnalyzer) {
       const { ProgressAnalyzer } = require('../services/progress-analyzer.service');
-      this._progressAnalyzer = new ProgressAnalyzer(
-        this.getAnalyticsRepository()
-      );
+      this._progressAnalyzer = new ProgressAnalyzer(this.getAnalyticsRepository());
     }
     return this._progressAnalyzer!;
   }
@@ -582,9 +616,7 @@ export class AnalyticsFactory {
   public getCompetencyAnalyzer(): ICompetencyAnalyzer {
     if (!this._competencyAnalyzer) {
       const { CompetencyAnalyzer } = require('../services/competency-analyzer.service');
-      this._competencyAnalyzer = new CompetencyAnalyzer(
-        this.getAnalyticsRepository()
-      );
+      this._competencyAnalyzer = new CompetencyAnalyzer(this.getAnalyticsRepository());
     }
     return this._competencyAnalyzer!;
   }
@@ -595,9 +627,7 @@ export class AnalyticsFactory {
   public getPerformanceAnalyzer(): IPerformanceAnalyzer {
     if (!this._performanceAnalyzer) {
       const { PerformanceAnalyzer } = require('../services/performance-analyzer.service');
-      this._performanceAnalyzer = new PerformanceAnalyzer(
-        this.getAnalyticsRepository()
-      );
+      this._performanceAnalyzer = new PerformanceAnalyzer(this.getAnalyticsRepository());
     }
     return this._performanceAnalyzer!;
   }
@@ -608,9 +638,7 @@ export class AnalyticsFactory {
   public getInsightGenerator(): IInsightGenerator {
     if (!this._insightGenerator) {
       const { InsightGenerator } = require('../services/insight-generator.service');
-      this._insightGenerator = new InsightGenerator(
-        this.getAnalyticsRepository()
-      );
+      this._insightGenerator = new InsightGenerator(this.getAnalyticsRepository());
     }
     return this._insightGenerator!;
   }
@@ -653,7 +681,7 @@ export class GoalsFactory {
   private static instance: GoalsFactory;
   private infrastructureFactory: InfrastructureFactory;
   private studyFactory: StudyFactory;
-  
+
   // Repositories (lazy initialized)
   private _goalsRepository: IGoalsRepository | null = null;
 
@@ -683,7 +711,7 @@ export class GoalsFactory {
     if (!this._goalsRepository) {
       const { GoalsRepository } = require('../repositories/goals.repository');
       this._goalsRepository = new GoalsRepository(
-        this.infrastructureFactory.getDynamoClient(), 
+        this.infrastructureFactory.getDynamoClient(),
         this.infrastructureFactory.getConfig()
       );
     }
@@ -696,9 +724,7 @@ export class GoalsFactory {
   public getGoalsProgressTracker(): IGoalsProgressTracker {
     if (!this._goalsProgressTracker) {
       const { GoalsProgressTracker } = require('../services/goals-progress-tracker.service');
-      this._goalsProgressTracker = new GoalsProgressTracker(
-        this.getGoalsRepository()
-      );
+      this._goalsProgressTracker = new GoalsProgressTracker(this.getGoalsRepository());
     }
     return this._goalsProgressTracker!;
   }
@@ -737,7 +763,7 @@ export class GoalsFactory {
 export class ProfileFactory {
   private static instance: ProfileFactory;
   private infrastructureFactory: InfrastructureFactory;
-  
+
   // Repositories (lazy initialized)
   private _profileRepository: IProfileRepository | null = null;
 
@@ -766,7 +792,7 @@ export class ProfileFactory {
     if (!this._profileRepository) {
       const { ProfileRepository } = require('../repositories/profile.repository');
       this._profileRepository = new ProfileRepository(
-        this.infrastructureFactory.getDynamoClient(), 
+        this.infrastructureFactory.getDynamoClient(),
         this.infrastructureFactory.getConfig()
       );
     }
@@ -779,9 +805,7 @@ export class ProfileFactory {
   public getAchievementCalculator(): IAchievementCalculator {
     if (!this._achievementCalculator) {
       const { AchievementCalculator } = require('../services/achievement-calculator.service');
-      this._achievementCalculator = new AchievementCalculator(
-        this.getProfileRepository()
-      );
+      this._achievementCalculator = new AchievementCalculator(this.getProfileRepository());
     }
     return this._achievementCalculator!;
   }
@@ -817,7 +841,7 @@ export class ProfileFactory {
 export class HealthFactory {
   private static instance: HealthFactory;
   private infrastructureFactory: InfrastructureFactory;
-  
+
   // Repositories (lazy initialized)
   private _healthRepository: IHealthRepository | null = null;
 
@@ -849,8 +873,8 @@ export class HealthFactory {
         region: this.infrastructureFactory.getConfig().region,
       });
       this._healthRepository = new HealthRepository(
-        dynamoClient, 
-        this.infrastructureFactory.getS3Client(), 
+        dynamoClient,
+        this.infrastructureFactory.getS3Client(),
         this.infrastructureFactory.getConfig()
       );
     }
@@ -883,7 +907,7 @@ export class HealthFactory {
  */
 export class ServiceFactory {
   private static instance: ServiceFactory;
-  
+
   // Domain-specific factories
   private infrastructureFactory: InfrastructureFactory;
   private authenticationFactory: AuthenticationFactory;

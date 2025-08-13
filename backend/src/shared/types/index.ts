@@ -1,55 +1,96 @@
-// Centralized type exports for the Study App V3 Backend
+// =======================================================
+// CENTRALIZED TYPE EXPORTS FOR STUDY APP V3 BACKEND
+// =======================================================
+// This file provides a unified interface to all type definitions
+// following standardized naming conventions and domain boundaries
 
-// API Types
-export * from './api.types';
-
-// Domain Types (excluding conflicting interfaces that are redefined in specific type files)
-export type { 
-  User, 
-  UserPreferences, 
-  StudySession, 
+// =======================================================
+// CORE DOMAIN TYPES (Primary Entities)
+// =======================================================
+export type {
+  // Primary domain entities
+  User,
+  UserPreferences,
+  StudySession,
   SessionQuestion,
-  ExamProvider,
-  TopicAnalytics
+  Question,
+  QuestionOption,
+  Provider,
+  Exam,
+  Topic,
+  UserProgress,
+  Goal,
+  
+  // Common base types and enums
+  DifficultyLevel,
+  StatusType,
+  EntityMetadata,
 } from './domain.types';
 
-// Auth Types
+// =======================================================
+// API LAYER TYPES (Request/Response Patterns)
+// =======================================================
+export * from './api.types';
+
+// =======================================================
+// DOMAIN-SPECIFIC TYPES (By Business Domain)
+// =======================================================
+
+// Authentication Domain
 export * from './auth.types';
 
-// Session Types
+// User Management Domain  
+export * from './user.types';
+
+// Session Management Domain
 export * from './session.types';
 
-// Provider Types
+// Provider/Certification Management Domain
 export * from './provider.types';
 
-// Exam Types
+// Exam Management Domain
 export * from './exam.types';
 
-// Topic Types
+// Topic Management Domain
 export * from './topic.types';
 
-// Question Types
+// Question Management Domain
 export * from './question.types';
 
-// Analytics Types
+// Analytics Domain
 export * from './analytics.types';
 
-// Goals Types  
+// Goals Management Domain
 export * from './goals.types';
 
-// Health Types
+// Health Monitoring Domain
 export * from './health.types';
 
-// Profile Types
+// User Profile Domain
 export * from './profile.types';
 
-// Repository Types
+// =======================================================
+// REPOSITORY LAYER TYPES (Data Access Patterns)
+// =======================================================
 export * from './repository.types';
 
-// Re-export commonly used AWS Lambda types
+// =======================================================
+// EXTERNAL TYPES (AWS Lambda, Third-party)
+// =======================================================
 export type {
   APIGatewayProxyEvent,
   APIGatewayProxyResult,
   Context,
-  APIGatewayProxyHandler
+  APIGatewayProxyHandler,
 } from 'aws-lambda';
+
+// =======================================================
+// TYPE ALIASES FOR BACKWARD COMPATIBILITY
+// =======================================================
+// These maintain compatibility while migrating to standardized names
+
+/** @deprecated Use Provider instead */
+export type { Provider as ExamProvider } from './domain.types';
+
+/** @deprecated Use DifficultyLevel instead */
+export type { DifficultyLevel as QuestionDifficulty } from './domain.types';

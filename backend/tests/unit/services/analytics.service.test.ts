@@ -16,7 +16,7 @@ import {
   ProgressAnalyticsRequest,
   ProgressOverview,
   CompetencyAnalytics,
-  LearningInsights
+  LearningInsights,
 } from '../../../src/shared/types/analytics.types';
 
 // Mock repository
@@ -44,7 +44,7 @@ class MockAnalyticsRepository implements IAnalyticsRepository {
           questionsCorrect: 4,
           accuracy: 80,
           averageTime: 120,
-          totalScore: 4
+          totalScore: 4,
         },
         {
           topicId: 's3',
@@ -54,9 +54,9 @@ class MockAnalyticsRepository implements IAnalyticsRepository {
           questionsCorrect: 4,
           accuracy: 80,
           averageTime: 130,
-          totalScore: 4
-        }
-      ]
+          totalScore: 4,
+        },
+      ],
     },
     {
       sessionId: 'session-2',
@@ -80,7 +80,7 @@ class MockAnalyticsRepository implements IAnalyticsRepository {
           questionsCorrect: 5,
           accuracy: 100,
           averageTime: 110,
-          totalScore: 5
+          totalScore: 5,
         },
         {
           topicId: 's3',
@@ -90,10 +90,10 @@ class MockAnalyticsRepository implements IAnalyticsRepository {
           questionsCorrect: 4,
           accuracy: 80,
           averageTime: 125,
-          totalScore: 4
-        }
-      ]
-    }
+          totalScore: 4,
+        },
+      ],
+    },
   ];
 
   private mockProgressData: UserProgressData[] = [
@@ -109,7 +109,7 @@ class MockAnalyticsRepository implements IAnalyticsRepository {
       lastStudiedAt: '2024-01-16T11:45:00Z',
       masteryLevel: 'advanced',
       createdAt: '2024-01-01T00:00:00Z',
-      updatedAt: '2024-01-16T11:45:00Z'
+      updatedAt: '2024-01-16T11:45:00Z',
     },
     {
       userId: 'user-1',
@@ -123,8 +123,8 @@ class MockAnalyticsRepository implements IAnalyticsRepository {
       lastStudiedAt: '2024-01-16T11:45:00Z',
       masteryLevel: 'intermediate',
       createdAt: '2024-01-01T00:00:00Z',
-      updatedAt: '2024-01-16T11:45:00Z'
-    }
+      updatedAt: '2024-01-16T11:45:00Z',
+    },
   ];
 
   async getCompletedSessions(filters: any): Promise<SessionAnalyticsData[]> {
@@ -143,7 +143,7 @@ class MockAnalyticsRepository implements IAnalyticsRepository {
         accuracy: 80,
         questionsAnswered: 5,
         averageTime: 120,
-        masteryLevel: 'intermediate'
+        masteryLevel: 'intermediate',
       },
       {
         topicId: 'ec2',
@@ -151,8 +151,8 @@ class MockAnalyticsRepository implements IAnalyticsRepository {
         accuracy: 100,
         questionsAnswered: 5,
         averageTime: 110,
-        masteryLevel: 'advanced'
-      }
+        masteryLevel: 'advanced',
+      },
     ];
   }
 
@@ -162,14 +162,14 @@ class MockAnalyticsRepository implements IAnalyticsRepository {
         period: '2024-01-15',
         value: 80,
         change: 0,
-        dataPoints: 1
+        dataPoints: 1,
       },
       {
         period: '2024-01-16',
         value: 90,
         change: 12.5,
-        dataPoints: 1
-      }
+        dataPoints: 1,
+      },
     ];
   }
 
@@ -187,7 +187,7 @@ class MockAnalyticsRepository implements IAnalyticsRepository {
       correctAnswers: 8,
       totalAnswers: 10,
       totalTime: 1200,
-      startTime: '2024-01-15T10:00:00Z'
+      startTime: '2024-01-15T10:00:00Z',
     };
   }
 
@@ -197,8 +197,8 @@ class MockAnalyticsRepository implements IAnalyticsRepository {
       metrics: {
         accuracy: 85,
         speed: 120,
-        consistency: 0.8
-      }
+        consistency: 0.8,
+      },
     };
   }
 }
@@ -218,13 +218,13 @@ describe('AnalyticsService', () => {
 
   beforeEach(() => {
     mockRepository = new MockAnalyticsRepository();
-    
+
     // Create instances of decomposed services
     progressAnalyzer = new ProgressAnalyzer(mockRepository);
     competencyAnalyzer = new CompetencyAnalyzer(mockRepository);
     performanceAnalyzer = new PerformanceAnalyzer(mockRepository);
     insightGenerator = new InsightGenerator(mockRepository);
-    
+
     analyticsService = new AnalyticsService(
       mockRepository,
       progressAnalyzer,
@@ -248,7 +248,7 @@ describe('AnalyticsService', () => {
     it('should return empty overview when no sessions exist', async () => {
       // Mock empty sessions
       jest.spyOn(mockRepository, 'getCompletedSessions').mockResolvedValue([]);
-      
+
       const overview: ProgressOverview = await analyticsService.calculateProgressOverview('user-1');
 
       expect(overview.totalSessionsCompleted).toBe(0);
@@ -267,7 +267,7 @@ describe('AnalyticsService', () => {
       expect(trends).toHaveProperty('sessionFrequencyTrend');
       expect(trends).toHaveProperty('difficultyProgressTrend');
       expect(trends).toHaveProperty('competencyGrowthTrend');
-      
+
       expect(Array.isArray(trends.accuracyTrend)).toBe(true);
       expect(Array.isArray(trends.studyTimeTrend)).toBe(true);
     });
@@ -275,7 +275,8 @@ describe('AnalyticsService', () => {
 
   describe('analyzeCompetencies', () => {
     it('should analyze competencies across topics and providers', async () => {
-      const competencies: CompetencyAnalytics = await analyticsService.analyzeCompetencies('user-1');
+      const competencies: CompetencyAnalytics =
+        await analyticsService.analyzeCompetencies('user-1');
 
       expect(competencies).toHaveProperty('topicCompetencies');
       expect(competencies).toHaveProperty('providerCompetencies');
@@ -311,20 +312,20 @@ describe('AnalyticsService', () => {
         overview: {
           overallProgress: 85,
           totalSessionsCompleted: 2,
-          overallAccuracy: 85
+          overallAccuracy: 85,
         },
         trends: {
           accuracyTrend: [
             { period: '2024-01-15', value: 80, change: 0, dataPoints: 1 },
-            { period: '2024-01-16', value: 90, change: 12.5, dataPoints: 1 }
+            { period: '2024-01-16', value: 90, change: 12.5, dataPoints: 1 },
           ],
           studyTimeTrend: [
             { period: '2024-01-15', value: 90, change: 0, dataPoints: 1 },
-            { period: '2024-01-16', value: 105, change: 16.7, dataPoints: 1 }
+            { period: '2024-01-16', value: 105, change: 16.7, dataPoints: 1 },
           ],
           difficultyProgressTrend: [],
           sessionFrequencyTrend: [],
-          competencyGrowthTrend: []
+          competencyGrowthTrend: [],
         },
         competencyData: {
           topicCompetencies: [
@@ -333,8 +334,8 @@ describe('AnalyticsService', () => {
               topicName: 'EC2 Instances',
               currentAccuracy: 90,
               averageTimePerQuestion: 115,
-              confidence: 0.8
-            }
+              confidence: 0.8,
+            },
           ],
           providerCompetencies: [
             {
@@ -344,19 +345,19 @@ describe('AnalyticsService', () => {
                 {
                   examId: 'saa-c03',
                   examName: 'Solutions Architect Associate',
-                  estimatedReadiness: 85
-                }
-              ]
-            }
-          ]
+                  estimatedReadiness: 85,
+                },
+              ],
+            },
+          ],
         },
         historicalData: [
           {
             date: '2024-01-15',
             accuracy: 80,
-            studyTime: 90
-          }
-        ]
+            studyTime: 90,
+          },
+        ],
       };
 
       const visualizationData = await analyticsService.prepareVisualizationData(mockAnalyticsData);
@@ -388,7 +389,7 @@ describe('AnalyticsService', () => {
   describe('getProgressAnalytics', () => {
     it('should return comprehensive progress analytics response', async () => {
       const request: ProgressAnalyticsRequest = {
-        timeframe: 'month'
+        timeframe: 'month',
       };
 
       const response = await analyticsService.getProgressAnalytics(request);
@@ -429,7 +430,7 @@ describe('AnalyticsService', () => {
         timeframe: 'month',
         providerId: 'aws',
         examId: 'saa-c03',
-        topics: ['ec2', 's3']
+        topics: ['ec2', 's3'],
       };
 
       const response = await analyticsService.getProgressAnalytics(request);
@@ -442,9 +443,13 @@ describe('AnalyticsService', () => {
   describe('error handling', () => {
     it('should handle repository errors gracefully', async () => {
       // Mock repository error
-      jest.spyOn(mockRepository, 'getCompletedSessions').mockRejectedValue(new Error('Database error'));
+      jest
+        .spyOn(mockRepository, 'getCompletedSessions')
+        .mockRejectedValue(new Error('Database error'));
 
-      await expect(analyticsService.calculateProgressOverview('user-1')).rejects.toThrow('Database error');
+      await expect(analyticsService.calculateProgressOverview('user-1')).rejects.toThrow(
+        'Database error'
+      );
     });
 
     it('should handle empty data gracefully', async () => {
@@ -453,7 +458,7 @@ describe('AnalyticsService', () => {
       jest.spyOn(mockRepository, 'getUserProgressData').mockResolvedValue([]);
 
       const overview = await analyticsService.calculateProgressOverview('user-1');
-      
+
       expect(overview.totalSessionsCompleted).toBe(0);
       expect(overview.overallAccuracy).toBe(0);
     });

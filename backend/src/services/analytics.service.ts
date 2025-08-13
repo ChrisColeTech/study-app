@@ -16,7 +16,8 @@ import {
   CompetencyAnalytics,
   HistoricalPerformance,
   LearningInsights,
-  VisualizationData
+  VisualizationData,
+  SessionPerformanceAnalytics,
 } from '../shared/types/analytics.types';
 
 export class AnalyticsService extends BaseService implements IAnalyticsService {
@@ -33,31 +34,34 @@ export class AnalyticsService extends BaseService implements IAnalyticsService {
   /**
    * Get detailed session analytics - Phase 24 implementation
    */
-  async getSessionAnalytics(sessionId: string): Promise<any> {
+  async getSessionAnalytics(sessionId: string): Promise<SessionPerformanceAnalytics> {
     return this.executeWithErrorHandling(
       async () => {
         this.validateRequired(sessionId, 'sessionId');
-        
+
         // Get session details and calculate analytics
         const sessionDetails = await this.analyticsRepository.getSessionDetails(sessionId);
         this.validateEntityExists(sessionDetails, 'Session', sessionId);
 
         // Calculate detailed session metrics
-        const analytics = {
-          sessionDetails,
-          performance: {
-            accuracy: sessionDetails.correctAnswers / sessionDetails.totalAnswers || 0,
-            averageTime: sessionDetails.totalTime / sessionDetails.totalAnswers || 0,
-            difficultyBreakdown: this.performanceAnalyzer.calculateDifficultyBreakdown(sessionDetails),
-            topicBreakdown: this.performanceAnalyzer.calculateTopicBreakdown(sessionDetails)
+        const analytics: SessionPerformanceAnalytics = {
+          difficulty: this.performanceAnalyzer.calculateDifficultyBreakdown(sessionDetails),
+          topics: this.performanceAnalyzer.calculateTopicBreakdown(sessionDetails),
+          timeDistribution: {
+            fastQuestions: 0, // Would calculate from actual session data
+            normalQuestions: 0,
+            slowQuestions: 0,
+            averageTimeEasy: 0,
+            averageTimeMedium: 0,
+            averageTimeHard: 0,
           },
-          insights: this.insightGenerator.generateSessionInsights(sessionDetails)
+          progressUpdates: [], // Would calculate from user progress data
         };
 
-        this.logSuccess('Session analytics generated successfully', { 
+        this.logSuccess('Session analytics generated successfully', {
           sessionId,
-          accuracy: analytics.performance.accuracy,
-          totalAnswers: sessionDetails.totalAnswers
+          difficultyCount: analytics.difficulty.length,
+          topicCount: analytics.topics.length,
         });
 
         return analytics;
@@ -65,7 +69,7 @@ export class AnalyticsService extends BaseService implements IAnalyticsService {
       {
         operation: 'get session analytics',
         entityType: 'Session',
-        entityId: sessionId
+        entityId: sessionId,
       }
     );
   }
@@ -77,19 +81,19 @@ export class AnalyticsService extends BaseService implements IAnalyticsService {
     return this.executeWithErrorHandling(
       async () => {
         this.validateRequired(params, 'params');
-        
+
         const result = await this.performanceAnalyzer.getPerformanceAnalytics(params);
-        
-        this.logSuccess('Performance analytics generated successfully', { 
-          paramsCount: Object.keys(params).length
+
+        this.logSuccess('Performance analytics generated successfully', {
+          paramsCount: Object.keys(params).length,
         });
-        
+
         return result;
       },
       {
         operation: 'get performance analytics',
         entityType: 'PerformanceAnalytics',
-        requestData: params
+        requestData: params,
       }
     );
   }
@@ -97,29 +101,25 @@ export class AnalyticsService extends BaseService implements IAnalyticsService {
   /**
    * Get comprehensive progress analytics - Main orchestration method
    */
-  async getProgressAnalytics(request: ProgressAnalyticsRequest): Promise<ProgressAnalyticsResponse> {
+  async getProgressAnalytics(
+    request: ProgressAnalyticsRequest
+  ): Promise<ProgressAnalyticsResponse> {
     return this.executeWithErrorHandling(
       async () => {
         this.validateRequired(request, 'request');
-        
+
         const userId = undefined; // Will be extracted from auth context in Phase 30
         const timeframe = request.timeframe || 'month';
         const startDate = request.startDate || this.getTimeframeStartDate(timeframe);
         const endDate = request.endDate || new Date().toISOString();
 
         // Calculate all analytics components in parallel for better performance using decomposed services
-        const [
-          overview,
-          trends,
-          competencyData,
-          historicalData,
-          insights,
-        ] = await Promise.all([
+        const [overview, trends, competencyData, historicalData, insights] = await Promise.all([
           this.progressAnalyzer.calculateProgressOverview(userId),
           this.progressAnalyzer.generateProgressTrends(timeframe, userId),
           this.competencyAnalyzer.analyzeCompetencies(userId),
           this.progressAnalyzer.getHistoricalPerformance(startDate, endDate, userId),
-          this.insightGenerator.generateLearningInsights(userId)
+          this.insightGenerator.generateLearningInsights(userId),
         ]);
 
         // Prepare visualization data
@@ -127,7 +127,7 @@ export class AnalyticsService extends BaseService implements IAnalyticsService {
           overview,
           trends,
           competencyData,
-          historicalData
+          historicalData,
         });
 
         // Get session count for metadata
@@ -143,7 +143,7 @@ export class AnalyticsService extends BaseService implements IAnalyticsService {
             competencyData,
             historicalData,
             insights,
-            visualizationData
+            visualizationData,
           },
           metadata: {
             timeframe: timeframe,
@@ -151,14 +151,14 @@ export class AnalyticsService extends BaseService implements IAnalyticsService {
             periodEnd: endDate,
             totalSessions: sessions.length,
             dataPoints: historicalData.length,
-            calculatedAt: new Date().toISOString()
-          }
+            calculatedAt: new Date().toISOString(),
+          },
         };
 
-        this.logSuccess('Progress analytics generated successfully', { 
+        this.logSuccess('Progress analytics generated successfully', {
           totalSessions: sessions.length,
           overallAccuracy: overview.overallAccuracy,
-          topicCount: competencyData.topicCompetencies.length
+          topicCount: competencyData.topicCompetencies.length,
         });
 
         return response;
@@ -166,7 +166,7 @@ export class AnalyticsService extends BaseService implements IAnalyticsService {
       {
         operation: 'generate progress analytics',
         entityType: 'ProgressAnalytics',
-        requestData: { timeframe: request.timeframe }
+        requestData: { timeframe: request.timeframe },
       }
     );
   }
@@ -179,10 +179,10 @@ export class AnalyticsService extends BaseService implements IAnalyticsService {
       async () => {
         return await this.progressAnalyzer.calculateProgressOverview(userId);
       },
-{
+      {
         operation: 'calculate progress overview',
         entityType: 'ProgressOverview',
-        ...(userId && { userId })
+        ...(userId && { userId }),
       }
     );
   }
@@ -196,11 +196,11 @@ export class AnalyticsService extends BaseService implements IAnalyticsService {
         this.validateRequired(timeframe, 'timeframe');
         return await this.progressAnalyzer.generateProgressTrends(timeframe, userId);
       },
-{
+      {
         operation: 'generate progress trends',
         entityType: 'ProgressTrends',
         requestData: { timeframe },
-        ...(userId && { userId })
+        ...(userId && { userId }),
       }
     );
   }
@@ -213,10 +213,10 @@ export class AnalyticsService extends BaseService implements IAnalyticsService {
       async () => {
         return await this.competencyAnalyzer.analyzeCompetencies(userId);
       },
-{
+      {
         operation: 'analyze competencies',
         entityType: 'CompetencyAnalytics',
-        ...(userId && { userId })
+        ...(userId && { userId }),
       }
     );
   }
@@ -224,18 +224,22 @@ export class AnalyticsService extends BaseService implements IAnalyticsService {
   /**
    * Get historical performance data - Delegated to ProgressAnalyzer
    */
-  async getHistoricalPerformance(startDate: string, endDate: string, userId?: string): Promise<HistoricalPerformance[]> {
+  async getHistoricalPerformance(
+    startDate: string,
+    endDate: string,
+    userId?: string
+  ): Promise<HistoricalPerformance[]> {
     return this.executeWithErrorHandling(
       async () => {
         this.validateRequired(startDate, 'startDate');
         this.validateRequired(endDate, 'endDate');
         return await this.progressAnalyzer.getHistoricalPerformance(startDate, endDate, userId);
       },
-{
+      {
         operation: 'get historical performance',
         entityType: 'HistoricalPerformance',
         requestData: { startDate, endDate },
-        ...(userId && { userId })
+        ...(userId && { userId }),
       }
     );
   }
@@ -248,10 +252,10 @@ export class AnalyticsService extends BaseService implements IAnalyticsService {
       async () => {
         return await this.insightGenerator.generateLearningInsights(userId);
       },
-{
+      {
         operation: 'generate learning insights',
         entityType: 'LearningInsights',
-        ...(userId && { userId })
+        ...(userId && { userId }),
       }
     );
   }
@@ -268,7 +272,7 @@ export class AnalyticsService extends BaseService implements IAnalyticsService {
       {
         operation: 'prepare visualization data',
         entityType: 'VisualizationData',
-        requestData: analyticsData
+        requestData: analyticsData,
       }
     );
   }

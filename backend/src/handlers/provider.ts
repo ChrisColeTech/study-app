@@ -6,11 +6,12 @@ import { HandlerContext, ApiResponse } from '../shared/types/api.types';
 import { ServiceFactory } from '../shared/service-factory';
 import { createLogger } from '../shared/logger';
 import { ERROR_CODES } from '../shared/constants/error.constants';
-import { 
-  GetProvidersRequest, 
+import {
+  GetProvidersRequest,
   GetProviderRequest,
   ProviderCategory,
-  ProviderStatus 
+  ProviderStatus,
+  ProviderStatusEnum,
 } from '../shared/types/provider.types';
 
 // Import new middleware
@@ -21,7 +22,7 @@ import {
   ErrorHandlingMiddleware,
   AuthMiddleware,
   ErrorContexts,
-  CommonParsing
+  CommonParsing,
 } from '../shared/middleware';
 
 export class ProviderHandler extends BaseHandler {
@@ -52,7 +53,7 @@ export class ProviderHandler extends BaseHandler {
         path: '/v1/providers/cache/refresh',
         handler: this.refreshCache.bind(this),
         requireAuth: false, // Will require admin auth in future phases
-      }
+      },
     ];
   }
 
@@ -65,17 +66,31 @@ export class ProviderHandler extends BaseHandler {
       category: { type: 'string', decode: true },
       status: { type: 'string', decode: true },
       search: CommonParsing.search,
-      includeInactive: CommonParsing.booleanFlag
+      includeInactive: CommonParsing.booleanFlag,
     });
     if (parseError) return parseError;
 
     // Validate enum values manually (simpler for now)
-    if (queryParams.category && !Object.values(ProviderCategory).includes(queryParams.category as ProviderCategory)) {
-      return this.buildErrorResponse(`Invalid category. Valid options: ${Object.values(ProviderCategory).join(', ')}`, 400, ERROR_CODES.VALIDATION_ERROR);
+    if (
+      queryParams.category &&
+      !Object.values(ProviderCategory).includes(queryParams.category as ProviderCategory)
+    ) {
+      return this.buildErrorResponse(
+        `Invalid category. Valid options: ${Object.values(ProviderCategory).join(', ')}`,
+        400,
+        ERROR_CODES.VALIDATION_ERROR
+      );
     }
 
-    if (queryParams.status && !Object.values(ProviderStatus).includes(queryParams.status as ProviderStatus)) {
-      return this.buildErrorResponse(`Invalid status. Valid options: ${Object.values(ProviderStatus).join(', ')}`, 400, ERROR_CODES.VALIDATION_ERROR);
+    if (
+      queryParams.status &&
+      !Object.values(ProviderStatusEnum).includes(queryParams.status as ProviderStatus)
+    ) {
+      return this.buildErrorResponse(
+        `Invalid status. Valid options: ${Object.values(ProviderStatusEnum).join(', ')}`,
+        400,
+        ERROR_CODES.VALIDATION_ERROR
+      );
     }
 
     // Build request object
@@ -83,7 +98,7 @@ export class ProviderHandler extends BaseHandler {
       ...(queryParams.category && { category: queryParams.category as ProviderCategory }),
       ...(queryParams.status && { status: queryParams.status as ProviderStatus }),
       ...(queryParams.search && { search: queryParams.search }),
-      ...(queryParams.includeInactive && { includeInactive: queryParams.includeInactive })
+      ...(queryParams.includeInactive && { includeInactive: queryParams.includeInactive }),
     };
 
     // Business logic only - delegate error handling to middleware
@@ -95,17 +110,17 @@ export class ProviderHandler extends BaseHandler {
       {
         requestId: context.requestId,
         operation: ErrorContexts.Provider.LIST,
-        additionalInfo: { filters: request }
+        additionalInfo: { filters: request },
       }
     );
 
     if (error) return error;
 
-    this.logger.info('Providers retrieved successfully', { 
+    this.logger.info('Providers retrieved successfully', {
       requestId: context.requestId,
       total: result!.total,
       returned: result!.providers.length,
-      filters: request
+      filters: request,
     });
 
     return this.buildSuccessResponse('Providers retrieved successfully', result);
@@ -125,18 +140,22 @@ export class ProviderHandler extends BaseHandler {
     }
 
     if (!/^[a-zA-Z0-9_-]+$/.test(pathParams.id)) {
-      return this.buildErrorResponse('Invalid provider ID format', 400, ERROR_CODES.VALIDATION_ERROR);
+      return this.buildErrorResponse(
+        'Invalid provider ID format',
+        400,
+        ERROR_CODES.VALIDATION_ERROR
+      );
     }
 
     // Parse query parameters
     const { data: queryParams } = ParsingMiddleware.parseQueryParams(context, {
-      includeCertifications: CommonParsing.booleanFlag
+      includeCertifications: CommonParsing.booleanFlag,
     });
 
     // Build request object
     const request: GetProviderRequest = {
       id: pathParams.id,
-      includeCertifications: queryParams?.includeCertifications !== false // Default to true
+      includeCertifications: queryParams?.includeCertifications !== false, // Default to true
     };
 
     // Business logic only - delegate error handling to middleware
@@ -148,17 +167,17 @@ export class ProviderHandler extends BaseHandler {
       {
         requestId: context.requestId,
         operation: ErrorContexts.Provider.GET,
-        additionalInfo: { providerId: request.id }
+        additionalInfo: { providerId: request.id },
       }
     );
 
     if (error) return error;
 
-    this.logger.info('Provider retrieved successfully', { 
+    this.logger.info('Provider retrieved successfully', {
       requestId: context.requestId,
       providerId: result!.provider.id,
       providerName: result!.provider.name,
-      certificationsCount: result!.provider.certifications.length
+      certificationsCount: result!.provider.certifications.length,
     });
 
     return this.buildSuccessResponse('Provider retrieved successfully', result);
@@ -176,17 +195,19 @@ export class ProviderHandler extends BaseHandler {
       },
       {
         requestId: context.requestId,
-        operation: ErrorContexts.Provider.REFRESH_CACHE
+        operation: ErrorContexts.Provider.REFRESH_CACHE,
       }
     );
 
     if (error) return error;
 
-    this.logger.info('Provider cache refreshed successfully', { 
-      requestId: context.requestId
+    this.logger.info('Provider cache refreshed successfully', {
+      requestId: context.requestId,
     });
 
-    return this.buildSuccessResponse('Cache refreshed successfully', { message: 'Provider cache refreshed successfully' });
+    return this.buildSuccessResponse('Cache refreshed successfully', {
+      message: 'Provider cache refreshed successfully',
+    });
   }
 }
 

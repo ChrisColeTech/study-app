@@ -3,15 +3,19 @@
 import { DynamoDBDocumentClient, QueryCommand } from '@aws-sdk/lib-dynamodb';
 import { ServiceConfig } from '../shared/service-factory';
 import { DynamoDBBaseRepository } from './base.repository';
-import { IBaseRepository, StandardQueryParams, StandardQueryResult } from '../shared/types/repository.types';
-import { 
+import {
+  IBaseRepository,
+  StandardQueryParams,
+  StandardQueryResult,
+} from '../shared/types/repository.types';
+import {
   SessionAnalyticsFilters as OriginalSessionAnalyticsFilters,
   SessionAnalyticsFilters,
   SessionAnalyticsData,
   UserProgressData,
   TopicPerformanceHistory,
   TrendData,
-  AnalyticsSnapshot
+  AnalyticsSnapshot,
 } from '../shared/types/analytics.types';
 import { StudySession } from '../shared/types/domain.types';
 import { AnalyticsSessionManager } from './analytics-session-manager';
@@ -26,7 +30,9 @@ export interface IAnalyticsRepository extends IBaseRepository {
    * @returns Promise<StandardQueryResult<SessionAnalyticsData>> - Standardized paginated results
    * @throws RepositoryError
    */
-  getCompletedSessions(filters: SessionAnalyticsFilters & StandardQueryParams): Promise<StandardQueryResult<SessionAnalyticsData>>;
+  getCompletedSessions(
+    filters: SessionAnalyticsFilters & StandardQueryParams
+  ): Promise<StandardQueryResult<SessionAnalyticsData>>;
 
   /**
    * Get user progress data with standardized result format
@@ -34,7 +40,9 @@ export interface IAnalyticsRepository extends IBaseRepository {
    * @returns Promise<StandardQueryResult<UserProgressData>> - Standardized paginated results
    * @throws RepositoryError
    */
-  getUserProgressData(filters?: StandardQueryParams & { userId?: string }): Promise<StandardQueryResult<UserProgressData>>;
+  getUserProgressData(
+    filters?: StandardQueryParams & { userId?: string }
+  ): Promise<StandardQueryResult<UserProgressData>>;
 
   /**
    * Get topic performance history with standardized result format
@@ -43,7 +51,10 @@ export interface IAnalyticsRepository extends IBaseRepository {
    * @returns Promise<StandardQueryResult<TopicPerformanceHistory>> - Standardized paginated results
    * @throws RepositoryError
    */
-  getTopicPerformanceHistory(topicIds: string[], filters?: StandardQueryParams & { userId?: string }): Promise<StandardQueryResult<TopicPerformanceHistory>>;
+  getTopicPerformanceHistory(
+    topicIds: string[],
+    filters?: StandardQueryParams & { userId?: string }
+  ): Promise<StandardQueryResult<TopicPerformanceHistory>>;
 
   /**
    * Calculate trend data for metrics with standardized result format
@@ -53,7 +64,11 @@ export interface IAnalyticsRepository extends IBaseRepository {
    * @returns Promise<StandardQueryResult<TrendData>> - Standardized paginated results
    * @throws RepositoryError
    */
-  calculateTrendData(metric: string, timeframe: string, filters?: StandardQueryParams & { userId?: string }): Promise<StandardQueryResult<TrendData>>;
+  calculateTrendData(
+    metric: string,
+    timeframe: string,
+    filters?: StandardQueryParams & { userId?: string }
+  ): Promise<StandardQueryResult<TrendData>>;
 
   /**
    * Save analytics snapshot
@@ -85,7 +100,9 @@ export interface IAnalyticsRepository extends IBaseRepository {
    * @returns Promise<StandardQueryResult<any>> - Standardized paginated results
    * @throws RepositoryError
    */
-  getPerformanceData(filters: StandardQueryParams & { params?: any }): Promise<StandardQueryResult<any>>;
+  getPerformanceData(
+    filters: StandardQueryParams & { params?: any }
+  ): Promise<StandardQueryResult<any>>;
 }
 
 export class AnalyticsRepository extends DynamoDBBaseRepository implements IAnalyticsRepository {
@@ -112,107 +129,150 @@ export class AnalyticsRepository extends DynamoDBBaseRepository implements IAnal
    * Perform health check operation for DynamoDB connectivity
    */
   protected async performHealthCheck(): Promise<void> {
-    await this.dynamoClient.send(new QueryCommand({
-      TableName: this.tableName,
-      KeyConditionExpression: 'sessionId = :sessionId',
-      ExpressionAttributeValues: { ':sessionId': 'health-check-session' },
-      Limit: 1
-    }));
+    await this.dynamoClient.send(
+      new QueryCommand({
+        TableName: this.tableName,
+        KeyConditionExpression: 'sessionId = :sessionId',
+        ExpressionAttributeValues: { ':sessionId': 'health-check-session' },
+        Limit: 1,
+      })
+    );
   }
 
   /**
    * Get completed sessions with analytics data
    * Delegates to AnalyticsSessionManager for pure data access
    */
-  async getCompletedSessions(filters: SessionAnalyticsFilters & StandardQueryParams): Promise<StandardQueryResult<SessionAnalyticsData>> {
-    return this.executeWithErrorHandling('getCompletedSessions', async () => {
-      this.logger.info('Delegating getCompletedSessions to AnalyticsSessionManager', { filters });
-      
-      const sessions = await this.sessionManager.getCompletedSessions(filters);
-      
-      // Transform sessions to analytics data format using data transformer
-      const analyticsData: SessionAnalyticsData[] = sessions.map(session => 
-        this.dataTransformer.transformSessionToAnalyticsData(session as unknown as StudySession)
-      );
+  async getCompletedSessions(
+    filters: SessionAnalyticsFilters & StandardQueryParams
+  ): Promise<StandardQueryResult<SessionAnalyticsData>> {
+    return this.executeWithErrorHandling(
+      'getCompletedSessions',
+      async () => {
+        this.logger.info('Delegating getCompletedSessions to AnalyticsSessionManager', { filters });
 
-      // Return standardized result format
-      return {
-        items: analyticsData,
-        total: analyticsData.length,
-        limit: filters.limit || this.config.query?.defaultLimit || 20,
-        offset: filters.offset || 0,
-        hasMore: false, // Will be calculated properly when pagination is implemented
-        executionTimeMs: 0 // Will be set by executeWithErrorHandling
-      };
-    }, { filters });
+        const sessions = await this.sessionManager.getCompletedSessions(filters);
+
+        // Transform sessions to analytics data format using data transformer
+        const analyticsData: SessionAnalyticsData[] = sessions.map(session =>
+          this.dataTransformer.transformSessionToAnalyticsData(session as unknown as StudySession)
+        );
+
+        // Return standardized result format
+        return {
+          items: analyticsData,
+          total: analyticsData.length,
+          limit: filters.limit || this.config.query?.defaultLimit || 20,
+          offset: filters.offset || 0,
+          hasMore: false, // Will be calculated properly when pagination is implemented
+          executionTimeMs: 0, // Will be set by executeWithErrorHandling
+        };
+      },
+      { filters }
+    );
   }
 
   /**
    * Get user progress data from UserProgress table
    * Delegates to AnalyticsSessionManager for pure data access
    */
-  async getUserProgressData(filters?: StandardQueryParams & { userId?: string }): Promise<StandardQueryResult<UserProgressData>> {
-    return this.executeWithErrorHandling('getUserProgressData', async () => {
-      this.logger.info('Delegating getUserProgressData to AnalyticsSessionManager', { filters });
-      
-      const progressData = await this.sessionManager.getUserProgressData(filters?.userId);
-      
-      // Return standardized result format
-      return {
-        items: progressData,
-        total: progressData.length,
-        limit: filters?.limit || this.config.query?.defaultLimit || 20,
-        offset: filters?.offset || 0,
-        hasMore: false, // Will be calculated properly when pagination is implemented
-        executionTimeMs: 0 // Will be set by executeWithErrorHandling
-      };
-    }, { filters });
+  async getUserProgressData(
+    filters?: StandardQueryParams & { userId?: string }
+  ): Promise<StandardQueryResult<UserProgressData>> {
+    return this.executeWithErrorHandling(
+      'getUserProgressData',
+      async () => {
+        this.logger.info('Delegating getUserProgressData to AnalyticsSessionManager', { filters });
+
+        const progressData = await this.sessionManager.getUserProgressData(filters?.userId);
+
+        // Return standardized result format
+        return {
+          items: progressData,
+          total: progressData.length,
+          limit: filters?.limit || this.config.query?.defaultLimit || 20,
+          offset: filters?.offset || 0,
+          hasMore: false, // Will be calculated properly when pagination is implemented
+          executionTimeMs: 0, // Will be set by executeWithErrorHandling
+        };
+      },
+      { filters }
+    );
   }
 
   /**
    * Get topic performance history (calculated from sessions)
    * Delegates to AnalyticsCalculator for analytical computations
    */
-  async getTopicPerformanceHistory(topicIds: string[], filters?: StandardQueryParams & { userId?: string }): Promise<StandardQueryResult<TopicPerformanceHistory>> {
-    return this.executeWithErrorHandling('getTopicPerformanceHistory', async () => {
-      this.validateRequired({ topicIds }, 'getTopicPerformanceHistory');
-      this.logger.info('Delegating getTopicPerformanceHistory to AnalyticsCalculator', { topicIds, filters });
-      
-      const performanceHistory = await this.calculator.getTopicPerformanceHistory(topicIds, filters?.userId);
-      
-      // Return standardized result format
-      return {
-        items: performanceHistory,
-        total: performanceHistory.length,
-        limit: filters?.limit || this.config.query?.defaultLimit || 20,
-        offset: filters?.offset || 0,
-        hasMore: false, // Will be calculated properly when pagination is implemented
-        executionTimeMs: 0 // Will be set by executeWithErrorHandling
-      };
-    }, { topicIds, filters });
+  async getTopicPerformanceHistory(
+    topicIds: string[],
+    filters?: StandardQueryParams & { userId?: string }
+  ): Promise<StandardQueryResult<TopicPerformanceHistory>> {
+    return this.executeWithErrorHandling(
+      'getTopicPerformanceHistory',
+      async () => {
+        this.validateRequired({ topicIds }, 'getTopicPerformanceHistory');
+        this.logger.info('Delegating getTopicPerformanceHistory to AnalyticsCalculator', {
+          topicIds,
+          filters,
+        });
+
+        const performanceHistory = await this.calculator.getTopicPerformanceHistory(
+          topicIds,
+          filters?.userId
+        );
+
+        // Return standardized result format
+        return {
+          items: performanceHistory,
+          total: performanceHistory.length,
+          limit: filters?.limit || this.config.query?.defaultLimit || 20,
+          offset: filters?.offset || 0,
+          hasMore: false, // Will be calculated properly when pagination is implemented
+          executionTimeMs: 0, // Will be set by executeWithErrorHandling
+        };
+      },
+      { topicIds, filters }
+    );
   }
 
   /**
    * Calculate trend data for a specific metric over time
    * Delegates to AnalyticsCalculator for analytical computations
    */
-  async calculateTrendData(metric: string, timeframe: string, filters?: StandardQueryParams & { userId?: string }): Promise<StandardQueryResult<TrendData>> {
-    return this.executeWithErrorHandling('calculateTrendData', async () => {
-      this.validateRequired({ metric, timeframe }, 'calculateTrendData');
-      this.logger.info('Delegating calculateTrendData to AnalyticsCalculator', { metric, timeframe, filters });
-      
-      const trendData = await this.calculator.calculateTrendData(metric, timeframe, filters?.userId);
-      
-      // Return standardized result format
-      return {
-        items: trendData,
-        total: trendData.length,
-        limit: filters?.limit || this.config.query?.defaultLimit || 20,
-        offset: filters?.offset || 0,
-        hasMore: false, // Will be calculated properly when pagination is implemented
-        executionTimeMs: 0 // Will be set by executeWithErrorHandling
-      };
-    }, { metric, timeframe, filters });
+  async calculateTrendData(
+    metric: string,
+    timeframe: string,
+    filters?: StandardQueryParams & { userId?: string }
+  ): Promise<StandardQueryResult<TrendData>> {
+    return this.executeWithErrorHandling(
+      'calculateTrendData',
+      async () => {
+        this.validateRequired({ metric, timeframe }, 'calculateTrendData');
+        this.logger.info('Delegating calculateTrendData to AnalyticsCalculator', {
+          metric,
+          timeframe,
+          filters,
+        });
+
+        const trendData = await this.calculator.calculateTrendData(
+          metric,
+          timeframe,
+          filters?.userId
+        );
+
+        // Return standardized result format
+        return {
+          items: trendData,
+          total: trendData.length,
+          limit: filters?.limit || this.config.query?.defaultLimit || 20,
+          offset: filters?.offset || 0,
+          hasMore: false, // Will be calculated properly when pagination is implemented
+          executionTimeMs: 0, // Will be set by executeWithErrorHandling
+        };
+      },
+      { metric, timeframe, filters }
+    );
   }
 
   /**
@@ -220,18 +280,25 @@ export class AnalyticsRepository extends DynamoDBBaseRepository implements IAnal
    * Delegates to AnalyticsSnapshotManager for snapshot operations
    */
   async saveAnalyticsSnapshot(snapshot: AnalyticsSnapshot): Promise<void> {
-    return this.executeWithErrorHandling('saveAnalyticsSnapshot', async () => {
-      this.validateRequired({ 
-        userId: snapshot.userId,
-        snapshotDate: snapshot.snapshotDate 
-      }, 'saveAnalyticsSnapshot');
-      
-      this.logger.info('Delegating saveAnalyticsSnapshot to AnalyticsSnapshotManager', { 
-        userId: snapshot.userId,
-        snapshotDate: snapshot.snapshotDate 
-      });
-      return this.snapshotManager.saveAnalyticsSnapshot(snapshot);
-    }, { userId: snapshot.userId, snapshotDate: snapshot.snapshotDate });
+    return this.executeWithErrorHandling(
+      'saveAnalyticsSnapshot',
+      async () => {
+        this.validateRequired(
+          {
+            userId: snapshot.userId,
+            snapshotDate: snapshot.snapshotDate,
+          },
+          'saveAnalyticsSnapshot'
+        );
+
+        this.logger.info('Delegating saveAnalyticsSnapshot to AnalyticsSnapshotManager', {
+          userId: snapshot.userId,
+          snapshotDate: snapshot.snapshotDate,
+        });
+        return this.snapshotManager.saveAnalyticsSnapshot(snapshot);
+      },
+      { userId: snapshot.userId, snapshotDate: snapshot.snapshotDate }
+    );
   }
 
   /**
@@ -239,10 +306,16 @@ export class AnalyticsRepository extends DynamoDBBaseRepository implements IAnal
    * Delegates to AnalyticsSnapshotManager for snapshot operations
    */
   async getAnalyticsSnapshot(userId?: string): Promise<AnalyticsSnapshot | null> {
-    return this.executeWithErrorHandling('getAnalyticsSnapshot', async () => {
-      this.logger.info('Delegating getAnalyticsSnapshot to AnalyticsSnapshotManager', { ...(userId && { userId }) });
-      return this.snapshotManager.getAnalyticsSnapshot(userId);
-    }, { ...(userId && { userId }) });
+    return this.executeWithErrorHandling(
+      'getAnalyticsSnapshot',
+      async () => {
+        this.logger.info('Delegating getAnalyticsSnapshot to AnalyticsSnapshotManager', {
+          ...(userId && { userId }),
+        });
+        return this.snapshotManager.getAnalyticsSnapshot(userId);
+      },
+      { ...(userId && { userId }) }
+    );
   }
 
   /**
@@ -250,11 +323,15 @@ export class AnalyticsRepository extends DynamoDBBaseRepository implements IAnal
    * Delegates to AnalyticsSessionManager for data access
    */
   async getSessionDetails(sessionId: string): Promise<any> {
-    return this.executeWithErrorHandling('getSessionDetails', async () => {
-      this.validateRequired({ sessionId }, 'getSessionDetails');
-      this.logger.info('Delegating getSessionDetails to AnalyticsSessionManager', { sessionId });
-      return this.sessionManager.getSessionDetails(sessionId);
-    }, { sessionId });
+    return this.executeWithErrorHandling(
+      'getSessionDetails',
+      async () => {
+        this.validateRequired({ sessionId }, 'getSessionDetails');
+        this.logger.info('Delegating getSessionDetails to AnalyticsSessionManager', { sessionId });
+        return this.sessionManager.getSessionDetails(sessionId);
+      },
+      { sessionId }
+    );
   }
 
   /**
@@ -262,10 +339,13 @@ export class AnalyticsRepository extends DynamoDBBaseRepository implements IAnal
    * Delegates to AnalyticsSessionManager for data access
    */
   async getPerformanceData(params: any): Promise<any> {
-    return this.executeWithErrorHandling('getPerformanceData', async () => {
-      this.logger.info('Delegating getPerformanceData to AnalyticsSessionManager', { params });
-      return this.sessionManager.getPerformanceData(params);
-    }, { params });
+    return this.executeWithErrorHandling(
+      'getPerformanceData',
+      async () => {
+        this.logger.info('Delegating getPerformanceData to AnalyticsSessionManager', { params });
+        return this.sessionManager.getPerformanceData(params);
+      },
+      { params }
+    );
   }
 }
-

@@ -80,7 +80,9 @@ export class ParsingMiddleware {
             logger.warn('Failed to transform query parameter', { key, value, error });
             return {
               data: null as any,
-              error: this.createValidationError(`Invalid ${key} format: ${(error as Error).message}`)
+              error: this.createValidationError(
+                `Invalid ${key} format: ${(error as Error).message}`
+              ),
             };
           }
         }
@@ -91,7 +93,7 @@ export class ParsingMiddleware {
           if (!validationResult.isValid) {
             return {
               data: null as any,
-              error: this.createValidationError(`${key}: ${validationResult.message}`)
+              error: this.createValidationError(`${key}: ${validationResult.message}`),
             };
           }
         }
@@ -99,9 +101,9 @@ export class ParsingMiddleware {
         parsed[key] = parsedValue;
       }
 
-      logger.debug('Query parameters parsed successfully', { 
+      logger.debug('Query parameters parsed successfully', {
         originalCount: Object.keys(queryParams).length,
-        parsedCount: Object.keys(parsed).length
+        parsedCount: Object.keys(parsed).length,
       });
 
       return { data: parsed as T, error: null };
@@ -109,7 +111,7 @@ export class ParsingMiddleware {
       logger.error('Failed to parse query parameters', error as Error);
       return {
         data: null as any,
-        error: this.createInternalError('Failed to parse query parameters')
+        error: this.createInternalError('Failed to parse query parameters'),
       };
     }
   }
@@ -118,8 +120,8 @@ export class ParsingMiddleware {
    * Enhanced type conversion with support for additional types
    */
   private static convertParameterType(
-    value: any, 
-    type: string, 
+    value: any,
+    type: string,
     key: string
   ): { value?: any; error?: ApiResponse } {
     try {
@@ -145,7 +147,11 @@ export class ParsingMiddleware {
           } else if (lowerValue === 'false' || lowerValue === '0' || lowerValue === 'no') {
             return { value: false };
           } else {
-            return { error: this.createValidationError(`${key} must be a valid boolean (true/false, 1/0, yes/no)`) };
+            return {
+              error: this.createValidationError(
+                `${key} must be a valid boolean (true/false, 1/0, yes/no)`
+              ),
+            };
           }
 
         case 'date':
@@ -156,7 +162,8 @@ export class ParsingMiddleware {
           return { value: date };
 
         case 'uuid':
-          const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+          const uuidRegex =
+            /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
           if (!uuidRegex.test(value)) {
             return { error: this.createValidationError(`${key} must be a valid UUID`) };
           }
@@ -172,7 +179,12 @@ export class ParsingMiddleware {
         case 'array':
           // Enhanced array parsing with configurable delimiter
           const delimiter = ','; // Default delimiter, could be configurable
-          return { value: value.split(delimiter).map((item: string) => item.trim()).filter(Boolean) };
+          return {
+            value: value
+              .split(delimiter)
+              .map((item: string) => item.trim())
+              .filter(Boolean),
+          };
 
         case 'string':
           // Enhanced string processing with trimming and length validation
@@ -207,7 +219,7 @@ export class ParsingMiddleware {
         if (required) {
           return {
             data: null as any,
-            error: this.createValidationError('Request body is required')
+            error: this.createValidationError('Request body is required'),
           };
         }
         return { data: {} as T, error: null };
@@ -217,7 +229,7 @@ export class ParsingMiddleware {
       if (context.event.body.length > maxSize) {
         return {
           data: null as any,
-          error: this.createValidationError(`Request body too large (max ${maxSize} bytes)`)
+          error: this.createValidationError(`Request body too large (max ${maxSize} bytes)`),
         };
       }
 
@@ -227,14 +239,14 @@ export class ParsingMiddleware {
         requestBody = JSON.parse(context.event.body);
       } catch (parseError) {
         const error = parseError as Error;
-        logger.warn('JSON parsing failed', { 
+        logger.warn('JSON parsing failed', {
           error: error.message,
           bodyLength: context.event.body.length,
-          bodyPreview: context.event.body.substring(0, 100)
+          bodyPreview: context.event.body.substring(0, 100),
         });
         return {
           data: null as any,
-          error: this.createValidationError(`Invalid JSON: ${error.message}`)
+          error: this.createValidationError(`Invalid JSON: ${error.message}`),
         };
       }
 
@@ -242,14 +254,15 @@ export class ParsingMiddleware {
       if (requestBody !== null && typeof requestBody !== 'object') {
         return {
           data: null as any,
-          error: this.createValidationError('Request body must be a JSON object')
+          error: this.createValidationError('Request body must be a JSON object'),
         };
       }
-      
+
       logger.debug('Request body parsed successfully', {
         hasBody: true,
-        fieldsCount: requestBody && typeof requestBody === 'object' ? Object.keys(requestBody).length : 0,
-        bodySize: context.event.body.length
+        fieldsCount:
+          requestBody && typeof requestBody === 'object' ? Object.keys(requestBody).length : 0,
+        bodySize: context.event.body.length,
       });
 
       return { data: requestBody as T, error: null };
@@ -257,7 +270,7 @@ export class ParsingMiddleware {
       logger.error('Failed to parse request body', error as Error);
       return {
         data: null as any,
-        error: this.createInternalError('Failed to parse request body')
+        error: this.createInternalError('Failed to parse request body'),
       };
     }
   }
@@ -280,7 +293,7 @@ export class ParsingMiddleware {
         }
 
         let parsedValue: any;
-        
+
         // Enhanced URL decoding with error handling
         try {
           parsedValue = decodeURIComponent(value);
@@ -297,7 +310,9 @@ export class ParsingMiddleware {
             logger.warn('Failed to transform path parameter', { key, value, error });
             return {
               data: null as any,
-              error: this.createValidationError(`Invalid ${key} format: ${(error as Error).message}`)
+              error: this.createValidationError(
+                `Invalid ${key} format: ${(error as Error).message}`
+              ),
             };
           }
         }
@@ -308,7 +323,9 @@ export class ParsingMiddleware {
           if (!validationResult.isValid) {
             return {
               data: null as any,
-              error: this.createValidationError(`${key}: ${validationResult.message || 'Invalid value'}`)
+              error: this.createValidationError(
+                `${key}: ${validationResult.message || 'Invalid value'}`
+              ),
             };
           }
         }
@@ -316,8 +333,8 @@ export class ParsingMiddleware {
         parsed[key] = parsedValue;
       }
 
-      logger.debug('Path parameters parsed successfully', { 
-        pathParamsCount: Object.keys(parsed).length
+      logger.debug('Path parameters parsed successfully', {
+        pathParamsCount: Object.keys(parsed).length,
       });
 
       return { data: parsed as T, error: null };
@@ -325,7 +342,7 @@ export class ParsingMiddleware {
       logger.error('Failed to parse path parameters', error as Error);
       return {
         data: null as any,
-        error: this.createInternalError('Failed to parse path parameters')
+        error: this.createInternalError('Failed to parse path parameters'),
       };
     }
   }
@@ -347,17 +364,13 @@ export class ParsingMiddleware {
     sort?: string;
     order?: 'asc' | 'desc';
   }> {
-    const {
-      defaultLimit = 50,
-      maxLimit = 100,
-      supportCursor = false
-    } = options;
+    const { defaultLimit = 50, maxLimit = 100, supportCursor = false } = options;
 
     const config: QueryParamConfig = {
       limit: { type: 'number' },
       offset: { type: 'number' },
       sort: { type: 'string' },
-      order: { type: 'string' }
+      order: { type: 'string' },
     };
 
     if (supportCursor) {
@@ -377,14 +390,14 @@ export class ParsingMiddleware {
     if (limit < 1 || limit > maxLimit) {
       return {
         data: null as any,
-        error: this.createValidationError(`Limit must be between 1 and ${maxLimit}`)
+        error: this.createValidationError(`Limit must be between 1 and ${maxLimit}`),
       };
     }
 
     if (offset < 0) {
       return {
         data: null as any,
-        error: this.createValidationError('Offset must be non-negative')
+        error: this.createValidationError('Offset must be non-negative'),
       };
     }
 
@@ -392,20 +405,20 @@ export class ParsingMiddleware {
     if (queryParams.order && !['asc', 'desc'].includes(queryParams.order)) {
       return {
         data: null as any,
-        error: this.createValidationError('Order must be "asc" or "desc"')
+        error: this.createValidationError('Order must be "asc" or "desc"'),
       };
     }
 
     const result: any = { limit, offset };
-    
+
     if (queryParams.cursor && supportCursor) {
       result.cursor = queryParams.cursor;
     }
-    
+
     if (queryParams.sort) {
       result.sort = queryParams.sort;
     }
-    
+
     if (queryParams.order) {
       result.order = queryParams.order as 'asc' | 'desc';
     }
@@ -429,7 +442,7 @@ export class ParsingMiddleware {
       allowedFilters = [],
       filterTypes = {},
       booleanFilters = ['includeInactive', 'includeExplanations', 'includeMetadata'],
-      dateFilters = []
+      dateFilters = [],
     } = schema;
 
     const { data: queryParams, error } = this.parseQueryParams(context);
@@ -462,7 +475,11 @@ export class ParsingMiddleware {
     // Enhanced boolean filter processing
     for (const boolFilter of booleanFilters) {
       if (queryParams[boolFilter] !== undefined) {
-        const conversionResult = this.convertParameterType(queryParams[boolFilter], 'boolean', boolFilter);
+        const conversionResult = this.convertParameterType(
+          queryParams[boolFilter],
+          'boolean',
+          boolFilter
+        );
         if (conversionResult.error) {
           return { data: null as any, error: conversionResult.error };
         }
@@ -473,7 +490,11 @@ export class ParsingMiddleware {
     // Enhanced date filter processing
     for (const dateFilter of dateFilters) {
       if (queryParams[dateFilter] !== undefined) {
-        const conversionResult = this.convertParameterType(queryParams[dateFilter], 'date', dateFilter);
+        const conversionResult = this.convertParameterType(
+          queryParams[dateFilter],
+          'date',
+          dateFilter
+        );
         if (conversionResult.error) {
           return { data: null as any, error: conversionResult.error };
         }
@@ -481,9 +502,9 @@ export class ParsingMiddleware {
       }
     }
 
-    logger.debug('Filter parameters parsed', { 
+    logger.debug('Filter parameters parsed', {
       filterCount: Object.keys(filters).length,
-      filters: Object.keys(filters)
+      filters: Object.keys(filters),
     });
 
     return { data: filters, error: null };
@@ -552,13 +573,13 @@ export class ParsingMiddleware {
             if (!parsed[parent]?.[child]) {
               return {
                 data: null as any,
-                error: this.createValidationError(`Required parameter missing: ${schemaKey}`)
+                error: this.createValidationError(`Required parameter missing: ${schemaKey}`),
               };
             }
           } else if (!parsed[schemaKey]) {
             return {
               data: null as any,
-              error: this.createValidationError(`Required parameter missing: ${schemaKey}`)
+              error: this.createValidationError(`Required parameter missing: ${schemaKey}`),
             };
           }
         }
@@ -569,7 +590,7 @@ export class ParsingMiddleware {
       logger.error('Failed to parse nested query parameters', error as Error);
       return {
         data: null as any,
-        error: this.createInternalError('Failed to parse nested query parameters')
+        error: this.createInternalError('Failed to parse nested query parameters'),
       };
     }
   }
@@ -582,9 +603,9 @@ export class ParsingMiddleware {
       success: false,
       error: {
         code: ERROR_CODES.VALIDATION_ERROR,
-        message
+        message,
       },
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
   }
 
@@ -595,14 +616,14 @@ export class ParsingMiddleware {
     if (context) {
       logger.error('Internal parsing error', { message, context });
     }
-    
+
     return {
       success: false,
       error: {
         code: ERROR_CODES.INTERNAL_ERROR,
-        message
+        message,
       },
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
   }
 
@@ -624,7 +645,20 @@ export class ParsingMiddleware {
       }
 
       const typedConfig = config as any;
-      if (typedConfig.type && !['string', 'number', 'boolean', 'array', 'date', 'uuid', 'email', 'json', 'float'].includes(typedConfig.type)) {
+      if (
+        typedConfig.type &&
+        ![
+          'string',
+          'number',
+          'boolean',
+          'array',
+          'date',
+          'uuid',
+          'email',
+          'json',
+          'float',
+        ].includes(typedConfig.type)
+      ) {
         errors.push(`Invalid type "${typedConfig.type}" for "${key}"`);
       }
     }
@@ -650,19 +684,19 @@ export const CommonParsing = {
    */
   pagination: {
     limit: { type: 'number' as const },
-    offset: { type: 'number' as const }
+    offset: { type: 'number' as const },
   },
 
   /**
    * Standard search parameter parsing with length validation
    */
-  search: { 
-    type: 'string' as const, 
+  search: {
+    type: 'string' as const,
     decode: true,
     validate: (value: string) => ({
       isValid: value.length >= 1 && value.length <= 255,
-      message: 'Search term must be between 1 and 255 characters'
-    })
+      message: 'Search term must be between 1 and 255 characters',
+    }),
   },
 
   /**
@@ -683,13 +717,13 @@ export const CommonParsing = {
   /**
    * Provider/exam ID parsing (alphanumeric with hyphens/underscores)
    */
-  alphanumericId: { 
-    type: 'string' as const, 
+  alphanumericId: {
+    type: 'string' as const,
     decode: true,
     validate: (value: string) => ({
       isValid: /^[a-zA-Z0-9_-]+$/.test(value),
-      message: 'ID must contain only alphanumeric characters, hyphens, and underscores'
-    })
+      message: 'ID must contain only alphanumeric characters, hyphens, and underscores',
+    }),
   },
 
   /**
@@ -719,8 +753,8 @@ export const CommonParsing = {
     type: 'number' as const,
     validate: (value: number) => ({
       isValid: value > 0 && Number.isInteger(value),
-      message: 'Value must be a positive integer'
-    })
+      message: 'Value must be a positive integer',
+    }),
   },
 
   /**
@@ -730,8 +764,8 @@ export const CommonParsing = {
     type: 'float' as const,
     validate: (value: number) => ({
       isValid: value >= 0 && value <= 100,
-      message: 'Percentage must be between 0 and 100'
-    })
+      message: 'Percentage must be between 0 and 100',
+    }),
   },
 
   /**
@@ -741,9 +775,9 @@ export const CommonParsing = {
     type: 'string' as const,
     validate: (value: string) => ({
       isValid: ['asc', 'desc'].includes(value.toLowerCase()),
-      message: 'Sort order must be "asc" or "desc"'
+      message: 'Sort order must be "asc" or "desc"',
     }),
-    transform: (value: string) => value.toLowerCase()
+    transform: (value: string) => value.toLowerCase(),
   },
 
   /**
@@ -755,9 +789,9 @@ export const CommonParsing = {
       const date = new Date(value);
       return {
         isValid: !isNaN(date.getTime()) && value.includes('T'),
-        message: 'Date must be in ISO 8601 format (YYYY-MM-DDTHH:mm:ss.sssZ)'
+        message: 'Date must be in ISO 8601 format (YYYY-MM-DDTHH:mm:ss.sssZ)',
       };
-    }
+    },
   },
 
   /**
@@ -767,9 +801,9 @@ export const CommonParsing = {
     type: 'string' as const,
     validate: (value: string) => ({
       isValid: ['easy', 'medium', 'hard'].includes(value.toLowerCase()),
-      message: 'Difficulty must be "easy", "medium", or "hard"'
+      message: 'Difficulty must be "easy", "medium", or "hard"',
     }),
-    transform: (value: string) => value.toLowerCase()
+    transform: (value: string) => value.toLowerCase(),
   },
 
   /**
@@ -779,8 +813,8 @@ export const CommonParsing = {
     type: 'string' as const,
     validate: (value: string) => ({
       isValid: ['aws', 'azure', 'gcp', 'comptia', 'cisco'].includes(value.toLowerCase()),
-      message: 'Provider must be one of: aws, azure, gcp, comptia, cisco'
+      message: 'Provider must be one of: aws, azure, gcp, comptia, cisco',
     }),
-    transform: (value: string) => value.toLowerCase()
-  }
+    transform: (value: string) => value.toLowerCase(),
+  },
 };

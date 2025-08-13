@@ -102,8 +102,9 @@ describe('AuthService', () => {
     it('should throw error for weak password', async () => {
       const weakPasswordData = { ...testUserData, password: 'weak' };
 
-      await expect(authService.registerUser(weakPasswordData))
-        .rejects.toThrow('Password must be at least 8 characters long');
+      await expect(authService.registerUser(weakPasswordData)).rejects.toThrow(
+        'Password must be at least 8 characters long'
+      );
 
       expect(mockBcrypt.hash).not.toHaveBeenCalled();
       expect(mockUserService.createUser).not.toHaveBeenCalled();
@@ -112,36 +113,41 @@ describe('AuthService', () => {
     it('should throw error for password without uppercase letter', async () => {
       const noUppercaseData = { ...testUserData, password: 'password123!' };
 
-      await expect(authService.registerUser(noUppercaseData))
-        .rejects.toThrow('Password must contain at least one uppercase letter');
+      await expect(authService.registerUser(noUppercaseData)).rejects.toThrow(
+        'Password must contain at least one uppercase letter'
+      );
     });
 
     it('should throw error for password without lowercase letter', async () => {
       const noLowercaseData = { ...testUserData, password: 'PASSWORD123!' };
 
-      await expect(authService.registerUser(noLowercaseData))
-        .rejects.toThrow('Password must contain at least one lowercase letter');
+      await expect(authService.registerUser(noLowercaseData)).rejects.toThrow(
+        'Password must contain at least one lowercase letter'
+      );
     });
 
     it('should throw error for password without number', async () => {
       const noNumberData = { ...testUserData, password: 'Password!' };
 
-      await expect(authService.registerUser(noNumberData))
-        .rejects.toThrow('Password must contain at least one number');
+      await expect(authService.registerUser(noNumberData)).rejects.toThrow(
+        'Password must contain at least one number'
+      );
     });
 
     it('should throw error for password without special character', async () => {
       const noSpecialData = { ...testUserData, password: 'Password123' };
 
-      await expect(authService.registerUser(noSpecialData))
-        .rejects.toThrow('Password must contain at least one special character');
+      await expect(authService.registerUser(noSpecialData)).rejects.toThrow(
+        'Password must contain at least one special character'
+      );
     });
 
     it('should throw error for password too long', async () => {
       const longPasswordData = { ...testUserData, password: 'P'.repeat(129) + 'assword123!' };
 
-      await expect(authService.registerUser(longPasswordData))
-        .rejects.toThrow('Password must be 128 characters or less');
+      await expect(authService.registerUser(longPasswordData)).rejects.toThrow(
+        'Password must be 128 characters or less'
+      );
     });
   });
 
@@ -206,8 +212,7 @@ describe('AuthService', () => {
     it('should throw error for non-existent user', async () => {
       mockUserService.getUserByEmail.mockResolvedValue(null);
 
-      await expect(authService.loginUser(loginData))
-        .rejects.toThrow('Invalid email or password');
+      await expect(authService.loginUser(loginData)).rejects.toThrow('Invalid email or password');
 
       expect(mockBcrypt.compare).not.toHaveBeenCalled();
     });
@@ -216,8 +221,7 @@ describe('AuthService', () => {
       const inactiveUser = { ...mockUser, isActive: false };
       mockUserService.getUserByEmail.mockResolvedValue(inactiveUser);
 
-      await expect(authService.loginUser(loginData))
-        .rejects.toThrow('Invalid email or password');
+      await expect(authService.loginUser(loginData)).rejects.toThrow('Invalid email or password');
 
       expect(mockBcrypt.compare).not.toHaveBeenCalled();
     });
@@ -226,8 +230,7 @@ describe('AuthService', () => {
       mockUserService.getUserByEmail.mockResolvedValue(mockUser);
       mockBcrypt.compare.mockResolvedValue(false);
 
-      await expect(authService.loginUser(loginData))
-        .rejects.toThrow('Invalid email or password');
+      await expect(authService.loginUser(loginData)).rejects.toThrow('Invalid email or password');
     });
   });
 
@@ -253,28 +256,33 @@ describe('AuthService', () => {
     it('should throw error for expired token', async () => {
       const error = new Error('Token expired');
       error.name = 'TokenExpiredError';
-      mockJwt.verify.mockImplementation(() => { throw error; });
+      mockJwt.verify.mockImplementation(() => {
+        throw error;
+      });
 
-      await expect(authService.validateToken('expired-token'))
-        .rejects.toThrow('Token expired');
+      await expect(authService.validateToken('expired-token')).rejects.toThrow('Token expired');
     });
 
     it('should throw error for invalid token', async () => {
       const error = new Error('Invalid token');
       error.name = 'JsonWebTokenError';
-      mockJwt.verify.mockImplementation(() => { throw error; });
+      mockJwt.verify.mockImplementation(() => {
+        throw error;
+      });
 
-      await expect(authService.validateToken('invalid-token'))
-        .rejects.toThrow('Invalid token');
+      await expect(authService.validateToken('invalid-token')).rejects.toThrow('Invalid token');
     });
 
     it('should throw generic error for other JWT errors', async () => {
       const error = new Error('Other error');
       error.name = 'OtherError';
-      mockJwt.verify.mockImplementation(() => { throw error; });
+      mockJwt.verify.mockImplementation(() => {
+        throw error;
+      });
 
-      await expect(authService.validateToken('problematic-token'))
-        .rejects.toThrow('Token validation failed');
+      await expect(authService.validateToken('problematic-token')).rejects.toThrow(
+        'Token validation failed'
+      );
     });
   });
 
@@ -328,10 +336,13 @@ describe('AuthService', () => {
     it('should throw error for expired refresh token', async () => {
       const error = new Error('Refresh token expired');
       error.name = 'TokenExpiredError';
-      mockJwt.verify.mockImplementation(() => { throw error; });
+      mockJwt.verify.mockImplementation(() => {
+        throw error;
+      });
 
-      await expect(authService.refreshToken('expired-refresh-token'))
-        .rejects.toThrow('Refresh token expired');
+      await expect(authService.refreshToken('expired-refresh-token')).rejects.toThrow(
+        'Refresh token expired'
+      );
     });
 
     it('should throw error when user not found or inactive', async () => {
@@ -347,8 +358,9 @@ describe('AuthService', () => {
       mockJwt.verify.mockReturnValue(mockPayload);
       mockUserService.getUserById.mockResolvedValue(null);
 
-      await expect(authService.refreshToken('valid-refresh-token'))
-        .rejects.toThrow('User not found or inactive');
+      await expect(authService.refreshToken('valid-refresh-token')).rejects.toThrow(
+        'User not found or inactive'
+      );
     });
   });
 

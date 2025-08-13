@@ -2,19 +2,19 @@
 // Phase 18: Goals Management System
 
 // Core goal types
-export type GoalType = 
-  | 'exam_preparation'    // Goals for passing specific exams
-  | 'topic_mastery'      // Goals for mastering specific topics  
-  | 'daily_practice'     // Daily study practice goals
-  | 'score_target'       // Target score achievement goals
-  | 'streak'             // Study streak maintenance goals;
+export type GoalType =
+  | 'exam_preparation' // Goals for passing specific exams
+  | 'topic_mastery' // Goals for mastering specific topics
+  | 'daily_practice' // Daily study practice goals
+  | 'score_target' // Target score achievement goals
+  | 'streak'; // Study streak maintenance goals;
 
-export type GoalTargetType = 
-  | 'exam'              // Target a specific exam
-  | 'topic'             // Target a specific topic
-  | 'questions'         // Target number of questions
-  | 'score'             // Target score achievement
-  | 'days';             // Target number of days
+export type GoalTargetType =
+  | 'exam' // Target a specific exam
+  | 'topic' // Target a specific topic
+  | 'questions' // Target number of questions
+  | 'score' // Target score achievement
+  | 'days'; // Target number of days
 
 export type GoalPriority = 'low' | 'medium' | 'high';
 export type GoalStatus = 'active' | 'completed' | 'paused' | 'abandoned';
@@ -29,28 +29,28 @@ export interface Goal {
   type: GoalType;
   priority: GoalPriority;
   status: GoalStatus;
-  
+
   // Target configuration
   targetType: GoalTargetType;
   targetValue: number;
   currentValue: number;
-  
+
   // Optional target references
   examId?: string;
   topicId?: string;
   providerId?: string;
-  
+
   // Dates
   deadline?: string;
   startDate: string;
   completedAt?: string;
   createdAt: string;
   updatedAt: string;
-  
+
   // Progress tracking
   progressPercentage: number;
   milestones: GoalMilestone[];
-  
+
   // Settings
   reminders: GoalReminder[];
   isArchived: boolean;
@@ -162,7 +162,11 @@ export interface IGoalsService {
   createGoal(userId: string, request: CreateGoalRequest): Promise<CreateGoalResponse>;
   getGoals(userId: string, request?: GetGoalsRequest): Promise<GetGoalsResponse>;
   getGoal(goalId: string, userId: string): Promise<GoalResponse>;
-  updateGoal(goalId: string, userId: string, request: UpdateGoalRequest): Promise<UpdateGoalResponse>;
+  updateGoal(
+    goalId: string,
+    userId: string,
+    request: UpdateGoalRequest
+  ): Promise<UpdateGoalResponse>;
   deleteGoal(goalId: string, userId: string): Promise<DeleteGoalResponse>;
   getGoalStats(userId: string): Promise<GoalStats>;
   updateGoalProgress(goalId: string, progress: number): Promise<void>;

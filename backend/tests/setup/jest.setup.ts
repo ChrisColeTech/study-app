@@ -114,7 +114,7 @@ export const createMockEvent = (overrides = {}) => ({
 // Custom matchers for API responses
 expect.extend({
   toBeValidApiResponse(received) {
-    const pass = 
+    const pass =
       typeof received === 'object' &&
       typeof received.statusCode === 'number' &&
       typeof received.headers === 'object' &&
@@ -127,7 +127,8 @@ expect.extend({
       };
     } else {
       return {
-        message: () => `Expected ${received} to be a valid API response with statusCode, headers, and body`,
+        message: () =>
+          `Expected ${received} to be a valid API response with statusCode, headers, and body`,
         pass: false,
       };
     }
@@ -144,7 +145,8 @@ expect.extend({
       };
     }
 
-    const pass = received.statusCode >= 200 && received.statusCode < 300 && parsedBody.success === true;
+    const pass =
+      received.statusCode >= 200 && received.statusCode < 300 && parsedBody.success === true;
 
     if (pass) {
       return {
@@ -153,7 +155,8 @@ expect.extend({
       };
     } else {
       return {
-        message: () => `Expected ${received} to have a success response (2xx status code and success: true)`,
+        message: () =>
+          `Expected ${received} to have a success response (2xx status code and success: true)`,
         pass: false,
       };
     }
@@ -179,7 +182,8 @@ expect.extend({
       };
     } else {
       return {
-        message: () => `Expected ${received} to have an error response (4xx/5xx status code and success: false)`,
+        message: () =>
+          `Expected ${received} to have an error response (4xx/5xx status code and success: false)`,
         pass: false,
       };
     }

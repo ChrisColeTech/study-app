@@ -16,30 +16,30 @@ const mockSessionRepository: jest.Mocked<ISessionRepository> = {
   findByUserId: jest.fn(),
   update: jest.fn(),
   delete: jest.fn(),
-  exists: jest.fn()
+  exists: jest.fn(),
 };
 
 const mockProviderService: jest.Mocked<IProviderService> = {
   getProvider: jest.fn(),
   getProviders: jest.fn(),
   searchProviders: jest.fn(),
-  refreshCache: jest.fn()
+  refreshCache: jest.fn(),
 };
 
 const mockExamService: jest.Mocked<IExamService> = {
   getExam: jest.fn(),
-  getExams: jest.fn()
+  getExams: jest.fn(),
 };
 
 const mockTopicService: jest.Mocked<ITopicService> = {
   getTopic: jest.fn(),
-  getTopics: jest.fn()
+  getTopics: jest.fn(),
 };
 
 const mockQuestionService: jest.Mocked<IQuestionService> = {
   getQuestion: jest.fn(),
   getQuestions: jest.fn(),
-  searchQuestions: jest.fn()
+  searchQuestions: jest.fn(),
 };
 
 describe('SessionService - Phase 19 Delete Functionality', () => {
@@ -68,14 +68,14 @@ describe('SessionService - Phase 19 Delete Functionality', () => {
         correctAnswer: ['A'],
         timeSpent: 30,
         skipped: false,
-        markedForReview: false
-      }
+        markedForReview: false,
+      },
     ],
     currentQuestionIndex: 0,
     totalQuestions: 1,
     correctAnswers: 0,
     createdAt: '2024-01-15T10:00:00Z',
-    updatedAt: '2024-01-15T10:00:00Z'
+    updatedAt: '2024-01-15T10:00:00Z',
   };
 
   describe('Session Deletion', () => {
@@ -85,7 +85,7 @@ describe('SessionService - Phase 19 Delete Functionality', () => {
       mockSessionRepository.update.mockResolvedValue({
         ...mockActiveSession,
         status: 'abandoned',
-        updatedAt: '2024-01-15T10:30:00Z'
+        updatedAt: '2024-01-15T10:30:00Z',
       });
 
       // Act
@@ -94,16 +94,13 @@ describe('SessionService - Phase 19 Delete Functionality', () => {
       // Assert
       expect(result).toEqual({
         success: true,
-        message: 'Session deleted successfully'
+        message: 'Session deleted successfully',
       });
       expect(mockSessionRepository.findById).toHaveBeenCalledWith(mockActiveSession.sessionId);
-      expect(mockSessionRepository.update).toHaveBeenCalledWith(
-        mockActiveSession.sessionId,
-        {
-          status: 'abandoned',
-          updatedAt: expect.any(String)
-        }
-      );
+      expect(mockSessionRepository.update).toHaveBeenCalledWith(mockActiveSession.sessionId, {
+        status: 'abandoned',
+        updatedAt: expect.any(String),
+      });
     });
 
     test('should successfully delete a paused session', async () => {
@@ -113,7 +110,7 @@ describe('SessionService - Phase 19 Delete Functionality', () => {
       mockSessionRepository.update.mockResolvedValue({
         ...pausedSession,
         status: 'abandoned',
-        updatedAt: '2024-01-15T10:30:00Z'
+        updatedAt: '2024-01-15T10:30:00Z',
       });
 
       // Act
@@ -122,7 +119,7 @@ describe('SessionService - Phase 19 Delete Functionality', () => {
       // Assert
       expect(result).toEqual({
         success: true,
-        message: 'Session deleted successfully'
+        message: 'Session deleted successfully',
       });
       expect(mockSessionRepository.update).toHaveBeenCalledWith(
         pausedSession.sessionId,
@@ -136,27 +133,29 @@ describe('SessionService - Phase 19 Delete Functionality', () => {
       mockSessionRepository.findById.mockResolvedValue(null);
 
       // Act & Assert
-      await expect(sessionService.deleteSession(nonExistentSessionId))
-        .rejects.toThrow(`Session not found: ${nonExistentSessionId}`);
-      
+      await expect(sessionService.deleteSession(nonExistentSessionId)).rejects.toThrow(
+        `Session not found: ${nonExistentSessionId}`
+      );
+
       expect(mockSessionRepository.findById).toHaveBeenCalledWith(nonExistentSessionId);
       expect(mockSessionRepository.update).not.toHaveBeenCalled();
     });
 
     test('should throw error when trying to delete completed session', async () => {
       // Arrange
-      const completedSession = { 
-        ...mockActiveSession, 
+      const completedSession = {
+        ...mockActiveSession,
         status: 'completed' as const,
         endTime: '2024-01-15T11:00:00Z',
-        score: 85
+        score: 85,
       };
       mockSessionRepository.findById.mockResolvedValue(completedSession);
 
       // Act & Assert
-      await expect(sessionService.deleteSession(completedSession.sessionId))
-        .rejects.toThrow('Cannot delete completed sessions - they are archived for analytics');
-      
+      await expect(sessionService.deleteSession(completedSession.sessionId)).rejects.toThrow(
+        'Cannot delete completed sessions - they are archived for analytics'
+      );
+
       expect(mockSessionRepository.findById).toHaveBeenCalledWith(completedSession.sessionId);
       expect(mockSessionRepository.update).not.toHaveBeenCalled();
     });
@@ -167,9 +166,10 @@ describe('SessionService - Phase 19 Delete Functionality', () => {
       mockSessionRepository.update.mockRejectedValue(new Error('Database connection failed'));
 
       // Act & Assert
-      await expect(sessionService.deleteSession(mockActiveSession.sessionId))
-        .rejects.toThrow('Database connection failed');
-      
+      await expect(sessionService.deleteSession(mockActiveSession.sessionId)).rejects.toThrow(
+        'Database connection failed'
+      );
+
       expect(mockSessionRepository.findById).toHaveBeenCalledWith(mockActiveSession.sessionId);
       expect(mockSessionRepository.update).toHaveBeenCalled();
     });
@@ -179,9 +179,10 @@ describe('SessionService - Phase 19 Delete Functionality', () => {
       mockSessionRepository.findById.mockRejectedValue(new Error('Database timeout'));
 
       // Act & Assert
-      await expect(sessionService.deleteSession(mockActiveSession.sessionId))
-        .rejects.toThrow('Database timeout');
-      
+      await expect(sessionService.deleteSession(mockActiveSession.sessionId)).rejects.toThrow(
+        'Database timeout'
+      );
+
       expect(mockSessionRepository.findById).toHaveBeenCalledWith(mockActiveSession.sessionId);
       expect(mockSessionRepository.update).not.toHaveBeenCalled();
     });
@@ -194,7 +195,7 @@ describe('SessionService - Phase 19 Delete Functionality', () => {
       mockSessionRepository.update.mockResolvedValue({
         ...mockActiveSession,
         status: 'abandoned',
-        updatedAt: '2024-01-15T10:30:00Z'
+        updatedAt: '2024-01-15T10:30:00Z',
       });
 
       // Act
@@ -203,9 +204,9 @@ describe('SessionService - Phase 19 Delete Functionality', () => {
       // Assert - Verify it's a soft delete (status change) not hard delete
       expect(mockSessionRepository.update).toHaveBeenCalledWith(
         mockActiveSession.sessionId,
-        expect.objectContaining({ 
+        expect.objectContaining({
           status: 'abandoned',
-          updatedAt: expect.any(String)
+          updatedAt: expect.any(String),
         })
       );
       expect(mockSessionRepository.delete).not.toHaveBeenCalled(); // Should not use hard delete
@@ -218,7 +219,7 @@ describe('SessionService - Phase 19 Delete Functionality', () => {
       mockSessionRepository.update.mockResolvedValue({
         ...mockActiveSession,
         status: 'abandoned',
-        updatedAt: '2024-01-15T10:30:00Z'
+        updatedAt: '2024-01-15T10:30:00Z',
       });
 
       // Act

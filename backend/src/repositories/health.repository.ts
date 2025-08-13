@@ -8,17 +8,17 @@ import { LambdaClient, GetFunctionCommand } from '@aws-sdk/client-lambda';
 import { CloudWatchLogsClient, DescribeLogGroupsCommand } from '@aws-sdk/client-cloudwatch-logs';
 import { ServiceConfig } from '../shared/service-factory';
 import { createLogger } from '../shared/logger';
-import { 
+import {
   ServiceDiagnostics,
-  DatabaseDiagnostics, 
-  StorageDiagnostics, 
-  LambdaDiagnostics, 
+  DatabaseDiagnostics,
+  StorageDiagnostics,
+  LambdaDiagnostics,
   CloudWatchDiagnostics,
   SystemResourceUsage,
   PerformanceMetrics,
   HealthTrend,
   IHealthRepository,
-  IDetailedHealthRepository
+  IDetailedHealthRepository,
 } from '../shared/types/health.types';
 import * as os from 'os';
 import * as dns from 'dns';
@@ -27,7 +27,10 @@ import { promisify } from 'util';
 // Re-export interfaces for external use
 export type { IHealthRepository, IDetailedHealthRepository } from '../shared/types/health.types';
 
-export class HealthRepository extends BaseRepository implements IHealthRepository, IDetailedHealthRepository {
+export class HealthRepository
+  extends BaseRepository
+  implements IHealthRepository, IDetailedHealthRepository
+{
   private dynamoClient: DynamoDBClient;
   private s3Client: S3Client;
   protected serviceConfig: ServiceConfig;
@@ -44,18 +47,18 @@ export class HealthRepository extends BaseRepository implements IHealthRepositor
         users: config.tables?.users || 'users',
         studySessions: config.tables?.studySessions || 'studySessions',
         goals: config.tables?.goals || 'goals',
-        userProgress: config.tables?.userProgress || 'userProgress'
+        userProgress: config.tables?.userProgress || 'userProgress',
       },
       s3: {
-        bucketName: config.s3?.bucketName || 'default-bucket'
-      }
+        bucketName: config.s3?.bucketName || 'default-bucket',
+      },
     };
     super('HealthRepository', repositoryConfig);
-    
+
     this.dynamoClient = dynamoClient;
     this.s3Client = s3Client;
     this.serviceConfig = config;
-    
+
     // Initialize helper services with proper dependencies
     this.healthMonitoring = new HealthMonitoringService(this.serviceConfig);
     this.connectivityTester = new HealthConnectivityTester(this.dynamoClient, this.serviceConfig);
@@ -69,13 +72,13 @@ export class HealthRepository extends BaseRepository implements IHealthRepositor
   protected async performHealthCheck(): Promise<void> {
     // Test DynamoDB connectivity
     const describeCommand = new DescribeTableCommand({
-      TableName: this.config.tables.users
+      TableName: this.config.tables.users,
     });
     await this.dynamoClient.send(describeCommand);
 
     // Test S3 connectivity
     const headBucketCommand = new HeadBucketCommand({
-      Bucket: this.config.s3.bucketName
+      Bucket: this.config.s3.bucketName,
     });
     await this.s3Client.send(headBucketCommand);
   }
@@ -90,21 +93,21 @@ export class HealthRepository extends BaseRepository implements IHealthRepositor
     try {
       const startTime = Date.now();
       const describeCommand = new DescribeTableCommand({
-        TableName: this.config.tables.users
+        TableName: this.config.tables.users,
       });
       await this.dynamoClient.send(describeCommand);
       dependencies.push({
         name: 'DynamoDB',
         type: 'dynamodb',
         healthy: true,
-        responseTime: Date.now() - startTime
+        responseTime: Date.now() - startTime,
       });
     } catch (error) {
       dependencies.push({
         name: 'DynamoDB',
         type: 'dynamodb',
         healthy: false,
-        error: (error as Error).message
+        error: (error as Error).message,
       });
     }
 
@@ -112,21 +115,21 @@ export class HealthRepository extends BaseRepository implements IHealthRepositor
     try {
       const startTime = Date.now();
       const headBucketCommand = new HeadBucketCommand({
-        Bucket: this.config.s3.bucketName
+        Bucket: this.config.s3.bucketName,
       });
       await this.s3Client.send(headBucketCommand);
       dependencies.push({
         name: 'S3',
         type: 's3',
         healthy: true,
-        responseTime: Date.now() - startTime
+        responseTime: Date.now() - startTime,
       });
     } catch (error) {
       dependencies.push({
         name: 'S3',
         type: 's3',
         healthy: false,
-        error: (error as Error).message
+        error: (error as Error).message,
       });
     }
 
@@ -139,11 +142,11 @@ export class HealthRepository extends BaseRepository implements IHealthRepositor
   async checkDynamoDbHealth(): Promise<ServiceDiagnostics> {
     return this.executeWithErrorHandling('checkDynamoDbHealth', async () => {
       const startTime = Date.now();
-      
+
       this.logger.debug('Checking DynamoDB health', { tableName: this.config.tables.users });
 
       const command = new DescribeTableCommand({
-        TableName: this.config.tables.users
+        TableName: this.config.tables.users,
       });
 
       await this.dynamoClient.send(command);
@@ -155,7 +158,7 @@ export class HealthRepository extends BaseRepository implements IHealthRepositor
         service: 'dynamodb',
         status: 'healthy',
         responseTime,
-        lastChecked: new Date().toISOString()
+        lastChecked: new Date().toISOString(),
       };
     });
   }
@@ -166,37 +169,41 @@ export class HealthRepository extends BaseRepository implements IHealthRepositor
   async getDetailedDynamoDbHealth(): Promise<DatabaseDiagnostics> {
     return this.executeWithErrorHandling('getDetailedDynamoDbHealth', async () => {
       const startTime = Date.now();
-      
+
       this.logger.debug('Getting detailed DynamoDB diagnostics');
 
       const tableNames = [
         this.config.tables.users,
         this.config.tables.studySessions,
         this.config.tables.userProgress,
-        this.config.tables.goals
+        this.config.tables.goals,
       ];
 
       const tables = await Promise.allSettled(
-        tableNames.map(async (tableName) => {
+        tableNames.map(async tableName => {
           const command = new DescribeTableCommand({ TableName: tableName });
           const result = await this.dynamoClient.send(command);
           const table = result.Table!;
-          
+
           return {
             name: tableName,
             status: table.TableStatus || 'UNKNOWN',
             itemCount: table.ItemCount || 0,
             sizeBytes: table.TableSizeBytes || 0,
             readCapacity: table.ProvisionedThroughput?.ReadCapacityUnits || 0,
-            writeCapacity: table.ProvisionedThroughput?.WriteCapacityUnits || 0
+            writeCapacity: table.ProvisionedThroughput?.WriteCapacityUnits || 0,
           };
         })
       );
 
       const responseTime = Date.now() - startTime;
       const successfulTables = tables.filter(t => t.status === 'fulfilled');
-      const status = successfulTables.length === tableNames.length ? 'healthy' : 
-                   successfulTables.length > 0 ? 'degraded' : 'unhealthy';
+      const status =
+        successfulTables.length === tableNames.length
+          ? 'healthy'
+          : successfulTables.length > 0
+            ? 'degraded'
+            : 'unhealthy';
 
       return {
         service: 'dynamodb',
@@ -205,11 +212,15 @@ export class HealthRepository extends BaseRepository implements IHealthRepositor
         lastChecked: new Date().toISOString(),
         details: {
           region: this.serviceConfig.region,
-          tables: tables.map(t => t.status === 'fulfilled' ? t.value : {
-            name: 'unknown',
-            status: 'ERROR'
-          })
-        }
+          tables: tables.map(t =>
+            t.status === 'fulfilled'
+              ? t.value
+              : {
+                  name: 'unknown',
+                  status: 'ERROR',
+                }
+          ),
+        },
       };
     });
   }
@@ -220,11 +231,11 @@ export class HealthRepository extends BaseRepository implements IHealthRepositor
   async checkS3Health(): Promise<ServiceDiagnostics> {
     return this.executeWithErrorHandling('checkS3Health', async () => {
       const startTime = Date.now();
-      
+
       this.logger.debug('Checking S3 health', { bucketName: this.config.s3.bucketName });
 
       const command = new HeadBucketCommand({
-        Bucket: this.config.s3.bucketName
+        Bucket: this.config.s3.bucketName,
       });
 
       await this.s3Client.send(command);
@@ -236,7 +247,7 @@ export class HealthRepository extends BaseRepository implements IHealthRepositor
         service: 's3',
         status: 'healthy',
         responseTime,
-        lastChecked: new Date().toISOString()
+        lastChecked: new Date().toISOString(),
       };
     });
   }
@@ -247,11 +258,11 @@ export class HealthRepository extends BaseRepository implements IHealthRepositor
   async checkAllServices(): Promise<ServiceDiagnostics[]> {
     return this.executeWithErrorHandling('checkAllServices', async () => {
       this.logger.info('Running comprehensive health checks');
-      
+
       // Run health checks in parallel for better performance
       const healthChecks = await Promise.allSettled([
         this.checkDynamoDbHealth(),
-        this.checkS3Health()
+        this.checkS3Health(),
       ]);
 
       const results: ServiceDiagnostics[] = [];
@@ -267,7 +278,7 @@ export class HealthRepository extends BaseRepository implements IHealthRepositor
             status: 'unhealthy',
             responseTime: 0,
             lastChecked: new Date().toISOString(),
-            error: check.reason?.message || 'Health check failed'
+            error: check.reason?.message || 'Health check failed',
           });
         }
       });
@@ -275,10 +286,10 @@ export class HealthRepository extends BaseRepository implements IHealthRepositor
       const healthyServices = results.filter(r => r.status === 'healthy').length;
       const totalServices = results.length;
 
-      this.logger.info('Health checks completed', { 
-        healthyServices, 
+      this.logger.info('Health checks completed', {
+        healthyServices,
         totalServices,
-        overallHealth: healthyServices === totalServices ? 'healthy' : 'degraded'
+        overallHealth: healthyServices === totalServices ? 'healthy' : 'degraded',
       });
 
       return results;
@@ -291,42 +302,46 @@ export class HealthRepository extends BaseRepository implements IHealthRepositor
   async getDetailedS3Health(): Promise<StorageDiagnostics> {
     return this.executeWithErrorHandling('getDetailedS3Health', async () => {
       const startTime = Date.now();
-      
+
       this.logger.debug('Getting detailed S3 diagnostics');
 
       const bucketNames = [
         this.serviceConfig.buckets.questionData,
-        this.serviceConfig.buckets.assets
+        this.serviceConfig.buckets.assets,
       ];
 
       const buckets = await Promise.allSettled(
-        bucketNames.map(async (bucketName) => {
+        bucketNames.map(async bucketName => {
           if (!bucketName) return { name: 'undefined', status: 'NOT_CONFIGURED' };
-          
+
           const headCommand = new HeadBucketCommand({ Bucket: bucketName });
           await this.s3Client.send(headCommand);
-          
+
           // Get bucket size (simplified - just count objects)
-          const listCommand = new ListObjectsV2Command({ 
+          const listCommand = new ListObjectsV2Command({
             Bucket: bucketName,
-            MaxKeys: 1000
+            MaxKeys: 1000,
           });
           const listResult = await this.s3Client.send(listCommand);
-          
+
           return {
             name: bucketName,
             status: 'ACTIVE',
             objectCount: listResult.KeyCount || 0,
             sizeBytes: listResult.Contents?.reduce((sum, obj) => sum + (obj.Size || 0), 0) || 0,
-            region: this.serviceConfig.region
+            region: this.serviceConfig.region,
           };
         })
       );
 
       const responseTime = Date.now() - startTime;
       const successfulBuckets = buckets.filter(b => b.status === 'fulfilled');
-      const status = successfulBuckets.length === bucketNames.length ? 'healthy' : 
-                   successfulBuckets.length > 0 ? 'degraded' : 'unhealthy';
+      const status =
+        successfulBuckets.length === bucketNames.length
+          ? 'healthy'
+          : successfulBuckets.length > 0
+            ? 'degraded'
+            : 'unhealthy';
 
       return {
         service: 's3',
@@ -335,11 +350,15 @@ export class HealthRepository extends BaseRepository implements IHealthRepositor
         lastChecked: new Date().toISOString(),
         details: {
           region: this.serviceConfig.region,
-          buckets: buckets.map(b => b.status === 'fulfilled' ? b.value : {
-            name: 'unknown',
-            status: 'ERROR'
-          })
-        }
+          buckets: buckets.map(b =>
+            b.status === 'fulfilled'
+              ? b.value
+              : {
+                  name: 'unknown',
+                  status: 'ERROR',
+                }
+          ),
+        },
       };
     });
   }
@@ -371,7 +390,11 @@ export class HealthRepository extends BaseRepository implements IHealthRepositor
   }
 
   // Delegate to configuration validator
-  async validateConfiguration(): Promise<{ valid: boolean; errors?: string[]; warnings?: string[] }> {
+  async validateConfiguration(): Promise<{
+    valid: boolean;
+    errors?: string[];
+    warnings?: string[];
+  }> {
     return this.executeWithErrorHandling('validateConfiguration', async () => {
       return this.configurationValidator.validateConfiguration();
     });
@@ -379,15 +402,23 @@ export class HealthRepository extends BaseRepository implements IHealthRepositor
 
   // Delegate to metrics collector
   async getPerformanceMetrics(service?: string): Promise<PerformanceMetrics> {
-    return this.executeWithErrorHandling('getPerformanceMetrics', async () => {
-      return this.metricsCollector.getPerformanceMetrics(service);
-    }, { service });
+    return this.executeWithErrorHandling(
+      'getPerformanceMetrics',
+      async () => {
+        return this.metricsCollector.getPerformanceMetrics(service);
+      },
+      { service }
+    );
   }
 
   async getHealthTrends(service?: string, hours = 24): Promise<any[]> {
-    return this.executeWithErrorHandling('getHealthTrends', async () => {
-      return this.metricsCollector.getHealthTrends(service, hours);
-    }, { service, hours });
+    return this.executeWithErrorHandling(
+      'getHealthTrends',
+      async () => {
+        return this.metricsCollector.getHealthTrends(service, hours);
+      },
+      { service, hours }
+    );
   }
 }
 
@@ -412,7 +443,7 @@ export class HealthMonitoringService {
    */
   async checkLambdaHealth(): Promise<LambdaDiagnostics> {
     const startTime = Date.now();
-    
+
     try {
       const functionName = process.env.AWS_LAMBDA_FUNCTION_NAME;
       if (!functionName) {
@@ -421,12 +452,12 @@ export class HealthMonitoringService {
           status: 'unhealthy',
           responseTime: 0,
           lastChecked: new Date().toISOString(),
-          error: 'Lambda function name not found in environment'
+          error: 'Lambda function name not found in environment',
         };
       }
 
       const command = new GetFunctionCommand({
-        FunctionName: functionName
+        FunctionName: functionName,
       });
 
       const result = await this.lambdaClient.send(command);
@@ -444,10 +475,12 @@ export class HealthMonitoringService {
           ...(result.Configuration?.MemorySize && { memorySize: result.Configuration.MemorySize }),
           ...(result.Configuration?.Timeout && { timeout: result.Configuration.Timeout }),
           ...(result.Configuration?.CodeSize && { codeSize: result.Configuration.CodeSize }),
-          ...(result.Configuration?.LastModified && { lastModified: result.Configuration.LastModified }),
+          ...(result.Configuration?.LastModified && {
+            lastModified: result.Configuration.LastModified,
+          }),
           ...(result.Configuration?.State && { state: result.Configuration.State }),
-          environment: result.Configuration?.Environment?.Variables || {}
-        }
+          environment: result.Configuration?.Environment?.Variables || {},
+        },
       };
     } catch (error) {
       const responseTime = Date.now() - startTime;
@@ -456,7 +489,7 @@ export class HealthMonitoringService {
         status: 'unhealthy',
         responseTime,
         lastChecked: new Date().toISOString(),
-        error: (error as Error).message
+        error: (error as Error).message,
       };
     }
   }
@@ -466,20 +499,21 @@ export class HealthMonitoringService {
    */
   async checkCloudWatchHealth(): Promise<CloudWatchDiagnostics> {
     const startTime = Date.now();
-    
+
     try {
       const command = new DescribeLogGroupsCommand({
-        limit: 10
+        limit: 10,
       });
 
       const result = await this.cloudwatchClient.send(command);
       const responseTime = Date.now() - startTime;
 
-      const logGroups = result.logGroups?.map(lg => ({
-        name: lg.logGroupName || 'unknown',
-        ...(lg.retentionInDays && { retentionInDays: lg.retentionInDays }),
-        ...(lg.storedBytes && { sizeBytes: lg.storedBytes })
-      })) || [];
+      const logGroups =
+        result.logGroups?.map(lg => ({
+          name: lg.logGroupName || 'unknown',
+          ...(lg.retentionInDays && { retentionInDays: lg.retentionInDays }),
+          ...(lg.storedBytes && { sizeBytes: lg.storedBytes }),
+        })) || [];
 
       return {
         service: 'cloudwatch',
@@ -488,8 +522,8 @@ export class HealthMonitoringService {
         lastChecked: new Date().toISOString(),
         details: {
           region: this.config.region,
-          logGroups
-        }
+          logGroups,
+        },
       };
     } catch (error) {
       const responseTime = Date.now() - startTime;
@@ -498,7 +532,7 @@ export class HealthMonitoringService {
         status: 'unhealthy',
         responseTime,
         lastChecked: new Date().toISOString(),
-        error: (error as Error).message
+        error: (error as Error).message,
       };
     }
   }
@@ -508,11 +542,11 @@ export class HealthMonitoringService {
    */
   async getSystemMetrics(): Promise<SystemResourceUsage> {
     const memoryUsage = process.memoryUsage();
-    
+
     return {
       cpu: {
         usage: process.cpuUsage().user / 1000000, // Convert to seconds
-        loadAverage: os.loadavg()
+        loadAverage: os.loadavg(),
       },
       memory: {
         used: Math.round(memoryUsage.heapUsed / 1024 / 1024),
@@ -520,15 +554,18 @@ export class HealthMonitoringService {
         external: Math.round(memoryUsage.external / 1024 / 1024),
         percentage: Math.round((memoryUsage.heapUsed / memoryUsage.heapTotal) * 100),
         rss: Math.round(memoryUsage.rss / 1024 / 1024),
-        arrayBuffers: Math.round(memoryUsage.arrayBuffers / 1024 / 1024)
+        arrayBuffers: Math.round(memoryUsage.arrayBuffers / 1024 / 1024),
       },
       heap: {
         used: Math.round(memoryUsage.heapUsed / 1024 / 1024),
         total: Math.round(memoryUsage.heapTotal / 1024 / 1024),
-        limit: Math.round((process.env.AWS_LAMBDA_FUNCTION_MEMORY_SIZE ? 
-                          parseInt(process.env.AWS_LAMBDA_FUNCTION_MEMORY_SIZE) : 512)),
-        percentage: Math.round((memoryUsage.heapUsed / memoryUsage.heapTotal) * 100)
-      }
+        limit: Math.round(
+          process.env.AWS_LAMBDA_FUNCTION_MEMORY_SIZE
+            ? parseInt(process.env.AWS_LAMBDA_FUNCTION_MEMORY_SIZE)
+            : 512
+        ),
+        percentage: Math.round((memoryUsage.heapUsed / memoryUsage.heapTotal) * 100),
+      },
     };
   }
 }
@@ -555,13 +592,13 @@ export class HealthConnectivityTester {
     const tests = await Promise.allSettled([
       this.testDnsResolution(),
       this.testAwsConnectivity(),
-      this.testInternetConnectivity()
+      this.testInternetConnectivity(),
     ]);
 
     return {
       dns: tests[0].status === 'fulfilled' ? tests[0].value : false,
       aws: tests[1].status === 'fulfilled' ? tests[1].value : false,
-      internet: tests[2].status === 'fulfilled' ? tests[2].value : false
+      internet: tests[2].status === 'fulfilled' ? tests[2].value : false,
     };
   }
 
@@ -584,7 +621,7 @@ export class HealthConnectivityTester {
   private async testAwsConnectivity(): Promise<boolean> {
     try {
       const command = new DescribeTableCommand({
-        TableName: this.config.tables.users
+        TableName: this.config.tables.users,
       });
       await this.dynamoClient.send(command);
       return true;
@@ -623,7 +660,11 @@ export class HealthConfigurationValidator {
   /**
    * Validate system configuration
    */
-  async validateConfiguration(): Promise<{ valid: boolean; errors?: string[]; warnings?: string[] }> {
+  async validateConfiguration(): Promise<{
+    valid: boolean;
+    errors?: string[];
+    warnings?: string[];
+  }> {
     const errors: string[] = [];
     const warnings: string[] = [];
 
@@ -634,7 +675,7 @@ export class HealthConfigurationValidator {
       'STUDY_SESSIONS_TABLE_NAME',
       'USER_PROGRESS_TABLE_NAME',
       'GOALS_TABLE_NAME',
-      'QUESTION_DATA_BUCKET_NAME'
+      'QUESTION_DATA_BUCKET_NAME',
     ];
 
     requiredEnvVars.forEach(envVar => {
@@ -665,7 +706,7 @@ export class HealthConfigurationValidator {
     return {
       valid: errors.length === 0,
       ...(errors.length > 0 && { errors }),
-      ...(warnings.length > 0 && { warnings })
+      ...(warnings.length > 0 && { warnings }),
     };
   }
 }
@@ -688,9 +729,9 @@ export class HealthMetricsCollector {
   async getPerformanceMetrics(service?: string): Promise<PerformanceMetrics> {
     // This is a simplified implementation
     // In a real system, you might collect metrics from CloudWatch or other monitoring systems
-    
+
     const startTime = Date.now();
-    
+
     try {
       if (service === 'dynamodb' || !service) {
         await this.healthRepository.checkDynamoDbHealth();
@@ -698,9 +739,9 @@ export class HealthMetricsCollector {
       if (service === 's3' || !service) {
         await this.healthRepository.checkS3Health();
       }
-      
+
       const responseTime = Date.now() - startTime;
-      
+
       return {
         responseTime,
         throughput: 0, // Would be calculated from real metrics
@@ -708,7 +749,7 @@ export class HealthMetricsCollector {
         availability: 100,
         totalRequests: 1,
         successfulRequests: 1,
-        failedRequests: 0
+        failedRequests: 0,
       };
     } catch (error) {
       const responseTime = Date.now() - startTime;
@@ -719,7 +760,7 @@ export class HealthMetricsCollector {
         availability: 0,
         totalRequests: 1,
         successfulRequests: 0,
-        failedRequests: 1
+        failedRequests: 1,
       };
     }
   }

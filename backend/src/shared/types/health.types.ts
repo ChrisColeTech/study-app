@@ -127,7 +127,7 @@ export interface DetailedHealthCheckResult {
   requestId?: string;
   totalResponseTime: number;
   overallAvailability: number;
-  
+
   // System information
   system: {
     nodeVersion: string;
@@ -136,13 +136,13 @@ export interface DetailedHealthCheckResult {
     uptime: number;
     pid: number;
   };
-  
+
   // Resource usage
   resources: SystemResourceUsage;
-  
+
   // Lambda environment
   lambda: LambdaEnvironmentInfo;
-  
+
   // Service diagnostics
   services: {
     database: DatabaseDiagnostics;
@@ -150,20 +150,20 @@ export interface DetailedHealthCheckResult {
     lambda?: LambdaDiagnostics;
     cloudwatch?: CloudWatchDiagnostics;
   };
-  
+
   // Performance metrics
   performance: {
     overall: PerformanceMetrics;
     byService: Record<string, PerformanceMetrics>;
   };
-  
+
   // Connectivity tests
   connectivity: {
     internet: boolean;
     aws: boolean;
     dns: boolean;
   };
-  
+
   // Configuration validation
   configuration: {
     valid: boolean;
@@ -173,7 +173,7 @@ export interface DetailedHealthCheckResult {
     buckets: Record<string, boolean>;
     environment: Record<string, any>;
   };
-  
+
   // Alerts and recommendations
   alerts?: {
     level: 'info' | 'warning' | 'error' | 'critical';
@@ -181,7 +181,7 @@ export interface DetailedHealthCheckResult {
     service?: string;
     timestamp: string;
   }[];
-  
+
   recommendations?: {
     priority: 'low' | 'medium' | 'high';
     category: 'performance' | 'security' | 'cost' | 'reliability';
@@ -246,7 +246,11 @@ export interface IDetailedHealthService extends IHealthService {
   getSystemDiagnostics(): Promise<SystemResourceUsage>;
   getServiceDiagnostics(service?: string): Promise<ServiceDiagnostics[]>;
   testServiceConnectivity(): Promise<{ internet: boolean; aws: boolean; dns: boolean }>;
-  validateSystemConfiguration(): Promise<{ valid: boolean; errors?: string[]; warnings?: string[] }>;
+  validateSystemConfiguration(): Promise<{
+    valid: boolean;
+    errors?: string[];
+    warnings?: string[];
+  }>;
   getPerformanceAnalysis(): Promise<PerformanceMetrics>;
   getHealthAlerts(): Promise<HealthAlert[]>;
   getHealthTrends(hours?: number): Promise<HealthTrend[]>;
@@ -262,7 +266,7 @@ export interface IHealthRepository extends IBaseRepository {
   checkDynamoDbHealth(): Promise<ServiceDiagnostics>;
 
   /**
-   * Check S3 health status  
+   * Check S3 health status
    * @returns Promise<ServiceDiagnostics> - S3 health diagnostics
    * @throws RepositoryError
    */

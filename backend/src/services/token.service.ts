@@ -16,7 +16,9 @@ export interface TokenGenerationResult {
 export interface ITokenService {
   generateTokens(user: UserResponse): Promise<TokenGenerationResult>;
   validateToken(token: string): Promise<JwtPayload>;
-  refreshToken(refreshToken: string): Promise<{ accessToken: string; refreshToken: string; expiresIn: number }>;
+  refreshToken(
+    refreshToken: string
+  ): Promise<{ accessToken: string; refreshToken: string; expiresIn: number }>;
 }
 
 export class TokenService implements ITokenService {
@@ -32,8 +34,13 @@ export class TokenService implements ITokenService {
     this.jwtExpiresIn = process.env.JWT_EXPIRES_IN || '24h';
     this.jwtRefreshExpiresIn = process.env.JWT_REFRESH_EXPIRES_IN || '7d';
 
-    if (this.jwtSecret === 'default-secret-key' || this.jwtRefreshSecret === 'default-refresh-secret-key') {
-      this.logger.warn('Using default JWT secrets - should be set via environment variables in production');
+    if (
+      this.jwtSecret === 'default-secret-key' ||
+      this.jwtRefreshSecret === 'default-refresh-secret-key'
+    ) {
+      this.logger.warn(
+        'Using default JWT secrets - should be set via environment variables in production'
+      );
     }
   }
 
@@ -45,7 +52,7 @@ export class TokenService implements ITokenService {
       userId: user.userId,
       email: user.email,
       aud: 'study-app-v3',
-      iss: 'study-app-v3-auth'
+      iss: 'study-app-v3-auth',
     };
 
     const signOptions: SignOptions = { expiresIn: this.jwtExpiresIn as any };
@@ -61,7 +68,7 @@ export class TokenService implements ITokenService {
     return {
       accessToken,
       refreshToken,
-      expiresIn
+      expiresIn,
     };
   }
 
@@ -71,13 +78,13 @@ export class TokenService implements ITokenService {
   async validateToken(token: string): Promise<JwtPayload> {
     try {
       const decoded = jwt.verify(token, this.jwtSecret) as JwtPayload;
-      
+
       this.logger.debug('Token validated successfully', { userId: decoded.userId });
-      
+
       return decoded;
     } catch (error: any) {
       this.logger.warn('Token validation failed', { error: error.message });
-      
+
       if (error.name === 'TokenExpiredError') {
         throw new Error('Token expired');
       } else if (error.name === 'JsonWebTokenError') {
@@ -91,18 +98,20 @@ export class TokenService implements ITokenService {
   /**
    * Refresh access token using refresh token
    */
-  async refreshToken(refreshTokenValue: string): Promise<{ accessToken: string; refreshToken: string; expiresIn: number }> {
+  async refreshToken(
+    refreshTokenValue: string
+  ): Promise<{ accessToken: string; refreshToken: string; expiresIn: number }> {
     try {
       const decoded = jwt.verify(refreshTokenValue, this.jwtRefreshSecret) as JwtPayload;
-      
+
       this.logger.debug('Refresh token validated successfully', { userId: decoded.userId });
-      
+
       // Create new payload with same user data but fresh timestamps
       const payload: Omit<JwtPayload, 'iat' | 'exp'> = {
         userId: decoded.userId,
         email: decoded.email,
         aud: decoded.aud,
-        iss: decoded.iss
+        iss: decoded.iss,
       };
 
       const signOptions: SignOptions = { expiresIn: this.jwtExpiresIn as any };
@@ -118,11 +127,11 @@ export class TokenService implements ITokenService {
       return {
         accessToken,
         refreshToken,
-        expiresIn
+        expiresIn,
       };
     } catch (error: any) {
       this.logger.warn('Token refresh failed', { error: error.message });
-      
+
       if (error.name === 'TokenExpiredError') {
         throw new Error('Refresh token expired');
       } else if (error.name === 'JsonWebTokenError') {

@@ -13,7 +13,7 @@ export interface ErrorContext {
 
 export abstract class BaseService {
   protected logger: ReturnType<typeof createLogger>;
-  
+
   constructor() {
     this.logger = createLogger({ component: this.constructor.name });
   }
@@ -36,7 +36,10 @@ export abstract class BaseService {
   /**
    * Standardized success logging with consistent format
    */
-  protected logSuccess(message: string, context: Partial<ErrorContext> & Record<string, any>): void {
+  protected logSuccess(
+    message: string,
+    context: Partial<ErrorContext> & Record<string, any>
+  ): void {
     this.logger.info(message, context);
   }
 
@@ -50,7 +53,10 @@ export abstract class BaseService {
   /**
    * Standardized warning logging with consistent format
    */
-  protected logWarning(message: string, context: Partial<ErrorContext> & Record<string, any>): void {
+  protected logWarning(
+    message: string,
+    context: Partial<ErrorContext> & Record<string, any>
+  ): void {
     this.logger.warn(message, context);
   }
 
@@ -59,14 +65,14 @@ export abstract class BaseService {
    */
   private logError(error: Error, context: ErrorContext): void {
     const logContext: Record<string, any> = {
-      operation: context.operation
+      operation: context.operation,
     };
-    
+
     if (context.entityType) logContext.entityType = context.entityType;
     if (context.entityId) logContext.entityId = context.entityId;
     if (context.userId) logContext.userId = context.userId;
     if (context.requestData) logContext.requestData = context.requestData;
-    
+
     this.logger.error(`Failed to ${context.operation}`, error, logContext);
   }
 
@@ -104,7 +110,11 @@ export abstract class BaseService {
   /**
    * Validate entity exists and throw if not found
    */
-  protected validateEntityExists<T>(entity: T | null | undefined, entityType: string, entityId: string): T {
+  protected validateEntityExists<T>(
+    entity: T | null | undefined,
+    entityType: string,
+    entityId: string
+  ): T {
     if (!entity) {
       throw this.createNotFoundError(entityType, entityId);
     }

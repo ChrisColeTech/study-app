@@ -2,51 +2,50 @@
 // Phase 15: Session Creation Feature
 // Phase 17: Session Update Feature
 
-import { v4 as uuidv4 } from 'uuid';
-import { 
-  StudySession, 
-  SessionQuestion,
-  Question
-} from '../shared/types/domain.types';
-// Removed import of Question from question.types - using Question from domain.types instead
 import {
+  ISessionService,
+  ISessionOrchestrator,
+  IAnswerProcessor,
   CreateSessionRequest,
   CreateSessionResponse,
   GetSessionResponse,
   UpdateSessionRequest,
   UpdateSessionResponse,
-  QuestionResponse,
-  SessionQuestionOption,
-  SessionProgress,
-  ISessionService,
-  ISessionOrchestrator,
-  IAnswerProcessor,
+  CompleteSessionResponse,
   SubmitAnswerRequest,
   SubmitAnswerResponse,
-  AnswerFeedback,
-  CompleteSessionResponse,
+  SessionSummary,
   DetailedSessionResults,
   QuestionResultBreakdown,
+  StudyRecommendations,
+  FocusArea,
+  SessionFilters,
+} from '../shared/types/session.types';
+import {
+  StudySession,
+  Question,
+} from '../shared/types/domain.types';
+import {
+  ISessionRepository,
+} from '../repositories/session.repository';
+import {
   DifficultyPerformance,
   TopicPerformanceBreakdown,
   TimeDistribution,
-  StudyRecommendations,
-  FocusArea,
-  SessionSummary
-} from '../shared/types/session.types';
-import { ISessionRepository } from '../repositories/session.repository';
+  UserProgressUpdate,
+} from '../shared/types/analytics.types';
 import { IProviderService } from './provider.service';
 import { IExamService } from './exam.service';
 import { ITopicService } from './topic.service';
 import { IQuestionService } from './question.service';
 import { createLogger } from '../shared/logger';
 import { BaseService } from '../shared/base-service';
+import { v4 as uuidv4 } from 'uuid';
 
 // Re-export the interface for ServiceFactory
 export type { ISessionService };
 
 export class SessionService extends BaseService implements ISessionService {
-
   constructor(
     private sessionRepository: ISessionRepository,
     private sessionOrchestrator: ISessionOrchestrator,
@@ -65,14 +64,14 @@ export class SessionService extends BaseService implements ISessionService {
    * Orchestrates SessionOrchestrator for question selection
    */
   async createSession(request: CreateSessionRequest): Promise<CreateSessionResponse> {
-    this.logger.info('Creating new session', { 
+    this.logger.info('Creating new session', {
       examId: request.examId,
       providerId: request.providerId,
       sessionType: request.sessionType,
       questionCount: request.questionCount,
       topics: request.topics,
       difficulty: request.difficulty,
-      timeLimit: request.timeLimit
+      timeLimit: request.timeLimit,
     });
 
     try {
@@ -88,7 +87,7 @@ export class SessionService extends BaseService implements ISessionService {
 
       // Use SessionOrchestrator for question selection
       const requestedCount = request.questionCount || questions.length;
-      const sessionQuestions = request.isAdaptive 
+      const sessionQuestions = request.isAdaptive
         ? this.sessionOrchestrator.selectAdaptiveQuestions(questions, requestedCount)
         : this.sessionOrchestrator.selectSessionQuestions(questions, requestedCount);
 
@@ -109,7 +108,7 @@ export class SessionService extends BaseService implements ISessionService {
           correctAnswer: q.correctAnswer || [],
           timeSpent: 0,
           skipped: false,
-          markedForReview: false
+          markedForReview: false,
         })),
         currentQuestionIndex: 0,
         totalQuestions: sessionQuestions.length,
@@ -121,39 +120,39 @@ export class SessionService extends BaseService implements ISessionService {
             difficultyDistribution: {
               easy: Math.round(requestedCount * 0.3),
               medium: Math.round(requestedCount * 0.5),
-              hard: Math.round(requestedCount * 0.2)
+              hard: Math.round(requestedCount * 0.2),
             },
-            adjustmentAlgorithm: 'difficulty-based'
-          }
+            adjustmentAlgorithm: 'difficulty-based',
+          },
         }),
         createdAt: now,
-        updatedAt: now
+        updatedAt: now,
       };
 
       // Store session using repository
       const createdSession = await this.sessionRepository.create(session);
 
       // Use SessionOrchestrator to get question details
-      const questionResponses = await this.sessionOrchestrator.getSessionQuestionsWithDetails(createdSession);
+      const questionResponses =
+        await this.sessionOrchestrator.getSessionQuestionsWithDetails(createdSession);
 
       const response: CreateSessionResponse = {
         session: createdSession,
-        questions: questionResponses
+        questions: questionResponses,
       };
 
-      this.logger.info('Session created successfully', { 
+      this.logger.info('Session created successfully', {
         sessionId: createdSession.sessionId,
         totalQuestions: createdSession.totalQuestions,
         providerId: createdSession.providerId,
-        examId: createdSession.examId
+        examId: createdSession.examId,
       });
 
       return response;
-
     } catch (error) {
-      this.logger.error('Failed to create session', error as Error, { 
+      this.logger.error('Failed to create session', error as Error, {
         examId: request.examId,
-        providerId: request.providerId 
+        providerId: request.providerId,
       });
       throw error;
     }
@@ -168,7 +167,7 @@ export class SessionService extends BaseService implements ISessionService {
 
     try {
       const session = await this.sessionRepository.findById(sessionId);
-      
+
       if (!session) {
         throw new Error(`Session not found: ${sessionId}`);
       }
@@ -179,19 +178,18 @@ export class SessionService extends BaseService implements ISessionService {
       // Use SessionOrchestrator to calculate progress
       const progress = this.sessionOrchestrator.calculateSessionProgress(session);
 
-      this.logger.info('Session retrieved successfully', { 
+      this.logger.info('Session retrieved successfully', {
         sessionId,
         status: session.status,
         currentQuestion: progress.currentQuestion,
-        totalQuestions: progress.totalQuestions
+        totalQuestions: progress.totalQuestions,
       });
 
       return {
         session,
         questions,
-        progress
+        progress,
       };
-
     } catch (error) {
       this.logger.error('Failed to get session', error as Error, { sessionId });
       throw error;
@@ -202,12 +200,15 @@ export class SessionService extends BaseService implements ISessionService {
    * Update session state
    * Phase 17: Session Update Feature
    */
-  async updateSession(sessionId: string, request: UpdateSessionRequest): Promise<UpdateSessionResponse> {
+  async updateSession(
+    sessionId: string,
+    request: UpdateSessionRequest
+  ): Promise<UpdateSessionResponse> {
     this.logger.info('Updating session', { sessionId, action: request.action });
 
     try {
       const existingSession = await this.sessionRepository.findById(sessionId);
-      
+
       if (!existingSession) {
         throw new Error(`Session not found: ${sessionId}`);
       }
@@ -222,25 +223,25 @@ export class SessionService extends BaseService implements ISessionService {
         case 'pause':
           updatedSession.status = 'paused';
           break;
-          
+
         case 'resume':
           updatedSession.status = 'active';
           break;
-          
+
         case 'next':
           updatedSession.currentQuestionIndex = Math.min(
-            updatedSession.currentQuestionIndex + 1, 
+            updatedSession.currentQuestionIndex + 1,
             updatedSession.questions.length - 1
           );
           break;
-          
+
         case 'previous':
           updatedSession.currentQuestionIndex = Math.max(
-            updatedSession.currentQuestionIndex - 1, 
+            updatedSession.currentQuestionIndex - 1,
             0
           );
           break;
-          
+
         case 'answer':
           // For answer actions, delegate to AnswerProcessor
           if (request.questionId && request.userAnswer && request.timeSpent !== undefined) {
@@ -249,38 +250,44 @@ export class SessionService extends BaseService implements ISessionService {
               answer: request.userAnswer,
               timeSpent: request.timeSpent,
               skipped: request.skipped || false,
-              markedForReview: request.markedForReview || false
+              markedForReview: request.markedForReview || false,
             });
-            
+
             // Return the answer processing result
             return {
               session: answerResult.session,
-              questions: await this.sessionOrchestrator.getSessionQuestionsWithDetails(answerResult.session),
-              progress: answerResult.progress
+              questions: await this.sessionOrchestrator.getSessionQuestionsWithDetails(
+                answerResult.session
+              ),
+              progress: answerResult.progress,
             };
           } else {
             throw new Error('Missing required fields for answer action');
           }
-          
+
         case 'mark_for_review':
           if (request.questionId) {
-            const questionIndex = updatedSession.questions.findIndex(q => q.questionId === request.questionId);
+            const questionIndex = updatedSession.questions.findIndex(
+              q => q.questionId === request.questionId
+            );
             if (questionIndex !== -1) {
-              updatedSession.questions[questionIndex].markedForReview = request.markedForReview || false;
+              updatedSession.questions[questionIndex].markedForReview =
+                request.markedForReview || false;
             }
           }
           break;
-          
+
         case 'complete':
           // Delegate to AnswerProcessor for completion
           const completeResult = await this.answerProcessor.completeSession(sessionId);
           const completedSession = await this.sessionRepository.findById(sessionId);
-          
+
           if (completedSession) {
             return {
               session: completedSession,
-              questions: await this.sessionOrchestrator.getSessionQuestionsWithDetails(completedSession),
-              progress: this.sessionOrchestrator.calculateSessionProgress(completedSession)
+              questions:
+                await this.sessionOrchestrator.getSessionQuestionsWithDetails(completedSession),
+              progress: this.sessionOrchestrator.calculateSessionProgress(completedSession),
             };
           } else {
             throw new Error('Failed to retrieve completed session');
@@ -295,22 +302,21 @@ export class SessionService extends BaseService implements ISessionService {
       const questions = await this.sessionOrchestrator.getSessionQuestionsWithDetails(savedSession);
       const progress = this.sessionOrchestrator.calculateSessionProgress(savedSession);
 
-      this.logger.info('Session updated successfully', { 
+      this.logger.info('Session updated successfully', {
         sessionId,
         action: request.action,
-        newStatus: savedSession.status
+        newStatus: savedSession.status,
       });
 
       return {
         session: savedSession,
         questions,
-        progress
+        progress,
       };
-
     } catch (error) {
-      this.logger.error('Failed to update session', error as Error, { 
+      this.logger.error('Failed to update session', error as Error, {
         sessionId,
-        action: request.action 
+        action: request.action,
       });
       throw error;
     }
@@ -325,7 +331,7 @@ export class SessionService extends BaseService implements ISessionService {
 
     try {
       const session = await this.sessionRepository.findById(sessionId);
-      
+
       if (!session) {
         throw new Error(`Session not found: ${sessionId}`);
       }
@@ -339,7 +345,7 @@ export class SessionService extends BaseService implements ISessionService {
       if (session.status === 'active' || session.status === 'paused') {
         await this.sessionRepository.update(sessionId, {
           status: 'abandoned',
-          updatedAt: new Date().toISOString()
+          updatedAt: new Date().toISOString(),
         });
 
         this.logger.info('Session marked as abandoned', { sessionId });
@@ -351,9 +357,8 @@ export class SessionService extends BaseService implements ISessionService {
 
       return {
         success: true,
-        message: 'Session deleted successfully'
+        message: 'Session deleted successfully',
       };
-
     } catch (error) {
       this.logger.error('Failed to delete session', error as Error, { sessionId });
       throw error;
@@ -364,13 +369,22 @@ export class SessionService extends BaseService implements ISessionService {
    * Submit answer for a question - Delegates to AnswerProcessor
    * Phase 18: Answer Submission Feature
    */
-  async submitAnswer(sessionId: string, request: SubmitAnswerRequest): Promise<SubmitAnswerResponse> {
-    this.logger.info('Delegating answer submission to AnswerProcessor', { sessionId, questionId: request.questionId });
+  async submitAnswer(
+    sessionId: string,
+    request: SubmitAnswerRequest
+  ): Promise<SubmitAnswerResponse> {
+    this.logger.info('Delegating answer submission to AnswerProcessor', {
+      sessionId,
+      questionId: request.questionId,
+    });
 
     try {
       return await this.answerProcessor.submitAnswer(sessionId, request);
     } catch (error) {
-      this.logger.error('Failed to submit answer', error as Error, { sessionId, questionId: request.questionId });
+      this.logger.error('Failed to submit answer', error as Error, {
+        sessionId,
+        questionId: request.questionId,
+      });
       throw error;
     }
   }
@@ -453,20 +467,27 @@ export class SessionService extends BaseService implements ISessionService {
    * Validate session update request
    * Phase 17: Session Update Feature
    */
-  private validateUpdateRequest(request: UpdateSessionRequest, existingSession: StudySession): void {
+  private validateUpdateRequest(
+    request: UpdateSessionRequest,
+    existingSession: StudySession
+  ): void {
     if (existingSession.status === 'completed') {
       throw new Error('Cannot update completed session');
     }
 
     if (request.action === 'answer') {
       if (!request.questionId || !request.userAnswer || request.timeSpent === undefined) {
-        throw new Error('Missing required fields for answer action: questionId, userAnswer, timeSpent');
+        throw new Error(
+          'Missing required fields for answer action: questionId, userAnswer, timeSpent'
+        );
       }
     }
 
     if (request.action === 'mark_for_review') {
       if (!request.questionId || request.markedForReview === undefined) {
-        throw new Error('Missing required fields for mark_for_review action: questionId, markedForReview');
+        throw new Error(
+          'Missing required fields for mark_for_review action: questionId, markedForReview'
+        );
       }
     }
   }

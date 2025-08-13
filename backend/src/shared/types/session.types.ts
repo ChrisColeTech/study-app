@@ -1,6 +1,12 @@
 // Study session specific types
 
 import { StudySession, SessionQuestion, Question } from './domain.types';
+import { 
+  DifficultyPerformance, 
+  TopicPerformanceBreakdown, 
+  TimeDistribution, 
+  UserProgressUpdate 
+} from './analytics.types';
 
 export interface CreateSessionRequest {
   examId: string;
@@ -180,42 +186,7 @@ export interface QuestionResultBreakdown {
   skipped: boolean;
 }
 
-export interface DifficultyPerformance {
-  difficulty: 'easy' | 'medium' | 'hard';
-  totalQuestions: number;
-  correctQuestions: number;
-  accuracy: number;
-  averageTime: number;
-  totalScore: number;
-  maxPossibleScore: number;
-}
-
-export interface TopicPerformanceBreakdown extends SessionTopicBreakdown {
-  strongestArea: boolean; // true if this is the best performing topic
-  weakestArea: boolean; // true if this is the worst performing topic
-  needsImprovement: boolean; // true if accuracy < 70%
-  totalScore: number;
-  maxPossibleScore: number;
-}
-
-export interface TimeDistribution {
-  fastQuestions: number; // < 50% of expected time
-  normalQuestions: number; // 50-100% of expected time
-  slowQuestions: number; // > 100% of expected time
-  averageTimeEasy: number;
-  averageTimeMedium: number;
-  averageTimeHard: number;
-}
-
-export interface UserProgressUpdate {
-  topicId: string;
-  topicName: string;
-  previousAccuracy: number;
-  newAccuracy: number;
-  previousMasteryLevel: string;
-  newMasteryLevel: string;
-  improvementDirection: 'improved' | 'declined' | 'maintained';
-}
+// Performance analytics types moved to analytics.types.ts - import from there instead
 
 export interface StudyRecommendations {
   overallRecommendation: 'excellent' | 'good' | 'needs_improvement' | 'requires_focused_study';
@@ -289,9 +260,7 @@ export interface ISessionAnalyzer {
     session: StudySession,
     questionDetails: Question[]
   ): Promise<TopicPerformanceBreakdown[]>;
-  analyzeSessionResults(
-    session: StudySession
-  ): Promise<DetailedSessionResults>;
+  analyzeSessionResults(session: StudySession): Promise<DetailedSessionResults>;
   generateStudyRecommendations(
     session: StudySession,
     detailedResults: DetailedSessionResults

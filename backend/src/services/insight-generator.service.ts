@@ -17,15 +17,13 @@ import {
   HistoricalPerformance,
   TopicCompetency,
   ProviderCompetency,
-  ExamCompetency
+  ExamCompetency,
 } from '../shared/types/analytics.types';
 
 export class InsightGenerator implements IInsightGenerator {
   private logger = createLogger({ service: 'InsightGenerator' });
 
-  constructor(
-    private analyticsRepository: IAnalyticsRepository
-  ) {}
+  constructor(private analyticsRepository: IAnalyticsRepository) {}
 
   /**
    * Generate learning insights and recommendations
@@ -48,11 +46,12 @@ export class InsightGenerator implements IInsightGenerator {
         patterns,
         recommendations,
         milestones,
-        warnings
+        warnings,
       };
-
     } catch (error) {
-      this.logger.error('Failed to generate learning insights', error as Error, { ...(userId && { userId }) });
+      this.logger.error('Failed to generate learning insights', error as Error, {
+        ...(userId && { userId }),
+      });
       throw error;
     }
   }
@@ -70,30 +69,38 @@ export class InsightGenerator implements IInsightGenerator {
       const accuracyOverTime: ChartDataPoint[] = trends.accuracyTrend.map((point: TrendData) => ({
         x: point.period,
         y: Math.round(point.value * 100) / 100,
-        label: `${Math.round(point.value * 100) / 100}%`
+        label: `${Math.round(point.value * 100) / 100}%`,
       }));
 
-      const studyTimeDistribution: ChartDataPoint[] = trends.studyTimeTrend.map((point: TrendData) => ({
-        x: point.period,
-        y: Math.round(point.value),
-        label: `${Math.round(point.value)} min`
-      }));
+      const studyTimeDistribution: ChartDataPoint[] = trends.studyTimeTrend.map(
+        (point: TrendData) => ({
+          x: point.period,
+          y: Math.round(point.value),
+          label: `${Math.round(point.value)} min`,
+        })
+      );
 
       const weeklyProgress: ChartDataPoint[] = historicalData.map((day: HistoricalPerformance) => ({
         x: day.date,
         y: day.accuracy,
-        label: `${Math.round(day.accuracy)}% accuracy`
+        label: `${Math.round(day.accuracy)}% accuracy`,
       }));
 
       // Prepare radar chart for topic mastery
       const topicMasteryRadar: RadarChartData = {
-        labels: competencyData.topicCompetencies.slice(0, 8).map((topic: TopicCompetency) => topic.topicName),
-        datasets: [{
-          label: 'Current Mastery',
-          data: competencyData.topicCompetencies.slice(0, 8).map((topic: TopicCompetency) => topic.currentAccuracy),
-          backgroundColor: 'rgba(54, 162, 235, 0.2)',
-          borderColor: 'rgba(54, 162, 235, 1)'
-        }]
+        labels: competencyData.topicCompetencies
+          .slice(0, 8)
+          .map((topic: TopicCompetency) => topic.topicName),
+        datasets: [
+          {
+            label: 'Current Mastery',
+            data: competencyData.topicCompetencies
+              .slice(0, 8)
+              .map((topic: TopicCompetency) => topic.currentAccuracy),
+            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+            borderColor: 'rgba(54, 162, 235, 1)',
+          },
+        ],
       };
 
       // Prepare difficulty progression
@@ -102,25 +109,27 @@ export class InsightGenerator implements IInsightGenerator {
         difficultyProgression.push({
           x: diffTrend.period,
           y: diffTrend.value,
-          label: `${diffTrend.difficulty}: ${Math.round(diffTrend.value)}%`
+          label: `${diffTrend.difficulty}: ${Math.round(diffTrend.value)}%`,
         });
       }
 
       // Prepare competency matrix
       const competencyMatrix: MatrixData = {
-        rows: competencyData.topicCompetencies.slice(0, 10).map((t: TopicCompetency) => t.topicName),
+        rows: competencyData.topicCompetencies
+          .slice(0, 10)
+          .map((t: TopicCompetency) => t.topicName),
         columns: ['Accuracy', 'Speed', 'Consistency', 'Improvement'],
         data: competencyData.topicCompetencies.slice(0, 10).map((topic: TopicCompetency) => [
           topic.currentAccuracy,
           Math.max(0, 100 - topic.averageTimePerQuestion / 10), // Speed score
           topic.confidence * 100, // Consistency score
-          Math.max(0, topic.improvementRate) // Improvement score
+          Math.max(0, topic.improvementRate), // Improvement score
         ]),
         colorScale: {
           min: 0,
           max: 100,
-          colors: ['#ff4444', '#ffaa00', '#44ff44']
-        }
+          colors: ['#ff4444', '#ffaa00', '#44ff44'],
+        },
       };
 
       // Prepare study activity heatmap
@@ -128,12 +137,12 @@ export class InsightGenerator implements IInsightGenerator {
         data: historicalData.slice(-30).map((day: HistoricalPerformance) => ({
           x: day.date,
           y: 'Study Time',
-          value: day.studyTime
+          value: day.studyTime,
         })),
         scale: {
           min: 0,
-          max: Math.max(...historicalData.map((d: HistoricalPerformance) => d.studyTime))
-        }
+          max: Math.max(...historicalData.map((d: HistoricalPerformance) => d.studyTime)),
+        },
       };
 
       // Prepare topic accuracy heatmap
@@ -141,12 +150,12 @@ export class InsightGenerator implements IInsightGenerator {
         data: competencyData.topicCompetencies.map((topic: TopicCompetency) => ({
           x: topic.topicName,
           y: 'Accuracy',
-          value: topic.currentAccuracy
+          value: topic.currentAccuracy,
         })),
         scale: {
           min: 0,
-          max: 100
-        }
+          max: 100,
+        },
       };
 
       // Prepare gauges
@@ -158,23 +167,25 @@ export class InsightGenerator implements IInsightGenerator {
         thresholds: {
           red: 40,
           yellow: 70,
-          green: 85
-        }
+          green: 85,
+        },
       };
 
-      const examReadinessGauges: GaugeData[] = competencyData.providerCompetencies.slice(0, 3).flatMap((provider: ProviderCompetency) =>
-        provider.examCompetencies.slice(0, 2).map((exam: ExamCompetency) => ({
-          label: `${exam.examName} Readiness`,
-          value: exam.estimatedReadiness,
-          min: 0,
-          max: 100,
-          thresholds: {
-            red: 50,
-            yellow: 75,
-            green: 85
-          }
-        }))
-      );
+      const examReadinessGauges: GaugeData[] = competencyData.providerCompetencies
+        .slice(0, 3)
+        .flatMap((provider: ProviderCompetency) =>
+          provider.examCompetencies.slice(0, 2).map((exam: ExamCompetency) => ({
+            label: `${exam.examName} Readiness`,
+            value: exam.estimatedReadiness,
+            min: 0,
+            max: 100,
+            thresholds: {
+              red: 50,
+              yellow: 75,
+              green: 85,
+            },
+          }))
+        );
 
       return {
         charts: {
@@ -183,18 +194,17 @@ export class InsightGenerator implements IInsightGenerator {
           topicMasteryRadar,
           difficultyProgression,
           weeklyProgress,
-          competencyMatrix
+          competencyMatrix,
         },
         heatmaps: {
           studyActivity,
-          topicAccuracy
+          topicAccuracy,
         },
         gauges: {
           overallProgress: overallProgressGauge,
-          examReadiness: examReadinessGauges
-        }
+          examReadiness: examReadinessGauges,
+        },
       };
-
     } catch (error) {
       this.logger.error('Failed to prepare visualization data', error as Error);
       throw error;
@@ -211,28 +221,31 @@ export class InsightGenerator implements IInsightGenerator {
     const sessionTimes = sessions.map(s => new Date(s.startTime).getHours());
     const morningCount = sessionTimes.filter(h => h >= 6 && h < 12).length;
     const eveningCount = sessionTimes.filter(h => h >= 18 && h < 24).length;
-    
+
     if (morningCount > sessions.length * 0.6) {
       patterns.push({
         type: 'time_preference',
         description: 'Prefers studying in the morning',
         strength: morningCount / sessions.length,
-        evidence: [`${Math.round(morningCount / sessions.length * 100)}% of sessions in morning hours`],
-        impact: 'positive'
+        evidence: [
+          `${Math.round((morningCount / sessions.length) * 100)}% of sessions in morning hours`,
+        ],
+        impact: 'positive',
       });
     }
 
     // Learning velocity pattern
     const recentSessions = sessions.slice(-10);
-    const avgAccuracy = recentSessions.reduce((sum, s) => sum + s.accuracy, 0) / recentSessions.length;
-    
+    const avgAccuracy =
+      recentSessions.reduce((sum, s) => sum + s.accuracy, 0) / recentSessions.length;
+
     if (avgAccuracy > 75) {
       patterns.push({
         type: 'learning_velocity',
         description: 'Fast learner with high retention',
         strength: avgAccuracy / 100,
         evidence: [`Average accuracy of ${Math.round(avgAccuracy)}% in recent sessions`],
-        impact: 'positive'
+        impact: 'positive',
       });
     }
 
@@ -248,20 +261,21 @@ export class InsightGenerator implements IInsightGenerator {
     // Study schedule recommendation
     if (sessions.length > 0) {
       const avgSessionDuration = sessions.reduce((sum, s) => sum + s.duration, 0) / sessions.length;
-      
+
       if (avgSessionDuration < 30) {
         recommendations.push({
           type: 'study_schedule',
           title: 'Extend Study Sessions',
-          description: 'Consider longer study sessions for better retention and deeper understanding',
+          description:
+            'Consider longer study sessions for better retention and deeper understanding',
           priority: 'medium',
           expectedImpact: 'Improved knowledge retention and better performance on complex topics',
           actionItems: [
             'Aim for 45-60 minute study sessions',
             'Take 5-10 minute breaks every 25 minutes',
-            'Focus on one topic per session'
+            'Focus on one topic per session',
           ],
-          timeframe: '1_week'
+          timeframe: '1_week',
         });
       }
     }
@@ -275,8 +289,10 @@ export class InsightGenerator implements IInsightGenerator {
         description: `Concentrate study time on ${weakTopics.length} topics that need improvement`,
         priority: 'high',
         expectedImpact: 'Significant improvement in overall accuracy and exam readiness',
-        actionItems: weakTopics.map(t => `Study ${t.topicId} - current accuracy: ${Math.round(t.accuracy)}%`),
-        timeframe: 'immediate'
+        actionItems: weakTopics.map(
+          t => `Study ${t.topicId} - current accuracy: ${Math.round(t.accuracy)}%`
+        ),
+        timeframe: 'immediate',
       });
     }
 
@@ -301,8 +317,8 @@ export class InsightGenerator implements IInsightGenerator {
         nextMilestone: {
           title: '100 Sessions',
           target: 100,
-          estimatedTime: `${Math.ceil((100 - sessionCount) / 5)} weeks at current pace`
-        }
+          estimatedTime: `${Math.ceil((100 - sessionCount) / 5)} weeks at current pace`,
+        },
       });
     }
 
@@ -318,8 +334,8 @@ export class InsightGenerator implements IInsightGenerator {
         nextMilestone: {
           title: '90% Accuracy',
           target: 90,
-          estimatedTime: '2-4 weeks with focused practice'
-        }
+          estimatedTime: '2-4 weeks with focused practice',
+        },
       });
     }
 
@@ -336,10 +352,12 @@ export class InsightGenerator implements IInsightGenerator {
     if (sessions.length >= 10) {
       const recentSessions = sessions.slice(-5);
       const olderSessions = sessions.slice(-10, -5);
-      
-      const recentAccuracy = recentSessions.reduce((sum, s) => sum + s.accuracy, 0) / recentSessions.length;
-      const olderAccuracy = olderSessions.reduce((sum, s) => sum + s.accuracy, 0) / olderSessions.length;
-      
+
+      const recentAccuracy =
+        recentSessions.reduce((sum, s) => sum + s.accuracy, 0) / recentSessions.length;
+      const olderAccuracy =
+        olderSessions.reduce((sum, s) => sum + s.accuracy, 0) / olderSessions.length;
+
       if (recentAccuracy < olderAccuracy - 10) {
         warnings.push({
           type: 'declining_performance',
@@ -350,17 +368,19 @@ export class InsightGenerator implements IInsightGenerator {
           recommendations: [
             'Review recent mistakes',
             'Take a short break to avoid burnout',
-            'Focus on fundamental concepts'
+            'Focus on fundamental concepts',
           ],
-          detectedAt: new Date().toISOString()
+          detectedAt: new Date().toISOString(),
         });
       }
     }
 
     // Study gap warning
     const lastSession = sessions[sessions.length - 1];
-    const daysSinceLastStudy = Math.floor((Date.now() - new Date(lastSession.startTime).getTime()) / (1000 * 60 * 60 * 24));
-    
+    const daysSinceLastStudy = Math.floor(
+      (Date.now() - new Date(lastSession.startTime).getTime()) / (1000 * 60 * 60 * 24)
+    );
+
     if (daysSinceLastStudy > 7) {
       warnings.push({
         type: 'study_gap',
@@ -371,9 +391,9 @@ export class InsightGenerator implements IInsightGenerator {
         recommendations: [
           'Resume regular study schedule',
           'Start with review of previous topics',
-          'Set daily study reminders'
+          'Set daily study reminders',
         ],
-        detectedAt: new Date().toISOString()
+        detectedAt: new Date().toISOString(),
       });
     }
 
@@ -388,7 +408,7 @@ export class InsightGenerator implements IInsightGenerator {
     return {
       strengths: [],
       weaknesses: [],
-      recommendations: []
+      recommendations: [],
     };
   }
 }

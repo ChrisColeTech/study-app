@@ -2,13 +2,13 @@ import { createLogger } from '../shared/logger';
 import type {
   SessionAnalyticsData,
   QuestionAnalyticsData,
-  SessionTopicAnalyticsData
+  SessionTopicAnalyticsData,
 } from '../shared/types/analytics.types';
 import type { StudySession } from '../shared/types/domain.types';
 
 /**
  * AnalyticsDataTransformer - Handles data transformation and utility functions
- * 
+ *
  * Single Responsibility: Data format conversion and utility calculations
  * Extracted from AnalyticsRepository as part of SRP compliance (Objective 13)
  */
@@ -19,8 +19,11 @@ export class AnalyticsDataTransformer {
    * Transform session data to analytics format
    */
   transformSessionToAnalyticsData(session: StudySession): SessionAnalyticsData {
-    const duration = session.endTime 
-      ? Math.round((new Date(session.endTime).getTime() - new Date(session.startTime).getTime()) / (1000 * 60))
+    const duration = session.endTime
+      ? Math.round(
+          (new Date(session.endTime).getTime() - new Date(session.startTime).getTime()) /
+            (1000 * 60)
+        )
       : 0;
 
     const questions: QuestionAnalyticsData[] = session.questions.map((q: any) => ({
@@ -32,7 +35,7 @@ export class AnalyticsDataTransformer {
       userAnswer: q.userAnswer || [],
       correctAnswer: q.correctAnswer,
       skipped: q.skipped,
-      markedForReview: q.markedForReview
+      markedForReview: q.markedForReview,
     }));
 
     // Calculate topic breakdown from questions
@@ -50,7 +53,7 @@ export class AnalyticsDataTransformer {
           questionsCorrect: 0,
           accuracy: 0,
           averageTime: 0,
-          totalScore: 0
+          totalScore: 0,
         });
       }
 
@@ -70,7 +73,9 @@ export class AnalyticsDataTransformer {
       if (topicData.questionsAnswered > 0) {
         topicData.accuracy = (topicData.questionsCorrect / topicData.questionsAnswered) * 100;
         const topicQuestions = questions.filter(q => q.topicId === topicData.topicId);
-        topicData.averageTime = topicQuestions.reduce((sum: number, q: any) => sum + q.timeSpent, 0) / topicQuestions.length;
+        topicData.averageTime =
+          topicQuestions.reduce((sum: number, q: any) => sum + q.timeSpent, 0) /
+          topicQuestions.length;
       }
     }
 
@@ -83,12 +88,14 @@ export class AnalyticsDataTransformer {
       endTime: session.endTime || '',
       duration: duration,
       totalQuestions: session.totalQuestions,
-      questionsAnswered: session.questions.filter(q => q.userAnswer && q.userAnswer.length > 0).length,
+      questionsAnswered: session.questions.filter(q => q.userAnswer && q.userAnswer.length > 0)
+        .length,
       correctAnswers: session.correctAnswers,
-      accuracy: session.correctAnswers > 0 ? (session.correctAnswers / session.totalQuestions) * 100 : 0,
+      accuracy:
+        session.correctAnswers > 0 ? (session.correctAnswers / session.totalQuestions) * 100 : 0,
       score: session.score || 0,
       questions: questions,
-      topicBreakdown: Array.from(topicMap.values())
+      topicBreakdown: Array.from(topicMap.values()),
     };
   }
 
@@ -97,7 +104,7 @@ export class AnalyticsDataTransformer {
    */
   getPeriodKey(dateString: string, timeframe: string): string {
     const date = new Date(dateString);
-    
+
     switch (timeframe) {
       case 'week':
         const weekNumber = this.getWeekNumber(date);

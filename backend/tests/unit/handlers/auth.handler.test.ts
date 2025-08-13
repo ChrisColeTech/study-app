@@ -64,12 +64,13 @@ describe('AuthHandler', () => {
     stageVariables: null,
   });
 
-  const createMockContext = (): Context => ({
-    awsRequestId: 'test-request-id',
-    functionName: 'test-function',
-    functionVersion: '1',
-    getRemainingTimeInMillis: () => 30000,
-  } as any);
+  const createMockContext = (): Context =>
+    ({
+      awsRequestId: 'test-request-id',
+      functionName: 'test-function',
+      functionVersion: '1',
+      getRemainingTimeInMillis: () => 30000,
+    }) as any;
 
   describe('register endpoint', () => {
     const validRegistrationData: CreateUserRequest = {
@@ -95,7 +96,11 @@ describe('AuthHandler', () => {
     };
 
     it('should register user successfully', async () => {
-      const event = createMockEvent('POST', '/auth/register', JSON.stringify(validRegistrationData));
+      const event = createMockEvent(
+        'POST',
+        '/auth/register',
+        JSON.stringify(validRegistrationData)
+      );
       const context = createMockContext();
 
       mockAuthService.registerUser.mockResolvedValue(mockLoginResponse);
@@ -148,10 +153,16 @@ describe('AuthHandler', () => {
     });
 
     it('should return conflict error for duplicate email', async () => {
-      const event = createMockEvent('POST', '/auth/register', JSON.stringify(validRegistrationData));
+      const event = createMockEvent(
+        'POST',
+        '/auth/register',
+        JSON.stringify(validRegistrationData)
+      );
       const context = createMockContext();
 
-      mockAuthService.registerUser.mockRejectedValue(new Error('User with this email already exists'));
+      mockAuthService.registerUser.mockRejectedValue(
+        new Error('User with this email already exists')
+      );
 
       const result = await authHandler.handle(event, context);
 
@@ -166,10 +177,16 @@ describe('AuthHandler', () => {
     });
 
     it('should return validation error for invalid password', async () => {
-      const event = createMockEvent('POST', '/auth/register', JSON.stringify(validRegistrationData));
+      const event = createMockEvent(
+        'POST',
+        '/auth/register',
+        JSON.stringify(validRegistrationData)
+      );
       const context = createMockContext();
 
-      mockAuthService.registerUser.mockRejectedValue(new Error('Password must be at least 8 characters long'));
+      mockAuthService.registerUser.mockRejectedValue(
+        new Error('Password must be at least 8 characters long')
+      );
 
       const result = await authHandler.handle(event, context);
 
@@ -184,7 +201,11 @@ describe('AuthHandler', () => {
     });
 
     it('should return internal error for unexpected errors', async () => {
-      const event = createMockEvent('POST', '/auth/register', JSON.stringify(validRegistrationData));
+      const event = createMockEvent(
+        'POST',
+        '/auth/register',
+        JSON.stringify(validRegistrationData)
+      );
       const context = createMockContext();
 
       mockAuthService.registerUser.mockRejectedValue(new Error('Unexpected database error'));

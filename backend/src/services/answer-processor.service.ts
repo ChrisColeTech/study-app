@@ -2,11 +2,7 @@
 // Handles answer submission, scoring, and session completion logic
 
 import { v4 as uuidv4 } from 'uuid';
-import { 
-  StudySession, 
-  SessionQuestion,
-  Question
-} from '../shared/types/domain.types';
+import { StudySession, SessionQuestion, Question } from '../shared/types/domain.types';
 import {
   SubmitAnswerRequest,
   SubmitAnswerResponse,
@@ -14,7 +10,7 @@ import {
   CompleteSessionResponse,
   SessionProgress,
   QuestionResponse,
-  IAnswerProcessor
+  IAnswerProcessor,
 } from '../shared/types/session.types';
 import { ISessionRepository } from '../repositories/session.repository';
 import { ISessionOrchestrator } from './session-orchestrator.service';
@@ -40,14 +36,14 @@ export class AnswerProcessor implements IAnswerProcessor {
       options: serviceQuestion.options.map((optText, index) => ({
         id: index.toString(),
         text: optText,
-        isCorrect: serviceQuestion.correctAnswer === index
+        isCorrect: serviceQuestion.correctAnswer === index,
       })),
       correctAnswer: [serviceQuestion.correctAnswer.toString()],
       explanation: serviceQuestion.explanation || '',
       difficulty: this.mapDifficulty(serviceQuestion.difficulty),
       tags: serviceQuestion.tags || [],
       createdAt: serviceQuestion.createdAt || new Date().toISOString(),
-      updatedAt: serviceQuestion.updatedAt || new Date().toISOString()
+      updatedAt: serviceQuestion.updatedAt || new Date().toISOString(),
     };
   }
 
@@ -76,14 +72,17 @@ export class AnswerProcessor implements IAnswerProcessor {
    * Submit answer for a question in the session
    * Phase 18: Answer Submission Feature
    */
-  async submitAnswer(sessionId: string, request: SubmitAnswerRequest): Promise<SubmitAnswerResponse> {
-    this.logger.info('Processing answer submission', { 
+  async submitAnswer(
+    sessionId: string,
+    request: SubmitAnswerRequest
+  ): Promise<SubmitAnswerResponse> {
+    this.logger.info('Processing answer submission', {
       sessionId,
       questionId: request.questionId,
       answerLength: request.answer.length,
       timeSpent: request.timeSpent,
       skipped: request.skipped,
-      markedForReview: request.markedForReview
+      markedForReview: request.markedForReview,
     });
 
     try {
@@ -104,7 +103,9 @@ export class AnswerProcessor implements IAnswerProcessor {
       }
 
       // Step 3: Get question details for scoring and feedback
-      const questionResponse = await this.questionService.getQuestion({ questionId: request.questionId });
+      const questionResponse = await this.questionService.getQuestion({
+        questionId: request.questionId,
+      });
       const serviceQuestionDetails = questionResponse.question;
       if (!serviceQuestionDetails) {
         throw new Error(`Question details not found: ${request.questionId}`);
@@ -112,10 +113,13 @@ export class AnswerProcessor implements IAnswerProcessor {
       const questionDetails = this.transformServiceQuestion(serviceQuestionDetails);
 
       // Step 4: Calculate answer correctness and score
-      const isCorrect = this.calculateAnswerCorrectness(request.answer, questionDetails.correctAnswer);
+      const isCorrect = this.calculateAnswerCorrectness(
+        request.answer,
+        questionDetails.correctAnswer
+      );
       const score = this.calculateQuestionScore(
-        isCorrect, 
-        questionDetails.difficulty, 
+        isCorrect,
+        questionDetails.difficulty,
         request.timeSpent
       );
 
@@ -129,17 +133,19 @@ export class AnswerProcessor implements IAnswerProcessor {
         timeSpent: request.timeSpent,
         skipped: request.skipped || false,
         markedForReview: request.markedForReview || false,
-        answeredAt: new Date().toISOString()
+        answeredAt: new Date().toISOString(),
       };
 
       // Update session-level counters
-      updatedSession.correctAnswers = updatedSession.questions.filter(q => q.isCorrect === true).length;
+      updatedSession.correctAnswers = updatedSession.questions.filter(
+        q => q.isCorrect === true
+      ).length;
       updatedSession.updatedAt = new Date().toISOString();
 
       // Step 6: Move to next question if not skipped
       if (!request.skipped) {
         updatedSession.currentQuestionIndex = Math.min(
-          updatedSession.currentQuestionIndex + 1, 
+          updatedSession.currentQuestionIndex + 1,
           updatedSession.questions.length - 1
         );
       }
@@ -162,7 +168,7 @@ export class AnswerProcessor implements IAnswerProcessor {
         timeSpent: request.timeSpent,
         questionDifficulty: questionDetails.difficulty,
         topicId: questionDetails.topicId,
-        topicName: topic?.name || 'Unknown Topic'
+        topicName: topic?.name || 'Unknown Topic',
       };
 
       // Step 10: Calculate session progress
@@ -173,29 +179,33 @@ export class AnswerProcessor implements IAnswerProcessor {
       if (updatedSession.currentQuestionIndex < updatedSession.questions.length - 1) {
         const nextQuestionIndex = updatedSession.currentQuestionIndex + 1;
         const nextSessionQuestion = updatedSession.questions[nextQuestionIndex];
-        const nextQuestionResponse = await this.questionService.getQuestion({ questionId: nextSessionQuestion.questionId });
+        const nextQuestionResponse = await this.questionService.getQuestion({
+          questionId: nextSessionQuestion.questionId,
+        });
         const nextQuestionDetails = nextQuestionResponse.question;
-        
+
         if (nextQuestionDetails) {
-          const nextTopicResponse = await this.topicService.getTopic({ id: nextQuestionDetails.topicId || '' });
+          const nextTopicResponse = await this.topicService.getTopic({
+            id: nextQuestionDetails.topicId || '',
+          });
           const nextTopic = nextTopicResponse.topic;
           nextQuestion = {
             questionId: nextQuestionDetails.questionId,
             text: nextQuestionDetails.questionText,
             options: nextQuestionDetails.options.map((optText, index) => ({
               id: index.toString(),
-              text: optText
+              text: optText,
             })),
             topicId: nextQuestionDetails.topicId || '',
             topicName: nextTopic?.name || 'Unknown Topic',
             difficulty: this.mapDifficulty(nextQuestionDetails.difficulty),
             timeAllowed: this.calculateTimeAllowed(nextQuestionDetails.difficulty),
-            markedForReview: nextSessionQuestion.markedForReview
+            markedForReview: nextSessionQuestion.markedForReview,
           };
         }
       }
 
-      this.logger.info('Answer submitted successfully', { 
+      this.logger.info('Answer submitted successfully', {
         sessionId,
         questionId: request.questionId,
         isCorrect,
@@ -203,8 +213,8 @@ export class AnswerProcessor implements IAnswerProcessor {
         sessionProgress: {
           currentQuestion: progress.currentQuestion,
           totalQuestions: progress.totalQuestions,
-          accuracy: progress.accuracy
-        }
+          accuracy: progress.accuracy,
+        },
       });
 
       const response: SubmitAnswerResponse = {
@@ -212,16 +222,15 @@ export class AnswerProcessor implements IAnswerProcessor {
         feedback,
         session: updatedSession,
         progress,
-        ...(nextQuestion && { nextQuestion })
+        ...(nextQuestion && { nextQuestion }),
       };
 
       return response;
-
     } catch (error) {
-      this.logger.error('Error submitting answer', { 
+      this.logger.error('Error submitting answer', {
         error: error instanceof Error ? error.message : String(error),
         sessionId,
-        request 
+        request,
       });
       throw error;
     }
@@ -246,14 +255,18 @@ export class AnswerProcessor implements IAnswerProcessor {
    * Calculate score for a question based on correctness, difficulty, and time
    * Phase 18: Answer Submission Feature
    */
-  private calculateQuestionScore(isCorrect: boolean, difficulty: string, timeSpent: number): number {
+  private calculateQuestionScore(
+    isCorrect: boolean,
+    difficulty: string,
+    timeSpent: number
+  ): number {
     if (!isCorrect) return 0;
 
     // Base points by difficulty
     const basePoints = {
-      'easy': 1,
-      'medium': 2,
-      'hard': 3
+      easy: 1,
+      medium: 2,
+      hard: 3,
     };
 
     const points = basePoints[difficulty as keyof typeof basePoints] || 2;
@@ -261,7 +274,7 @@ export class AnswerProcessor implements IAnswerProcessor {
     // Time bonus: up to 50% bonus for fast answers
     const expectedTime = this.calculateTimeAllowed(difficulty);
     const timeFactor = Math.max(0.5, Math.min(1.5, expectedTime / timeSpent));
-    
+
     return Math.round(points * timeFactor);
   }
 
@@ -272,11 +285,7 @@ export class AnswerProcessor implements IAnswerProcessor {
   private calculateTotalSessionScore(questions: SessionQuestion[], baseDifficulty: string): number {
     return questions.reduce((total, question) => {
       if (question.isCorrect) {
-        const score = this.calculateQuestionScore(
-          true, 
-          baseDifficulty, 
-          question.timeSpent
-        );
+        const score = this.calculateQuestionScore(true, baseDifficulty, question.timeSpent);
         return total + score;
       }
       return total;
@@ -308,21 +317,27 @@ export class AnswerProcessor implements IAnswerProcessor {
       // Step 2: Check if all questions are answered
       const unansweredQuestions = session.questions.filter(q => q.isCorrect === undefined);
       if (unansweredQuestions.length > 0) {
-        throw new Error(`Cannot complete session: ${unansweredQuestions.length} questions remain unanswered`);
+        throw new Error(
+          `Cannot complete session: ${unansweredQuestions.length} questions remain unanswered`
+        );
       }
 
       // Step 3: Update session status to completed
       const completedAt = new Date().toISOString();
       const completedSession = await this.sessionRepository.update(sessionId, {
         status: 'completed',
-        endTime: completedAt
+        endTime: completedAt,
       });
 
       // Step 4: Get question details for analysis
       const questionDetails = await this.getQuestionDetailsForCompletion(completedSession);
 
       // Step 5: Generate session summary
-      const sessionSummary = this.generateSessionSummary(completedSession, questionDetails, completedAt);
+      const sessionSummary = this.generateSessionSummary(
+        completedSession,
+        questionDetails,
+        completedAt
+      );
 
       // Step 6: Get detailed analysis from SessionAnalyzer
       const detailedResults = await this.sessionAnalyzer.analyzeSessionResults(completedSession);
@@ -336,16 +351,15 @@ export class AnswerProcessor implements IAnswerProcessor {
       this.logger.info('Session completed successfully', {
         sessionId,
         accuracy: sessionSummary.accuracy,
-        totalQuestions: sessionSummary.totalQuestions
+        totalQuestions: sessionSummary.totalQuestions,
       });
 
       return {
         success: true,
         sessionSummary,
         detailedResults,
-        recommendations
+        recommendations,
       };
-
     } catch (error) {
       this.logger.error('Failed to complete session', error as Error, { sessionId });
       throw error;
@@ -358,8 +372,10 @@ export class AnswerProcessor implements IAnswerProcessor {
    */
   private async getQuestionDetailsForCompletion(session: StudySession): Promise<Question[]> {
     const questionDetails = await Promise.all(
-      session.questions.map(async (sessionQuestion) => {
-        const questionResponse = await this.questionService.getQuestion({ questionId: sessionQuestion.questionId });
+      session.questions.map(async sessionQuestion => {
+        const questionResponse = await this.questionService.getQuestion({
+          questionId: sessionQuestion.questionId,
+        });
         const questionData = questionResponse.question;
         if (!questionData) {
           throw new Error(`Question not found for completion: ${sessionQuestion.questionId}`);
@@ -376,15 +392,15 @@ export class AnswerProcessor implements IAnswerProcessor {
    * Phase 21: Session Completion Feature
    */
   private generateSessionSummary(
-    session: StudySession, 
-    questionDetails: Question[], 
+    session: StudySession,
+    questionDetails: Question[],
     completedAt: string
   ) {
     const questionsAnswered = session.questions.filter(q => q.userAnswer !== undefined).length;
     const questionsCorrect = session.questions.filter(q => q.isCorrect === true).length;
     const questionsSkipped = session.questions.filter(q => q.skipped).length;
     const questionsReviewed = session.questions.filter(q => q.markedForReview).length;
-    
+
     const accuracy = questionsAnswered > 0 ? (questionsCorrect / questionsAnswered) * 100 : 0;
     const totalTimeSpent = session.questions.reduce((total, q) => total + q.timeSpent, 0);
     const averageTimePerQuestion = questionsAnswered > 0 ? totalTimeSpent / questionsAnswered : 0;
@@ -406,7 +422,7 @@ export class AnswerProcessor implements IAnswerProcessor {
       passingScore: Math.floor(session.totalQuestions * 0.7), // 70% passing
       passed: accuracy >= 70,
       topicBreakdown,
-      completedAt
+      completedAt,
     };
   }
 
@@ -427,7 +443,7 @@ export class AnswerProcessor implements IAnswerProcessor {
           topicName: question.topicId, // Will be enhanced with real topic names
           questionsTotal: 0,
           questionsCorrect: 0,
-          totalTime: 0
+          totalTime: 0,
         });
       }
 
@@ -439,18 +455,27 @@ export class AnswerProcessor implements IAnswerProcessor {
 
     return Array.from(topicStats.values()).map(stats => ({
       ...stats,
-      accuracy: stats.questionsTotal > 0 ? (stats.questionsCorrect / stats.questionsTotal) * 100 : 0,
-      averageTime: stats.questionsTotal > 0 ? stats.totalTime / stats.questionsTotal : 0
+      accuracy:
+        stats.questionsTotal > 0 ? (stats.questionsCorrect / stats.questionsTotal) * 100 : 0,
+      averageTime: stats.questionsTotal > 0 ? stats.totalTime / stats.questionsTotal : 0,
     }));
   }
 
   /**
    * Generate study recommendations based on session performance
    */
-  private generateStudyRecommendations(session: StudySession, detailedResults: any, questionDetails: Question[]) {
+  private generateStudyRecommendations(
+    session: StudySession,
+    detailedResults: any,
+    questionDetails: Question[]
+  ) {
     const accuracy = detailedResults.accuracyPercentage;
-    
-    let overallRecommendation: 'excellent' | 'good' | 'needs_improvement' | 'requires_focused_study';
+
+    let overallRecommendation:
+      | 'excellent'
+      | 'good'
+      | 'needs_improvement'
+      | 'requires_focused_study';
     let readinessForExam: boolean;
     let suggestedStudyTime: number;
 
@@ -480,10 +505,10 @@ export class AnswerProcessor implements IAnswerProcessor {
       nextSessionRecommendation: {
         sessionType: 'practice' as const,
         topics: [],
-        difficulty: accuracy < 70 ? 'easy' as const : 'medium' as const,
-        questionCount: 20
+        difficulty: accuracy < 70 ? ('easy' as const) : ('medium' as const),
+        questionCount: 20,
       },
-      motivationalMessage: this.generateMotivationalMessage(accuracy, session.totalQuestions)
+      motivationalMessage: this.generateMotivationalMessage(accuracy, session.totalQuestions),
     };
   }
 
@@ -507,10 +532,14 @@ export class AnswerProcessor implements IAnswerProcessor {
    */
   private calculateTimeAllowed(difficulty: string): number {
     switch (difficulty) {
-      case 'easy': return 60;    // 1 minute
-      case 'medium': return 90;  // 1.5 minutes
-      case 'hard': return 120;   // 2 minutes
-      default: return 90;        // Default to medium
+      case 'easy':
+        return 60; // 1 minute
+      case 'medium':
+        return 90; // 1.5 minutes
+      case 'hard':
+        return 120; // 2 minutes
+      default:
+        return 90; // Default to medium
     }
   }
 }

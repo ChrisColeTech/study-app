@@ -1,12 +1,12 @@
 // Topic service for Study App V3 Backend
 
-import { 
-  Topic, 
-  GetTopicsRequest, 
-  GetTopicsResponse, 
+import {
+  Topic,
+  GetTopicsRequest,
+  GetTopicsResponse,
   GetTopicRequest,
   GetTopicResponse,
-  ITopicService
+  ITopicService,
 } from '../shared/types/topic.types';
 import { ITopicRepository } from '../repositories/topic.repository';
 import { createLogger } from '../shared/logger';
@@ -24,18 +24,18 @@ export class TopicService extends BaseService implements ITopicService {
    * Get all topics with optional filtering
    */
   async getTopics(request: GetTopicsRequest): Promise<GetTopicsResponse> {
-    this.logger.info('Getting topics', { 
-      provider: request.provider, 
+    this.logger.info('Getting topics', {
+      provider: request.provider,
       exam: request.exam,
       category: request.category,
       search: request.search,
-      level: request.level
+      level: request.level,
     });
 
     try {
       // Get topics from repository based on filters
       let allTopics: Topic[];
-      
+
       if (request.provider) {
         allTopics = await this.topicRepository.findByProvider(request.provider);
       } else if (request.exam) {
@@ -50,37 +50,39 @@ export class TopicService extends BaseService implements ITopicService {
 
       // Apply additional filters that weren't handled by repository methods
       if (request.category) {
-        filteredTopics = filteredTopics.filter(t => 
+        filteredTopics = filteredTopics.filter(t =>
           t.category?.toLowerCase().includes(request.category!.toLowerCase())
         );
       }
 
       // Filter by level
       if (request.level) {
-        filteredTopics = filteredTopics.filter(t => 
-          t.level?.toLowerCase() === request.level!.toLowerCase()
+        filteredTopics = filteredTopics.filter(
+          t => t.level?.toLowerCase() === request.level!.toLowerCase()
         );
       }
-      
+
       // Filter by exam if not already filtered by repository
       if (request.exam && !request.provider) {
         const searchLower = request.exam.toLowerCase();
-        filteredTopics = filteredTopics.filter(t => 
-          t.examId?.toLowerCase() === searchLower ||
-          t.examName?.toLowerCase().includes(searchLower) ||
-          (t.examCode && t.examCode.toLowerCase().includes(searchLower))
+        filteredTopics = filteredTopics.filter(
+          t =>
+            t.examId?.toLowerCase() === searchLower ||
+            t.examName?.toLowerCase().includes(searchLower) ||
+            (t.examCode && t.examCode.toLowerCase().includes(searchLower))
         );
       }
 
       // Apply search filter
       if (request.search) {
         const searchLower = request.search.toLowerCase();
-        filteredTopics = filteredTopics.filter(t => 
-          t.name.toLowerCase().includes(searchLower) ||
-          (t.description && t.description.toLowerCase().includes(searchLower)) ||
-          t.providerName.toLowerCase().includes(searchLower) ||
-          t.examName.toLowerCase().includes(searchLower) ||
-          t.skillsValidated.some(skill => skill.toLowerCase().includes(searchLower))
+        filteredTopics = filteredTopics.filter(
+          t =>
+            t.name.toLowerCase().includes(searchLower) ||
+            (t.description && t.description.toLowerCase().includes(searchLower)) ||
+            t.providerName.toLowerCase().includes(searchLower) ||
+            t.examName.toLowerCase().includes(searchLower) ||
+            t.skillsValidated.some(skill => skill.toLowerCase().includes(searchLower))
         );
       }
 
@@ -98,7 +100,9 @@ export class TopicService extends BaseService implements ITopicService {
       // Get available filter options from all topics
       const availableProviders = [...new Set(allTopics.map(t => t.providerId))].sort();
       const availableExams = [...new Set(allTopics.map(t => t.examId))].sort();
-      const availableCategories = [...new Set(allTopics.map(t => t.category).filter((cat): cat is string => Boolean(cat)))].sort();
+      const availableCategories = [
+        ...new Set(allTopics.map(t => t.category).filter((cat): cat is string => Boolean(cat))),
+      ].sort();
       const availableLevels = [...new Set(allTopics.map(t => t.level))].sort();
 
       const response: GetTopicsResponse = {
@@ -108,17 +112,16 @@ export class TopicService extends BaseService implements ITopicService {
           providers: availableProviders,
           exams: availableExams,
           categories: availableCategories,
-          levels: availableLevels
-        }
+          levels: availableLevels,
+        },
       };
 
-      this.logger.info('Topics retrieved successfully', { 
+      this.logger.info('Topics retrieved successfully', {
         total: response.total,
-        filtered: filteredTopics.length 
+        filtered: filteredTopics.length,
       });
 
       return response;
-
     } catch (error) {
       this.logger.error('Failed to get topics', error as Error);
       throw new Error('Failed to retrieve topics');
@@ -129,10 +132,10 @@ export class TopicService extends BaseService implements ITopicService {
    * Get a single topic by ID with optional context
    */
   async getTopic(request: GetTopicRequest): Promise<GetTopicResponse> {
-    this.logger.info('Getting topic by ID', { 
+    this.logger.info('Getting topic by ID', {
       id: request.id,
       includeProvider: request.includeProvider,
-      includeExam: request.includeExam
+      includeExam: request.includeExam,
     });
 
     try {
@@ -146,7 +149,7 @@ export class TopicService extends BaseService implements ITopicService {
 
       // Build response with topic data
       const response: GetTopicResponse = {
-        topic
+        topic,
       };
 
       // Add provider context if requested
@@ -155,7 +158,7 @@ export class TopicService extends BaseService implements ITopicService {
           id: topic.providerId,
           name: topic.providerName,
           category: topic.category || 'other',
-          status: 'active'
+          status: 'active',
         };
       }
 
@@ -167,13 +170,13 @@ export class TopicService extends BaseService implements ITopicService {
           code: topic.examCode || topic.examId,
           level: topic.level,
           fullName: topic.examName,
-          skillsValidated: topic.skillsValidated || []
+          skillsValidated: topic.skillsValidated || [],
         };
       }
 
       // Add basic stats (could be enhanced with real data)
       response.stats = {
-        estimatedStudyTime: topic.metadata?.studyTimeRecommended ?? 0
+        estimatedStudyTime: topic.metadata?.studyTimeRecommended ?? 0,
       };
 
       // Add difficulty distribution if available
@@ -183,7 +186,6 @@ export class TopicService extends BaseService implements ITopicService {
 
       this.logger.info('Topic retrieved successfully', { id: request.id });
       return response;
-
     } catch (error) {
       this.logger.error('Failed to get topic', error as Error, { id: request.id });
       throw error;
@@ -198,10 +200,10 @@ export class TopicService extends BaseService implements ITopicService {
 
     try {
       this.topicRepository.clearCache();
-      
+
       // Warm up the cache by loading all topics
       await this.topicRepository.findAll();
-      
+
       this.logger.info('Topic cache refreshed successfully');
     } catch (error) {
       this.logger.error('Failed to refresh topic cache', error as Error);

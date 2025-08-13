@@ -1,15 +1,16 @@
 // Refactored provider service using dedicated filters and mappers
 // Eliminates complex filtering logic mixed with business operations
 
-import { 
-  Provider, 
-  GetProvidersRequest, 
-  GetProvidersResponse, 
-  GetProviderRequest, 
-  GetProviderResponse, 
+import {
+  Provider,
+  GetProvidersRequest,
+  GetProvidersResponse,
+  GetProviderRequest,
+  GetProviderResponse,
   IProviderService,
   ProviderCategory,
-  ProviderStatus
+  ProviderStatus,
+  ProviderStatusEnum,
 } from '../shared/types/provider.types';
 import { IProviderRepository } from '../repositories/provider.repository';
 import { ProviderFilter } from '../filters/provider.filter';
@@ -29,11 +30,11 @@ export class ProviderService extends BaseService implements IProviderService {
    * Get all providers with optional filtering
    */
   async getProviders(request: GetProvidersRequest): Promise<GetProvidersResponse> {
-    this.logger.info('Getting providers', { 
-      category: request.category, 
+    this.logger.info('Getting providers', {
+      category: request.category,
       status: request.status,
       search: request.search,
-      includeInactive: request.includeInactive 
+      includeInactive: request.includeInactive,
     });
 
     try {
@@ -49,16 +50,16 @@ export class ProviderService extends BaseService implements IProviderService {
 
       // Create response using dedicated mapper
       const response = ProviderMapper.toGetProvidersResponse(
-        sortedProviders, 
-        total, 
-        allProviders, 
+        sortedProviders,
+        total,
+        allProviders,
         request
       );
 
-      this.logger.info('Providers retrieved successfully', { 
+      this.logger.info('Providers retrieved successfully', {
         total: response.total,
         filtered: response.providers.length,
-        activeProviders: response.providers.filter(p => p.status === ProviderStatus.ACTIVE).length
+        activeProviders: response.providers.filter(p => p.status === ProviderStatusEnum.ACTIVE).length,
       });
 
       return response;
@@ -82,23 +83,23 @@ export class ProviderService extends BaseService implements IProviderService {
       }
 
       // Check if provider is active (unless explicitly including inactive)
-      if (provider.status !== ProviderStatus.ACTIVE && !request.includeInactive) {
+      if (provider.status !== ProviderStatusEnum.ACTIVE && !request.includeInactive) {
         throw new Error(`Provider not found: ${request.id}`);
       }
 
       // Create response using dedicated mapper
       const response = ProviderMapper.toGetProviderResponse(provider);
 
-      this.logger.info('Provider retrieved successfully', { 
+      this.logger.info('Provider retrieved successfully', {
         providerId: provider.id,
         name: provider.name,
-        status: provider.status
+        status: provider.status,
       });
 
       return response;
     } catch (error) {
-      this.logger.error('Failed to get provider', error as Error, { 
-        providerId: request.id 
+      this.logger.error('Failed to get provider', error as Error, {
+        providerId: request.id,
       });
       throw error;
     }
@@ -112,10 +113,10 @@ export class ProviderService extends BaseService implements IProviderService {
 
     try {
       const providers = await this.providerRepository.findByCategory(category);
-      
-      this.logger.info('Providers by category retrieved successfully', { 
+
+      this.logger.info('Providers by category retrieved successfully', {
         category,
-        count: providers.length
+        count: providers.length,
       });
 
       return providers;
@@ -133,10 +134,10 @@ export class ProviderService extends BaseService implements IProviderService {
 
     try {
       const providers = await this.providerRepository.findByStatus(status);
-      
-      this.logger.info('Providers by status retrieved successfully', { 
+
+      this.logger.info('Providers by status retrieved successfully', {
         status,
-        count: providers.length
+        count: providers.length,
       });
 
       return providers;
@@ -154,10 +155,10 @@ export class ProviderService extends BaseService implements IProviderService {
 
     try {
       this.providerRepository.clearCache();
-      
+
       // Warm up the cache by loading all providers
       await this.providerRepository.findAll();
-      
+
       this.logger.info('Provider cache refreshed successfully');
     } catch (error) {
       this.logger.error('Failed to refresh provider cache', error as Error);

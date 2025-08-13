@@ -155,7 +155,8 @@ export interface IAchievementCalculator {
   calculateAchievements(userId: string, profile: UserProfile): Promise<Achievement[]>;
 }
 
-export interface IProfileRepository extends IStandardCrudRepository<UserProfile, UserProfile, Partial<UserProfile>> {
+export interface IProfileRepository
+  extends IStandardCrudRepository<UserProfile, UserProfile, Partial<UserProfile>> {
   /**
    * Find profile by user ID (business identifier)
    * @param userId - User identifier

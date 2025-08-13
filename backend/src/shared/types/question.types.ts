@@ -1,44 +1,18 @@
-// Question types for Study App V3 Backend
-// Phase 12: Question Listing Feature
+// =======================================================
+// QUESTION DOMAIN TYPES - STUDY APP V3 BACKEND
+// =======================================================
+// This file contains question-specific types for API requests/responses
+// and business operations. Core Question entity is defined in domain.types.ts
 
-export interface Question {
-  questionId: string;
-  providerId: string;
-  examId: string;
-  topicId?: string;
-  questionText: string;
-  options: string[];
-  correctAnswer: number;
-  explanation?: string;
-  difficulty: QuestionDifficulty;
-  type: QuestionType;
-  tags?: string[];
-  metadata: QuestionMetadata;
-  createdAt?: string;
-  updatedAt?: string;
-}
+import { Question, QuestionOption, DifficultyLevel, EntityMetadata } from './domain.types';
 
-export interface QuestionMetadata {
-  source?: string;
-  authorId?: string;
-  reviewStatus?: ReviewStatus;
-  reviewedBy?: string;
-  reviewedAt?: string;
-  language?: string;
-  estimatedTime?: number; // seconds
-  skillLevel?: string;
-  bloomsLevel?: BloomsLevel;
-  cognitiveLoad?: CognitiveLoad;
-  customFields?: Record<string, any>;
-}
+// =======================================================
+// QUESTION CLASSIFICATION ENUMS
+// =======================================================
 
-export enum QuestionDifficulty {
-  BEGINNER = 'beginner',
-  INTERMEDIATE = 'intermediate', 
-  ADVANCED = 'advanced',
-  EXPERT = 'expert'
-}
-
+/**
+ * Standardized question types for different assessment formats
+ */
 export enum QuestionType {
   MULTIPLE_CHOICE = 'multiple_choice',
   MULTIPLE_SELECT = 'multiple_select',
@@ -46,38 +20,83 @@ export enum QuestionType {
   FILL_IN_THE_BLANK = 'fill_in_the_blank',
   DRAG_AND_DROP = 'drag_and_drop',
   SCENARIO = 'scenario',
-  SIMULATION = 'simulation'
+  SIMULATION = 'simulation',
 }
 
+/**
+ * Review status for question content management
+ */
 export enum ReviewStatus {
   DRAFT = 'draft',
   PENDING_REVIEW = 'pending_review',
   APPROVED = 'approved',
   REJECTED = 'rejected',
-  ARCHIVED = 'archived'
+  ARCHIVED = 'archived',
 }
 
+/**
+ * Bloom's taxonomy levels for educational assessment
+ */
 export enum BloomsLevel {
   REMEMBER = 'remember',
   UNDERSTAND = 'understand',
   APPLY = 'apply',
   ANALYZE = 'analyze',
   EVALUATE = 'evaluate',
-  CREATE = 'create'
+  CREATE = 'create',
 }
 
+/**
+ * Cognitive load classification for question complexity
+ */
 export enum CognitiveLoad {
   LOW = 'low',
   MEDIUM = 'medium',
-  HIGH = 'high'
+  HIGH = 'high',
 }
 
-// Request/Response types for Question Listing
+// =======================================================
+// QUESTION METADATA AND CLASSIFICATION
+// =======================================================
+
+/**
+ * Extended metadata for question management and analytics
+ */
+export interface QuestionMetadata extends EntityMetadata {
+  source?: string;
+  authorId?: string;
+  reviewStatus: ReviewStatus;
+  reviewedBy?: string;
+  reviewedAt?: string;
+  language: string;
+  estimatedTime: number; // seconds
+  skillLevel: string;
+  bloomsLevel: BloomsLevel;
+  cognitiveLoad: CognitiveLoad;
+  customFields?: Record<string, any>;
+}
+
+/**
+ * Enhanced Question entity with extended metadata
+ * Extends the core Question interface from domain.types.ts
+ */
+export interface EnhancedQuestion extends Question {
+  type: QuestionType;
+  metadata: QuestionMetadata;
+}
+
+// =======================================================
+// QUESTION API REQUEST/RESPONSE TYPES
+// =======================================================
+
+/**
+ * Request parameters for listing questions with filtering
+ */
 export interface GetQuestionsRequest {
   provider?: string;
   exam?: string;
   topic?: string;
-  difficulty?: QuestionDifficulty;
+  difficulty?: DifficultyLevel;
   type?: QuestionType;
   tags?: string[];
   search?: string;
@@ -87,14 +106,17 @@ export interface GetQuestionsRequest {
   includeMetadata?: boolean;
 }
 
+/**
+ * Response format for question listing with filtering metadata
+ */
 export interface GetQuestionsResponse {
-  questions: Question[];
+  questions: EnhancedQuestion[];
   total: number;
   filters: {
     providers: string[];
     exams: string[];
     topics: string[];
-    difficulties: QuestionDifficulty[];
+    difficulties: DifficultyLevel[];
     types: QuestionType[];
     tags: string[];
   };
@@ -105,24 +127,35 @@ export interface GetQuestionsResponse {
   };
 }
 
-// Request/Response types for Question Details (Phase 13)
+/**
+ * Request parameters for getting a specific question
+ */
 export interface GetQuestionRequest {
   questionId: string;
   includeExplanation?: boolean;
   includeMetadata?: boolean;
 }
 
+/**
+ * Response format for single question details
+ */
 export interface GetQuestionResponse {
-  question: Question;
+  question: EnhancedQuestion;
 }
 
-// Request/Response types for Question Search (Phase 14)
+// =======================================================
+// QUESTION SEARCH TYPES
+// =======================================================
+
+/**
+ * Advanced search request with full-text search capabilities
+ */
 export interface SearchQuestionsRequest {
   query: string;
   provider?: string;
   exam?: string;
   topic?: string;
-  difficulty?: QuestionDifficulty;
+  difficulty?: DifficultyLevel;
   type?: QuestionType;
   tags?: string[];
   limit?: number;
@@ -133,6 +166,9 @@ export interface SearchQuestionsRequest {
   highlightMatches?: boolean;
 }
 
+/**
+ * Search response with relevance scoring and highlighting
+ */
 export interface SearchQuestionsResponse {
   questions: SearchQuestionResult[];
   total: number;
@@ -142,7 +178,7 @@ export interface SearchQuestionsResponse {
     providers: string[];
     exams: string[];
     topics: string[];
-    difficulties: QuestionDifficulty[];
+    difficulties: DifficultyLevel[];
     types: QuestionType[];
     tags: string[];
   };
@@ -153,11 +189,17 @@ export interface SearchQuestionsResponse {
   };
 }
 
-export interface SearchQuestionResult extends Question {
+/**
+ * Question result with search relevance and highlighting
+ */
+export interface SearchQuestionResult extends EnhancedQuestion {
   relevanceScore: number; // 0-1 relevance score
   highlights?: SearchHighlights; // Highlighted matching terms
 }
 
+/**
+ * Text highlighting for search matches
+ */
 export interface SearchHighlights {
   questionText?: string[];
   options?: string[];
@@ -165,17 +207,36 @@ export interface SearchHighlights {
   tags?: string[];
 }
 
+/**
+ * Search sorting options
+ */
 export enum SearchSortOption {
   RELEVANCE = 'relevance',
   DIFFICULTY_ASC = 'difficulty_asc',
   DIFFICULTY_DESC = 'difficulty_desc',
   CREATED_ASC = 'created_asc',
-  CREATED_DESC = 'created_desc'
+  CREATED_DESC = 'created_desc',
 }
 
-// Service interface
+// =======================================================
+// SERVICE INTERFACE
+// =======================================================
+
+/**
+ * Question service interface for business operations
+ */
 export interface IQuestionService {
   getQuestions(request: GetQuestionsRequest): Promise<GetQuestionsResponse>;
   getQuestion(request: GetQuestionRequest): Promise<GetQuestionResponse>;
   searchQuestions(request: SearchQuestionsRequest): Promise<SearchQuestionsResponse>;
 }
+
+// =======================================================
+// BACKWARD COMPATIBILITY
+// =======================================================
+// Re-export core Question types for convenience
+
+export type { Question, QuestionOption, DifficultyLevel } from './domain.types';
+
+/** @deprecated Use DifficultyLevel enum instead */
+export type QuestionDifficulty = DifficultyLevel;

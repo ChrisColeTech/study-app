@@ -40,7 +40,7 @@ export class HealthHandler extends BaseHandler {
    */
   private async healthCheck(context: HandlerContext): Promise<ApiResponse> {
     try {
-      this.logger.info('Health check requested', { 
+      this.logger.info('Health check requested', {
         requestId: context.requestId,
         userAgent: context.event.headers['User-Agent'],
       });
@@ -50,15 +50,11 @@ export class HealthHandler extends BaseHandler {
 
       return this.success(result, 'Health check completed');
     } catch (error) {
-      this.logger.error('Health check failed', error, { 
-        requestId: context.requestId 
+      this.logger.error('Health check failed', error, {
+        requestId: context.requestId,
       });
-      
-      return this.error(
-        ERROR_CODES.INTERNAL_ERROR,
-        'Health check failed',
-        error
-      );
+
+      return this.error(ERROR_CODES.INTERNAL_ERROR, 'Health check failed', error);
     }
   }
 
@@ -68,14 +64,14 @@ export class HealthHandler extends BaseHandler {
    */
   private async systemStatus(context: HandlerContext): Promise<ApiResponse> {
     try {
-      this.logger.info('System status requested', { 
+      this.logger.info('System status requested', {
         requestId: context.requestId,
         userAgent: context.event.headers['User-Agent'],
       });
 
       const healthService = this.serviceFactory.getHealthService();
       const config = this.serviceFactory.getConfig();
-      
+
       // Get basic health info
       const healthData = await healthService.checkHealth();
 
@@ -120,15 +116,11 @@ export class HealthHandler extends BaseHandler {
 
       return this.success(systemInfo, 'System status retrieved');
     } catch (error) {
-      this.logger.error('System status check failed', error, { 
-        requestId: context.requestId 
+      this.logger.error('System status check failed', error, {
+        requestId: context.requestId,
       });
-      
-      return this.error(
-        ERROR_CODES.INTERNAL_ERROR,
-        'System status check failed',
-        error
-      );
+
+      return this.error(ERROR_CODES.INTERNAL_ERROR, 'System status check failed', error);
     }
   }
 }

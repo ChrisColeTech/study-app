@@ -1,157 +1,168 @@
-// Provider types for Study App V3 Backend
+// =======================================================
+// PROVIDER DOMAIN TYPES - STUDY APP V3 BACKEND
+// =======================================================
+// This file contains provider-specific types for API requests/responses
+// and business operations. Core Provider entity is defined in domain.types.ts
 
-export interface Provider {
-  id: string;
-  name: string;
+import { Provider, Exam, EntityMetadata, StatusType } from './domain.types';
+
+// =======================================================
+// PROVIDER CLASSIFICATION ENUMS
+// =======================================================
+
+/**
+ * Provider categories for classification
+ */
+export enum ProviderCategory {
+  CLOUD = 'cloud',
+  NETWORK = 'network',
+  SECURITY = 'security',
+  DATABASE = 'database',
+  DEVELOPER = 'developer',
+  PROJECT_MANAGEMENT = 'project_management',
+  OTHER = 'other'
+}
+
+/**
+ * Certification levels for skill classification
+ */
+export enum CertificationLevel {
+  FOUNDATIONAL = 'foundational',
+  ASSOCIATE = 'associate', 
+  PROFESSIONAL = 'professional',
+  EXPERT = 'expert',
+  SPECIALTY = 'specialty'
+}
+
+/**
+ * Exam format types
+ */
+export enum ExamFormat {
+  MULTIPLE_CHOICE = 'multiple_choice',
+  PRACTICAL = 'practical',
+  SIMULATION = 'simulation',
+  MIXED = 'mixed'
+}
+
+/**
+ * Study resource types
+ */
+export enum ResourceType {
+  OFFICIAL_GUIDE = 'official_guide',
+  PRACTICE_EXAM = 'practice_exam',
+  VIDEO_COURSE = 'video_course',
+  DOCUMENTATION = 'documentation',
+  WHITEPAPER = 'whitepaper',
+  HANDS_ON_LAB = 'hands_on_lab',
+  COMMUNITY = 'community'
+}
+
+// =======================================================
+// PROVIDER METADATA AND EXTENDED TYPES
+// =======================================================
+
+/**
+ * Extended metadata for provider management
+ */
+export interface ProviderMetadata extends EntityMetadata {
+  headquarters?: string;
+  founded?: string;
+  employeeCount?: string;
+  marketCap?: string;
+  industry?: string;
+  tags?: string[];
+  popularityRank?: number;
+  customFields?: Record<string, any>;
+}
+
+/**
+ * Enhanced Provider entity with extended metadata
+ * Uses the core Provider from domain.types.ts but adds provider-specific fields
+ */
+export interface EnhancedProvider extends Provider {
   fullName: string;
-  description: string;
-  status: ProviderStatus;
+  status: StatusType;
   website: string;
   logoUrl: string;
   category: ProviderCategory;
   certifications: Certification[];
   metadata: ProviderMetadata;
-  createdAt: string;
-  updatedAt: string;
 }
 
-export interface Certification {
-  id: string;
-  name: string;
+/**
+ * Certification within a provider (extends core Exam)
+ */
+export interface Certification extends Exam {
   fullName: string;
-  code: string;
-  description: string;
   level: CertificationLevel;
-  status: CertificationStatus;
   examCode: string;
-  passingScore?: number;
   maxScore?: number;
-  duration: number; // minutes
   questionCount?: number;
   cost?: number;
   validityPeriod?: number; // months
   prerequisites?: string[];
-  topics: string[];
   skillsValidated: string[];
   examFormat: ExamFormat;
   languages: string[];
   retakePolicy?: string;
   studyResources?: StudyResource[];
   metadata: CertificationMetadata;
-  createdAt: string;
-  updatedAt: string;
 }
 
+/**
+ * Study resource for certification preparation
+ */
 export interface StudyResource {
   type: ResourceType;
   title: string;
   url: string;
   description?: string;
   isFree: boolean;
-  provider: string;
+  rating?: number;
+  reviewCount?: number;
 }
 
-export interface ProviderMetadata {
-  headquarters?: string;
-  founded?: number;
-  industry?: string;
-  specialization?: string[];
-  marketShare?: string;
-  popularCertifications?: string[];
-  difficultyRating?: number; // 1-5 scale
-  jobMarketDemand?: string; // high, medium, low
-  averageSalary?: string;
-  careerPaths?: string[];
-  customFields?: Record<string, any>;
-}
-
-export interface CertificationMetadata {
+/**
+ * Extended metadata for certification management
+ */
+export interface CertificationMetadata extends EntityMetadata {
   difficultyLevel?: number; // 1-5 scale
   popularityRank?: number;
-  passRate?: number; // percentage
   marketDemand?: string; // high, medium, low
-  salaryImpact?: string;
   jobRoles?: string[];
   industries?: string[];
-  nextStepCertifications?: string[];
+  averageSalaryIncrease?: number; // percentage
   studyTimeRecommended?: number; // hours
-  handsOnExperience?: boolean;
   customFields?: Record<string, any>;
 }
 
-export enum ProviderStatus {
-  ACTIVE = 'active',
-  INACTIVE = 'inactive',
-  DEPRECATED = 'deprecated',
-  COMING_SOON = 'coming_soon'
-}
+// =======================================================
+// PROVIDER API REQUEST/RESPONSE TYPES
+// =======================================================
 
-export enum CertificationStatus {
-  ACTIVE = 'active',
-  INACTIVE = 'inactive',
-  RETIRED = 'retired',
-  BETA = 'beta',
-  COMING_SOON = 'coming_soon'
-}
-
-export enum ProviderCategory {
-  CLOUD = 'cloud',
-  NETWORKING = 'networking',
-  SECURITY = 'security',
-  DATABASE = 'database',
-  PROGRAMMING = 'programming',
-  PROJECT_MANAGEMENT = 'project_management',
-  GENERAL_IT = 'general_it',
-  VENDOR_SPECIFIC = 'vendor_specific'
-}
-
-export enum CertificationLevel {
-  FOUNDATIONAL = 'foundational',
-  ASSOCIATE = 'associate',
-  PROFESSIONAL = 'professional',
-  EXPERT = 'expert',
-  SPECIALTY = 'specialty',
-  MASTER = 'master'
-}
-
-export enum ExamFormat {
-  MULTIPLE_CHOICE = 'multiple_choice',
-  MULTIPLE_SELECT = 'multiple_select',
-  DRAG_DROP = 'drag_drop',
-  SIMULATION = 'simulation',
-  PRACTICAL = 'practical',
-  MIXED = 'mixed'
-}
-
-export enum ResourceType {
-  OFFICIAL_GUIDE = 'official_guide',
-  TRAINING_COURSE = 'training_course',
-  PRACTICE_EXAM = 'practice_exam',
-  VIDEO_COURSE = 'video_course',
-  BOOK = 'book',
-  WHITEPAPER = 'whitepaper',
-  DOCUMENTATION = 'documentation',
-  COMMUNITY_FORUM = 'community_forum',
-  BLOG_POST = 'blog_post',
-  WEBINAR = 'webinar'
-}
-
-// Request/Response types
+/**
+ * Request parameters for listing providers
+ */
 export interface GetProvidersRequest {
   category?: ProviderCategory;
-  status?: ProviderStatus;
+  status?: StatusType;
   search?: string;
   includeInactive?: boolean;
+  includeCertifications?: boolean;
+  sortBy?: 'name' | 'popularity' | 'created';
   limit?: number;
   offset?: number;
 }
 
+/**
+ * Response format for provider listing
+ */
 export interface GetProvidersResponse {
-  providers: Provider[];
+  providers: EnhancedProvider[];
   total: number;
   filters: {
     categories: ProviderCategory[];
-    statuses: ProviderStatus[];
+    statuses: StatusType[];
   };
   pagination?: {
     limit: number;
@@ -160,19 +171,46 @@ export interface GetProvidersResponse {
   };
 }
 
+/**
+ * Request parameters for getting a specific provider
+ */
 export interface GetProviderRequest {
-  id: string;
+  providerId?: string;
+  id?: string; // Alternative identifier for backward compatibility
   includeCertifications?: boolean;
   includeInactive?: boolean;
 }
 
+/**
+ * Response format for single provider details
+ */
 export interface GetProviderResponse {
-  provider: Provider;
+  provider: EnhancedProvider;
 }
 
-// Service interfaces
+// =======================================================
+// SERVICE INTERFACE
+// =======================================================
+
+/**
+ * Provider service interface for business operations
+ */
 export interface IProviderService {
   getProviders(request: GetProvidersRequest): Promise<GetProvidersResponse>;
   getProvider(request: GetProviderRequest): Promise<GetProviderResponse>;
-  refreshCache(): Promise<void>;
 }
+
+// =======================================================
+// BACKWARD COMPATIBILITY
+// =======================================================
+// Re-export core Provider types for convenience
+
+export type { Provider, Exam } from './domain.types';
+
+/** @deprecated Use StatusType instead */
+export type ProviderStatus = StatusType;
+
+/** @deprecated Use StatusType instead */
+export type CertificationStatus = StatusType;
+// Re-export StatusType as enum for value access in filters and handlers
+export { StatusType as ProviderStatusEnum } from './domain.types';

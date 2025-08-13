@@ -1,9 +1,9 @@
 // Question service for Study App V3 Backend
 // Phase 12: Question Listing Feature
 
-import { 
-  Question, 
-  GetQuestionsRequest, 
+import {
+  Question,
+  GetQuestionsRequest,
   GetQuestionsResponse,
   GetQuestionRequest,
   GetQuestionResponse,
@@ -14,7 +14,7 @@ import {
   SearchSortOption,
   IQuestionService,
   QuestionDifficulty,
-  QuestionType
+  QuestionType,
 } from '../shared/types/question.types';
 import { IQuestionRepository } from '../repositories/question.repository';
 import { createLogger } from '../shared/logger';
@@ -24,7 +24,6 @@ import { BaseService } from '../shared/base-service';
 export type { IQuestionService };
 
 export class QuestionService extends BaseService implements IQuestionService {
-
   constructor(
     private questionRepository: IQuestionRepository,
     private questionSelector: QuestionSelector,
@@ -40,7 +39,7 @@ export class QuestionService extends BaseService implements IQuestionService {
     return this.executeWithErrorHandling(
       async () => {
         this.validateRequired(request, 'request');
-        
+
         // Get questions based on provider/exam filters using repository
         let allQuestions: Question[] = [];
 
@@ -62,14 +61,14 @@ export class QuestionService extends BaseService implements IQuestionService {
         // Delegate filtering and processing to QuestionSelector
         const result = await this.questionSelector.selectQuestions(allQuestions, request);
 
-        this.logSuccess('Questions retrieved successfully', { 
+        this.logSuccess('Questions retrieved successfully', {
           total: result.total,
           returned: result.questions.length,
           provider: request.provider,
           exam: request.exam,
           topic: request.topic,
           difficulty: request.difficulty,
-          type: request.type
+          type: request.type,
         });
 
         return result;
@@ -80,8 +79,8 @@ export class QuestionService extends BaseService implements IQuestionService {
         requestData: {
           provider: request.provider,
           exam: request.exam,
-          limit: request.limit
-        }
+          limit: request.limit,
+        },
       }
     );
   }
@@ -95,20 +94,27 @@ export class QuestionService extends BaseService implements IQuestionService {
       async () => {
         this.validateRequired(request, 'request');
         this.validateRequired(request.questionId, 'questionId');
-        
+
         // Get question from repository
         const question = await this.questionRepository.findById(request.questionId);
-        const validatedQuestion = this.validateEntityExists(question, 'Question', request.questionId);
+        const validatedQuestion = this.validateEntityExists(
+          question,
+          'Question',
+          request.questionId
+        );
 
         // Process question output using QuestionSelector
-        const processedQuestion = this.questionSelector.processQuestionOutput(validatedQuestion, request);
-        
-        this.logSuccess('Question retrieved successfully', { 
+        const processedQuestion = this.questionSelector.processQuestionOutput(
+          validatedQuestion,
+          request
+        );
+
+        this.logSuccess('Question retrieved successfully', {
           questionId: request.questionId,
           providerId: processedQuestion.providerId,
           examId: processedQuestion.examId,
           includeExplanation: request.includeExplanation,
-          includeMetadata: request.includeMetadata
+          includeMetadata: request.includeMetadata,
         });
 
         return { question: processedQuestion };
@@ -119,8 +125,8 @@ export class QuestionService extends BaseService implements IQuestionService {
         entityId: request.questionId,
         requestData: {
           includeExplanation: request.includeExplanation,
-          includeMetadata: request.includeMetadata
-        }
+          includeMetadata: request.includeMetadata,
+        },
       }
     );
   }
@@ -134,24 +140,24 @@ export class QuestionService extends BaseService implements IQuestionService {
       async () => {
         this.validateRequired(request, 'request');
         this.validateRequired(request.query, 'query');
-        
+
         const startTime = Date.now();
 
         // Use repository search if available, otherwise fall back to manual search
         let searchResults: Question[];
-        
+
         if (request.provider && request.exam) {
           // Use repository search method for better performance
           const result = await this.questionRepository.searchQuestions(
-            request.query, 
+            request.query,
             undefined,
-            request.provider, 
+            request.provider,
             request.exam
           );
           searchResults = result.items;
         } else if (request.provider) {
           const result = await this.questionRepository.searchQuestions(
-            request.query, 
+            request.query,
             undefined,
             request.provider
           );
@@ -162,18 +168,24 @@ export class QuestionService extends BaseService implements IQuestionService {
         }
 
         // Delegate search processing to QuestionAnalyzer
-        const result = await this.questionAnalyzer.performAdvancedSearch(searchResults, request, startTime);
+        const result = await this.questionAnalyzer.performAdvancedSearch(
+          searchResults,
+          request,
+          startTime
+        );
 
-        this.logSuccess('Questions searched successfully', { 
+        this.logSuccess('Questions searched successfully', {
           query: request.query,
           total: result.total,
           returned: result.questions.length,
           searchTime: result.searchTime,
-          averageScore: result.questions.length > 0 
-            ? result.questions.reduce((sum, r) => sum + r.relevanceScore, 0) / result.questions.length 
-            : 0,
+          averageScore:
+            result.questions.length > 0
+              ? result.questions.reduce((sum, r) => sum + r.relevanceScore, 0) /
+                result.questions.length
+              : 0,
           provider: request.provider,
-          exam: request.exam
+          exam: request.exam,
         });
 
         return result;
@@ -185,8 +197,8 @@ export class QuestionService extends BaseService implements IQuestionService {
           query: request.query,
           provider: request.provider,
           exam: request.exam,
-          limit: request.limit
-        }
+          limit: request.limit,
+        },
       }
     );
   }
@@ -198,12 +210,12 @@ export class QuestionService extends BaseService implements IQuestionService {
     return this.executeWithErrorHandling(
       async () => {
         this.questionRepository.clearCache?.();
-        
+
         this.logSuccess('Question cache refreshed successfully', {});
       },
       {
         operation: 'refresh question cache',
-        entityType: 'QuestionCache'
+        entityType: 'QuestionCache',
       }
     );
   }
@@ -221,7 +233,10 @@ export class QuestionSelector {
   /**
    * Select and process questions with filtering and pagination
    */
-  async selectQuestions(allQuestions: Question[], request: GetQuestionsRequest): Promise<GetQuestionsResponse> {
+  async selectQuestions(
+    allQuestions: Question[],
+    request: GetQuestionsRequest
+  ): Promise<GetQuestionsResponse> {
     // Apply filters
     let filteredQuestions = this.applyFilters(allQuestions, request);
 
@@ -255,8 +270,8 @@ export class QuestionSelector {
       pagination: {
         limit,
         offset,
-        hasMore: offset + limit < total
-      }
+        hasMore: offset + limit < total,
+      },
     };
   }
 
@@ -271,7 +286,7 @@ export class QuestionSelector {
       delete processedQuestion.explanation;
     }
 
-    // Strip metadata if not requested (default true for details endpoint)  
+    // Strip metadata if not requested (default true for details endpoint)
     if (request.includeMetadata === false) {
       processedQuestion.metadata = {};
     }
@@ -302,9 +317,7 @@ export class QuestionSelector {
 
     // Filter by tags
     if (request.tags && request.tags.length > 0) {
-      filtered = filtered.filter(q => 
-        q.tags && request.tags!.some(tag => q.tags!.includes(tag))
-      );
+      filtered = filtered.filter(q => q.tags && request.tags!.some(tag => q.tags!.includes(tag)));
     }
 
     return filtered;
@@ -333,19 +346,18 @@ export class QuestionSelector {
 
     // Filter by tags
     if (request.tags && request.tags.length > 0) {
-      filtered = filtered.filter(q => 
-        q.tags && request.tags!.some(tag => q.tags!.includes(tag))
-      );
+      filtered = filtered.filter(q => q.tags && request.tags!.some(tag => q.tags!.includes(tag)));
     }
 
     // Apply search filter
     if (request.search) {
       const searchLower = request.search.toLowerCase();
-      filtered = filtered.filter(q => 
-        q.questionText.toLowerCase().includes(searchLower) ||
-        q.options.some(option => option.toLowerCase().includes(searchLower)) ||
-        (q.explanation && q.explanation.toLowerCase().includes(searchLower)) ||
-        (q.tags && q.tags.some(tag => tag.toLowerCase().includes(searchLower)))
+      filtered = filtered.filter(
+        q =>
+          q.questionText.toLowerCase().includes(searchLower) ||
+          q.options.some(option => option.toLowerCase().includes(searchLower)) ||
+          (q.explanation && q.explanation.toLowerCase().includes(searchLower)) ||
+          (q.tags && q.tags.some(tag => tag.toLowerCase().includes(searchLower)))
       );
     }
 
@@ -376,7 +388,7 @@ export class QuestionSelector {
       topics: topics.sort(),
       difficulties,
       types,
-      tags: tags.sort()
+      tags: tags.sort(),
     };
   }
 }
@@ -394,18 +406,25 @@ export class QuestionAnalyzer {
    * Perform advanced search with full-text search and relevance scoring
    */
   async performAdvancedSearch(
-    searchResults: Question[], 
-    request: SearchQuestionsRequest, 
+    searchResults: Question[],
+    request: SearchQuestionsRequest,
     startTime: number
   ): Promise<SearchQuestionsResponse> {
     // Apply additional filtering that wasn't handled by repository search
     let filteredQuestions = this.questionSelector.applySearchFilters(searchResults, request);
 
     // Apply full-text search with relevance scoring on the filtered results
-    const searchQuestionResults = this.performFullTextSearch(filteredQuestions, request.query, request.highlightMatches);
+    const searchQuestionResults = this.performFullTextSearch(
+      filteredQuestions,
+      request.query,
+      request.highlightMatches
+    );
 
     // Apply sorting
-    const sortedResults = this.applySorting(searchQuestionResults, request.sortBy || SearchSortOption.RELEVANCE);
+    const sortedResults = this.applySorting(
+      searchQuestionResults,
+      request.sortBy || SearchSortOption.RELEVANCE
+    );
 
     // Apply pagination
     const limit = request.limit || 20;
@@ -444,32 +463,40 @@ export class QuestionAnalyzer {
       pagination: {
         limit,
         offset,
-        hasMore: offset + limit < total
-      }
+        hasMore: offset + limit < total,
+      },
     };
   }
 
   /**
    * Perform full-text search with relevance scoring
    */
-  private performFullTextSearch(questions: Question[], query: string, highlightMatches: boolean = false): SearchQuestionResult[] {
+  private performFullTextSearch(
+    questions: Question[],
+    query: string,
+    highlightMatches: boolean = false
+  ): SearchQuestionResult[] {
     const searchTerms = this.tokenizeQuery(query);
     const results: SearchQuestionResult[] = [];
 
     for (const question of questions) {
       const searchData = this.extractSearchableText(question);
-      const { score, highlights } = this.calculateRelevanceScore(searchData, searchTerms, highlightMatches);
-      
+      const { score, highlights } = this.calculateRelevanceScore(
+        searchData,
+        searchTerms,
+        highlightMatches
+      );
+
       if (score > 0) {
         const result: SearchQuestionResult = {
           ...question,
-          relevanceScore: score
+          relevanceScore: score,
         };
-        
+
         if (highlightMatches && highlights) {
           result.highlights = highlights;
         }
-        
+
         results.push(result);
       }
     }
@@ -480,37 +507,40 @@ export class QuestionAnalyzer {
   /**
    * Apply sorting to search results
    */
-  private applySorting(results: SearchQuestionResult[], sortBy: SearchSortOption): SearchQuestionResult[] {
+  private applySorting(
+    results: SearchQuestionResult[],
+    sortBy: SearchSortOption
+  ): SearchQuestionResult[] {
     switch (sortBy) {
       case SearchSortOption.RELEVANCE:
         return results.sort((a, b) => b.relevanceScore - a.relevanceScore);
-      
+
       case SearchSortOption.DIFFICULTY_ASC:
         return results.sort((a, b) => {
           const difficultyOrder = { beginner: 0, intermediate: 1, advanced: 2, expert: 3 };
           return (difficultyOrder[a.difficulty] || 1) - (difficultyOrder[b.difficulty] || 1);
         });
-      
+
       case SearchSortOption.DIFFICULTY_DESC:
         return results.sort((a, b) => {
           const difficultyOrder = { beginner: 0, intermediate: 1, advanced: 2, expert: 3 };
           return (difficultyOrder[b.difficulty] || 1) - (difficultyOrder[a.difficulty] || 1);
         });
-      
+
       case SearchSortOption.CREATED_ASC:
         return results.sort((a, b) => {
           const aTime = new Date(a.createdAt || '1970-01-01').getTime();
           const bTime = new Date(b.createdAt || '1970-01-01').getTime();
           return aTime - bTime;
         });
-      
+
       case SearchSortOption.CREATED_DESC:
         return results.sort((a, b) => {
           const aTime = new Date(a.createdAt || '1970-01-01').getTime();
           const bTime = new Date(b.createdAt || '1970-01-01').getTime();
           return bTime - aTime;
         });
-      
+
       default:
         return results.sort((a, b) => b.relevanceScore - a.relevanceScore);
     }
@@ -537,7 +567,7 @@ export class QuestionAnalyzer {
 
     // Combine individual terms and phrases
     const allTerms = [...originalTerms, ...phrases];
-    
+
     // Remove duplicates and very short terms
     return [...new Set(allTerms)].filter(term => term.length >= 2);
   }
@@ -555,7 +585,7 @@ export class QuestionAnalyzer {
       questionText: question.questionText.toLowerCase(),
       options: question.options.map(opt => opt.toLowerCase()),
       explanation: (question.explanation || '').toLowerCase(),
-      tags: (question.tags || []).map(tag => tag.toLowerCase())
+      tags: (question.tags || []).map(tag => tag.toLowerCase()),
     };
   }
 
@@ -572,17 +602,17 @@ export class QuestionAnalyzer {
 
     // Enhanced field weights for relevance scoring
     const weights = {
-      questionText: 1.0,    // Highest weight for question text
-      options: 0.8,         // High weight for options
-      tags: 0.7,           // High weight for tags (increased from 0.6)
-      explanation: 0.5      // Medium weight for explanations (increased from 0.4)
+      questionText: 1.0, // Highest weight for question text
+      options: 0.8, // High weight for options
+      tags: 0.7, // High weight for tags (increased from 0.6)
+      explanation: 0.5, // Medium weight for explanations (increased from 0.4)
     };
 
     // Position bonuses
     const positionBonus = {
-      early: 1.2,    // First 50 characters
-      middle: 1.0,   // Default
-      late: 0.8      // Last 50 characters
+      early: 1.2, // First 50 characters
+      middle: 1.0, // Default
+      late: 0.8, // Last 50 characters
     };
 
     // Track matches for each field
@@ -590,7 +620,7 @@ export class QuestionAnalyzer {
       questionText: [],
       options: [],
       explanation: [],
-      tags: []
+      tags: [],
     };
 
     let termMatchCount = 0; // Track how many terms matched
@@ -601,9 +631,13 @@ export class QuestionAnalyzer {
       // Question text matches with position bonus
       const questionMatches = this.findEnhancedMatches(searchData.questionText, term);
       if (questionMatches.matches.length > 0) {
-        const positionMultiplier = questionMatches.avgPosition < 50 ? positionBonus.early :
-          questionMatches.avgPosition > (searchData.questionText.length - 50) ? positionBonus.late : positionBonus.middle;
-        
+        const positionMultiplier =
+          questionMatches.avgPosition < 50
+            ? positionBonus.early
+            : questionMatches.avgPosition > searchData.questionText.length - 50
+              ? positionBonus.late
+              : positionBonus.middle;
+
         totalScore += questionMatches.matches.length * weights.questionText * positionMultiplier;
         fieldMatches.questionText.push(...questionMatches.matches);
         termMatched = true;
@@ -653,11 +687,13 @@ export class QuestionAnalyzer {
 
     // Term coverage bonus - more terms matched = higher score
     const termCoverageBonus = termMatchCount / searchTerms.length;
-    totalScore *= (0.5 + 0.5 * termCoverageBonus);
+    totalScore *= 0.5 + 0.5 * termCoverageBonus;
 
     // Normalize score to 0-1 range with improved scaling
-    const maxPossibleScore = searchTerms.length * 
-      (weights.questionText + weights.options + weights.tags + weights.explanation) * 2.5;
+    const maxPossibleScore =
+      searchTerms.length *
+      (weights.questionText + weights.options + weights.tags + weights.explanation) *
+      2.5;
     let normalizedScore = Math.min(totalScore / maxPossibleScore, 1.0);
 
     // Apply minimum threshold - questions with very low scores are likely irrelevant
@@ -687,10 +723,13 @@ export class QuestionAnalyzer {
   /**
    * Find enhanced matches for a search term in text with position tracking
    */
-  private findEnhancedMatches(text: string, term: string): { matches: string[]; avgPosition: number } {
+  private findEnhancedMatches(
+    text: string,
+    term: string
+  ): { matches: string[]; avgPosition: number } {
     const matches: string[] = [];
     const positions: number[] = [];
-    
+
     // Try multiple matching strategies
     const strategies = [
       // Exact word boundary match
@@ -698,17 +737,17 @@ export class QuestionAnalyzer {
       // Partial word match
       new RegExp(`\\b\\w*${this.escapeRegex(term)}\\w*\\b`, 'gi'),
       // Substring match for technical terms
-      new RegExp(`${this.escapeRegex(term)}`, 'gi')
+      new RegExp(`${this.escapeRegex(term)}`, 'gi'),
     ];
 
     for (const regex of strategies) {
       let match;
       regex.lastIndex = 0; // Reset regex
-      
+
       while ((match = regex.exec(text)) !== null && matches.length < 8) {
         const matchText = match[0];
         const position = match.index;
-        
+
         // Avoid duplicate matches
         if (!matches.includes(matchText.toLowerCase())) {
           matches.push(matchText.toLowerCase());
@@ -717,8 +756,9 @@ export class QuestionAnalyzer {
       }
     }
 
-    const avgPosition = positions.length > 0 ? positions.reduce((a, b) => a + b, 0) / positions.length : 0;
-    
+    const avgPosition =
+      positions.length > 0 ? positions.reduce((a, b) => a + b, 0) / positions.length : 0;
+
     return { matches: matches.slice(0, 5), avgPosition };
   }
 
@@ -741,7 +781,7 @@ export class QuestionAnalyzer {
    */
   private fuzzyMatch(text: string, term: string): boolean {
     if (text.length < term.length) return false;
-    
+
     // Simple Levenshtein distance check
     const maxDistance = Math.floor(term.length / 3); // Allow 1 error per 3 characters
     return this.levenshteinDistance(text, term) <= maxDistance;
@@ -752,15 +792,15 @@ export class QuestionAnalyzer {
    */
   private levenshteinDistance(str1: string, str2: string): number {
     const matrix: number[][] = [];
-    
+
     for (let i = 0; i <= str2.length; i++) {
       matrix[i] = [i];
     }
-    
+
     for (let j = 0; j <= str1.length; j++) {
       matrix[0][j] = j;
     }
-    
+
     for (let i = 1; i <= str2.length; i++) {
       for (let j = 1; j <= str1.length; j++) {
         if (str2.charAt(i - 1) === str1.charAt(j - 1)) {
@@ -768,13 +808,13 @@ export class QuestionAnalyzer {
         } else {
           matrix[i][j] = Math.min(
             matrix[i - 1][j - 1] + 1, // substitution
-            matrix[i][j - 1] + 1,     // insertion
-            matrix[i - 1][j] + 1      // deletion
+            matrix[i][j - 1] + 1, // insertion
+            matrix[i - 1][j] + 1 // deletion
           );
         }
       }
     }
-    
+
     return matrix[str2.length][str1.length];
   }
 }

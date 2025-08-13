@@ -2,7 +2,12 @@
 // Eliminates mixed validation/business logic concerns
 
 import { IUserRepository } from '../repositories/user.repository';
-import { User, CreateUserRequest, UpdateUserRequest, UserResponse } from '../shared/types/user.types';
+import {
+  User,
+  CreateUserRequest,
+  UpdateUserRequest,
+  UserResponse,
+} from '../shared/types/user.types';
 import { UserValidator } from '../validators/user.validator';
 import { UserMapper } from '../mappers/user.mapper';
 import { createLogger } from '../shared/logger';
@@ -43,10 +48,10 @@ export class UserService implements IUserService {
 
       // Convert to UserResponse using dedicated mapper
       const userResponse = UserMapper.toUserResponse(user);
-      
-      this.logger.info('User created successfully', { 
-        userId: user.userId, 
-        email: user.email 
+
+      this.logger.info('User created successfully', {
+        userId: user.userId,
+        email: user.email,
       });
 
       return userResponse;
@@ -64,7 +69,7 @@ export class UserService implements IUserService {
 
     try {
       const user = await this.userRepository.findById(userId);
-      
+
       if (!user) {
         this.logger.debug('User not found', { userId });
         return null;
@@ -90,7 +95,7 @@ export class UserService implements IUserService {
 
     try {
       const user = await this.userRepository.findByEmail(email);
-      
+
       if (!user) {
         this.logger.debug('User not found', { email });
         return null;
@@ -118,9 +123,9 @@ export class UserService implements IUserService {
 
       // Convert to UserResponse using dedicated mapper
       const userResponse = UserMapper.toUserResponse(updatedUser);
-      
+
       this.logger.info('User updated successfully', { userId });
-      
+
       return userResponse;
     } catch (error) {
       this.logger.error('Failed to update user', error as Error, { userId });
@@ -136,13 +141,13 @@ export class UserService implements IUserService {
 
     try {
       const result = await this.userRepository.delete(userId);
-      
+
       if (result) {
         this.logger.info('User deactivated successfully', { userId });
       } else {
         this.logger.warn('User not found for deactivation', { userId });
       }
-      
+
       return result;
     } catch (error) {
       this.logger.error('Failed to deactivate user', error as Error, { userId });
@@ -162,5 +167,4 @@ export class UserService implements IUserService {
       throw error;
     }
   }
-
 }

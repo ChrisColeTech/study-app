@@ -1,9 +1,9 @@
 /**
  * Repository Pattern Standardization for Study App V3
- * 
+ *
  * This file defines standardized base interfaces and patterns for all repositories
  * following the helper class delegation pattern established in Objectives 11-15.
- * 
+ *
  * Objective 16: Repository Pattern Standardization
  */
 
@@ -21,12 +21,12 @@ export interface IBaseRepository {
    * Get repository name for logging and error tracking
    */
   getRepositoryName(): string;
-  
+
   /**
    * Health check for repository dependencies
    */
   healthCheck(): Promise<RepositoryHealthStatus>;
-  
+
   /**
    * Clear repository cache if applicable - standardized optional method
    */
@@ -37,7 +37,8 @@ export interface IBaseRepository {
  * Standardized interface for CRUD operations across all repositories
  * All repositories should implement this interface with appropriate entity types
  */
-export interface IStandardCrudRepository<T, CreateRequest, UpdateRequest, FilterRequest = any> extends IBaseRepository {
+export interface IStandardCrudRepository<T, CreateRequest, UpdateRequest, FilterRequest = any>
+  extends IBaseRepository {
   /**
    * Create a new entity
    * @param data - Entity creation data
@@ -174,7 +175,8 @@ export interface StandardFilterParams extends StandardPaginationParams {
 /**
  * Standard CRUD operations interface for DynamoDB-based repositories
  */
-export interface ICrudRepository<T, TCreateRequest, TUpdateRequest, TFilters = any> extends IBaseRepository {
+export interface ICrudRepository<T, TCreateRequest, TUpdateRequest, TFilters = any>
+  extends IBaseRepository {
   /**
    * Create a new entity
    * @param data - Entity creation data
@@ -182,7 +184,7 @@ export interface ICrudRepository<T, TCreateRequest, TUpdateRequest, TFilters = a
    * @throws RepositoryError - Standardized repository error
    */
   create(data: TCreateRequest): Promise<T>;
-  
+
   /**
    * Find entity by ID
    * @param id - Unique identifier
@@ -190,7 +192,7 @@ export interface ICrudRepository<T, TCreateRequest, TUpdateRequest, TFilters = a
    * @throws RepositoryError - Standardized repository error
    */
   findById(id: string): Promise<T | null>;
-  
+
   /**
    * Update existing entity
    * @param id - Unique identifier
@@ -199,7 +201,7 @@ export interface ICrudRepository<T, TCreateRequest, TUpdateRequest, TFilters = a
    * @throws RepositoryError - Standardized repository error
    */
   update(id: string, updateData: TUpdateRequest): Promise<T>;
-  
+
   /**
    * Delete entity by ID
    * @param id - Unique identifier
@@ -207,7 +209,7 @@ export interface ICrudRepository<T, TCreateRequest, TUpdateRequest, TFilters = a
    * @throws RepositoryError - Standardized repository error
    */
   delete(id: string): Promise<boolean>;
-  
+
   /**
    * Check if entity exists
    * @param id - Unique identifier
@@ -215,7 +217,7 @@ export interface ICrudRepository<T, TCreateRequest, TUpdateRequest, TFilters = a
    * @throws RepositoryError - Standardized repository error
    */
   exists(id: string): Promise<boolean>;
-  
+
   /**
    * Find entities with filters and pagination
    * @param filters - Query filters
@@ -235,7 +237,7 @@ export interface IReadOnlyRepository<T, TFilters = any> extends IBaseRepository 
    * @throws RepositoryError - Standardized repository error
    */
   findAll(): Promise<T[]>;
-  
+
   /**
    * Find entity by ID
    * @param id - Unique identifier
@@ -243,7 +245,7 @@ export interface IReadOnlyRepository<T, TFilters = any> extends IBaseRepository 
    * @throws RepositoryError - Standardized repository error
    */
   findById(id: string): Promise<T | null>;
-  
+
   /**
    * Find entities with filters
    * @param filters - Query filters
@@ -251,12 +253,12 @@ export interface IReadOnlyRepository<T, TFilters = any> extends IBaseRepository 
    * @throws RepositoryError - Standardized repository error
    */
   findWithFilters(filters: TFilters): Promise<T[]>;
-  
+
   /**
    * Clear repository cache
    */
   clearCache(): void;
-  
+
   /**
    * Refresh cache from source
    * @returns Promise<void>
@@ -276,7 +278,7 @@ export interface IAnalyticalRepository<T> extends IBaseRepository {
    * @throws RepositoryError - Standardized repository error
    */
   getAggregatedData(query: AnalyticalQuery): Promise<T[]>;
-  
+
   /**
    * Save snapshot for caching
    * @param snapshot - Data snapshot
@@ -284,7 +286,7 @@ export interface IAnalyticalRepository<T> extends IBaseRepository {
    * @throws RepositoryError - Standardized repository error
    */
   saveSnapshot(snapshot: DataSnapshot): Promise<void>;
-  
+
   /**
    * Get cached snapshot
    * @param key - Snapshot key
@@ -308,7 +310,7 @@ export enum RepositoryErrorType {
   CONNECTION_ERROR = 'CONNECTION_ERROR',
   TIMEOUT_ERROR = 'TIMEOUT_ERROR',
   PERMISSION_ERROR = 'PERMISSION_ERROR',
-  INTERNAL_ERROR = 'INTERNAL_ERROR'
+  INTERNAL_ERROR = 'INTERNAL_ERROR',
 }
 
 /**
@@ -420,7 +422,7 @@ export interface IQueryBuilder<T> {
    * @returns IQueryBuilder<T> - Fluent interface
    */
   where(field: string, operator: QueryOperator, value: any): IQueryBuilder<T>;
-  
+
   /**
    * Add sorting
    * @param field - Field name
@@ -428,7 +430,7 @@ export interface IQueryBuilder<T> {
    * @returns IQueryBuilder<T> - Fluent interface
    */
   orderBy(field: string, direction: 'asc' | 'desc'): IQueryBuilder<T>;
-  
+
   /**
    * Set pagination
    * @param limit - Items per page
@@ -436,7 +438,7 @@ export interface IQueryBuilder<T> {
    * @returns IQueryBuilder<T> - Fluent interface
    */
   paginate(limit: number, offset?: number): IQueryBuilder<T>;
-  
+
   /**
    * Execute query
    * @returns Promise<PaginatedResult<T>> - Query results
@@ -457,7 +459,7 @@ export enum QueryOperator {
   CONTAINS = 'contains',
   BEGINS_WITH = 'begins_with',
   IN = 'in',
-  BETWEEN = 'between'
+  BETWEEN = 'between',
 }
 
 // ========================================
@@ -513,21 +515,21 @@ export interface RepositoryConfig {
   s3: {
     bucketName: string;
   };
-  
+
   // Cache settings
   cache?: {
     ttl: number;
     maxSize: number;
     enabled: boolean;
   };
-  
+
   // Query settings
   query?: {
     defaultLimit: number;
     maxLimit: number;
     timeoutMs: number;
   };
-  
+
   // Health check settings
   health?: {
     checkIntervalMs: number;

@@ -49,9 +49,9 @@ export class AuthService extends BaseService implements IAuthService {
         // Create login response using dedicated mapper
         const loginResponse = AuthMapper.createLoginResponse(user, tokens);
 
-        this.logSuccess('User registered and authenticated successfully', { 
-          userId: user.userId, 
-          email: user.email 
+        this.logSuccess('User registered and authenticated successfully', {
+          userId: user.userId,
+          email: user.email,
         });
 
         return loginResponse;
@@ -59,7 +59,7 @@ export class AuthService extends BaseService implements IAuthService {
       {
         operation: 'register user',
         entityType: 'User',
-        requestData: { email: userData.email }
+        requestData: { email: userData.email },
       }
     );
   }
@@ -78,11 +78,14 @@ export class AuthService extends BaseService implements IAuthService {
         }
 
         // Verify password using dedicated service
-        const isPasswordValid = await this.passwordService.verifyPassword(loginData.password, user.passwordHash);
+        const isPasswordValid = await this.passwordService.verifyPassword(
+          loginData.password,
+          user.passwordHash
+        );
         if (!isPasswordValid) {
-          this.logWarning('Login attempt with invalid password', { 
+          this.logWarning('Login attempt with invalid password', {
             email: loginData.email,
-            userId: user.userId 
+            userId: user.userId,
           });
           throw this.createBusinessError('Invalid email or password');
         }
@@ -97,9 +100,9 @@ export class AuthService extends BaseService implements IAuthService {
         // Create login response using dedicated mapper
         const loginResponse = AuthMapper.createLoginResponse(userResponse!, tokens);
 
-        this.logSuccess('User authenticated successfully', { 
-          userId: user.userId, 
-          email: user.email 
+        this.logSuccess('User authenticated successfully', {
+          userId: user.userId,
+          email: user.email,
         });
 
         return loginResponse;
@@ -107,7 +110,7 @@ export class AuthService extends BaseService implements IAuthService {
       {
         operation: 'authenticate user',
         entityType: 'User',
-        requestData: { email: loginData.email }
+        requestData: { email: loginData.email },
       }
     );
   }
@@ -128,10 +131,10 @@ export class AuthService extends BaseService implements IAuthService {
     try {
       // Validate refresh token and get new tokens using dedicated service
       const tokenData = await this.tokenService.refreshToken(refreshTokenValue);
-      
+
       // Extract user ID from the refresh token to get current user data
       const decoded = await this.tokenService.validateToken(tokenData.accessToken);
-      
+
       // Get current user data to ensure user is still active
       const user = await this.userService.getUserById(decoded.userId);
       if (!user || !user.isActive) {
@@ -151,7 +154,6 @@ export class AuthService extends BaseService implements IAuthService {
     }
   }
 
-
   /**
    * Logout user by invalidating token
    * In Phase 5, this will implement token blacklisting
@@ -160,16 +162,15 @@ export class AuthService extends BaseService implements IAuthService {
     try {
       // Validate the token first using dedicated service
       const decoded = await this.tokenService.validateToken(token);
-      
-      this.logger.info('User logged out successfully', { 
+
+      this.logger.info('User logged out successfully', {
         userId: decoded.userId,
-        email: decoded.email 
+        email: decoded.email,
       });
 
       // TODO: In Phase 5, implement token blacklisting using DynamoDB
       // For now, logout is handled client-side by removing the token
       // Future implementation will store blacklisted tokens in DynamoDB
-      
     } catch (error) {
       this.logger.error('Logout failed', error as Error);
       throw new Error('Invalid token for logout');

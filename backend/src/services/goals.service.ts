@@ -19,7 +19,7 @@ import {
   IGoalsProgressTracker,
   GoalType,
   GoalStatus,
-  GoalPriority
+  GoalPriority,
 } from '../shared/types/goals.types';
 import { IGoalsRepository } from '../repositories/goals.repository';
 import { IProviderService } from './provider.service';
@@ -32,7 +32,6 @@ import { BaseService } from '../shared/base-service';
 export type { IGoalsService };
 
 export class GoalsService extends BaseService implements IGoalsService {
-
   constructor(
     private goalsRepository: IGoalsRepository,
     private providerService: IProviderService,
@@ -51,7 +50,7 @@ export class GoalsService extends BaseService implements IGoalsService {
       async () => {
         this.validateRequired(userId, 'userId');
         this.validateRequired(request, 'request');
-        
+
         // Validate the request
         await this.validateGoalRequest(request);
 
@@ -64,13 +63,13 @@ export class GoalsService extends BaseService implements IGoalsService {
           milestoneId: uuidv4(),
           ...milestone,
           isCompleted: false,
-          order: index
+          order: index,
         }));
 
         // Process reminders
         const reminders: GoalReminder[] = (request.reminders || []).map(reminder => ({
           reminderId: uuidv4(),
-          ...reminder
+          ...reminder,
         }));
 
         // Create goal object
@@ -95,18 +94,18 @@ export class GoalsService extends BaseService implements IGoalsService {
           progressPercentage: 0,
           milestones,
           reminders,
-          isArchived: false
+          isArchived: false,
         };
 
         // Store goal using repository
         const createdGoal = await this.goalsRepository.create(goal);
 
-        this.logSuccess('Goal created successfully', { 
+        this.logSuccess('Goal created successfully', {
           goalId: createdGoal.goalId,
           userId,
           type: createdGoal.type,
           targetValue: createdGoal.targetValue,
-          title: createdGoal.title
+          title: createdGoal.title,
         });
 
         return { goal: createdGoal };
@@ -118,8 +117,8 @@ export class GoalsService extends BaseService implements IGoalsService {
         requestData: {
           type: request.type,
           targetType: request.targetType,
-          title: request.title
-        }
+          title: request.title,
+        },
       }
     );
   }
@@ -134,21 +133,21 @@ export class GoalsService extends BaseService implements IGoalsService {
       // Apply defaults
       const limit = Math.min(request.limit || 50, 100);
       const offset = request.offset || 0;
-      
+
       const filters = {
         ...request,
         limit,
-        offset
+        offset,
       };
 
       // Get goals from repository
       const result = await this.goalsRepository.findByUserId(userId, filters);
 
-      this.logger.info('Goals retrieved successfully', { 
+      this.logger.info('Goals retrieved successfully', {
         userId,
         total: result.total,
         returned: result.items.length,
-        filters
+        filters,
       });
 
       return {
@@ -156,9 +155,8 @@ export class GoalsService extends BaseService implements IGoalsService {
         total: result.total,
         limit,
         offset,
-        filters
+        filters,
       };
-
     } catch (error) {
       this.logger.error('Failed to retrieve goals', error as Error, { userId, request });
       throw error;
@@ -183,16 +181,15 @@ export class GoalsService extends BaseService implements IGoalsService {
         throw new Error('Goal not found or access denied');
       }
 
-      this.logger.info('Goal retrieved successfully', { 
+      this.logger.info('Goal retrieved successfully', {
         goalId: goal.goalId,
         userId,
         type: goal.type,
         status: goal.status,
-        progress: goal.progressPercentage
+        progress: goal.progressPercentage,
       });
 
       return { goal };
-
     } catch (error) {
       this.logger.error('Failed to retrieve goal', error as Error, { goalId, userId });
       throw error;
@@ -202,7 +199,11 @@ export class GoalsService extends BaseService implements IGoalsService {
   /**
    * Update an existing goal
    */
-  async updateGoal(goalId: string, userId: string, request: UpdateGoalRequest): Promise<UpdateGoalResponse> {
+  async updateGoal(
+    goalId: string,
+    userId: string,
+    request: UpdateGoalRequest
+  ): Promise<UpdateGoalResponse> {
     this.logger.info('Updating goal', { goalId, userId, updates: Object.keys(request) });
 
     try {
@@ -223,7 +224,7 @@ export class GoalsService extends BaseService implements IGoalsService {
       // Prepare update data
       const updateData: Partial<Goal> = {
         ...request,
-        updatedAt: new Date().toISOString()
+        updatedAt: new Date().toISOString(),
       };
 
       // Handle goal completion
@@ -235,21 +236,23 @@ export class GoalsService extends BaseService implements IGoalsService {
       // Update progress percentage if currentValue is being updated
       if (request.currentValue !== undefined) {
         const targetValue = request.targetValue || existingGoal.targetValue;
-        updateData.progressPercentage = Math.min(Math.round((request.currentValue / targetValue) * 100), 100);
+        updateData.progressPercentage = Math.min(
+          Math.round((request.currentValue / targetValue) * 100),
+          100
+        );
       }
 
       // Update goal using repository
       const updatedGoal = await this.goalsRepository.update(goalId, updateData);
 
-      this.logger.info('Goal updated successfully', { 
+      this.logger.info('Goal updated successfully', {
         goalId: updatedGoal.goalId,
         userId,
         status: updatedGoal.status,
-        progress: updatedGoal.progressPercentage
+        progress: updatedGoal.progressPercentage,
       });
 
       return { goal: updatedGoal };
-
     } catch (error) {
       this.logger.error('Failed to update goal', error as Error, { goalId, userId, request });
       throw error;
@@ -281,9 +284,8 @@ export class GoalsService extends BaseService implements IGoalsService {
 
       return {
         success: true,
-        message: 'Goal deleted successfully'
+        message: 'Goal deleted successfully',
       };
-
     } catch (error) {
       this.logger.error('Failed to delete goal', error as Error, { goalId, userId });
       throw error;

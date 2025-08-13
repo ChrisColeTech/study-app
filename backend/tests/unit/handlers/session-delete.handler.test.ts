@@ -14,7 +14,7 @@ const mockSessionService: jest.Mocked<SessionService> = {
   createSession: jest.fn(),
   getSession: jest.fn(),
   updateSession: jest.fn(),
-  deleteSession: jest.fn()
+  deleteSession: jest.fn(),
 } as any;
 
 describe('SessionHandler - Phase 19 Delete Endpoint', () => {
@@ -23,11 +23,11 @@ describe('SessionHandler - Phase 19 Delete Endpoint', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    
+
     // Setup ServiceFactory mock
     mockServiceFactory = {
       getInstance: jest.fn().mockReturnThis(),
-      getSessionService: jest.fn().mockReturnValue(mockSessionService)
+      getSessionService: jest.fn().mockReturnValue(mockSessionService),
     } as any;
     (ServiceFactory.getInstance as jest.Mock).mockReturnValue(mockServiceFactory);
 
@@ -44,8 +44,8 @@ describe('SessionHandler - Phase 19 Delete Endpoint', () => {
       headers: { 'Content-Type': 'application/json' },
       body: null,
       requestContext: { requestId: 'test-request-123' } as any,
-      isBase64Encoded: false
-    }
+      isBase64Encoded: false,
+    },
   });
 
   describe('DELETE /v1/sessions/{id}', () => {
@@ -53,10 +53,10 @@ describe('SessionHandler - Phase 19 Delete Endpoint', () => {
       // Arrange
       const sessionId = '550e8400-e29b-41d4-a716-446655440000';
       const context = createMockContext(sessionId);
-      
+
       mockSessionService.deleteSession.mockResolvedValue({
         success: true,
-        message: 'Session deleted successfully'
+        message: 'Session deleted successfully',
       });
 
       // Act
@@ -69,9 +69,9 @@ describe('SessionHandler - Phase 19 Delete Endpoint', () => {
         message: 'Session deleted successfully',
         data: {
           success: true,
-          message: 'Session deleted successfully'
+          message: 'Session deleted successfully',
         },
-        timestamp: expect.any(String)
+        timestamp: expect.any(String),
       });
       expect(mockSessionService.deleteSession).toHaveBeenCalledWith(sessionId);
     });
@@ -80,7 +80,7 @@ describe('SessionHandler - Phase 19 Delete Endpoint', () => {
       // Arrange
       const sessionId = '550e8400-e29b-41d4-a716-446655440999';
       const context = createMockContext(sessionId);
-      
+
       mockSessionService.deleteSession.mockRejectedValue(
         new Error('Session not found: ' + sessionId)
       );
@@ -100,7 +100,7 @@ describe('SessionHandler - Phase 19 Delete Endpoint', () => {
       // Arrange
       const sessionId = '550e8400-e29b-41d4-a716-446655440000';
       const context = createMockContext(sessionId);
-      
+
       mockSessionService.deleteSession.mockRejectedValue(
         new Error('Cannot delete completed sessions - they are archived for analytics')
       );
@@ -145,8 +145,8 @@ describe('SessionHandler - Phase 19 Delete Endpoint', () => {
           headers: { 'Content-Type': 'application/json' },
           body: null,
           requestContext: { requestId: 'test-request-123' } as any,
-          isBase64Encoded: false
-        }
+          isBase64Encoded: false,
+        },
       };
 
       // Act
@@ -165,10 +165,8 @@ describe('SessionHandler - Phase 19 Delete Endpoint', () => {
       // Arrange
       const sessionId = '550e8400-e29b-41d4-a716-446655440000';
       const context = createMockContext(sessionId);
-      
-      mockSessionService.deleteSession.mockRejectedValue(
-        new Error('Database connection failed')
-      );
+
+      mockSessionService.deleteSession.mockRejectedValue(new Error('Database connection failed'));
 
       // Act
       const response = await sessionHandler.handle(context.event, {} as any);
@@ -187,10 +185,10 @@ describe('SessionHandler - Phase 19 Delete Endpoint', () => {
       // Arrange
       const validSessionId = '550e8400-e29b-41d4-a716-446655440000';
       const context = createMockContext(validSessionId);
-      
+
       mockSessionService.deleteSession.mockResolvedValue({
         success: true,
-        message: 'Session deleted successfully'
+        message: 'Session deleted successfully',
       });
 
       // Act
@@ -206,7 +204,7 @@ describe('SessionHandler - Phase 19 Delete Endpoint', () => {
         '123',
         'abc-def-ghi',
         '550e8400-e29b-41d4-a716-446655440000-extra',
-        'not-a-uuid-at-all'
+        'not-a-uuid-at-all',
       ];
 
       for (const invalidId of invalidFormats) {

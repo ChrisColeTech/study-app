@@ -57,7 +57,7 @@ describe('SessionService - Phase 17 Update Functionality', () => {
     correctAnswer: ['0'],
     timeSpent: 0,
     skipped: false,
-    markedForReview: false
+    markedForReview: false,
   };
 
   const mockSession: StudySession = {
@@ -72,12 +72,12 @@ describe('SessionService - Phase 17 Update Functionality', () => {
     totalQuestions: 1,
     correctAnswers: 0,
     createdAt: '2024-01-01T10:00:00Z',
-    updatedAt: '2024-01-01T10:00:00Z'
+    updatedAt: '2024-01-01T10:00:00Z',
   };
 
   beforeEach(() => {
     jest.clearAllMocks();
-    
+
     sessionService = new SessionService(
       mockSessionRepository,
       mockProviderService,
@@ -94,11 +94,11 @@ describe('SessionService - Phase 17 Update Functionality', () => {
       mockSessionRepository.update.mockResolvedValue({
         ...mockSession,
         status: 'paused',
-        updatedAt: '2024-01-01T10:05:00Z'
+        updatedAt: '2024-01-01T10:05:00Z',
       });
 
       const updateRequest: UpdateSessionRequest = {
-        action: 'pause'
+        action: 'pause',
       };
 
       const result = await sessionService.updateSession(mockSessionId, mockUserId, updateRequest);
@@ -111,13 +111,13 @@ describe('SessionService - Phase 17 Update Functionality', () => {
 
     test('should resume paused session', async () => {
       const pausedSession = { ...mockSession, status: 'paused' as const };
-      
+
       mockDynamoClient.onAnyCommand().resolves({
-        Item: pausedSession
+        Item: pausedSession,
       });
 
       const updateRequest: UpdateSessionRequest = {
-        action: 'resume'
+        action: 'resume',
       };
 
       const result = await sessionService.updateSession(mockSessionId, mockUserId, updateRequest);
@@ -127,13 +127,13 @@ describe('SessionService - Phase 17 Update Functionality', () => {
 
     test('should complete session and calculate score', async () => {
       const activeSession = { ...mockSession };
-      
+
       mockDynamoClient.onAnyCommand().resolves({
-        Item: activeSession
+        Item: activeSession,
       });
 
       const updateRequest: UpdateSessionRequest = {
-        action: 'complete'
+        action: 'complete',
       };
 
       const result = await sessionService.updateSession(mockSessionId, mockUserId, updateRequest);
@@ -150,19 +150,19 @@ describe('SessionService - Phase 17 Update Functionality', () => {
       questions: [
         { ...mockSessionQuestion, questionId: 'q1' },
         { ...mockSessionQuestion, questionId: 'q2' },
-        { ...mockSessionQuestion, questionId: 'q3' }
+        { ...mockSessionQuestion, questionId: 'q3' },
       ],
       totalQuestions: 3,
-      currentQuestionIndex: 1
+      currentQuestionIndex: 1,
     };
 
     test('should navigate to next question', async () => {
       mockDynamoClient.onAnyCommand().resolves({
-        Item: multiQuestionSession
+        Item: multiQuestionSession,
       });
 
       const updateRequest: UpdateSessionRequest = {
-        action: 'next'
+        action: 'next',
       };
 
       const result = await sessionService.updateSession(mockSessionId, mockUserId, updateRequest);
@@ -172,11 +172,11 @@ describe('SessionService - Phase 17 Update Functionality', () => {
 
     test('should navigate to previous question', async () => {
       mockDynamoClient.onAnyCommand().resolves({
-        Item: multiQuestionSession
+        Item: multiQuestionSession,
       });
 
       const updateRequest: UpdateSessionRequest = {
-        action: 'previous'
+        action: 'previous',
       };
 
       const result = await sessionService.updateSession(mockSessionId, mockUserId, updateRequest);
@@ -186,13 +186,13 @@ describe('SessionService - Phase 17 Update Functionality', () => {
 
     test('should not navigate beyond boundaries', async () => {
       const firstQuestionSession = { ...multiQuestionSession, currentQuestionIndex: 0 };
-      
+
       mockDynamoClient.onAnyCommand().resolves({
-        Item: firstQuestionSession
+        Item: firstQuestionSession,
       });
 
       const updateRequest: UpdateSessionRequest = {
-        action: 'previous'
+        action: 'previous',
       };
 
       await expect(
@@ -211,20 +211,20 @@ describe('SessionService - Phase 17 Update Functionality', () => {
             questionText: 'Test question',
             options: ['Option A', 'Option B'],
             topicId: 'test-topic',
-            difficulty: 'medium'
-          }
-        })
+            difficulty: 'medium',
+          },
+        }),
       };
       mockServiceFactory.getQuestionService = jest.fn().mockReturnValue(mockQuestionService);
 
       // Create fresh session copy for this test
       const freshSession = {
         ...mockSession,
-        questions: [{ ...mockSessionQuestion }]
+        questions: [{ ...mockSessionQuestion }],
       };
 
       mockDynamoClient.onAnyCommand().resolves({
-        Item: freshSession
+        Item: freshSession,
       });
 
       const updateRequest: UpdateSessionRequest = {
@@ -233,7 +233,7 @@ describe('SessionService - Phase 17 Update Functionality', () => {
         userAnswer: ['0'], // Correct answer
         timeSpent: 45,
         skipped: false,
-        markedForReview: false
+        markedForReview: false,
       };
 
       const result = await sessionService.updateSession(mockSessionId, mockUserId, updateRequest);
@@ -253,20 +253,20 @@ describe('SessionService - Phase 17 Update Functionality', () => {
             questionText: 'Test question',
             options: ['Option A', 'Option B'],
             topicId: 'test-topic',
-            difficulty: 'medium'
-          }
-        })
+            difficulty: 'medium',
+          },
+        }),
       };
       mockServiceFactory.getQuestionService = jest.fn().mockReturnValue(mockQuestionService);
 
       // Create fresh session copy for this test
       const freshSession = {
         ...mockSession,
-        questions: [{ ...mockSessionQuestion }]
+        questions: [{ ...mockSessionQuestion }],
       };
 
       mockDynamoClient.onAnyCommand().resolves({
-        Item: freshSession
+        Item: freshSession,
       });
 
       const updateRequest: UpdateSessionRequest = {
@@ -275,7 +275,7 @@ describe('SessionService - Phase 17 Update Functionality', () => {
         userAnswer: ['1'], // Incorrect answer
         timeSpent: 60,
         skipped: false,
-        markedForReview: true
+        markedForReview: true,
       };
 
       const result = await sessionService.updateSession(mockSessionId, mockUserId, updateRequest);
@@ -298,20 +298,20 @@ describe('SessionService - Phase 17 Update Functionality', () => {
             questionText: 'Test question',
             options: ['Option A', 'Option B'],
             topicId: 'test-topic',
-            difficulty: 'medium'
-          }
-        })
+            difficulty: 'medium',
+          },
+        }),
       };
       mockServiceFactory.getQuestionService = jest.fn().mockReturnValue(mockQuestionService);
 
       mockDynamoClient.onAnyCommand().resolves({
-        Item: mockSession
+        Item: mockSession,
       });
 
       const updateRequest: UpdateSessionRequest = {
         action: 'mark_for_review',
         questionId: 'test-question-1',
-        markedForReview: true
+        markedForReview: true,
       };
 
       const result = await sessionService.updateSession(mockSessionId, mockUserId, updateRequest);
@@ -323,13 +323,13 @@ describe('SessionService - Phase 17 Update Functionality', () => {
   describe('Validation Tests', () => {
     test('should reject updates to completed session', async () => {
       const completedSession = { ...mockSession, status: 'completed' as const };
-      
+
       mockDynamoClient.onAnyCommand().resolves({
-        Item: completedSession
+        Item: completedSession,
       });
 
       const updateRequest: UpdateSessionRequest = {
-        action: 'pause'
+        action: 'pause',
       };
 
       await expect(
@@ -337,15 +337,15 @@ describe('SessionService - Phase 17 Update Functionality', () => {
       ).rejects.toThrow('Cannot modify completed session');
     });
 
-    test('should reject access to other user\'s session', async () => {
+    test("should reject access to other user's session", async () => {
       const otherUserSession = { ...mockSession, userId: 'other-user' };
-      
+
       mockDynamoClient.onAnyCommand().resolves({
-        Item: otherUserSession
+        Item: otherUserSession,
       });
 
       const updateRequest: UpdateSessionRequest = {
-        action: 'pause'
+        action: 'pause',
       };
 
       await expect(
@@ -355,11 +355,11 @@ describe('SessionService - Phase 17 Update Functionality', () => {
 
     test('should validate required fields for answer action', async () => {
       mockDynamoClient.onAnyCommand().resolves({
-        Item: mockSession
+        Item: mockSession,
       });
 
       const updateRequest: UpdateSessionRequest = {
-        action: 'answer'
+        action: 'answer',
         // Missing required fields
       };
 
@@ -374,12 +374,24 @@ describe('SessionService - Phase 17 Update Functionality', () => {
       const sessionWithAnswers = {
         ...mockSession,
         questions: [
-          { ...mockSessionQuestion, questionId: 'q1', userAnswer: ['0'], isCorrect: true, timeSpent: 30 },
-          { ...mockSessionQuestion, questionId: 'q2', userAnswer: ['1'], isCorrect: false, timeSpent: 45 },
-          { ...mockSessionQuestion, questionId: 'q3', userAnswer: undefined, timeSpent: 0 } // Unanswered
+          {
+            ...mockSessionQuestion,
+            questionId: 'q1',
+            userAnswer: ['0'],
+            isCorrect: true,
+            timeSpent: 30,
+          },
+          {
+            ...mockSessionQuestion,
+            questionId: 'q2',
+            userAnswer: ['1'],
+            isCorrect: false,
+            timeSpent: 45,
+          },
+          { ...mockSessionQuestion, questionId: 'q3', userAnswer: undefined, timeSpent: 0 }, // Unanswered
         ],
         totalQuestions: 3,
-        correctAnswers: 1
+        correctAnswers: 1,
       };
 
       const mockQuestionService = {
@@ -389,18 +401,18 @@ describe('SessionService - Phase 17 Update Functionality', () => {
             questionText: 'Test question',
             options: ['Option A', 'Option B'],
             topicId: 'test-topic',
-            difficulty: 'medium'
-          }
-        }))
+            difficulty: 'medium',
+          },
+        })),
       };
       mockServiceFactory.getQuestionService = jest.fn().mockReturnValue(mockQuestionService);
 
       mockDynamoClient.onAnyCommand().resolves({
-        Item: sessionWithAnswers
+        Item: sessionWithAnswers,
       });
 
       const updateRequest: UpdateSessionRequest = {
-        action: 'pause'
+        action: 'pause',
       };
 
       const result = await sessionService.updateSession(mockSessionId, mockUserId, updateRequest);

@@ -46,7 +46,7 @@ class TopicCacheManager {
     this.cache.set(key, {
       data,
       timestamp: Date.now(),
-      ttl: this.CACHE_TTL
+      ttl: this.CACHE_TTL,
     });
     this.logger.debug('Data cached successfully', { key });
   }
@@ -93,9 +93,9 @@ class TopicMetadataGenerator {
       'Compute Services': 'compute',
       'Monitoring & Management': 'management',
       'Messaging & Integration': 'integration',
-      'Databases': 'database',
+      Databases: 'database',
       'Networking & Content Delivery': 'networking',
-      'Security & Identity': 'security'
+      'Security & Identity': 'security',
     };
     return categoryMap[topicName] || 'general';
   }
@@ -105,11 +105,11 @@ class TopicMetadataGenerator {
    */
   getProviderName(providerId: string): string {
     const providerNames: Record<string, string> = {
-      'aws': 'Amazon Web Services',
-      'azure': 'Microsoft Azure',
-      'gcp': 'Google Cloud Platform',
-      'cisco': 'Cisco',
-      'comptia': 'CompTIA'
+      aws: 'Amazon Web Services',
+      azure: 'Microsoft Azure',
+      gcp: 'Google Cloud Platform',
+      cisco: 'Cisco',
+      comptia: 'CompTIA',
     };
     return providerNames[providerId] || providerId.toUpperCase();
   }
@@ -122,7 +122,7 @@ class TopicMetadataGenerator {
       'saa-c03': 'Solutions Architect Associate',
       'saa-c02': 'Solutions Architect Associate',
       'dva-c01': 'Developer Associate',
-      'soa-c02': 'SysOps Administrator Associate'
+      'soa-c02': 'SysOps Administrator Associate',
     };
     return examNames[examId] || examId.toUpperCase();
   }
@@ -135,10 +135,11 @@ class TopicMetadataGenerator {
     if (examId.includes('professional')) return 'professional';
     if (examId.includes('specialty')) return 'specialty';
     if (examId.includes('foundational')) return 'foundational';
-    
+
     // Default mapping based on exam patterns
-    if (examId.includes('saa') || examId.includes('dva') || examId.includes('soa')) return 'associate';
-    
+    if (examId.includes('saa') || examId.includes('dva') || examId.includes('soa'))
+      return 'associate';
+
     return 'foundational';
   }
 
@@ -151,9 +152,9 @@ class TopicMetadataGenerator {
       'Compute Services': ['EC2', 'Lambda', 'ECS', 'Auto Scaling', 'Load Balancing'],
       'Monitoring & Management': ['CloudWatch', 'CloudTrail', 'Config', 'Systems Manager'],
       'Messaging & Integration': ['SQS', 'SNS', 'EventBridge', 'API Gateway'],
-      'Databases': ['RDS', 'DynamoDB', 'Aurora', 'ElastiCache', 'Redshift'],
+      Databases: ['RDS', 'DynamoDB', 'Aurora', 'ElastiCache', 'Redshift'],
       'Networking & Content Delivery': ['VPC', 'CloudFront', 'Route 53', 'Direct Connect'],
-      'Security & Identity': ['IAM', 'KMS', 'Cognito', 'WAF', 'Shield']
+      'Security & Identity': ['IAM', 'KMS', 'Cognito', 'WAF', 'Shield'],
     };
     return skillsMap[topicName] || [topicName];
   }
@@ -167,9 +168,9 @@ class TopicMetadataGenerator {
       'Compute Services': 4,
       'Monitoring & Management': 3,
       'Messaging & Integration': 4,
-      'Databases': 4,
+      Databases: 4,
       'Networking & Content Delivery': 5,
-      'Security & Identity': 5
+      'Security & Identity': 5,
     };
     return difficultyMap[topicName] || 3;
   }
@@ -183,9 +184,9 @@ class TopicMetadataGenerator {
       'Compute Services': 'high',
       'Monitoring & Management': 'medium',
       'Messaging & Integration': 'high',
-      'Databases': 'high',
+      Databases: 'high',
       'Networking & Content Delivery': 'medium',
-      'Security & Identity': 'high'
+      'Security & Identity': 'high',
     };
     return demandMap[topicName] || 'medium';
   }
@@ -196,12 +197,25 @@ class TopicMetadataGenerator {
   getRelevantJobRoles(topicName: string): string[] {
     const jobRolesMap: Record<string, string[]> = {
       'Storage Services': ['Solutions Architect', 'Cloud Engineer', 'DevOps Engineer'],
-      'Compute Services': ['Solutions Architect', 'Cloud Engineer', 'DevOps Engineer', 'Software Developer'],
-      'Monitoring & Management': ['DevOps Engineer', 'Site Reliability Engineer', 'Cloud Operations'],
+      'Compute Services': [
+        'Solutions Architect',
+        'Cloud Engineer',
+        'DevOps Engineer',
+        'Software Developer',
+      ],
+      'Monitoring & Management': [
+        'DevOps Engineer',
+        'Site Reliability Engineer',
+        'Cloud Operations',
+      ],
       'Messaging & Integration': ['Solutions Architect', 'Integration Developer', 'API Developer'],
-      'Databases': ['Database Administrator', 'Data Engineer', 'Solutions Architect'],
-      'Networking & Content Delivery': ['Network Engineer', 'Solutions Architect', 'Cloud Engineer'],
-      'Security & Identity': ['Security Engineer', 'Solutions Architect', 'Compliance Officer']
+      Databases: ['Database Administrator', 'Data Engineer', 'Solutions Architect'],
+      'Networking & Content Delivery': [
+        'Network Engineer',
+        'Solutions Architect',
+        'Cloud Engineer',
+      ],
+      'Security & Identity': ['Security Engineer', 'Solutions Architect', 'Compliance Officer'],
     };
     return jobRolesMap[topicName] || ['Cloud Professional'];
   }
@@ -238,38 +252,44 @@ class TopicDataTransformer {
   /**
    * Load topics from a question file (extract topics from question data)
    */
-  async loadTopicsFromQuestionFile(s3Client: S3Client, bucketName: string, key: string): Promise<Topic[]> {
+  async loadTopicsFromQuestionFile(
+    s3Client: S3Client,
+    bucketName: string,
+    key: string
+  ): Promise<Topic[]> {
     try {
       const getCommand = new GetObjectCommand({
         Bucket: bucketName,
-        Key: key
+        Key: key,
       });
 
       const result = await s3Client.send(getCommand);
-      
+
       if (result.Body) {
         const content = await result.Body.transformToString();
         const questionData = JSON.parse(content);
-        
+
         // Extract provider and exam info from file path
         const pathParts = key.split('/');
         const providerId = pathParts[1] || 'unknown';
         const examId = pathParts[2] || 'unknown';
-        
+
         // Extract unique topics from question data
         const topicsMap = new Map<string, any>();
-        
+
         // First, get topic statistics from metadata if available
         if (questionData.metadata?.topic_statistics) {
-          Object.entries(questionData.metadata.topic_statistics).forEach(([topicName, stats]: [string, any]) => {
-            topicsMap.set(topicName, {
-              name: topicName,
-              questionCount: stats.total_questions || stats.answered_questions || 0,
-              coverage: stats.coverage_percentage || 0
-            });
-          });
+          Object.entries(questionData.metadata.topic_statistics).forEach(
+            ([topicName, stats]: [string, any]) => {
+              topicsMap.set(topicName, {
+                name: topicName,
+                questionCount: stats.total_questions || stats.answered_questions || 0,
+                coverage: stats.coverage_percentage || 0,
+              });
+            }
+          );
         }
-        
+
         // Then, extract topics from individual questions
         if (questionData.study_data && Array.isArray(questionData.study_data)) {
           questionData.study_data.forEach((item: any) => {
@@ -284,12 +304,12 @@ class TopicDataTransformer {
             }
           });
         }
-        
+
         // Transform to Topic objects
-        const topics: Topic[] = Array.from(topicsMap.entries()).map(([topicName, data]) => 
+        const topics: Topic[] = Array.from(topicsMap.entries()).map(([topicName, data]) =>
           this.transformToTopic(topicName, data, providerId, examId, questionData.metadata)
         );
-        
+
         this.logger.debug(`Extracted ${topics.length} topics from ${key}`);
         return topics;
       }
@@ -305,9 +325,15 @@ class TopicDataTransformer {
   /**
    * Transform topic data to Topic format
    */
-  transformToTopic(topicName: string, data: any, providerId: string, examId: string, metadata?: any): Topic {
+  transformToTopic(
+    topicName: string,
+    data: any,
+    providerId: string,
+    examId: string,
+    metadata?: any
+  ): Topic {
     const topicId = `${providerId}-${examId}-${topicName.toLowerCase().replace(/[^a-z0-9]/g, '-')}`;
-    
+
     return {
       id: topicId,
       name: topicName,
@@ -329,11 +355,11 @@ class TopicDataTransformer {
         customFields: {
           questionCount: data.questionCount || 0,
           coverage: data.coverage,
-          extractedFrom: 'question-data'
-        }
+          extractedFrom: 'question-data',
+        },
       },
       createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      updatedAt: new Date().toISOString(),
     };
   }
 
@@ -341,10 +367,12 @@ class TopicDataTransformer {
    * Validate topic data structure
    */
   isValidTopic(data: any): boolean {
-    return data && 
-           typeof data.id === 'string' &&
-           typeof data.name === 'string' &&
-           typeof data.examId === 'string';
+    return (
+      data &&
+      typeof data.id === 'string' &&
+      typeof data.name === 'string' &&
+      typeof data.examId === 'string'
+    );
   }
 }
 
@@ -389,16 +417,16 @@ export interface ITopicRepository extends IListRepository<Topic, any> {
 
 export class TopicRepository extends S3BaseRepository implements ITopicRepository {
   private s3Client: S3Client;
-  
+
   // Helper class instances for delegation
   private cacheManager: TopicCacheManager;
   private dataTransformer: TopicDataTransformer;
   private metadataGenerator: TopicMetadataGenerator;
-  
+
   constructor(s3Client: S3Client, config: ServiceConfig) {
     super('TopicRepository', config, config.s3.bucketName);
     this.s3Client = s3Client;
-    
+
     // Initialize helper classes
     this.cacheManager = new TopicCacheManager();
     this.dataTransformer = new TopicDataTransformer();
@@ -409,11 +437,13 @@ export class TopicRepository extends S3BaseRepository implements ITopicRepositor
    * Perform health check operation for S3 connectivity
    */
   protected async performHealthCheck(): Promise<void> {
-    await this.s3Client.send(new ListObjectsV2Command({
-      Bucket: this.bucketName,
-      Prefix: 'questions/',
-      MaxKeys: 1
-    }));
+    await this.s3Client.send(
+      new ListObjectsV2Command({
+        Bucket: this.bucketName,
+        Prefix: 'questions/',
+        MaxKeys: 1,
+      })
+    );
   }
 
   /**
@@ -422,7 +452,7 @@ export class TopicRepository extends S3BaseRepository implements ITopicRepositor
   async findAll(filters?: any): Promise<StandardQueryResult<Topic>> {
     return this.executeWithErrorHandling('findAll', async () => {
       const cacheKey = this.cacheManager.generateCacheKey('all');
-      
+
       // Check cache first
       const cached = this.cacheManager.getFromCache<Topic[]>(cacheKey);
       if (cached) {
@@ -433,7 +463,7 @@ export class TopicRepository extends S3BaseRepository implements ITopicRepositor
           limit: filters?.limit || this.config.query?.defaultLimit || 20,
           offset: filters?.offset || 0,
           hasMore: false,
-          executionTimeMs: 0
+          executionTimeMs: 0,
         };
       }
 
@@ -443,7 +473,7 @@ export class TopicRepository extends S3BaseRepository implements ITopicRepositor
       const listCommand = new ListObjectsV2Command({
         Bucket: this.bucketName,
         Prefix: 'questions/',
-        MaxKeys: 1000
+        MaxKeys: 1000,
       });
 
       const listResult = await this.s3Client.send(listCommand);
@@ -451,27 +481,28 @@ export class TopicRepository extends S3BaseRepository implements ITopicRepositor
 
       if (listResult.Contents) {
         // Find all questions.json files
-        const questionFiles = listResult.Contents.filter(obj => 
-          obj.Key && 
-          obj.Key.endsWith('/questions.json')
+        const questionFiles = listResult.Contents.filter(
+          obj => obj.Key && obj.Key.endsWith('/questions.json')
         );
 
-        this.logger.info('Found question files to extract topics from', { count: questionFiles.length });
+        this.logger.info('Found question files to extract topics from', {
+          count: questionFiles.length,
+        });
 
         // Load each question file and extract topics using data transformer
         for (const file of questionFiles) {
           if (file.Key) {
             try {
               const topics = await this.dataTransformer.loadTopicsFromQuestionFile(
-                this.s3Client, 
-                this.bucketName, 
+                this.s3Client,
+                this.bucketName,
                 file.Key
               );
               allTopics.push(...topics);
             } catch (error) {
-              this.logger.warn('Failed to load topics from question file', { 
+              this.logger.warn('Failed to load topics from question file', {
                 file: file.Key,
-                error: (error as Error).message
+                error: (error as Error).message,
               });
             }
           }
@@ -480,9 +511,9 @@ export class TopicRepository extends S3BaseRepository implements ITopicRepositor
 
       // Cache the results
       this.cacheManager.setCache(cacheKey, allTopics);
-      
-      this.logger.info('Topics loaded successfully', { 
-        totalTopics: allTopics.length
+
+      this.logger.info('Topics loaded successfully', {
+        totalTopics: allTopics.length,
       });
 
       // Return standardized result format
@@ -492,7 +523,7 @@ export class TopicRepository extends S3BaseRepository implements ITopicRepositor
         limit: filters?.limit || this.config.query?.defaultLimit || 20,
         offset: filters?.offset || 0,
         hasMore: false, // All topics loaded in one call
-        executionTimeMs: 0 // Will be set by executeWithErrorHandling
+        executionTimeMs: 0, // Will be set by executeWithErrorHandling
       };
     });
   }
@@ -501,129 +532,143 @@ export class TopicRepository extends S3BaseRepository implements ITopicRepositor
    * Find a specific topic by ID
    */
   async findById(topicId: string): Promise<Topic | null> {
-    return this.executeWithErrorHandling('findById', async () => {
-      this.validateRequired({ topicId }, 'findById');
-      
-      const cacheKey = this.cacheManager.generateCacheKey('byId', topicId);
-      
-      // Check cache first
-      const cached = this.cacheManager.getFromCache<Topic>(cacheKey);
-      if (cached) {
-        this.logger.debug('Topic retrieved from cache', { topicId });
-        return cached;
-      }
+    return this.executeWithErrorHandling(
+      'findById',
+      async () => {
+        this.validateRequired({ topicId }, 'findById');
 
-      // Load all topics and find the specific one
-      const allTopicsResult = await this.findAll();
-      const topic = allTopicsResult.items.find((t: any) => t.id === topicId);
+        const cacheKey = this.cacheManager.generateCacheKey('byId', topicId);
 
-      if (topic) {
-        // Cache the result
-        this.cacheManager.setCache(cacheKey, topic);
-        this.logger.debug('Topic found', { topicId });
-        return topic;
-      } else {
-        this.logger.warn('Topic not found', { topicId });
-        return null;
-      }
-    }, { topicId });
+        // Check cache first
+        const cached = this.cacheManager.getFromCache<Topic>(cacheKey);
+        if (cached) {
+          this.logger.debug('Topic retrieved from cache', { topicId });
+          return cached;
+        }
+
+        // Load all topics and find the specific one
+        const allTopicsResult = await this.findAll();
+        const topic = allTopicsResult.items.find((t: any) => t.id === topicId);
+
+        if (topic) {
+          // Cache the result
+          this.cacheManager.setCache(cacheKey, topic);
+          this.logger.debug('Topic found', { topicId });
+          return topic;
+        } else {
+          this.logger.warn('Topic not found', { topicId });
+          return null;
+        }
+      },
+      { topicId }
+    );
   }
 
   /**
    * Find topics by exam
    */
   async findByExam(examId: string): Promise<Topic[]> {
-    return this.executeWithErrorHandling('findByExam', async () => {
-      this.validateRequired({ examId }, 'findByExam');
-      
-      const cacheKey = this.cacheManager.generateCacheKey('byExam', examId);
-      
-      // Check cache first
-      const cached = this.cacheManager.getFromCache<Topic[]>(cacheKey);
-      if (cached) {
-        this.logger.debug('Topics retrieved from cache', { examId });
-        return cached;
-      }
+    return this.executeWithErrorHandling(
+      'findByExam',
+      async () => {
+        this.validateRequired({ examId }, 'findByExam');
 
-      const allTopicsResult = await this.findAll();
-      const examTopics = allTopicsResult.items.filter((topic: any) => topic.examId === examId);
+        const cacheKey = this.cacheManager.generateCacheKey('byExam', examId);
 
-      // Cache the results
-      this.cacheManager.setCache(cacheKey, examTopics);
-      
-      this.logger.info('Topics by exam loaded successfully', { 
-        examId,
-        totalTopics: examTopics.length
-      });
+        // Check cache first
+        const cached = this.cacheManager.getFromCache<Topic[]>(cacheKey);
+        if (cached) {
+          this.logger.debug('Topics retrieved from cache', { examId });
+          return cached;
+        }
 
-      return examTopics;
-    }, { examId });
+        const allTopicsResult = await this.findAll();
+        const examTopics = allTopicsResult.items.filter((topic: any) => topic.examId === examId);
+
+        // Cache the results
+        this.cacheManager.setCache(cacheKey, examTopics);
+
+        this.logger.info('Topics by exam loaded successfully', {
+          examId,
+          totalTopics: examTopics.length,
+        });
+
+        return examTopics;
+      },
+      { examId }
+    );
   }
 
   /**
    * Find topics by provider
    */
   async findByProvider(providerId: string): Promise<Topic[]> {
-    return this.executeWithErrorHandling('findByProvider', async () => {
-      this.validateRequired({ providerId }, 'findByProvider');
-      
-      const cacheKey = this.cacheManager.generateCacheKey('byProvider', providerId);
-      
-      // Check cache first
-      const cached = this.cacheManager.getFromCache<Topic[]>(cacheKey);
-      if (cached) {
-        this.logger.debug('Topics retrieved from cache', { providerId });
-        return cached;
-      }
+    return this.executeWithErrorHandling(
+      'findByProvider',
+      async () => {
+        this.validateRequired({ providerId }, 'findByProvider');
 
-      this.logger.info('Loading topics by provider from S3', { providerId, bucket: this.bucketName });
+        const cacheKey = this.cacheManager.generateCacheKey('byProvider', providerId);
 
-      // List question files for this provider
-      const listCommand = new ListObjectsV2Command({
-        Bucket: this.bucketName,
-        Prefix: `questions/${providerId}/`,
-        MaxKeys: 1000
-      });
+        // Check cache first
+        const cached = this.cacheManager.getFromCache<Topic[]>(cacheKey);
+        if (cached) {
+          this.logger.debug('Topics retrieved from cache', { providerId });
+          return cached;
+        }
 
-      const listResult = await this.s3Client.send(listCommand);
-      const topics: Topic[] = [];
+        this.logger.info('Loading topics by provider from S3', {
+          providerId,
+          bucket: this.bucketName,
+        });
 
-      if (listResult.Contents) {
-        const questionFiles = listResult.Contents.filter(obj => 
-          obj.Key && 
-          obj.Key.endsWith('/questions.json')
-        );
+        // List question files for this provider
+        const listCommand = new ListObjectsV2Command({
+          Bucket: this.bucketName,
+          Prefix: `questions/${providerId}/`,
+          MaxKeys: 1000,
+        });
 
-        // Load each question file and extract topics for this provider using data transformer
-        for (const file of questionFiles) {
-          if (file.Key) {
-            try {
-              const providerTopics = await this.dataTransformer.loadTopicsFromQuestionFile(
-                this.s3Client, 
-                this.bucketName, 
-                file.Key
-              );
-              topics.push(...providerTopics);
-            } catch (error) {
-              this.logger.warn('Failed to load topics from question file', { 
-                file: file.Key,
-                error: (error as Error).message
-              });
+        const listResult = await this.s3Client.send(listCommand);
+        const topics: Topic[] = [];
+
+        if (listResult.Contents) {
+          const questionFiles = listResult.Contents.filter(
+            obj => obj.Key && obj.Key.endsWith('/questions.json')
+          );
+
+          // Load each question file and extract topics for this provider using data transformer
+          for (const file of questionFiles) {
+            if (file.Key) {
+              try {
+                const providerTopics = await this.dataTransformer.loadTopicsFromQuestionFile(
+                  this.s3Client,
+                  this.bucketName,
+                  file.Key
+                );
+                topics.push(...providerTopics);
+              } catch (error) {
+                this.logger.warn('Failed to load topics from question file', {
+                  file: file.Key,
+                  error: (error as Error).message,
+                });
+              }
             }
           }
         }
-      }
 
-      // Cache the results
-      this.cacheManager.setCache(cacheKey, topics);
-      
-      this.logger.info('Topics loaded successfully', { 
-        providerId,
-        totalTopics: topics.length
-      });
+        // Cache the results
+        this.cacheManager.setCache(cacheKey, topics);
 
-      return topics;
-    }, { providerId });
+        this.logger.info('Topics loaded successfully', {
+          providerId,
+          totalTopics: topics.length,
+        });
+
+        return topics;
+      },
+      { providerId }
+    );
   }
 
   /**

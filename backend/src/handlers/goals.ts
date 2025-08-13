@@ -7,11 +7,7 @@ import { ServiceFactory } from '../shared/service-factory';
 import { GoalsService } from '../services/goals.service';
 import { createLogger } from '../shared/logger';
 import { ERROR_CODES } from '../shared/constants/error.constants';
-import { 
-  CreateGoalRequest,
-  UpdateGoalRequest,
-  GetGoalsRequest
-} from '../shared/types/goals.types';
+import { CreateGoalRequest, UpdateGoalRequest, GetGoalsRequest } from '../shared/types/goals.types';
 
 // Import middleware
 import {
@@ -21,7 +17,7 @@ import {
   ValidationMiddleware,
   AuthMiddleware,
   AuthConfigs,
-  AuthenticatedContext
+  AuthenticatedContext,
 } from '../shared/middleware';
 import { GoalsValidationSchemas } from '../shared/middleware/validation-schemas';
 
@@ -31,21 +27,29 @@ export class GoalsHandler extends BaseHandler {
   // Helper methods for GoalsHandler standardization
   private validateUserIdFromBody(requestBody: any): ApiResponse | null {
     if (!requestBody!.userId) {
-      return this.buildErrorResponse('userId is required until Phase 30 authentication is implemented', 400, ERROR_CODES.VALIDATION_ERROR);
+      return this.buildErrorResponse(
+        'userId is required until Phase 30 authentication is implemented',
+        400,
+        ERROR_CODES.VALIDATION_ERROR
+      );
     }
     return null;
   }
 
   private validateUserIdFromQuery(queryParams: any): ApiResponse | null {
     if (!queryParams?.userId) {
-      return this.buildErrorResponse('userId query parameter is required until Phase 30 authentication is implemented', 400, ERROR_CODES.VALIDATION_ERROR);
+      return this.buildErrorResponse(
+        'userId query parameter is required until Phase 30 authentication is implemented',
+        400,
+        ERROR_CODES.VALIDATION_ERROR
+      );
     }
     return null;
   }
 
   private buildGetGoalsRequest(queryParams: any): GetGoalsRequest {
     const request: GetGoalsRequest = {};
-    
+
     if (queryParams?.status) {
       request.status = queryParams.status.split(',').map((s: string) => s.trim()) as any[];
     }
@@ -64,7 +68,7 @@ export class GoalsHandler extends BaseHandler {
     if (queryParams?.sortOrder) request.sortOrder = queryParams.sortOrder as any;
     if (queryParams?.limit) request.limit = Math.min(queryParams.limit, 100);
     if (queryParams?.offset) request.offset = queryParams.offset;
-    
+
     return request;
   }
 
@@ -110,7 +114,7 @@ export class GoalsHandler extends BaseHandler {
         path: '/v1/goals/{id}',
         handler: this.deleteGoal.bind(this),
         requireAuth: false,
-      }
+      },
     ];
   }
 
@@ -118,8 +122,10 @@ export class GoalsHandler extends BaseHandler {
    * Create a new goal
    */
   private async createGoal(context: HandlerContext): Promise<ApiResponse> {
-// Parse and validate request body using middleware
-    const { data: requestBody, error: parseError } = await this.parseRequestBodyOrError<CreateGoalRequest & { userId: string }>(context, true);
+    // Parse and validate request body using middleware
+    const { data: requestBody, error: parseError } = await this.parseRequestBodyOrError<
+      CreateGoalRequest & { userId: string }
+    >(context, true);
     if (parseError) return parseError;
 
     // Validate userId is provided until Phase 30
@@ -127,7 +133,10 @@ export class GoalsHandler extends BaseHandler {
     if (userIdValidation) return userIdValidation;
 
     // Validate using comprehensive schema (replaces validateCreateGoalRequest)
-    const validationResult = ValidationMiddleware.validateRequestBody(context, GoalsValidationSchemas.createGoalRequest());
+    const validationResult = ValidationMiddleware.validateRequestBody(
+      context,
+      GoalsValidationSchemas.createGoalRequest()
+    );
     if (validationResult.error) return validationResult.error;
 
     // Business logic only - delegate error handling to middleware
@@ -140,22 +149,22 @@ export class GoalsHandler extends BaseHandler {
         requestId: context.requestId,
         operation: ErrorContexts.Goals.CREATE,
         userId: requestBody!.userId,
-        additionalInfo: { 
+        additionalInfo: {
           type: requestBody!.type,
           targetType: requestBody!.targetType,
-          targetValue: requestBody!.targetValue
-        }
+          targetValue: requestBody!.targetValue,
+        },
       }
     );
 
     if (error) return error;
 
-    this.logger.info('Goal created successfully', { 
+    this.logger.info('Goal created successfully', {
       requestId: context.requestId,
       userId: requestBody!.userId,
       goalId: result!.goal.goalId,
       type: result!.goal.type,
-      targetValue: result!.goal.targetValue
+      targetValue: result!.goal.targetValue,
     });
 
     return this.buildSuccessResponse('Goal created successfully', result);
@@ -165,7 +174,7 @@ export class GoalsHandler extends BaseHandler {
    * Get goals with optional filtering
    */
   private async getGoals(context: HandlerContext): Promise<ApiResponse> {
-// Parse query parameters using middleware
+    // Parse query parameters using middleware
     const { data: queryParams, error: parseError } = await this.parseQueryParamsOrError(context, {
       userId: { type: 'string', decode: true },
       status: { type: 'string', decode: true },
@@ -179,7 +188,7 @@ export class GoalsHandler extends BaseHandler {
       sortBy: { type: 'string', decode: true },
       sortOrder: { type: 'string', decode: true },
       limit: { type: 'number' },
-      offset: { type: 'number' }
+      offset: { type: 'number' },
     });
     if (parseError) return parseError;
 
@@ -200,18 +209,18 @@ export class GoalsHandler extends BaseHandler {
         requestId: context.requestId,
         operation: ErrorContexts.Goals.LIST,
         userId: queryParams.userId,
-        additionalInfo: { filters: request }
+        additionalInfo: { filters: request },
       }
     );
 
     if (error) return error;
 
-    this.logger.info('Goals retrieved successfully', { 
+    this.logger.info('Goals retrieved successfully', {
       requestId: context.requestId,
       userId: queryParams.userId,
       total: result!.total,
       returned: result!.goals.length,
-      filters: request
+      filters: request,
     });
 
     return this.buildSuccessResponse('Goals retrieved successfully', result);
@@ -221,14 +230,17 @@ export class GoalsHandler extends BaseHandler {
    * Get a specific goal by ID
    */
   private async getGoal(context: HandlerContext): Promise<ApiResponse> {
-// Parse path parameters using middleware
+    // Parse path parameters using middleware
     const { data: pathParams, error: parseError } = await this.parsePathParamsOrError(context);
     if (parseError) return parseError;
 
     // Parse query parameters using middleware
-    const { data: queryParams, error: queryParseError } = ParsingMiddleware.parseQueryParams(context, {
-      userId: { type: 'string', decode: true }
-    });
+    const { data: queryParams, error: queryParseError } = ParsingMiddleware.parseQueryParams(
+      context,
+      {
+        userId: { type: 'string', decode: true },
+      }
+    );
     if (queryParseError) return queryParseError;
 
     // Validate userId is provided until Phase 30
@@ -236,7 +248,11 @@ export class GoalsHandler extends BaseHandler {
     if (userIdValidation) return userIdValidation;
 
     // Validate goal ID using ValidationMiddleware (replaces validateGoalId)
-    const goalValidation = ValidationMiddleware.validateFields({ goalId: pathParams.id }, GoalsValidationSchemas.goalId(), 'params');
+    const goalValidation = ValidationMiddleware.validateFields(
+      { goalId: pathParams.id },
+      GoalsValidationSchemas.goalId(),
+      'params'
+    );
     if (goalValidation) return goalValidation;
 
     // Business logic only - delegate error handling to middleware
@@ -249,19 +265,19 @@ export class GoalsHandler extends BaseHandler {
         requestId: context.requestId,
         operation: ErrorContexts.Goals.GET,
         userId: queryParams.userId,
-        additionalInfo: { goalId: pathParams.id }
+        additionalInfo: { goalId: pathParams.id },
       }
     );
 
     if (error) return error;
 
-    this.logger.info('Goal retrieved successfully', { 
+    this.logger.info('Goal retrieved successfully', {
       requestId: context.requestId,
       userId: queryParams.userId,
       goalId: result!.goal.goalId,
       type: result!.goal.type,
       status: result!.goal.status,
-      progress: result!.goal.progressPercentage
+      progress: result!.goal.progressPercentage,
     });
 
     return this.buildSuccessResponse('Goal retrieved successfully', result);
@@ -271,14 +287,17 @@ export class GoalsHandler extends BaseHandler {
    * Update an existing goal
    */
   private async updateGoal(context: HandlerContext): Promise<ApiResponse> {
-// Parse path parameters using middleware
+    // Parse path parameters using middleware
     const { data: pathParams, error: parseError } = await this.parsePathParamsOrError(context);
     if (parseError) return parseError;
 
     // Parse query parameters using middleware
-    const { data: queryParams, error: queryParseError } = ParsingMiddleware.parseQueryParams(context, {
-      userId: { type: 'string', decode: true }
-    });
+    const { data: queryParams, error: queryParseError } = ParsingMiddleware.parseQueryParams(
+      context,
+      {
+        userId: { type: 'string', decode: true },
+      }
+    );
     if (queryParseError) return queryParseError;
 
     // Validate userId is provided until Phase 30
@@ -286,14 +305,23 @@ export class GoalsHandler extends BaseHandler {
     if (userIdValidation) return userIdValidation;
 
     // Parse and validate request body using middleware
-    const { data: requestBody, error: bodyParseError } = ParsingMiddleware.parseRequestBody<UpdateGoalRequest>(context, true);
+    const { data: requestBody, error: bodyParseError } =
+      ParsingMiddleware.parseRequestBody<UpdateGoalRequest>(context, true);
     if (bodyParseError) return bodyParseError;
 
     // Validate goal ID and request body using ValidationMiddleware
-    const goalValidation = ValidationMiddleware.validateFields({ goalId: pathParams.id }, GoalsValidationSchemas.goalId(), 'params');
+    const goalValidation = ValidationMiddleware.validateFields(
+      { goalId: pathParams.id },
+      GoalsValidationSchemas.goalId(),
+      'params'
+    );
     if (goalValidation) return goalValidation;
 
-    const updateValidation = ValidationMiddleware.validateFields(requestBody, GoalsValidationSchemas.updateGoalRequest(), 'body');
+    const updateValidation = ValidationMiddleware.validateFields(
+      requestBody,
+      GoalsValidationSchemas.updateGoalRequest(),
+      'body'
+    );
     if (updateValidation) return updateValidation;
 
     // Business logic only - delegate error handling to middleware
@@ -306,22 +334,22 @@ export class GoalsHandler extends BaseHandler {
         requestId: context.requestId,
         operation: ErrorContexts.Goals.UPDATE,
         userId: queryParams.userId,
-        additionalInfo: { 
+        additionalInfo: {
           goalId: pathParams.id,
-          updates: Object.keys(requestBody!)
-        }
+          updates: Object.keys(requestBody!),
+        },
       }
     );
 
     if (error) return error;
 
-    this.logger.info('Goal updated successfully', { 
+    this.logger.info('Goal updated successfully', {
       requestId: context.requestId,
       userId: queryParams.userId,
       goalId: result!.goal.goalId,
       status: result!.goal.status,
       progress: result!.goal.progressPercentage,
-      updates: Object.keys(requestBody!)
+      updates: Object.keys(requestBody!),
     });
 
     return this.buildSuccessResponse('Goal updated successfully', result);
@@ -331,14 +359,17 @@ export class GoalsHandler extends BaseHandler {
    * Delete a goal
    */
   private async deleteGoal(context: HandlerContext): Promise<ApiResponse> {
-// Parse path parameters using middleware
+    // Parse path parameters using middleware
     const { data: pathParams, error: parseError } = await this.parsePathParamsOrError(context);
     if (parseError) return parseError;
 
     // Parse query parameters using middleware
-    const { data: queryParams, error: queryParseError } = ParsingMiddleware.parseQueryParams(context, {
-      userId: { type: 'string', decode: true }
-    });
+    const { data: queryParams, error: queryParseError } = ParsingMiddleware.parseQueryParams(
+      context,
+      {
+        userId: { type: 'string', decode: true },
+      }
+    );
     if (queryParseError) return queryParseError;
 
     // Validate userId is provided until Phase 30
@@ -346,7 +377,11 @@ export class GoalsHandler extends BaseHandler {
     if (userIdValidation) return userIdValidation;
 
     // Validate goal ID using ValidationMiddleware (replaces validateGoalId)
-    const goalValidation = ValidationMiddleware.validateFields({ goalId: pathParams.id }, GoalsValidationSchemas.goalId(), 'params');
+    const goalValidation = ValidationMiddleware.validateFields(
+      { goalId: pathParams.id },
+      GoalsValidationSchemas.goalId(),
+      'params'
+    );
     if (goalValidation) return goalValidation;
 
     // Business logic only - delegate error handling to middleware
@@ -359,16 +394,16 @@ export class GoalsHandler extends BaseHandler {
         requestId: context.requestId,
         operation: ErrorContexts.Goals.DELETE,
         userId: queryParams.userId,
-        additionalInfo: { goalId: pathParams.id }
+        additionalInfo: { goalId: pathParams.id },
       }
     );
 
     if (error) return error;
 
-    this.logger.info('Goal deleted successfully', { 
+    this.logger.info('Goal deleted successfully', {
       requestId: context.requestId,
       userId: queryParams.userId,
-      goalId: pathParams.id
+      goalId: pathParams.id,
     });
 
     return this.buildSuccessResponse('Goal deleted successfully', result);
@@ -378,9 +413,9 @@ export class GoalsHandler extends BaseHandler {
    * Get goal statistics for user
    */
   private async getGoalStats(context: HandlerContext): Promise<ApiResponse> {
-// Parse query parameters using middleware
+    // Parse query parameters using middleware
     const { data: queryParams, error: parseError } = await this.parseQueryParamsOrError(context, {
-      userId: { type: 'string', decode: true }
+      userId: { type: 'string', decode: true },
     });
     if (parseError) return parseError;
 
@@ -397,29 +432,23 @@ export class GoalsHandler extends BaseHandler {
       {
         requestId: context.requestId,
         operation: ErrorContexts.Goals.STATS,
-        userId: queryParams.userId
+        userId: queryParams.userId,
       }
     );
 
     if (error) return error;
 
-    this.logger.info('Goal statistics retrieved successfully', { 
+    this.logger.info('Goal statistics retrieved successfully', {
       requestId: context.requestId,
       userId: queryParams.userId,
       totalGoals: result!.totalGoals,
       activeGoals: result!.activeGoals,
       completedGoals: result!.completedGoals,
-      completionRate: result!.completionRate
+      completionRate: result!.completionRate,
     });
 
     return this.buildSuccessResponse('Goal statistics retrieved successfully', result);
   }
-
-
-
-
-
-
 }
 
 // Export handler function for Lambda

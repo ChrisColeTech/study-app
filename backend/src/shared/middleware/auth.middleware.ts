@@ -29,21 +29,22 @@ export class AuthMiddleware {
   static async authenticateRequest(
     context: HandlerContext,
     options: AuthOptions = { required: true }
-  ): Promise<{ 
-    authenticatedContext?: AuthenticatedContext; 
-    error?: ApiResponse 
+  ): Promise<{
+    authenticatedContext?: AuthenticatedContext;
+    error?: ApiResponse;
   }> {
     try {
       // Extract token from Authorization header
-      const authHeader = context.event.headers?.Authorization || context.event.headers?.authorization;
-      
+      const authHeader =
+        context.event.headers?.Authorization || context.event.headers?.authorization;
+
       if (!authHeader) {
         if (options.required) {
           return {
             error: ErrorHandlingMiddleware.createErrorResponse(
               ERROR_CODES.UNAUTHORIZED,
               'Authorization header is required'
-            )
+            ),
           };
         }
         // Auth not required, return original context
@@ -55,18 +56,18 @@ export class AuthMiddleware {
           error: ErrorHandlingMiddleware.createErrorResponse(
             ERROR_CODES.UNAUTHORIZED,
             'Authorization header must use Bearer token format'
-          )
+          ),
         };
       }
 
       const token = authHeader.substring(7);
-      
+
       if (!token || token.trim() === '') {
         return {
           error: ErrorHandlingMiddleware.createErrorResponse(
             ERROR_CODES.UNAUTHORIZED,
             'Bearer token is required'
-          )
+          ),
         };
       }
 
@@ -81,16 +82,16 @@ export class AuthMiddleware {
         logger.warn('Token validation failed', {
           requestId: context.requestId,
           error: error.message,
-          tokenLength: token.length
+          tokenLength: token.length,
         });
 
         const errorInfo = ErrorHandlingMiddleware.handleAuthError(error, {
           requestId: context.requestId,
-          operation: 'token-validation'
+          operation: 'token-validation',
         });
-        
+
         return {
-          error: ErrorHandlingMiddleware.createErrorResponse(errorInfo.code, errorInfo.message)
+          error: ErrorHandlingMiddleware.createErrorResponse(errorInfo.code, errorInfo.message),
         };
       }
 
@@ -99,14 +100,14 @@ export class AuthMiddleware {
         logger.warn('Invalid token payload structure', {
           requestId: context.requestId,
           hasUserId: !!tokenPayload.userId,
-          hasEmail: !!tokenPayload.email
+          hasEmail: !!tokenPayload.email,
         });
 
         return {
           error: ErrorHandlingMiddleware.createErrorResponse(
             ERROR_CODES.UNAUTHORIZED,
             'Invalid token payload'
-          )
+          ),
         };
       }
 
@@ -114,14 +115,14 @@ export class AuthMiddleware {
       if (options.roles && options.roles.length > 0) {
         logger.debug('Role validation not yet implemented', {
           requestId: context.requestId,
-          requiredRoles: options.roles
+          requiredRoles: options.roles,
         });
       }
 
       if (options.permissions && options.permissions.length > 0) {
         logger.debug('Permission validation not yet implemented', {
           requestId: context.requestId,
-          requiredPermissions: options.permissions
+          requiredPermissions: options.permissions,
         });
       }
 
@@ -130,27 +131,26 @@ export class AuthMiddleware {
         ...context,
         userId: tokenPayload.userId,
         userEmail: tokenPayload.email,
-        tokenPayload
+        tokenPayload,
       };
 
       logger.debug('Request authenticated successfully', {
         requestId: context.requestId,
         userId: tokenPayload.userId,
-        email: tokenPayload.email
+        email: tokenPayload.email,
       });
 
       return { authenticatedContext };
-
     } catch (error: any) {
       logger.error('Authentication middleware error', error, {
-        requestId: context.requestId
+        requestId: context.requestId,
       });
 
       return {
         error: ErrorHandlingMiddleware.createErrorResponse(
           ERROR_CODES.INTERNAL_ERROR,
           'Authentication processing failed'
-        )
+        ),
       };
     }
   }
@@ -180,7 +180,9 @@ export class AuthMiddleware {
    * Create middleware function for specific auth requirements
    */
   static createAuthMiddleware(options: AuthOptions = { required: true }) {
-    return async (context: HandlerContext): Promise<{
+    return async (
+      context: HandlerContext
+    ): Promise<{
       authenticatedContext?: AuthenticatedContext;
       error?: ApiResponse;
     }> => {
@@ -193,13 +195,13 @@ export class AuthMiddleware {
    */
   static extractToken(context: HandlerContext): { token?: string; error?: ApiResponse } {
     const authHeader = context.event.headers?.Authorization || context.event.headers?.authorization;
-    
+
     if (!authHeader) {
       return {
         error: ErrorHandlingMiddleware.createErrorResponse(
           ERROR_CODES.VALIDATION_ERROR,
           'Authorization header is required'
-        )
+        ),
       };
     }
 
@@ -208,18 +210,18 @@ export class AuthMiddleware {
         error: ErrorHandlingMiddleware.createErrorResponse(
           ERROR_CODES.VALIDATION_ERROR,
           'Authorization header must use Bearer token format'
-        )
+        ),
       };
     }
 
     const token = authHeader.substring(7);
-    
+
     if (!token || token.trim() === '') {
       return {
         error: ErrorHandlingMiddleware.createErrorResponse(
           ERROR_CODES.VALIDATION_ERROR,
           'Bearer token is required'
-        )
+        ),
       };
     }
 
@@ -239,7 +241,7 @@ export class AuthMiddleware {
         requestId: authenticatedContext.requestId,
         userId: authenticatedContext.userId,
         resourceUserId,
-        resourceType
+        resourceType,
       });
 
       return ErrorHandlingMiddleware.createErrorResponse(
@@ -272,5 +274,5 @@ export const AuthConfigs = {
   /**
    * User authentication required (future feature)
    */
-  USER: { required: true, roles: ['user'] }
+  USER: { required: true, roles: ['user'] },
 };

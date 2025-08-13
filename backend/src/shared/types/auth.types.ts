@@ -70,27 +70,27 @@ export const PERMISSIONS = {
   USER_READ: 'user:read',
   USER_WRITE: 'user:write',
   USER_DELETE: 'user:delete',
-  
-  // Session management  
+
+  // Session management
   SESSION_READ: 'session:read',
   SESSION_WRITE: 'session:write',
   SESSION_DELETE: 'session:delete',
-  
+
   // Analytics
   ANALYTICS_READ: 'analytics:read',
   ANALYTICS_WRITE: 'analytics:write',
-  
+
   // Goals
   GOALS_READ: 'goals:read',
   GOALS_WRITE: 'goals:write',
   GOALS_DELETE: 'goals:delete',
-  
+
   // Admin
   ADMIN_READ: 'admin:read',
   ADMIN_WRITE: 'admin:write',
 } as const;
 
-export type Permission = typeof PERMISSIONS[keyof typeof PERMISSIONS];
+export type Permission = (typeof PERMISSIONS)[keyof typeof PERMISSIONS];
 
 // User roles
 export const ROLES = {
@@ -99,4 +99,4 @@ export const ROLES = {
   MODERATOR: 'moderator',
 } as const;
 
-export type Role = typeof ROLES[keyof typeof ROLES];
+export type Role = (typeof ROLES)[keyof typeof ROLES];

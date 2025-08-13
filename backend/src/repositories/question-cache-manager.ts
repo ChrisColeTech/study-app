@@ -38,7 +38,7 @@ export class QuestionCacheManager {
     this.cache.set(key, {
       data,
       timestamp: Date.now(),
-      ttl: customTtl || this.DEFAULT_TTL
+      ttl: customTtl || this.DEFAULT_TTL,
     });
   }
 

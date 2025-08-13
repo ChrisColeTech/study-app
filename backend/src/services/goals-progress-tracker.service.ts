@@ -1,16 +1,16 @@
 import { createLogger } from '../shared/logger';
 import type { IGoalsRepository } from '../repositories/goals.repository';
-import type { 
+import type {
   IGoalsProgressTracker,
   Goal,
   GoalStats,
   GoalType,
-  GoalPriority
+  GoalPriority,
 } from '../shared/types/goals.types';
 
 /**
  * GoalsProgressTracker - Handles progress tracking and analytics for goals
- * 
+ *
  * Responsibilities:
  * - Goal statistics calculation
  * - Progress updates and milestone tracking
@@ -20,9 +20,7 @@ import type {
 export class GoalsProgressTracker implements IGoalsProgressTracker {
   private logger = createLogger({ component: 'GoalsProgressTracker' });
 
-  constructor(
-    private goalsRepository: IGoalsRepository
-  ) {}
+  constructor(private goalsRepository: IGoalsRepository) {}
 
   /**
    * Get goal statistics for a user
@@ -49,20 +47,30 @@ export class GoalsProgressTracker implements IGoalsProgressTracker {
           return (end - start) / (1000 * 60 * 60 * 24); // days
         });
 
-      const averageCompletionTime = completedGoalsWithTime.length > 0
-        ? Math.round(completedGoalsWithTime.reduce((sum, days) => sum + days, 0) / completedGoalsWithTime.length)
-        : 0;
+      const averageCompletionTime =
+        completedGoalsWithTime.length > 0
+          ? Math.round(
+              completedGoalsWithTime.reduce((sum, days) => sum + days, 0) /
+                completedGoalsWithTime.length
+            )
+          : 0;
 
       // Group by type and priority
-      const goalsByType = allGoals.items.reduce((acc, goal) => {
-        acc[goal.type] = (acc[goal.type] || 0) + 1;
-        return acc;
-      }, {} as { [key in GoalType]: number });
+      const goalsByType = allGoals.items.reduce(
+        (acc, goal) => {
+          acc[goal.type] = (acc[goal.type] || 0) + 1;
+          return acc;
+        },
+        {} as { [key in GoalType]: number }
+      );
 
-      const goalsByPriority = allGoals.items.reduce((acc, goal) => {
-        acc[goal.priority] = (acc[goal.priority] || 0) + 1;
-        return acc;
-      }, {} as { [key in GoalPriority]: number });
+      const goalsByPriority = allGoals.items.reduce(
+        (acc, goal) => {
+          acc[goal.priority] = (acc[goal.priority] || 0) + 1;
+          return acc;
+        },
+        {} as { [key in GoalPriority]: number }
+      );
 
       // Get upcoming deadlines (next 7 days)
       const now = new Date();
@@ -93,19 +101,18 @@ export class GoalsProgressTracker implements IGoalsProgressTracker {
         goalsByType,
         goalsByPriority,
         upcomingDeadlines,
-        recentCompletions
+        recentCompletions,
       };
 
-      this.logger.info('Goal statistics retrieved successfully', { 
+      this.logger.info('Goal statistics retrieved successfully', {
         userId,
         totalGoals,
         activeGoals,
         completedGoals,
-        completionRate
+        completionRate,
       });
 
       return stats;
-
     } catch (error) {
       this.logger.error('Failed to retrieve goal statistics', error as Error, { userId });
       throw error;
@@ -125,12 +132,15 @@ export class GoalsProgressTracker implements IGoalsProgressTracker {
       }
 
       const newCurrentValue = Math.min(progress, goal.targetValue);
-      const progressPercentage = Math.min(Math.round((newCurrentValue / goal.targetValue) * 100), 100);
+      const progressPercentage = Math.min(
+        Math.round((newCurrentValue / goal.targetValue) * 100),
+        100
+      );
 
       const updateData: Partial<Goal> = {
         currentValue: newCurrentValue,
         progressPercentage,
-        updatedAt: new Date().toISOString()
+        updatedAt: new Date().toISOString(),
       };
 
       // Auto-complete goal if target reached
@@ -141,13 +151,12 @@ export class GoalsProgressTracker implements IGoalsProgressTracker {
 
       await this.goalsRepository.update(goalId, updateData);
 
-      this.logger.info('Goal progress updated successfully', { 
+      this.logger.info('Goal progress updated successfully', {
         goalId,
         currentValue: newCurrentValue,
         progressPercentage,
-        status: updateData.status
+        status: updateData.status,
       });
-
     } catch (error) {
       this.logger.error('Failed to update goal progress', error as Error, { goalId, progress });
       // Don't throw error here - progress updates shouldn't break other flows

@@ -29,7 +29,10 @@ export interface ValidationSchema {
 
 export class ValidationMiddleware {
   // Performance optimization: Cache validation results for repeated validations
-  private static validationCache = new Map<string, { result: ApiResponse | null; timestamp: number }>();
+  private static validationCache = new Map<
+    string,
+    { result: ApiResponse | null; timestamp: number }
+  >();
   private static readonly CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
   /**
@@ -43,7 +46,7 @@ export class ValidationMiddleware {
     const validationError = this.validateFields(parsedData, schema, requestType);
     return {
       error: validationError,
-      data: parsedData
+      data: parsedData,
     };
   }
 
@@ -68,8 +71,11 @@ export class ValidationMiddleware {
     if (!context.event.body) {
       if (schema.required && schema.required.length > 0) {
         return {
-          error: this.createStandardErrorResponse('Request body is required', ERROR_CODES.VALIDATION_ERROR),
-          data: null
+          error: this.createStandardErrorResponse(
+            'Request body is required',
+            ERROR_CODES.VALIDATION_ERROR
+          ),
+          data: null,
         };
       }
       return { error: null, data: {} };
@@ -81,25 +87,25 @@ export class ValidationMiddleware {
     } catch (error) {
       logger.warn('JSON parsing failed', { error: (error as Error).message });
       return {
-        error: this.createStandardErrorResponse('Invalid JSON in request body', ERROR_CODES.VALIDATION_ERROR),
-        data: null
+        error: this.createStandardErrorResponse(
+          'Invalid JSON in request body',
+          ERROR_CODES.VALIDATION_ERROR
+        ),
+        data: null,
       };
     }
 
     const validationError = this.validateFields(requestBody, schema, 'body');
     return {
       error: validationError,
-      data: requestBody
+      data: requestBody,
     };
   }
 
   /**
    * Enhanced path parameter validation with better error messages
    */
-  static validatePathParams(
-    context: HandlerContext,
-    schema: ValidationSchema
-  ): ApiResponse | null {
+  static validatePathParams(context: HandlerContext, schema: ValidationSchema): ApiResponse | null {
     const pathParams = context.event.pathParameters || {};
     return this.validateFields(pathParams, schema, 'params');
   }
@@ -124,8 +130,8 @@ export class ValidationMiddleware {
       for (const requiredField of schema.required) {
         if (!this.isFieldPresent(fields[requiredField])) {
           const error = this.createFieldErrorResponse(
-            requiredField, 
-            `${requiredField} is required`, 
+            requiredField,
+            `${requiredField} is required`,
             requestType
           );
           this.cacheValidation(cacheKey, error);
@@ -137,12 +143,12 @@ export class ValidationMiddleware {
     // Enhanced field validation with context and better error handling
     const validationContext: ValidationContext = {
       allFields: fields,
-      requestType
+      requestType,
     };
 
     for (const rule of schema.rules) {
       const fieldValue = fields[rule.field];
-      
+
       // Skip validation if field is not present and not required
       if (!this.isFieldPresent(fieldValue)) {
         continue;
@@ -163,7 +169,7 @@ export class ValidationMiddleware {
         logger.error('Validation rule execution failed', {
           field: rule.field,
           error: (validationError as Error).message,
-          requestType
+          requestType,
         });
         const error = this.createFieldErrorResponse(
           rule.field,
@@ -219,9 +225,9 @@ export class ValidationMiddleware {
    * Performance optimization: Check if field has a meaningful value
    */
   private static isFieldPresent(value: any): boolean {
-    return value !== undefined && 
-           value !== null && 
-           !(typeof value === 'string' && value.trim() === '');
+    return (
+      value !== undefined && value !== null && !(typeof value === 'string' && value.trim() === '')
+    );
   }
 
   /**
@@ -242,7 +248,7 @@ export class ValidationMiddleware {
    */
   private static getCachedValidation(cacheKey: string): ApiResponse | null {
     const cached = this.validationCache.get(cacheKey);
-    if (cached && (Date.now() - cached.timestamp) < this.CACHE_TTL) {
+    if (cached && Date.now() - cached.timestamp < this.CACHE_TTL) {
       return cached.result;
     }
     // Clean up expired cache entry
@@ -263,10 +269,10 @@ export class ValidationMiddleware {
         this.validationCache.delete(oldestKey);
       }
     }
-    
+
     this.validationCache.set(cacheKey, {
       result,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     });
   }
 
@@ -283,9 +289,9 @@ export class ValidationMiddleware {
       error: {
         code,
         message,
-        ...(details && { details })
+        ...(details && { details }),
       },
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
   }
 
@@ -300,17 +306,13 @@ export class ValidationMiddleware {
     logger.warn('Validation failed', {
       field,
       message,
-      requestType
+      requestType,
     });
 
-    return this.createStandardErrorResponse(
-      message,
-      ERROR_CODES.VALIDATION_ERROR,
-      {
-        field,
-        location: requestType
-      }
-    );
+    return this.createStandardErrorResponse(message, ERROR_CODES.VALIDATION_ERROR, {
+      field,
+      location: requestType,
+    });
   }
 
   /**
@@ -326,7 +328,7 @@ export class ValidationMiddleware {
   static getCacheStats(): { size: number; hitRate: number } {
     return {
       size: this.validationCache.size,
-      hitRate: 0 // Simplified for now, could track hits/misses
+      hitRate: 0, // Simplified for now, could track hits/misses
     };
   }
 }
@@ -361,7 +363,7 @@ export class ValidationRules {
   static numberRange(min: number, max?: number) {
     return (value: any): ValidationResult => {
       const num = typeof value === 'string' ? parseInt(value, 10) : value;
-      
+
       if (isNaN(num) || typeof num !== 'number') {
         return { isValid: false, error: 'Must be a valid number' };
       }
@@ -392,9 +394,9 @@ export class ValidationRules {
       const validValues = caseSensitive ? enumValues : enumValues.map(v => v.toUpperCase());
 
       if (!validValues.includes(testValue)) {
-        return { 
-          isValid: false, 
-          error: `Invalid value. Valid options: ${enumValues.join(', ')}` 
+        return {
+          isValid: false,
+          error: `Invalid value. Valid options: ${enumValues.join(', ')}`,
         };
       }
 
@@ -412,9 +414,9 @@ export class ValidationRules {
       }
 
       if (!/^[a-zA-Z0-9_-]+$/.test(value)) {
-        return { 
-          isValid: false, 
-          error: 'Invalid format. Use alphanumeric characters, hyphens, and underscores only' 
+        return {
+          isValid: false,
+          error: 'Invalid format. Use alphanumeric characters, hyphens, and underscores only',
         };
       }
 
@@ -460,7 +462,11 @@ export class ValidationRules {
   /**
    * Validate array with constraints
    */
-  static array(minItems?: number, maxItems?: number, itemValidator?: (item: any) => ValidationResult) {
+  static array(
+    minItems?: number,
+    maxItems?: number,
+    itemValidator?: (item: any) => ValidationResult
+  ) {
     return (value: any): ValidationResult => {
       if (!Array.isArray(value)) {
         return { isValid: false, error: 'Must be an array' };
@@ -478,9 +484,9 @@ export class ValidationRules {
         for (let i = 0; i < value.length; i++) {
           const itemResult = itemValidator(value[i]);
           if (!itemResult.isValid) {
-            return { 
-              isValid: false, 
-              error: `Item ${i + 1}: ${itemResult.error}` 
+            return {
+              isValid: false,
+              error: `Item ${i + 1}: ${itemResult.error}`,
             };
           }
         }
@@ -521,9 +527,9 @@ export class ValidationRules {
 
       const validSessionTypes = ['practice', 'exam', 'review'];
       if (!validSessionTypes.includes(value)) {
-        return { 
-          isValid: false, 
-          error: `sessionType must be one of: ${validSessionTypes.join(', ')}` 
+        return {
+          isValid: false,
+          error: `sessionType must be one of: ${validSessionTypes.join(', ')}`,
         };
       }
 
@@ -532,7 +538,7 @@ export class ValidationRules {
   }
 
   /**
-   * Validate session action enum  
+   * Validate session action enum
    */
   static sessionAction() {
     return (value: string): ValidationResult => {
@@ -540,11 +546,19 @@ export class ValidationRules {
         return { isValid: false, error: 'Must be a string' };
       }
 
-      const validActions = ['pause', 'resume', 'next', 'previous', 'answer', 'mark_for_review', 'complete'];
+      const validActions = [
+        'pause',
+        'resume',
+        'next',
+        'previous',
+        'answer',
+        'mark_for_review',
+        'complete',
+      ];
       if (!validActions.includes(value)) {
-        return { 
-          isValid: false, 
-          error: `action must be one of: ${validActions.join(', ')}` 
+        return {
+          isValid: false,
+          error: `action must be one of: ${validActions.join(', ')}`,
         };
       }
 
@@ -563,17 +577,21 @@ export class ValidationRules {
 
       try {
         const date = new Date(value);
-        
+
         // Check if the date is valid and the string format matches ISO standard
-        const isValid = date instanceof Date && 
-               !isNaN(date.getTime()) && 
-               (!!value.match(/^\d{4}-\d{2}-\d{2}$/) || 
-                !!value.match(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{3})?Z?$/));
-        
+        const isValid =
+          date instanceof Date &&
+          !isNaN(date.getTime()) &&
+          (!!value.match(/^\d{4}-\d{2}-\d{2}$/) ||
+            !!value.match(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{3})?Z?$/));
+
         if (!isValid) {
-          return { isValid: false, error: 'Must be a valid ISO date string (YYYY-MM-DD or YYYY-MM-DDTHH:mm:ss.sssZ)' };
+          return {
+            isValid: false,
+            error: 'Must be a valid ISO date string (YYYY-MM-DD or YYYY-MM-DDTHH:mm:ss.sssZ)',
+          };
         }
-        
+
         return { isValid: true };
       } catch {
         return { isValid: false, error: 'Invalid date format' };
@@ -587,7 +605,7 @@ export class ValidationRules {
   static float(min?: number, max?: number) {
     return (value: any): ValidationResult => {
       const num = typeof value === 'string' ? parseFloat(value) : value;
-      
+
       if (isNaN(num) || typeof num !== 'number') {
         return { isValid: false, error: 'Must be a valid decimal number' };
       }
@@ -669,9 +687,9 @@ export class ValidationRules {
 
       const extension = value.toLowerCase().split('.').pop();
       if (!extension || !allowedExtensions.includes(extension)) {
-        return { 
-          isValid: false, 
-          error: `Invalid file extension. Allowed: ${allowedExtensions.join(', ')}` 
+        return {
+          isValid: false,
+          error: `Invalid file extension. Allowed: ${allowedExtensions.join(', ')}`,
         };
       }
 
@@ -688,7 +706,8 @@ export class ValidationRules {
         return { isValid: false, error: 'Must be a string' };
       }
 
-      const ipRegex = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+      const ipRegex =
+        /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
       if (!ipRegex.test(value)) {
         return { isValid: false, error: 'Invalid IP address format' };
       }

@@ -68,8 +68,9 @@ describe('UserService', () => {
     it('should throw error for invalid email format', async () => {
       const invalidEmailData = { ...testUserData, email: 'invalid-email' };
 
-      await expect(userService.createUser(invalidEmailData, testPasswordHash))
-        .rejects.toThrow('Invalid email format');
+      await expect(userService.createUser(invalidEmailData, testPasswordHash)).rejects.toThrow(
+        'Invalid email format'
+      );
 
       expect(mockUserRepository.findByEmail).not.toHaveBeenCalled();
       expect(mockUserRepository.create).not.toHaveBeenCalled();
@@ -78,8 +79,9 @@ describe('UserService', () => {
     it('should throw error when email already exists', async () => {
       mockUserRepository.findByEmail.mockResolvedValue(mockUser);
 
-      await expect(userService.createUser(testUserData, testPasswordHash))
-        .rejects.toThrow('User with this email already exists');
+      await expect(userService.createUser(testUserData, testPasswordHash)).rejects.toThrow(
+        'User with this email already exists'
+      );
 
       expect(mockUserRepository.findByEmail).toHaveBeenCalledWith('test@example.com');
       expect(mockUserRepository.create).not.toHaveBeenCalled();
@@ -89,16 +91,18 @@ describe('UserService', () => {
       const invalidData = { ...testUserData, firstName: '' };
       mockUserRepository.findByEmail.mockResolvedValue(null);
 
-      await expect(userService.createUser(invalidData, testPasswordHash))
-        .rejects.toThrow('First name is required');
+      await expect(userService.createUser(invalidData, testPasswordHash)).rejects.toThrow(
+        'First name is required'
+      );
     });
 
     it('should throw error for empty last name', async () => {
       const invalidData = { ...testUserData, lastName: '  ' };
       mockUserRepository.findByEmail.mockResolvedValue(null);
 
-      await expect(userService.createUser(invalidData, testPasswordHash))
-        .rejects.toThrow('Last name is required');
+      await expect(userService.createUser(invalidData, testPasswordHash)).rejects.toThrow(
+        'Last name is required'
+      );
     });
 
     it('should throw error for names that are too long', async () => {
@@ -106,26 +110,32 @@ describe('UserService', () => {
       const invalidData = { ...testUserData, firstName: longName };
       mockUserRepository.findByEmail.mockResolvedValue(null);
 
-      await expect(userService.createUser(invalidData, testPasswordHash))
-        .rejects.toThrow('First name must be 50 characters or less');
+      await expect(userService.createUser(invalidData, testPasswordHash)).rejects.toThrow(
+        'First name must be 50 characters or less'
+      );
     });
 
     it('should throw error for names with invalid characters', async () => {
       const invalidData = { ...testUserData, firstName: 'John123' };
       mockUserRepository.findByEmail.mockResolvedValue(null);
 
-      await expect(userService.createUser(invalidData, testPasswordHash))
-        .rejects.toThrow('First name contains invalid characters');
+      await expect(userService.createUser(invalidData, testPasswordHash)).rejects.toThrow(
+        'First name contains invalid characters'
+      );
     });
 
     it('should allow names with valid special characters', async () => {
-      const validData = { ...testUserData, firstName: "Mary-Jane", lastName: "O'Connor" };
+      const validData = { ...testUserData, firstName: 'Mary-Jane', lastName: "O'Connor" };
       mockUserRepository.findByEmail.mockResolvedValue(null);
-      mockUserRepository.create.mockResolvedValue({ ...mockUser, firstName: "Mary-Jane", lastName: "O'Connor" });
+      mockUserRepository.create.mockResolvedValue({
+        ...mockUser,
+        firstName: 'Mary-Jane',
+        lastName: "O'Connor",
+      });
 
       const result = await userService.createUser(validData, testPasswordHash);
 
-      expect(result.firstName).toBe("Mary-Jane");
+      expect(result.firstName).toBe('Mary-Jane');
       expect(result.lastName).toBe("O'Connor");
     });
   });
@@ -247,8 +257,9 @@ describe('UserService', () => {
     it('should throw error for empty first name update', async () => {
       const updateData = { firstName: '  ' };
 
-      await expect(userService.updateUser('test-user-id', updateData))
-        .rejects.toThrow('First name is required');
+      await expect(userService.updateUser('test-user-id', updateData)).rejects.toThrow(
+        'First name is required'
+      );
 
       expect(mockUserRepository.update).not.toHaveBeenCalled();
     });
@@ -256,8 +267,9 @@ describe('UserService', () => {
     it('should throw error for invalid characters in name update', async () => {
       const updateData = { firstName: 'Jane123' };
 
-      await expect(userService.updateUser('test-user-id', updateData))
-        .rejects.toThrow('First name contains invalid characters');
+      await expect(userService.updateUser('test-user-id', updateData)).rejects.toThrow(
+        'First name contains invalid characters'
+      );
 
       expect(mockUserRepository.update).not.toHaveBeenCalled();
     });

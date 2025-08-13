@@ -27,43 +27,49 @@ export class ErrorHandlingMiddleware {
     {
       keywords: ['not found', 'NoSuchKey', 'does not exist', 'ResourceNotFoundException'],
       errorCode: ERROR_CODES.NOT_FOUND,
-      statusCode: 404
+      statusCode: 404,
     },
     {
       keywords: ['already exists', 'duplicate', 'conflict', 'ConditionalCheckFailedException'],
       errorCode: ERROR_CODES.CONFLICT,
-      statusCode: 409
+      statusCode: 409,
     },
     {
-      keywords: ['unauthorized', 'access denied', 'permission denied', 'Invalid token', 'malformed'],
+      keywords: [
+        'unauthorized',
+        'access denied',
+        'permission denied',
+        'Invalid token',
+        'malformed',
+      ],
       errorCode: ERROR_CODES.UNAUTHORIZED,
-      statusCode: 401
+      statusCode: 401,
     },
     {
       keywords: ['forbidden', 'insufficient privileges'],
       errorCode: ERROR_CODES.FORBIDDEN,
-      statusCode: 403
+      statusCode: 403,
     },
     {
       keywords: ['validation', 'invalid', 'required', 'must be', 'ValidationException'],
       errorCode: ERROR_CODES.VALIDATION_ERROR,
-      statusCode: 400
+      statusCode: 400,
     },
     {
       keywords: ['expired', 'timeout'],
       errorCode: ERROR_CODES.TOKEN_EXPIRED,
-      statusCode: 408
+      statusCode: 408,
     },
     {
       keywords: ['rate limit', 'too many requests', 'ProvisionedThroughputExceededException'],
       errorCode: ERROR_CODES.RATE_LIMITED,
-      statusCode: 429
+      statusCode: 429,
     },
     {
       keywords: ['ServiceUnavailableException', 'InternalServerError'],
       errorCode: ERROR_CODES.INTERNAL_ERROR,
-      statusCode: 503
-    }
+      statusCode: 503,
+    },
   ];
 
   /**
@@ -76,12 +82,10 @@ export class ErrorHandlingMiddleware {
   ): { code: string; message: string; statusCode: number } {
     const errorMessage = error?.message || 'Unknown error occurred';
     const allMappings = [...customMappings, ...this.DEFAULT_ERROR_MAPPINGS];
-    
+
     // Find matching error mapping efficiently
     const errorMapping = allMappings.find(mapping =>
-      mapping.keywords.some(keyword =>
-        errorMessage.toLowerCase().includes(keyword.toLowerCase())
-      )
+      mapping.keywords.some(keyword => errorMessage.toLowerCase().includes(keyword.toLowerCase()))
     );
 
     let statusCode = 500;
@@ -104,7 +108,7 @@ export class ErrorHandlingMiddleware {
       statusCode,
       originalError: errorMessage,
       ...(context.userId && { userId: context.userId }),
-      ...(context.additionalInfo && { additionalInfo: context.additionalInfo })
+      ...(context.additionalInfo && { additionalInfo: context.additionalInfo }),
     };
 
     if (statusCode >= 500) {
@@ -141,20 +145,20 @@ export class ErrorHandlingMiddleware {
     fields: Record<string, any>,
     requiredFields: string[]
   ): { code: string; message: string; statusCode: number } | null {
-    const missingFields = requiredFields.filter(field => 
-      !fields[field] || 
-      (typeof fields[field] === 'string' && fields[field].trim() === '')
+    const missingFields = requiredFields.filter(
+      field => !fields[field] || (typeof fields[field] === 'string' && fields[field].trim() === '')
     );
 
     if (missingFields.length > 0) {
-      const message = missingFields.length === 1 
-        ? `${missingFields[0]} is required`
-        : `Missing required fields: ${missingFields.join(', ')}`;
-        
-      return { 
-        code: ERROR_CODES.VALIDATION_ERROR, 
-        message, 
-        statusCode: 400 
+      const message =
+        missingFields.length === 1
+          ? `${missingFields[0]} is required`
+          : `Missing required fields: ${missingFields.join(', ')}`;
+
+      return {
+        code: ERROR_CODES.VALIDATION_ERROR,
+        message,
+        statusCode: 400,
       };
     }
 
@@ -169,18 +173,22 @@ export class ErrorHandlingMiddleware {
     context: ErrorContext
   ): { code: string; message: string; statusCode: number } {
     const errorMessage = error?.message || 'Authentication failed';
-    
+
     // Optimized auth error detection
     if (errorMessage.includes('expired')) {
       return { code: ERROR_CODES.TOKEN_EXPIRED, message: 'Token expired', statusCode: 401 };
     }
-    
+
     if (errorMessage.includes('Invalid token') || errorMessage.includes('malformed')) {
       return { code: ERROR_CODES.TOKEN_INVALID, message: 'Invalid token', statusCode: 401 };
     }
-    
+
     if (errorMessage.includes('Missing') || errorMessage.includes('required')) {
-      return { code: ERROR_CODES.UNAUTHORIZED, message: 'Authentication required', statusCode: 401 };
+      return {
+        code: ERROR_CODES.UNAUTHORIZED,
+        message: 'Authentication required',
+        statusCode: 401,
+      };
     }
 
     // Log auth error efficiently
@@ -188,7 +196,7 @@ export class ErrorHandlingMiddleware {
       requestId: context.requestId,
       operation: context.operation,
       error: errorMessage,
-      ...(context.additionalInfo && { additionalInfo: context.additionalInfo })
+      ...(context.additionalInfo && { additionalInfo: context.additionalInfo }),
     });
 
     return { code: ERROR_CODES.UNAUTHORIZED, message: 'Authentication failed', statusCode: 401 };
@@ -203,20 +211,20 @@ export class ErrorHandlingMiddleware {
     fieldErrors?: Record<string, string>
   ): { code: string; message: string; statusCode: number; details?: Record<string, string> } {
     const message = error?.message || 'Validation failed';
-    
+
     logger.warn('Validation error', {
       requestId: context.requestId,
       operation: context.operation,
       error: message,
       fieldErrors,
-      ...(context.additionalInfo && { additionalInfo: context.additionalInfo })
+      ...(context.additionalInfo && { additionalInfo: context.additionalInfo }),
     });
 
     return {
       code: ERROR_CODES.VALIDATION_ERROR,
       message,
       statusCode: 400,
-      ...(fieldErrors && { details: fieldErrors })
+      ...(fieldErrors && { details: fieldErrors }),
     };
   }
 
@@ -229,35 +237,40 @@ export class ErrorHandlingMiddleware {
     const servicePatterns: Record<string, ErrorMapping[]> = {
       session: [
         {
-          keywords: ['Cannot update completed', 'Cannot delete completed', 'Cannot pause', 'Invalid transition'],
+          keywords: [
+            'Cannot update completed',
+            'Cannot delete completed',
+            'Cannot pause',
+            'Invalid transition',
+          ],
           errorCode: ERROR_CODES.CONFLICT,
-          statusCode: 409
+          statusCode: 409,
         },
         {
           keywords: ['Session not found', 'No questions found for session'],
           errorCode: ERROR_CODES.NOT_FOUND,
-          statusCode: 404
-        }
+          statusCode: 404,
+        },
       ],
       question: [
         {
           keywords: ['Invalid provider', 'Invalid exam', 'Invalid topic'],
           errorCode: ERROR_CODES.NOT_FOUND,
-          statusCode: 404
+          statusCode: 404,
         },
         {
           keywords: ['Question count must be', 'Time limit must be'],
           errorCode: ERROR_CODES.VALIDATION_ERROR,
-          statusCode: 400
-        }
+          statusCode: 400,
+        },
       ],
       analytics: [
         {
           keywords: ['Insufficient data', 'No analytics available'],
           errorCode: ERROR_CODES.NOT_FOUND,
-          statusCode: 404
-        }
-      ]
+          statusCode: 404,
+        },
+      ],
     };
 
     return servicePatterns[serviceName.toLowerCase()] || [];
@@ -277,8 +290,12 @@ export class ErrorHandlingMiddleware {
     context: ErrorContext,
     customMappings: ErrorMapping[] = []
   ): Promise<{ result?: T; error?: ApiResponse }> {
-    const { result, errorInfo } = await this.withErrorProcessing(operation, context, customMappings);
-    
+    const { result, errorInfo } = await this.withErrorProcessing(
+      operation,
+      context,
+      customMappings
+    );
+
     if (errorInfo) {
       // Convert new format to legacy format for compatibility
       const errorResponse: ApiResponse = {
@@ -286,18 +303,18 @@ export class ErrorHandlingMiddleware {
         message: errorInfo.message,
         error: {
           code: errorInfo.code,
-          message: errorInfo.message
+          message: errorInfo.message,
         },
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
       return { error: errorResponse };
     }
-    
+
     // Handle undefined result properly for strict TypeScript
     if (result === undefined) {
       return {};
     }
-    
+
     return { result };
   }
 
@@ -313,7 +330,7 @@ export class ErrorHandlingMiddleware {
       success: true,
       message,
       data,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
   }
 
@@ -321,19 +338,15 @@ export class ErrorHandlingMiddleware {
    * @deprecated Use BaseHandler.buildErrorResponse() instead
    * This method violates BaseHandler pattern and will be removed
    */
-  static createErrorResponse(
-    code: string,
-    message: string,
-    details?: any
-  ): ApiResponse {
+  static createErrorResponse(code: string, message: string, details?: any): ApiResponse {
     const errorResponse: any = {
       success: false,
       message,
       error: {
         code,
-        message
+        message,
       },
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
 
     if (details) {
@@ -377,44 +390,44 @@ export const ErrorContexts = {
     REGISTER: 'user-register',
     REFRESH: 'token-refresh',
     LOGOUT: 'user-logout',
-    VALIDATE: 'token-validate'
+    VALIDATE: 'token-validate',
   },
-  
+
   Session: {
     CREATE: 'session-create',
     GET: 'session-get',
     UPDATE: 'session-update',
-    DELETE: 'session-delete'
+    DELETE: 'session-delete',
   },
-  
+
   Question: {
     LIST: 'question-list',
     GET: 'question-get',
-    SEARCH: 'question-search'
+    SEARCH: 'question-search',
   },
-  
+
   Provider: {
     LIST: 'provider-list',
     GET: 'provider-get',
-    REFRESH_CACHE: 'provider-cache-refresh'
+    REFRESH_CACHE: 'provider-cache-refresh',
   },
-  
+
   Exam: {
     LIST: 'exam-list',
-    GET: 'exam-get'
+    GET: 'exam-get',
   },
-  
+
   Topic: {
     LIST: 'topic-list',
-    GET: 'topic-get'
+    GET: 'topic-get',
   },
-  
+
   Goals: {
     CREATE: 'goal-create',
     LIST: 'goal-list',
     GET: 'goal-get',
     UPDATE: 'goal-update',
     DELETE: 'goal-delete',
-    STATS: 'goal-stats'
-  }
+    STATS: 'goal-stats',
+  },
 };

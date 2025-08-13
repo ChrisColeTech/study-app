@@ -17,8 +17,8 @@ export class QuestionQueryBuilder {
    * Filter questions by difficulty
    */
   filterByDifficulty(questions: Question[], difficulty: string): Question[] {
-    return questions.filter(question => 
-      question.difficulty.toLowerCase() === difficulty.toLowerCase()
+    return questions.filter(
+      question => question.difficulty.toLowerCase() === difficulty.toLowerCase()
     );
   }
 
@@ -26,21 +26,27 @@ export class QuestionQueryBuilder {
    * Search questions by text content with enhanced matching
    */
   searchQuestions(questions: Question[], query: string): Question[] {
-    const searchTerms = query.toLowerCase().split(' ').filter(term => term.length >= 2); // Minimum 2 characters
-    
+    const searchTerms = query
+      .toLowerCase()
+      .split(' ')
+      .filter(term => term.length >= 2); // Minimum 2 characters
+
     return questions.filter(question => {
       const searchableText = [
         question.questionText,
         ...(question.options || []),
         question.explanation || '',
         ...(question.tags || []),
-        question.topicId || ''
-      ].join(' ').toLowerCase();
+        question.topicId || '',
+      ]
+        .join(' ')
+        .toLowerCase();
 
       // Enhanced search: either all terms match or at least 60% of terms match for longer queries
       const matchCount = searchTerms.filter(term => searchableText.includes(term)).length;
-      const requiredMatches = searchTerms.length <= 2 ? searchTerms.length : Math.ceil(searchTerms.length * 0.6);
-      
+      const requiredMatches =
+        searchTerms.length <= 2 ? searchTerms.length : Math.ceil(searchTerms.length * 0.6);
+
       return matchCount >= requiredMatches;
     });
   }
@@ -59,31 +65,31 @@ export class QuestionQueryBuilder {
   optimizeQuestionsForSearch(allQuestions: Question[]): Question[] {
     const popularProviders = ['aws', 'azure', 'gcp', 'cisco', 'comptia'];
     const optimizedQuestions: Question[] = [];
-    
+
     // Prioritize popular providers first
     for (const provider of popularProviders) {
-      const providerQuestions = allQuestions.filter(q => 
-        q.providerId.toLowerCase() === provider.toLowerCase()
+      const providerQuestions = allQuestions.filter(
+        q => q.providerId.toLowerCase() === provider.toLowerCase()
       );
       optimizedQuestions.push(...providerQuestions);
-      
+
       // If we have enough questions for search, stop here for performance
       if (optimizedQuestions.length >= 1000) {
         break;
       }
     }
-    
+
     // Add remaining questions if needed
     if (optimizedQuestions.length < 1000) {
-      const remainingQuestions = allQuestions.filter(q => 
-        !popularProviders.includes(q.providerId.toLowerCase())
+      const remainingQuestions = allQuestions.filter(
+        q => !popularProviders.includes(q.providerId.toLowerCase())
       );
       optimizedQuestions.push(...remainingQuestions);
     }
-    
-    this.logger.info('Optimized questions for search', { 
+
+    this.logger.info('Optimized questions for search', {
       totalQuestions: optimizedQuestions.length,
-      providers: [...new Set(optimizedQuestions.map(q => q.providerId))]
+      providers: [...new Set(optimizedQuestions.map(q => q.providerId))],
     });
 
     return optimizedQuestions.slice(0, 1000); // Limit to 1000 for performance
@@ -107,10 +113,9 @@ export class QuestionQueryBuilder {
    * Filter S3 objects to question files only
    */
   filterToQuestionFiles(objects: any[]): { Key: string }[] {
-    return objects.filter((obj): obj is { Key: string } => 
-      obj.Key && 
-      typeof obj.Key === 'string' &&
-      obj.Key.endsWith('/questions.json')
+    return objects.filter(
+      (obj): obj is { Key: string } =>
+        obj.Key && typeof obj.Key === 'string' && obj.Key.endsWith('/questions.json')
     );
   }
 
@@ -121,7 +126,7 @@ export class QuestionQueryBuilder {
     const pathParts = key.split('/');
     return {
       providerId: pathParts.length >= 3 ? pathParts[1] : 'unknown',
-      examId: pathParts.length >= 3 ? pathParts[2] : 'unknown'
+      examId: pathParts.length >= 3 ? pathParts[2] : 'unknown',
     };
   }
 }

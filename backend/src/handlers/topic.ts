@@ -6,17 +6,14 @@ import { HandlerContext, ApiResponse } from '../shared/types/api.types';
 import { ServiceFactory } from '../shared/service-factory';
 import { createLogger } from '../shared/logger';
 import { ERROR_CODES } from '../shared/constants/error.constants';
-import { 
-  GetTopicsRequest,
-  GetTopicRequest
-} from '../shared/types/topic.types';
+import { GetTopicsRequest, GetTopicRequest } from '../shared/types/topic.types';
 
 // Import new middleware
 import {
   ParsingMiddleware,
   ErrorHandlingMiddleware,
   ErrorContexts,
-  CommonParsing
+  CommonParsing,
 } from '../shared/middleware';
 
 export class TopicHandler extends BaseHandler {
@@ -41,7 +38,7 @@ export class TopicHandler extends BaseHandler {
         path: '/v1/topics/{id}',
         handler: this.getTopic.bind(this),
         requireAuth: false,
-      }
+      },
     ];
   }
 
@@ -55,7 +52,7 @@ export class TopicHandler extends BaseHandler {
       exam: { type: 'string', decode: true },
       category: { type: 'string', decode: true },
       search: CommonParsing.search,
-      level: { type: 'string', decode: true }
+      level: { type: 'string', decode: true },
     });
     if (parseError) return parseError;
 
@@ -65,7 +62,7 @@ export class TopicHandler extends BaseHandler {
       ...(queryParams.exam && { exam: queryParams.exam }),
       ...(queryParams.category && { category: queryParams.category }),
       ...(queryParams.search && { search: queryParams.search }),
-      ...(queryParams.level && { level: queryParams.level })
+      ...(queryParams.level && { level: queryParams.level }),
     };
 
     // Business logic only - delegate error handling to middleware
@@ -77,16 +74,16 @@ export class TopicHandler extends BaseHandler {
       {
         requestId: context.requestId,
         operation: ErrorContexts.Topic.LIST,
-        additionalInfo: { filters: request }
+        additionalInfo: { filters: request },
       }
     );
 
     if (error) return error;
 
-    this.logger.info('Topics retrieved successfully', { 
+    this.logger.info('Topics retrieved successfully', {
       requestId: context.requestId,
       total: result!.total,
-      filters: request
+      filters: request,
     });
 
     return this.buildSuccessResponse('Topics retrieved successfully', result);
@@ -108,14 +105,14 @@ export class TopicHandler extends BaseHandler {
     // Parse query parameters
     const { data: queryParams } = ParsingMiddleware.parseQueryParams(context, {
       includeProvider: CommonParsing.booleanFlag,
-      includeExam: CommonParsing.booleanFlag
+      includeExam: CommonParsing.booleanFlag,
     });
 
     // Build request object
     const request: GetTopicRequest = {
       id: decodeURIComponent(pathParams.id),
       ...(queryParams?.includeProvider && { includeProvider: queryParams.includeProvider }),
-      ...(queryParams?.includeExam && { includeExam: queryParams.includeExam })
+      ...(queryParams?.includeExam && { includeExam: queryParams.includeExam }),
     };
 
     // Business logic only - delegate error handling to middleware
@@ -127,17 +124,17 @@ export class TopicHandler extends BaseHandler {
       {
         requestId: context.requestId,
         operation: ErrorContexts.Topic.GET,
-        additionalInfo: { topicId: request.id }
+        additionalInfo: { topicId: request.id },
       }
     );
 
     if (error) return error;
 
-    this.logger.info('Topic retrieved successfully', { 
+    this.logger.info('Topic retrieved successfully', {
       requestId: context.requestId,
       topicId: request.id,
       includeProvider: request.includeProvider,
-      includeExam: request.includeExam
+      includeExam: request.includeExam,
     });
 
     return this.buildSuccessResponse('Topic retrieved successfully', result);

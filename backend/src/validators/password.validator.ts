@@ -7,7 +7,6 @@ export interface PasswordValidationResult {
 }
 
 export class PasswordValidator {
-  
   /**
    * Comprehensive password strength validation
    */
@@ -17,7 +16,7 @@ export class PasswordValidator {
     if (!password) {
       return {
         isValid: false,
-        errors: ['Password is required']
+        errors: ['Password is required'],
       };
     }
 
@@ -51,7 +50,7 @@ export class PasswordValidator {
 
     return {
       isValid: errors.length === 0,
-      errors
+      errors,
     };
   }
 
@@ -60,7 +59,7 @@ export class PasswordValidator {
    */
   static validateOrThrow(password: string): void {
     const result = this.validate(password);
-    
+
     if (!result.isValid) {
       throw new Error(result.errors[0]); // Throw first error for backward compatibility
     }

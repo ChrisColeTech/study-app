@@ -66,11 +66,13 @@ export class ExamRepository extends S3BaseRepository implements IExamRepository 
    * Perform health check operation for S3 connectivity
    */
   protected async performHealthCheck(): Promise<void> {
-    await this.s3Client.send(new ListObjectsV2Command({
-      Bucket: this.bucketName,
-      Prefix: this.EXAMS_PREFIX,
-      MaxKeys: 1
-    }));
+    await this.s3Client.send(
+      new ListObjectsV2Command({
+        Bucket: this.bucketName,
+        Prefix: this.EXAMS_PREFIX,
+        MaxKeys: 1,
+      })
+    );
   }
 
   /**
@@ -96,7 +98,7 @@ export class ExamRepository extends S3BaseRepository implements IExamRepository 
     this.cache.set(key, {
       data,
       timestamp: Date.now(),
-      ttl: customTtl || this.CACHE_TTL
+      ttl: customTtl || this.CACHE_TTL,
     });
   }
 
@@ -104,7 +106,7 @@ export class ExamRepository extends S3BaseRepository implements IExamRepository 
     return this.executeWithErrorHandling('findAll', async () => {
       const cacheKey = 'all-exams';
       const cachedExams = this.getFromCache<Exam[]>(cacheKey);
-      
+
       let exams: Exam[];
       if (cachedExams) {
         exams = cachedExams;
@@ -120,41 +122,57 @@ export class ExamRepository extends S3BaseRepository implements IExamRepository 
         limit: filters?.limit || this.config.query?.defaultLimit || 20,
         offset: filters?.offset || 0,
         hasMore: false, // All exams loaded in one call
-        executionTimeMs: 0 // Will be set by executeWithErrorHandling
+        executionTimeMs: 0, // Will be set by executeWithErrorHandling
       };
     });
   }
 
   async findById(examId: string): Promise<Exam | null> {
-    return this.executeWithErrorHandling('findById', async () => {
-      this.validateRequired({ examId }, 'findById');
-      const allExamsResult = await this.findAll();
-      return allExamsResult.items.find(e => e.examId === examId) || null;
-    }, { examId });
+    return this.executeWithErrorHandling(
+      'findById',
+      async () => {
+        this.validateRequired({ examId }, 'findById');
+        const allExamsResult = await this.findAll();
+        return allExamsResult.items.find(e => e.examId === examId) || null;
+      },
+      { examId }
+    );
   }
 
   async findByProvider(provider: string): Promise<Exam[]> {
-    return this.executeWithErrorHandling('findByProvider', async () => {
-      this.validateRequired({ provider }, 'findByProvider');
-      const allExamsResult = await this.findAll();
-      return allExamsResult.items.filter(e => e.providerId === provider);
-    }, { provider });
+    return this.executeWithErrorHandling(
+      'findByProvider',
+      async () => {
+        this.validateRequired({ provider }, 'findByProvider');
+        const allExamsResult = await this.findAll();
+        return allExamsResult.items.filter(e => e.providerId === provider);
+      },
+      { provider }
+    );
   }
 
   async findByCategory(category: string): Promise<Exam[]> {
-    return this.executeWithErrorHandling('findByCategory', async () => {
-      this.validateRequired({ category }, 'findByCategory');
-      const allExamsResult = await this.findAll();
-      return allExamsResult.items.filter(e => e.category === category);
-    }, { category });
+    return this.executeWithErrorHandling(
+      'findByCategory',
+      async () => {
+        this.validateRequired({ category }, 'findByCategory');
+        const allExamsResult = await this.findAll();
+        return allExamsResult.items.filter(e => e.category === category);
+      },
+      { category }
+    );
   }
 
   async findByLevel(level: string): Promise<Exam[]> {
-    return this.executeWithErrorHandling('findByLevel', async () => {
-      this.validateRequired({ level }, 'findByLevel');
-      const allExamsResult = await this.findAll();
-      return allExamsResult.items.filter(e => e.level === level);
-    }, { level });
+    return this.executeWithErrorHandling(
+      'findByLevel',
+      async () => {
+        this.validateRequired({ level }, 'findByLevel');
+        const allExamsResult = await this.findAll();
+        return allExamsResult.items.filter(e => e.level === level);
+      },
+      { level }
+    );
   }
 
   clearCache(): void {

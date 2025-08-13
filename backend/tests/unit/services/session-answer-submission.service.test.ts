@@ -10,24 +10,24 @@ const mockSessionRepository = {
   findById: jest.fn(),
   update: jest.fn(),
   create: jest.fn(),
-  delete: jest.fn()
+  delete: jest.fn(),
 };
 
 const mockProviderService = {
-  getProvider: jest.fn()
+  getProvider: jest.fn(),
 };
 
 const mockExamService = {
-  getExam: jest.fn()
+  getExam: jest.fn(),
 };
 
 const mockTopicService = {
-  getTopic: jest.fn()
+  getTopic: jest.fn(),
 };
 
 const mockQuestionService = {
   getQuestion: jest.fn(),
-  getQuestions: jest.fn()
+  getQuestions: jest.fn(),
 };
 
 describe('SessionService - Answer Submission (Phase 20)', () => {
@@ -58,14 +58,14 @@ describe('SessionService - Answer Submission (Phase 20)', () => {
           correctAnswer: ['A'],
           timeSpent: 0,
           skipped: false,
-          markedForReview: false
-        }
+          markedForReview: false,
+        },
       ],
       currentQuestionIndex: 0,
       totalQuestions: 1,
       correctAnswers: 0,
       createdAt: '2024-01-01T00:00:00Z',
-      updatedAt: '2024-01-01T00:00:00Z'
+      updatedAt: '2024-01-01T00:00:00Z',
     };
 
     const mockQuestionDetails = {
@@ -78,7 +78,7 @@ describe('SessionService - Answer Submission (Phase 20)', () => {
       correctAnswer: ['A'],
       explanation: 'This is the correct answer because...',
       difficulty: 'medium',
-      tags: ['test']
+      tags: ['test'],
     };
 
     it('should submit correct answer successfully', async () => {
@@ -87,7 +87,7 @@ describe('SessionService - Answer Submission (Phase 20)', () => {
         answer: ['A'],
         timeSpent: 60,
         skipped: false,
-        markedForReview: false
+        markedForReview: false,
       };
 
       const updatedSession = {
@@ -98,11 +98,11 @@ describe('SessionService - Answer Submission (Phase 20)', () => {
             userAnswer: ['A'],
             isCorrect: true,
             timeSpent: 60,
-            answeredAt: expect.any(String)
-          }
+            answeredAt: expect.any(String),
+          },
         ],
         correctAnswers: 1,
-        updatedAt: expect.any(String)
+        updatedAt: expect.any(String),
       };
 
       mockSessionRepository.findById.mockResolvedValue(mockSession);
@@ -127,7 +127,7 @@ describe('SessionService - Answer Submission (Phase 20)', () => {
         answer: ['B'],
         timeSpent: 45,
         skipped: false,
-        markedForReview: false
+        markedForReview: false,
       };
 
       const updatedSession = {
@@ -138,11 +138,11 @@ describe('SessionService - Answer Submission (Phase 20)', () => {
             userAnswer: ['B'],
             isCorrect: false,
             timeSpent: 45,
-            answeredAt: expect.any(String)
-          }
+            answeredAt: expect.any(String),
+          },
         ],
         correctAnswers: 0,
-        updatedAt: expect.any(String)
+        updatedAt: expect.any(String),
       };
 
       mockSessionRepository.findById.mockResolvedValue(mockSession);
@@ -165,7 +165,7 @@ describe('SessionService - Answer Submission (Phase 20)', () => {
         answer: ['C'],
         timeSpent: 10,
         skipped: true,
-        markedForReview: false
+        markedForReview: false,
       };
 
       const updatedSession = {
@@ -177,11 +177,11 @@ describe('SessionService - Answer Submission (Phase 20)', () => {
             isCorrect: false,
             timeSpent: 10,
             skipped: true,
-            answeredAt: expect.any(String)
-          }
+            answeredAt: expect.any(String),
+          },
         ],
         correctAnswers: 0,
-        updatedAt: expect.any(String)
+        updatedAt: expect.any(String),
       };
 
       mockSessionRepository.findById.mockResolvedValue(mockSession);
@@ -200,7 +200,7 @@ describe('SessionService - Answer Submission (Phase 20)', () => {
         answer: ['A'],
         timeSpent: 120,
         skipped: false,
-        markedForReview: true
+        markedForReview: true,
       };
 
       const updatedSession = {
@@ -212,11 +212,11 @@ describe('SessionService - Answer Submission (Phase 20)', () => {
             isCorrect: true,
             timeSpent: 120,
             markedForReview: true,
-            answeredAt: expect.any(String)
-          }
+            answeredAt: expect.any(String),
+          },
         ],
         correctAnswers: 1,
-        updatedAt: expect.any(String)
+        updatedAt: expect.any(String),
       };
 
       mockSessionRepository.findById.mockResolvedValue(mockSession);
@@ -233,13 +233,14 @@ describe('SessionService - Answer Submission (Phase 20)', () => {
       const request: SubmitAnswerRequest = {
         questionId: 'question-1',
         answer: ['A'],
-        timeSpent: 60
+        timeSpent: 60,
       };
 
       mockSessionRepository.findById.mockResolvedValue(null);
 
-      await expect(sessionService.submitAnswer('non-existent-session', request))
-        .rejects.toThrow('Session not found');
+      await expect(sessionService.submitAnswer('non-existent-session', request)).rejects.toThrow(
+        'Session not found'
+      );
     });
 
     it('should throw error for inactive session', async () => {
@@ -247,26 +248,28 @@ describe('SessionService - Answer Submission (Phase 20)', () => {
       const request: SubmitAnswerRequest = {
         questionId: 'question-1',
         answer: ['A'],
-        timeSpent: 60
+        timeSpent: 60,
       };
 
       mockSessionRepository.findById.mockResolvedValue(inactiveSession);
 
-      await expect(sessionService.submitAnswer('test-session-id', request))
-        .rejects.toThrow('Cannot submit answers to inactive session');
+      await expect(sessionService.submitAnswer('test-session-id', request)).rejects.toThrow(
+        'Cannot submit answers to inactive session'
+      );
     });
 
     it('should throw error for question not in session', async () => {
       const request: SubmitAnswerRequest = {
         questionId: 'non-existent-question',
         answer: ['A'],
-        timeSpent: 60
+        timeSpent: 60,
       };
 
       mockSessionRepository.findById.mockResolvedValue(mockSession);
 
-      await expect(sessionService.submitAnswer('test-session-id', request))
-        .rejects.toThrow('Question not found in session');
+      await expect(sessionService.submitAnswer('test-session-id', request)).rejects.toThrow(
+        'Question not found in session'
+      );
     });
 
     it('should calculate score correctly based on difficulty and time', async () => {
@@ -279,7 +282,7 @@ describe('SessionService - Answer Submission (Phase 20)', () => {
         answer: ['A'],
         timeSpent: 30, // Fast answer
         skipped: false,
-        markedForReview: false
+        markedForReview: false,
       };
 
       // Test easy question with fast answer

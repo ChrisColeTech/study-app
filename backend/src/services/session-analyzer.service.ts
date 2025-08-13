@@ -1,21 +1,26 @@
 // Session Analyzer Service - Phase 5: SessionService Decomposition
 // Handles results analysis, performance calculations, and study recommendations
 
-import { 
-  StudySession, 
-  SessionQuestion,
-  Question
-} from '../shared/types/domain.types';
 import {
+  ISessionAnalyzer,
   DetailedSessionResults,
   QuestionResultBreakdown,
+  StudyRecommendations,
+  FocusArea,
+} from '../shared/types/session.types';
+import {
+  StudySession,
+  Question,
+} from '../shared/types/domain.types';
+import {
+  ISessionRepository,
+} from '../repositories/session.repository';
+import {
   DifficultyPerformance,
   TopicPerformanceBreakdown,
   TimeDistribution,
-  StudyRecommendations,
-  FocusArea,
-  ISessionAnalyzer
-} from '../shared/types/session.types';
+  UserProgressUpdate,
+} from '../shared/types/analytics.types';
 import { createLogger } from '../shared/logger';
 
 export class SessionAnalyzer implements ISessionAnalyzer {
@@ -31,17 +36,18 @@ export class SessionAnalyzer implements ISessionAnalyzer {
     completedAt: string,
     sessionDuration: number
   ): Promise<DetailedSessionResults> {
-    this.logger.info('Generating detailed session results', { 
+    this.logger.info('Generating detailed session results', {
       sessionId: session.sessionId,
       questionCount: questionDetails.length,
-      sessionDuration 
+      sessionDuration,
     });
 
     try {
       // Calculate basic metrics
       const totalTimeSpent = session.questions.reduce((total, q) => total + q.timeSpent, 0);
       const answeredQuestions = session.questions.filter(q => q.userAnswer !== undefined);
-      const averageTimePerQuestion = answeredQuestions.length > 0 ? totalTimeSpent / answeredQuestions.length : 0;
+      const averageTimePerQuestion =
+        answeredQuestions.length > 0 ? totalTimeSpent / answeredQuestions.length : 0;
 
       // Generate question-by-question breakdown
       const questionsBreakdown = this.generateQuestionBreakdown(session, questionDetails);
@@ -75,22 +81,21 @@ export class SessionAnalyzer implements ISessionAnalyzer {
         performanceByTopic,
         timeDistribution,
         completedAt,
-        sessionDuration
+        sessionDuration,
       };
 
-      this.logger.info('Detailed session results generated', { 
+      this.logger.info('Detailed session results generated', {
         sessionId: session.sessionId,
         finalScore: detailedResults.finalScore,
         maxPossibleScore: detailedResults.maxPossibleScore,
-        accuracyPercentage: detailedResults.accuracyPercentage
+        accuracyPercentage: detailedResults.accuracyPercentage,
       });
 
       return detailedResults;
-
     } catch (error) {
-      this.logger.error('Error generating detailed results', { 
+      this.logger.error('Error generating detailed results', {
         error: error instanceof Error ? error.message : String(error),
-        sessionId: session.sessionId 
+        sessionId: session.sessionId,
       });
       throw error;
     }
@@ -104,20 +109,23 @@ export class SessionAnalyzer implements ISessionAnalyzer {
     session: StudySession,
     questionDetails: Question[]
   ): Promise<TopicPerformanceBreakdown[]> {
-    this.logger.info('Calculating topic performance', { 
+    this.logger.info('Calculating topic performance', {
       sessionId: session.sessionId,
-      questionCount: questionDetails.length 
+      questionCount: questionDetails.length,
     });
 
-    const topicStats = new Map<string, {
-      topicId: string;
-      topicName: string;
-      questionsTotal: number;
-      questionsCorrect: number;
-      totalTime: number;
-      totalScore: number;
-      maxPossibleScore: number;
-    }>();
+    const topicStats = new Map<
+      string,
+      {
+        topicId: string;
+        topicName: string;
+        questionsTotal: number;
+        questionsCorrect: number;
+        totalTime: number;
+        totalScore: number;
+        maxPossibleScore: number;
+      }
+    >();
 
     // Aggregate stats by topic
     session.questions.forEach((sessionQuestion, index) => {
@@ -133,27 +141,31 @@ export class SessionAnalyzer implements ISessionAnalyzer {
           questionsCorrect: 0,
           totalTime: 0,
           totalScore: 0,
-          maxPossibleScore: 0
+          maxPossibleScore: 0,
         });
       }
 
       const stats = topicStats.get(topicId)!;
       stats.questionsTotal++;
       stats.totalTime += sessionQuestion.timeSpent;
-      
+
       // Calculate max possible score for this question
       const maxScore = this.calculateQuestionMaxScore(question.difficulty);
       stats.maxPossibleScore += maxScore;
 
       if (sessionQuestion.isCorrect) {
         stats.questionsCorrect++;
-        stats.totalScore += this.calculateQuestionScore(question.difficulty, sessionQuestion.timeSpent);
+        stats.totalScore += this.calculateQuestionScore(
+          question.difficulty,
+          sessionQuestion.timeSpent
+        );
       }
     });
 
     // Convert to performance breakdown array
     const topicPerformances = Array.from(topicStats.values()).map(stats => {
-      const accuracy = stats.questionsTotal > 0 ? (stats.questionsCorrect / stats.questionsTotal) * 100 : 0;
+      const accuracy =
+        stats.questionsTotal > 0 ? (stats.questionsCorrect / stats.questionsTotal) * 100 : 0;
       const averageTime = stats.questionsTotal > 0 ? stats.totalTime / stats.questionsTotal : 0;
 
       return {
@@ -166,8 +178,8 @@ export class SessionAnalyzer implements ISessionAnalyzer {
         totalScore: stats.totalScore,
         maxPossibleScore: stats.maxPossibleScore,
         strongestArea: false, // Will be set below
-        weakestArea: false,   // Will be set below
-        needsImprovement: accuracy < 70
+        weakestArea: false, // Will be set below
+        needsImprovement: accuracy < 70,
       };
     });
 
@@ -180,10 +192,11 @@ export class SessionAnalyzer implements ISessionAnalyzer {
       }
     }
 
-    this.logger.info('Topic performance calculated', { 
+    this.logger.info('Topic performance calculated', {
       sessionId: session.sessionId,
       topicCount: topicPerformances.length,
-      averageAccuracy: topicPerformances.reduce((sum, t) => sum + t.accuracy, 0) / topicPerformances.length
+      averageAccuracy:
+        topicPerformances.reduce((sum, t) => sum + t.accuracy, 0) / topicPerformances.length,
     });
 
     return topicPerformances;
@@ -199,8 +212,9 @@ export class SessionAnalyzer implements ISessionAnalyzer {
   ): QuestionResultBreakdown[] {
     return session.questions.map((sessionQuestion, index) => {
       const question = questionDetails[index];
-      const score = sessionQuestion.isCorrect ? 
-        this.calculateQuestionScore(question?.difficulty || 'medium', sessionQuestion.timeSpent) : 0;
+      const score = sessionQuestion.isCorrect
+        ? this.calculateQuestionScore(question?.difficulty || 'medium', sessionQuestion.timeSpent)
+        : 0;
 
       return {
         questionId: sessionQuestion.questionId,
@@ -215,7 +229,7 @@ export class SessionAnalyzer implements ISessionAnalyzer {
         topicName: `Topic ${question?.topicId || 'Unknown'}`,
         explanation: question?.explanation || 'No explanation available',
         markedForReview: sessionQuestion.markedForReview,
-        skipped: sessionQuestion.skipped
+        skipped: sessionQuestion.skipped,
       };
     });
   }
@@ -236,11 +250,11 @@ export class SessionAnalyzer implements ISessionAnalyzer {
    */
   private calculateQuestionMaxScore(difficulty: string): number {
     const basePoints = {
-      'easy': 1,
-      'medium': 2,
-      'hard': 3
+      easy: 1,
+      medium: 2,
+      hard: 3,
     };
-    
+
     const points = basePoints[difficulty as keyof typeof basePoints] || 2;
     return Math.round(points * 1.5); // Maximum with time bonus
   }
@@ -254,16 +268,16 @@ export class SessionAnalyzer implements ISessionAnalyzer {
     questionDetails: Question[]
   ): DifficultyPerformance[] {
     const difficulties = ['easy', 'medium', 'hard'] as const;
-    
+
     return difficulties.map(difficulty => {
-      const questionsOfDifficulty = session.questions.filter((_, index) => 
-        questionDetails[index]?.difficulty === difficulty
+      const questionsOfDifficulty = session.questions.filter(
+        (_, index) => questionDetails[index]?.difficulty === difficulty
       );
 
       const totalQuestions = questionsOfDifficulty.length;
       const correctQuestions = questionsOfDifficulty.filter(q => q.isCorrect).length;
       const accuracy = totalQuestions > 0 ? (correctQuestions / totalQuestions) * 100 : 0;
-      
+
       const totalTime = questionsOfDifficulty.reduce((sum, q) => sum + q.timeSpent, 0);
       const averageTime = totalQuestions > 0 ? totalTime / totalQuestions : 0;
 
@@ -280,7 +294,7 @@ export class SessionAnalyzer implements ISessionAnalyzer {
         accuracy,
         averageTime,
         totalScore,
-        maxPossibleScore
+        maxPossibleScore,
       };
     });
   }
@@ -296,11 +310,11 @@ export class SessionAnalyzer implements ISessionAnalyzer {
     let fastQuestions = 0;
     let normalQuestions = 0;
     let slowQuestions = 0;
-    
+
     const timesByDifficulty = {
       easy: [] as number[],
       medium: [] as number[],
-      hard: [] as number[]
+      hard: [] as number[],
     };
 
     session.questions.forEach((sessionQuestion, index) => {
@@ -309,7 +323,7 @@ export class SessionAnalyzer implements ISessionAnalyzer {
 
       const expectedTime = this.calculateExpectedTime(question.difficulty);
       const actualTime = sessionQuestion.timeSpent;
-      
+
       // Categorize question timing
       if (actualTime < expectedTime * 0.5) {
         fastQuestions++;
@@ -326,12 +340,18 @@ export class SessionAnalyzer implements ISessionAnalyzer {
     });
 
     // Calculate averages by difficulty
-    const averageTimeEasy = timesByDifficulty.easy.length > 0 ? 
-      timesByDifficulty.easy.reduce((a, b) => a + b, 0) / timesByDifficulty.easy.length : 0;
-    const averageTimeMedium = timesByDifficulty.medium.length > 0 ? 
-      timesByDifficulty.medium.reduce((a, b) => a + b, 0) / timesByDifficulty.medium.length : 0;
-    const averageTimeHard = timesByDifficulty.hard.length > 0 ? 
-      timesByDifficulty.hard.reduce((a, b) => a + b, 0) / timesByDifficulty.hard.length : 0;
+    const averageTimeEasy =
+      timesByDifficulty.easy.length > 0
+        ? timesByDifficulty.easy.reduce((a, b) => a + b, 0) / timesByDifficulty.easy.length
+        : 0;
+    const averageTimeMedium =
+      timesByDifficulty.medium.length > 0
+        ? timesByDifficulty.medium.reduce((a, b) => a + b, 0) / timesByDifficulty.medium.length
+        : 0;
+    const averageTimeHard =
+      timesByDifficulty.hard.length > 0
+        ? timesByDifficulty.hard.reduce((a, b) => a + b, 0) / timesByDifficulty.hard.length
+        : 0;
 
     return {
       fastQuestions,
@@ -339,7 +359,7 @@ export class SessionAnalyzer implements ISessionAnalyzer {
       slowQuestions,
       averageTimeEasy,
       averageTimeMedium,
-      averageTimeHard
+      averageTimeHard,
     };
   }
 
@@ -349,10 +369,14 @@ export class SessionAnalyzer implements ISessionAnalyzer {
    */
   private calculateExpectedTime(difficulty: string): number {
     switch (difficulty) {
-      case 'easy': return 60;    // 1 minute
-      case 'medium': return 90;  // 1.5 minutes
-      case 'hard': return 120;   // 2 minutes
-      default: return 90;        // Default to medium
+      case 'easy':
+        return 60; // 1 minute
+      case 'medium':
+        return 90; // 1.5 minutes
+      case 'hard':
+        return 120; // 2 minutes
+      default:
+        return 90; // Default to medium
     }
   }
 
@@ -362,17 +386,17 @@ export class SessionAnalyzer implements ISessionAnalyzer {
    */
   private calculateQuestionScore(difficulty: string, timeSpent: number): number {
     const basePoints = {
-      'easy': 1,
-      'medium': 2,
-      'hard': 3
+      easy: 1,
+      medium: 2,
+      hard: 3,
     };
 
     const points = basePoints[difficulty as keyof typeof basePoints] || 2;
     const expectedTime = this.calculateExpectedTime(difficulty);
-    
+
     // Time bonus: up to 50% bonus for fast answers
     const timeFactor = Math.max(0.5, Math.min(1.5, expectedTime / timeSpent));
-    
+
     return Math.round(points * timeFactor);
   }
 
@@ -386,19 +410,23 @@ export class SessionAnalyzer implements ISessionAnalyzer {
     const totalQuestions = session.questions.length;
     const correctAnswers = session.questions.filter(q => q.isCorrect === true).length;
     const accuracy = totalQuestions > 0 ? Math.round((correctAnswers / totalQuestions) * 100) : 0;
-    
+
     return {
       sessionId: session.sessionId,
       finalScore: session.score || 0,
       maxPossibleScore: totalQuestions * 3, // Assuming max 3 points per question
       accuracyPercentage: accuracy,
       totalTimeSpent: session.questions.reduce((total, q) => total + (q.timeSpent || 0), 0),
-      averageTimePerQuestion: totalQuestions > 0 ? session.questions.reduce((total, q) => total + (q.timeSpent || 0), 0) / totalQuestions : 0,
+      averageTimePerQuestion:
+        totalQuestions > 0
+          ? session.questions.reduce((total, q) => total + (q.timeSpent || 0), 0) / totalQuestions
+          : 0,
       questionsBreakdown: session.questions.map((q, index) => {
         // Calculate score based on correctness and default values
-        const questionScore = q.isCorrect ? 
-          this.calculateQuestionScore('medium', q.timeSpent || 0) : 0;
-        
+        const questionScore = q.isCorrect
+          ? this.calculateQuestionScore('medium', q.timeSpent || 0)
+          : 0;
+
         return {
           questionId: q.questionId,
           questionText: 'Question text not available',
@@ -412,7 +440,7 @@ export class SessionAnalyzer implements ISessionAnalyzer {
           topicName: 'Unknown Topic',
           explanation: 'No explanation available',
           markedForReview: q.markedForReview || false,
-          skipped: q.skipped || false
+          skipped: q.skipped || false,
         };
       }),
       performanceByDifficulty: [],
@@ -423,10 +451,10 @@ export class SessionAnalyzer implements ISessionAnalyzer {
         slowQuestions: 0,
         averageTimeEasy: 0,
         averageTimeMedium: 0,
-        averageTimeHard: 0
+        averageTimeHard: 0,
       },
       completedAt: new Date().toISOString(),
-      sessionDuration: session.questions.reduce((total, q) => total + (q.timeSpent || 0), 0)
+      sessionDuration: session.questions.reduce((total, q) => total + (q.timeSpent || 0), 0),
     };
   }
 
@@ -439,11 +467,15 @@ export class SessionAnalyzer implements ISessionAnalyzer {
     detailedResults: DetailedSessionResults
   ): Promise<StudyRecommendations> {
     const accuracy = detailedResults.accuracyPercentage;
-    
-    let overallRecommendation: 'excellent' | 'good' | 'needs_improvement' | 'requires_focused_study';
+
+    let overallRecommendation:
+      | 'excellent'
+      | 'good'
+      | 'needs_improvement'
+      | 'requires_focused_study';
     let readinessForExam = false;
     let suggestedStudyTime = 30; // minutes per day
-    
+
     if (accuracy >= 90) {
       overallRecommendation = 'excellent';
       readinessForExam = true;
@@ -461,7 +493,7 @@ export class SessionAnalyzer implements ISessionAnalyzer {
       readinessForExam = false;
       suggestedStudyTime = 45;
     }
-    
+
     return {
       overallRecommendation,
       readinessForExam,
@@ -471,9 +503,9 @@ export class SessionAnalyzer implements ISessionAnalyzer {
         sessionType: 'practice' as const,
         topics: [],
         difficulty: accuracy >= 85 ? 'hard' : accuracy >= 70 ? 'medium' : 'easy',
-        questionCount: accuracy >= 70 ? 15 : 20
+        questionCount: accuracy >= 70 ? 15 : 20,
       },
-      motivationalMessage: this.generateMotivationalMessage(accuracy)
+      motivationalMessage: this.generateMotivationalMessage(accuracy),
     };
   }
 
@@ -489,7 +521,7 @@ export class SessionAnalyzer implements ISessionAnalyzer {
     } else if (accuracy >= 70) {
       return "Good effort! You're on the right track. Focus on your weak areas to improve further.";
     } else {
-      return "Keep studying! Every practice session is a step forward. Focus on understanding the concepts better.";
+      return 'Keep studying! Every practice session is a step forward. Focus on understanding the concepts better.';
     }
   }
 }

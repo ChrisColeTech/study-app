@@ -4,13 +4,13 @@ import type { ServiceConfig } from '../shared/service-factory';
 import type {
   SessionAnalyticsFilters,
   SessionAnalyticsData,
-  UserProgressData
+  UserProgressData,
 } from '../shared/types/analytics.types';
 import type { StudySession } from '../shared/types/domain.types';
 
 /**
  * AnalyticsSessionManager - Handles session and user progress data access
- * 
+ *
  * Single Responsibility: Pure DynamoDB operations for analytics data retrieval
  * Extracted from AnalyticsRepository as part of SRP compliance (Objective 13)
  */
@@ -34,11 +34,11 @@ export class AnalyticsSessionManager {
         TableName: this.config.tables.studySessions,
         FilterExpression: '#status = :status',
         ExpressionAttributeNames: {
-          '#status': 'status'
+          '#status': 'status',
         },
         ExpressionAttributeValues: {
-          ':status': 'completed'
-        }
+          ':status': 'completed',
+        },
       };
 
       // Add additional filters
@@ -79,15 +79,16 @@ export class AnalyticsSessionManager {
       const result = await this.dynamoClient.send(new ScanCommand(params));
       const sessions = result.Items || [];
 
-      this.logger.info('Successfully retrieved sessions for analytics', { 
+      this.logger.info('Successfully retrieved sessions for analytics', {
         count: sessions.length,
-        filters 
+        filters,
       });
 
       return sessions as SessionAnalyticsData[];
-
     } catch (error) {
-      this.logger.error('Failed to get completed sessions for analytics', error as Error, { filters });
+      this.logger.error('Failed to get completed sessions for analytics', error as Error, {
+        filters,
+      });
       throw new Error(`Failed to retrieve session analytics data: ${(error as Error).message}`);
     }
   }
@@ -100,7 +101,7 @@ export class AnalyticsSessionManager {
 
     try {
       const params: any = {
-        TableName: this.config.tables.userProgress
+        TableName: this.config.tables.userProgress,
       };
 
       if (userId) {
@@ -112,15 +113,16 @@ export class AnalyticsSessionManager {
       const result = await this.dynamoClient.send(new ScanCommand(params));
       const progressData = result.Items || [];
 
-      this.logger.info('Successfully retrieved user progress data', { 
+      this.logger.info('Successfully retrieved user progress data', {
         count: progressData.length,
-        ...(userId && { userId })
+        ...(userId && { userId }),
       });
 
       return progressData as UserProgressData[];
-
     } catch (error) {
-      this.logger.error('Failed to get user progress data', error as Error, { ...(userId && { userId }) });
+      this.logger.error('Failed to get user progress data', error as Error, {
+        ...(userId && { userId }),
+      });
       throw new Error(`Failed to retrieve user progress data: ${(error as Error).message}`);
     }
   }
@@ -134,11 +136,11 @@ export class AnalyticsSessionManager {
     try {
       const params = {
         TableName: this.config.tables.studySessions,
-        Key: { sessionId }
+        Key: { sessionId },
       };
 
       const response = await this.dynamoClient.send(new GetCommand(params));
-      
+
       if (!response.Item) {
         return null;
       }
@@ -148,12 +150,16 @@ export class AnalyticsSessionManager {
       return {
         sessionId: session.sessionId,
         totalAnswers: session.questions.length,
-        correctAnswers: session.questions.filter((q: any) => q.userAnswer && q.correctAnswer && 
-          JSON.stringify(q.userAnswer.sort()) === JSON.stringify(q.correctAnswer.sort())).length,
+        correctAnswers: session.questions.filter(
+          (q: any) =>
+            q.userAnswer &&
+            q.correctAnswer &&
+            JSON.stringify(q.userAnswer.sort()) === JSON.stringify(q.correctAnswer.sort())
+        ).length,
         totalTime: session.questions.reduce((sum: number, q: any) => sum + (q.timeSpent || 0), 0),
         providerId: session.providerId,
         examId: session.examId,
-        completedAt: session.updatedAt
+        completedAt: session.updatedAt,
       };
     } catch (error) {
       this.logger.error('Failed to get session details', error as Error, { sessionId });
@@ -173,7 +179,7 @@ export class AnalyticsSessionManager {
         sessions: [],
         accuracy: 0,
         averageTime: 0,
-        competencyScores: {}
+        competencyScores: {},
       };
     } catch (error) {
       this.logger.error('Failed to get performance data', error as Error, { params });

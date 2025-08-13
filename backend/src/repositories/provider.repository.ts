@@ -66,11 +66,13 @@ export class ProviderRepository extends S3BaseRepository implements IProviderRep
    * Perform health check operation for S3 connectivity
    */
   protected async performHealthCheck(): Promise<void> {
-    await this.s3Client.send(new ListObjectsV2Command({
-      Bucket: this.bucketName,
-      Prefix: this.PROVIDERS_PREFIX,
-      MaxKeys: 1
-    }));
+    await this.s3Client.send(
+      new ListObjectsV2Command({
+        Bucket: this.bucketName,
+        Prefix: this.PROVIDERS_PREFIX,
+        MaxKeys: 1,
+      })
+    );
   }
 
   /**
@@ -96,7 +98,7 @@ export class ProviderRepository extends S3BaseRepository implements IProviderRep
     this.cache.set(key, {
       data,
       timestamp: Date.now(),
-      ttl: customTtl || this.CACHE_TTL
+      ttl: customTtl || this.CACHE_TTL,
     });
   }
 
@@ -106,18 +108,18 @@ export class ProviderRepository extends S3BaseRepository implements IProviderRep
   async findAll(filters?: any): Promise<StandardQueryResult<Provider>> {
     return this.executeWithErrorHandling('findAll', async () => {
       const cacheKey = 'all-providers';
-      
+
       // Check cache first
       const cachedProviders = this.getFromCache<Provider[]>(cacheKey);
       let providers: Provider[];
-      
+
       if (cachedProviders) {
         this.logger.debug('Providers retrieved from cache', { count: cachedProviders.length });
         providers = cachedProviders;
       } else {
         // Load from S3
         providers = await this.loadProvidersFromS3();
-        
+
         // Cache results
         this.setCache(cacheKey, providers);
         this.logger.info('Providers loaded from S3', { count: providers.length });
@@ -130,7 +132,7 @@ export class ProviderRepository extends S3BaseRepository implements IProviderRep
         limit: filters?.limit || this.config.query?.defaultLimit || 20,
         offset: filters?.offset || 0,
         hasMore: false, // All providers loaded in one call
-        executionTimeMs: 0 // Will be set by executeWithErrorHandling
+        executionTimeMs: 0, // Will be set by executeWithErrorHandling
       };
     });
   }
@@ -139,88 +141,114 @@ export class ProviderRepository extends S3BaseRepository implements IProviderRep
    * Find provider by ID
    */
   async findById(providerId: string): Promise<Provider | null> {
-    return this.executeWithErrorHandling('findById', async () => {
-      this.validateRequired({ providerId }, 'findById');
+    return this.executeWithErrorHandling(
+      'findById',
+      async () => {
+        this.validateRequired({ providerId }, 'findById');
 
-      const cacheKey = `provider-${providerId}`;
-      
-      // Check cache first
-      const cachedProvider = this.getFromCache<Provider>(cacheKey);
-      if (cachedProvider) {
-        this.logger.debug('Provider retrieved from cache', { providerId });
-        return cachedProvider;
-      }
+        const cacheKey = `provider-${providerId}`;
 
-      // Get all providers and find by ID
-      const allProvidersResult = await this.findAll();
-      const provider = allProvidersResult.items.find((p: any) => p.id === providerId) || null;
-      
-      // Cache individual provider
-      if (provider) {
-        this.setCache(cacheKey, provider);
-        this.logger.debug('Provider found and cached', { providerId });
-      } else {
-        this.logger.debug('Provider not found', { providerId });
-      }
+        // Check cache first
+        const cachedProvider = this.getFromCache<Provider>(cacheKey);
+        if (cachedProvider) {
+          this.logger.debug('Provider retrieved from cache', { providerId });
+          return cachedProvider;
+        }
 
-      return provider;
-    }, { providerId });
+        // Get all providers and find by ID
+        const allProvidersResult = await this.findAll();
+        const provider = allProvidersResult.items.find((p: any) => p.id === providerId) || null;
+
+        // Cache individual provider
+        if (provider) {
+          this.setCache(cacheKey, provider);
+          this.logger.debug('Provider found and cached', { providerId });
+        } else {
+          this.logger.debug('Provider not found', { providerId });
+        }
+
+        return provider;
+      },
+      { providerId }
+    );
   }
 
   /**
    * Find providers by category
    */
   async findByCategory(category: string): Promise<Provider[]> {
-    return this.executeWithErrorHandling('findByCategory', async () => {
-      this.validateRequired({ category }, 'findByCategory');
+    return this.executeWithErrorHandling(
+      'findByCategory',
+      async () => {
+        this.validateRequired({ category }, 'findByCategory');
 
-      const cacheKey = `providers-category-${category}`;
-      
-      // Check cache first
-      const cachedProviders = this.getFromCache<Provider[]>(cacheKey);
-      if (cachedProviders) {
-        this.logger.debug('Providers retrieved from cache', { category, count: cachedProviders.length });
-        return cachedProviders;
-      }
+        const cacheKey = `providers-category-${category}`;
 
-      // Get all providers and filter by category
-      const allProvidersResult = await this.findAll();
-      const filteredProviders = allProvidersResult.items.filter((p: any) => p.category === category);
-      
-      // Cache filtered results
-      this.setCache(cacheKey, filteredProviders);
+        // Check cache first
+        const cachedProviders = this.getFromCache<Provider[]>(cacheKey);
+        if (cachedProviders) {
+          this.logger.debug('Providers retrieved from cache', {
+            category,
+            count: cachedProviders.length,
+          });
+          return cachedProviders;
+        }
 
-      this.logger.info('Providers filtered by category', { category, count: filteredProviders.length });
-      return filteredProviders;
-    }, { category });
+        // Get all providers and filter by category
+        const allProvidersResult = await this.findAll();
+        const filteredProviders = allProvidersResult.items.filter(
+          (p: any) => p.category === category
+        );
+
+        // Cache filtered results
+        this.setCache(cacheKey, filteredProviders);
+
+        this.logger.info('Providers filtered by category', {
+          category,
+          count: filteredProviders.length,
+        });
+        return filteredProviders;
+      },
+      { category }
+    );
   }
 
   /**
    * Find providers by status
    */
   async findByStatus(status: string): Promise<Provider[]> {
-    return this.executeWithErrorHandling('findByStatus', async () => {
-      this.validateRequired({ status }, 'findByStatus');
+    return this.executeWithErrorHandling(
+      'findByStatus',
+      async () => {
+        this.validateRequired({ status }, 'findByStatus');
 
-      const cacheKey = `providers-status-${status}`;
-      
-      // Check cache first
-      const cachedProviders = this.getFromCache<Provider[]>(cacheKey);
-      if (cachedProviders) {
-        this.logger.debug('Providers retrieved from cache', { status, count: cachedProviders.length });
-        return cachedProviders;
-      }
+        const cacheKey = `providers-status-${status}`;
 
-      // Get all providers and filter by status
-      const allProvidersResult = await this.findAll();
-      const filteredProviders = allProvidersResult.items.filter((p: any) => p.status === status);
-      
-      // Cache filtered results
-      this.setCache(cacheKey, filteredProviders);
+        // Check cache first
+        const cachedProviders = this.getFromCache<Provider[]>(cacheKey);
+        if (cachedProviders) {
+          this.logger.debug('Providers retrieved from cache', {
+            status,
+            count: cachedProviders.length,
+          });
+          return cachedProviders;
+        }
 
-      this.logger.info('Providers filtered by status', { status, count: filteredProviders.length });
-      return filteredProviders;
-    }, { status });
+        // Get all providers and filter by status
+        const allProvidersResult = await this.findAll();
+        const filteredProviders = allProvidersResult.items.filter((p: any) => p.status === status);
+
+        // Cache filtered results
+        this.setCache(cacheKey, filteredProviders);
+
+        this.logger.info('Providers filtered by status', {
+          status,
+          count: filteredProviders.length,
+        });
+        return filteredProviders;
+      },
+      { status }
+    );
   }
 
   /**

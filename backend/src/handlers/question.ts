@@ -6,13 +6,13 @@ import { HandlerContext, ApiResponse } from '../shared/types/api.types';
 import { ServiceFactory } from '../shared/service-factory';
 import { createLogger } from '../shared/logger';
 import { ERROR_CODES } from '../shared/constants/error.constants';
-import { 
+import {
   GetQuestionsRequest,
   GetQuestionRequest,
   SearchQuestionsRequest,
   QuestionDifficulty,
   QuestionType,
-  SearchSortOption
+  SearchSortOption,
 } from '../shared/types/question.types';
 
 // Import new middleware
@@ -23,7 +23,7 @@ import {
   CommonParsing,
   ValidationMiddleware,
   AuthMiddleware,
-  AuthConfigs
+  AuthConfigs,
 } from '../shared/middleware';
 import { QuestionValidationSchemas } from '../shared/middleware/validation-schemas';
 
@@ -55,7 +55,7 @@ export class QuestionHandler extends BaseHandler {
         path: '/v1/questions/search',
         handler: this.searchQuestions.bind(this),
         requireAuth: false,
-      }
+      },
     ];
   }
 
@@ -74,12 +74,16 @@ export class QuestionHandler extends BaseHandler {
       search: CommonParsing.search,
       includeExplanations: CommonParsing.booleanFlag,
       includeMetadata: CommonParsing.booleanFlag,
-      ...CommonParsing.pagination
+      ...CommonParsing.pagination,
     });
     if (parseError) return parseError;
 
     // Validate enums if provided using ValidationMiddleware (replaces validateEnumParams)
-    const enumValidation = ValidationMiddleware.validateFields(queryParams, QuestionValidationSchemas.enumParams(), 'query');
+    const enumValidation = ValidationMiddleware.validateFields(
+      queryParams,
+      QuestionValidationSchemas.enumParams(),
+      'query'
+    );
     if (enumValidation) return enumValidation;
 
     // Build request object
@@ -94,7 +98,7 @@ export class QuestionHandler extends BaseHandler {
       ...(queryParams.limit && { limit: queryParams.limit }),
       ...(queryParams.offset && { offset: queryParams.offset }),
       includeExplanations: queryParams.includeExplanations === true,
-      includeMetadata: queryParams.includeMetadata === true
+      includeMetadata: queryParams.includeMetadata === true,
     };
 
     // Business logic only - delegate error handling to middleware
@@ -106,17 +110,17 @@ export class QuestionHandler extends BaseHandler {
       {
         requestId: context.requestId,
         operation: ErrorContexts.Question.LIST,
-        additionalInfo: { filters: request }
+        additionalInfo: { filters: request },
       }
     );
 
     if (error) return error;
 
-    this.logger.info('Questions retrieved successfully', { 
+    this.logger.info('Questions retrieved successfully', {
       requestId: context.requestId,
       total: result!.total,
       returned: result!.questions.length,
-      filters: request
+      filters: request,
     });
 
     return this.buildSuccessResponse('Questions retrieved successfully', result);
@@ -131,20 +135,24 @@ export class QuestionHandler extends BaseHandler {
     if (parseError) return parseError;
 
     // Validate question ID using ValidationMiddleware (replaces inline validation)
-    const questionIdValidation = ValidationMiddleware.validateFields({ questionId: pathParams.id }, QuestionValidationSchemas.questionId(), 'params');
+    const questionIdValidation = ValidationMiddleware.validateFields(
+      { questionId: pathParams.id },
+      QuestionValidationSchemas.questionId(),
+      'params'
+    );
     if (questionIdValidation) return questionIdValidation;
 
     // Parse query parameters
     const { data: queryParams } = ParsingMiddleware.parseQueryParams(context, {
       includeExplanation: CommonParsing.booleanFlag,
-      includeMetadata: CommonParsing.booleanFlag
+      includeMetadata: CommonParsing.booleanFlag,
     });
 
     // Build request object
     const request: GetQuestionRequest = {
       questionId: pathParams.id,
       includeExplanation: queryParams?.includeExplanation !== false, // Default to true
-      includeMetadata: queryParams?.includeMetadata !== false // Default to true
+      includeMetadata: queryParams?.includeMetadata !== false, // Default to true
     };
 
     // Business logic only - delegate error handling to middleware
@@ -156,17 +164,17 @@ export class QuestionHandler extends BaseHandler {
       {
         requestId: context.requestId,
         operation: ErrorContexts.Question.GET,
-        additionalInfo: { questionId: request.questionId }
+        additionalInfo: { questionId: request.questionId },
       }
     );
 
     if (error) return error;
 
-    this.logger.info('Question retrieved successfully', { 
+    this.logger.info('Question retrieved successfully', {
       requestId: context.requestId,
       questionId: result!.question.questionId,
       providerId: result!.question.providerId,
-      examId: result!.question.examId
+      examId: result!.question.examId,
     });
 
     return this.buildSuccessResponse('Question retrieved successfully', result);
@@ -177,15 +185,24 @@ export class QuestionHandler extends BaseHandler {
    */
   private async searchQuestions(context: HandlerContext): Promise<ApiResponse> {
     // Parse and validate request body using middleware
-    const { data: requestBody, error: parseError } = await this.parseRequestBodyOrError<SearchQuestionsRequest>(context, true);
+    const { data: requestBody, error: parseError } =
+      await this.parseRequestBodyOrError<SearchQuestionsRequest>(context, true);
     if (parseError) return parseError;
 
     // Validate query field using ValidationMiddleware (replaces inline validation)
-    const queryValidation = ValidationMiddleware.validateFields(requestBody!, QuestionValidationSchemas.searchQueryRequest(), 'body');
+    const queryValidation = ValidationMiddleware.validateFields(
+      requestBody!,
+      QuestionValidationSchemas.searchQueryRequest(),
+      'body'
+    );
     if (queryValidation) return queryValidation;
 
     // Validate optional fields using ValidationMiddleware (replaces validateSearchRequest)
-    const searchValidation = ValidationMiddleware.validateFields(requestBody!, QuestionValidationSchemas.searchRequest(), 'body');
+    const searchValidation = ValidationMiddleware.validateFields(
+      requestBody!,
+      QuestionValidationSchemas.searchRequest(),
+      'body'
+    );
     if (searchValidation) return searchValidation;
 
     // Build search request
@@ -202,7 +219,7 @@ export class QuestionHandler extends BaseHandler {
       ...(requestBody!.offset && { offset: requestBody!.offset }),
       includeExplanations: requestBody!.includeExplanations === true,
       includeMetadata: requestBody!.includeMetadata === true,
-      highlightMatches: requestBody!.highlightMatches === true
+      highlightMatches: requestBody!.highlightMatches === true,
     };
 
     // Business logic only - delegate error handling to middleware
@@ -214,26 +231,22 @@ export class QuestionHandler extends BaseHandler {
       {
         requestId: context.requestId,
         operation: ErrorContexts.Question.SEARCH,
-        additionalInfo: { query: request.query }
+        additionalInfo: { query: request.query },
       }
     );
 
     if (error) return error;
 
-    this.logger.info('Questions searched successfully', { 
+    this.logger.info('Questions searched successfully', {
       requestId: context.requestId,
       query: result!.query,
       total: result!.total,
       returned: result!.questions.length,
-      searchTime: result!.searchTime
+      searchTime: result!.searchTime,
     });
 
     return this.buildSuccessResponse('Questions searched successfully', result);
   }
-
-
-
-
 }
 
 // Export handler function for Lambda

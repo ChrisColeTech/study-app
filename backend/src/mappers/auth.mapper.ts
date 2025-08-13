@@ -6,7 +6,6 @@ import { AuthUser, LoginResponse } from '../shared/types/auth.types';
 import { TokenGenerationResult } from '../services/token.service';
 
 export class AuthMapper {
-  
   /**
    * Transform UserResponse to AuthUser with default roles and permissions
    */
@@ -18,7 +17,7 @@ export class AuthMapper {
       lastName: user.lastName,
       isActive: user.isActive,
       roles: ['user'], // Default role - will be expanded in future phases
-      permissions: [] // Will be populated based on roles in future phases
+      permissions: [], // Will be populated based on roles in future phases
     };
   }
 
@@ -30,7 +29,7 @@ export class AuthMapper {
       user,
       accessToken: tokens.accessToken,
       refreshToken: tokens.refreshToken,
-      expiresIn: tokens.expiresIn
+      expiresIn: tokens.expiresIn,
     };
   }
 

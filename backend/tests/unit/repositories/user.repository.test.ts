@@ -1,7 +1,13 @@
 // Unit tests for UserRepository
 
 import { mockClient } from 'aws-sdk-client-mock';
-import { DynamoDBDocumentClient, PutCommand, GetCommand, QueryCommand, UpdateCommand } from '@aws-sdk/lib-dynamodb';
+import {
+  DynamoDBDocumentClient,
+  PutCommand,
+  GetCommand,
+  QueryCommand,
+  UpdateCommand,
+} from '@aws-sdk/lib-dynamodb';
 import { UserRepository } from '../../../src/repositories/user.repository';
 import { ServiceConfig } from '../../../src/shared/service-factory';
 import { CreateUserRequest } from '../../../src/shared/types/user.types';
@@ -108,16 +114,18 @@ describe('UserRepository', () => {
       error.name = 'ConditionalCheckFailedException';
       dynamoMock.on(PutCommand).rejects(error);
 
-      await expect(repository.create(testUserData, testPasswordHash))
-        .rejects.toThrow('User ID conflict occurred');
+      await expect(repository.create(testUserData, testPasswordHash)).rejects.toThrow(
+        'User ID conflict occurred'
+      );
     });
 
     it('should rethrow other DynamoDB errors', async () => {
       const error = new Error('Some other error');
       dynamoMock.on(PutCommand).rejects(error);
 
-      await expect(repository.create(testUserData, testPasswordHash))
-        .rejects.toThrow('Some other error');
+      await expect(repository.create(testUserData, testPasswordHash)).rejects.toThrow(
+        'Some other error'
+      );
     });
   });
 
@@ -276,8 +284,9 @@ describe('UserRepository', () => {
       error.name = 'ConditionalCheckFailedException';
       dynamoMock.on(UpdateCommand).rejects(error);
 
-      await expect(repository.update('nonexistent-id', { firstName: 'Jane' }))
-        .rejects.toThrow('User not found');
+      await expect(repository.update('nonexistent-id', { firstName: 'Jane' })).rejects.toThrow(
+        'User not found'
+      );
     });
   });
 

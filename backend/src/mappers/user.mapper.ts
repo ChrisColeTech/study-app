@@ -4,7 +4,6 @@
 import { User, UserResponse } from '../shared/types/user.types';
 
 export class UserMapper {
-  
   /**
    * Convert User to UserResponse (removes sensitive fields like passwordHash)
    */

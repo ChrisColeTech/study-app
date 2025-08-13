@@ -1,30 +1,30 @@
-// User domain types and interfaces
+// =======================================================
+// USER DOMAIN TYPES - STUDY APP V3 BACKEND
+// =======================================================
+// This file contains user-specific types for API requests/responses
+// and business operations. Core User entity is defined in domain.types.ts
 
-export interface User {
-  userId: string;
-  email: string;
-  passwordHash: string;
-  firstName: string;
-  lastName: string;
-  createdAt: string;
-  updatedAt: string;
-  isActive: boolean;
-  preferences?: UserPreferences;
-}
+import { User, UserPreferences, EntityMetadata } from './domain.types';
 
-export interface UserPreferences {
-  defaultProvider?: string;
-  studyReminderEmail?: boolean;
-  progressEmailFrequency?: 'daily' | 'weekly' | 'monthly' | 'never';
-}
+// =======================================================
+// USER API REQUEST/RESPONSE TYPES
+// =======================================================
 
+/**
+ * Request payload for creating a new user
+ */
 export interface CreateUserRequest {
   email: string;
-  password: string;
   firstName: string;
   lastName: string;
+  password: string;
+  preferences?: Partial<UserPreferences>;
 }
 
+/**
+ * Standardized user response format for API endpoints
+ * Note: Excludes sensitive fields like passwordHash and internal metadata
+ */
 export interface UserResponse {
   userId: string;
   email: string;
@@ -33,38 +33,98 @@ export interface UserResponse {
   createdAt: string;
   updatedAt: string;
   isActive: boolean;
-  preferences?: UserPreferences;
+  preferences: UserPreferences;
+  profileCompleteness: number; // percentage
+  lastLoginAt?: string;
 }
 
+/**
+ * Request payload for updating user information
+ */
 export interface UpdateUserRequest {
   firstName?: string;
   lastName?: string;
-  preferences?: UserPreferences;
+  preferences?: Partial<UserPreferences>;
+  isActive?: boolean;
 }
 
-// Validation schemas using Zod (future enhancement)
+/**
+ * User validation rules for form validation and business logic
+ */
 export interface UserValidationRules {
   email: {
-    required: true;
+    required: boolean;
     format: 'email';
-    maxLength: 255;
-  };
-  password: {
-    required: true;
-    minLength: 8;
-    maxLength: 128;
-    pattern: string; // Will include complexity requirements
+    maxLength: number;
   };
   firstName: {
-    required: true;
-    minLength: 1;
-    maxLength: 50;
-    pattern: string; // Alphabetic characters and basic punctuation
+    required: boolean;
+    minLength: number;
+    maxLength: number;
   };
   lastName: {
-    required: true;
-    minLength: 1;
-    maxLength: 50;
-    pattern: string; // Alphabetic characters and basic punctuation
+    required: boolean;
+    minLength: number;
+    maxLength: number;
+  };
+  password: {
+    required: boolean;
+    minLength: number;
+    requireUppercase: boolean;
+    requireLowercase: boolean;
+    requireNumbers: boolean;
+    requireSpecialChars: boolean;
   };
 }
+
+// =======================================================
+// USER BUSINESS OPERATION TYPES
+// =======================================================
+
+/**
+ * User context information for authenticated operations
+ */
+export interface UserContext {
+  userId: string;
+  email: string;
+  fullName: string;
+  isActive: boolean;
+  lastActiveAt: string;
+  sessionContext?: {
+    sessionId: string;
+    loginAt: string;
+    ipAddress?: string;
+    userAgent?: string;
+  };
+}
+
+/**
+ * User activity tracking for analytics and monitoring
+ */
+export interface UserActivity extends EntityMetadata {
+  userId: string;
+  activityType: 'login' | 'logout' | 'session_start' | 'session_complete' | 'goal_created' | 'preference_updated';
+  metadata: Record<string, any>;
+  ipAddress?: string;
+  userAgent?: string;
+}
+
+/**
+ * Extended user preferences for profile management
+ * Consolidates preferences from different domains
+ */
+export interface ExtendedUserPreferences extends UserPreferences {
+  defaultProvider?: string;
+  studyReminderEmail?: boolean;
+  progressEmailFrequency?: 'daily' | 'weekly' | 'monthly' | 'never';
+  theme?: 'light' | 'dark' | 'auto';
+  language?: 'en' | 'es' | 'fr' | 'de' | 'zh' | 'ja';
+  timezone?: string;
+}
+
+// =======================================================
+// BACKWARD COMPATIBILITY
+// =======================================================
+// Re-export core User types for convenience and maintain existing imports
+
+export type { User, UserPreferences } from './domain.types';

@@ -5,17 +5,14 @@ import { HandlerContext, ApiResponse } from '../shared/types/api.types';
 import { ServiceFactory } from '../shared/service-factory';
 import { createLogger } from '../shared/logger';
 import { ERROR_CODES } from '../shared/constants/error.constants';
-import { 
-  ProgressAnalyticsRequest,
-  IAnalyticsService
-} from '../shared/types/analytics.types';
+import { ProgressAnalyticsRequest, IAnalyticsService } from '../shared/types/analytics.types';
 
 // Import middleware
 import {
   ParsingMiddleware,
   ErrorHandlingMiddleware,
   ErrorContexts,
-  ValidationMiddleware
+  ValidationMiddleware,
 } from '../shared/middleware';
 import { AnalyticsValidationSchemas } from '../shared/middleware/validation-schemas';
 
@@ -53,7 +50,7 @@ export class AnalyticsHandler extends BaseHandler {
         path: '/v1/analytics/health',
         handler: this.getAnalyticsHealth.bind(this),
         requireAuth: false,
-      }
+      },
     ];
   }
 
@@ -70,18 +67,23 @@ export class AnalyticsHandler extends BaseHandler {
     if (parseError) return parseError;
 
     // Validate and build analytics request using ValidationMiddleware (replaces validateProgressAnalyticsRequest)
-    const validationResult = ValidationMiddleware.validateFields(queryParams, AnalyticsValidationSchemas.progressAnalyticsRequest(), 'query');
+    const validationResult = ValidationMiddleware.validateFields(
+      queryParams,
+      AnalyticsValidationSchemas.progressAnalyticsRequest(),
+      'query'
+    );
     if (validationResult) return validationResult;
 
     const analyticsRequest: ProgressAnalyticsRequest = {
-      timeframe: queryParams.timeframe as 'week' | 'month' | 'quarter' | 'year' | 'all' || 'month',
+      timeframe:
+        (queryParams.timeframe as 'week' | 'month' | 'quarter' | 'year' | 'all') || 'month',
       providerId: queryParams.providerId,
       examId: queryParams.examId,
       topics: queryParams.topics ? queryParams.topics.split(',') : undefined,
       startDate: queryParams.startDate,
       endDate: queryParams.endDate,
       ...(queryParams.limit && { limit: parseInt(queryParams.limit, 10) }),
-      ...(queryParams.offset && { offset: parseInt(queryParams.offset, 10) })
+      ...(queryParams.offset && { offset: parseInt(queryParams.offset, 10) }),
     };
 
     // Business logic - delegate error handling to middleware
@@ -93,24 +95,24 @@ export class AnalyticsHandler extends BaseHandler {
       {
         requestId: context.requestId,
         operation: 'ANALYTICS_GET_PROGRESS',
-        additionalInfo: { 
+        additionalInfo: {
           timeframe: analyticsRequest.timeframe,
           providerId: analyticsRequest.providerId,
           examId: analyticsRequest.examId,
-          topicCount: analyticsRequest.topics?.length || 0
-        }
+          topicCount: analyticsRequest.topics?.length || 0,
+        },
       }
     );
 
     if (error) return error;
 
-    this.logger.info('Progress analytics retrieved successfully', { 
+    this.logger.info('Progress analytics retrieved successfully', {
       requestId: context.requestId,
       totalSessions: result!.metadata.totalSessions,
       dataPoints: result!.metadata.dataPoints,
       timeframe: result!.metadata.timeframe,
       overallAccuracy: result!.data.overview.overallAccuracy,
-      topicCount: result!.data.competencyData.topicCompetencies.length
+      topicCount: result!.data.competencyData.topicCompetencies.length,
     });
 
     return this.buildSuccessResponse('Progress analytics retrieved successfully', result);
@@ -133,7 +135,7 @@ export class AnalyticsHandler extends BaseHandler {
       {
         requestId: context.requestId,
         operation: 'ANALYTICS_GET_SESSION',
-        additionalInfo: { sessionId: pathParams.id }
+        additionalInfo: { sessionId: pathParams.id },
       }
     );
 
@@ -150,7 +152,7 @@ export class AnalyticsHandler extends BaseHandler {
     const { data: queryParams, error: parseError } = await this.parseQueryParamsOrError(context);
     if (parseError) return parseError;
 
-    // Business logic - delegate to service  
+    // Business logic - delegate to service
     const { result, error } = await this.executeServiceOrError(
       async () => {
         const analyticsService = this.serviceFactory.getAnalyticsService();
@@ -159,7 +161,7 @@ export class AnalyticsHandler extends BaseHandler {
       {
         requestId: context.requestId,
         operation: 'ANALYTICS_GET_PERFORMANCE',
-        additionalInfo: { filters: Object.keys(queryParams) }
+        additionalInfo: { filters: Object.keys(queryParams) },
       }
     );
 
@@ -176,7 +178,7 @@ export class AnalyticsHandler extends BaseHandler {
 
     try {
       const analyticsService = this.serviceFactory.getAnalyticsService();
-      
+
       // Basic health check - verify service can be instantiated and basic methods exist
       const healthData = {
         status: 'healthy',
@@ -188,7 +190,7 @@ export class AnalyticsHandler extends BaseHandler {
           competencyTracking: 'available',
           trendAnalysis: 'available',
           learningInsights: 'available',
-          visualizationData: 'available'
+          visualizationData: 'available',
         },
         version: '1.0.0',
         capabilities: [
@@ -198,31 +200,29 @@ export class AnalyticsHandler extends BaseHandler {
           'Learning pattern identification',
           'Visualization data preparation',
           'Trend analysis',
-          'Mastery progression tracking'
-        ]
+          'Mastery progression tracking',
+        ],
       };
 
-      this.logger.info('Analytics health check completed', { 
+      this.logger.info('Analytics health check completed', {
         requestId: context.requestId,
-        status: healthData.status
+        status: healthData.status,
       });
 
       return this.buildSuccessResponse('Analytics service is healthy', healthData);
-
     } catch (error) {
-      this.logger.error('Analytics health check failed', error as Error, { 
-        requestId: context.requestId 
+      this.logger.error('Analytics health check failed', error as Error, {
+        requestId: context.requestId,
       });
 
-      return this.buildErrorResponse('Analytics service health check failed', 503, 'SERVICE_UNAVAILABLE', { error: (error as Error).message });
+      return this.buildErrorResponse(
+        'Analytics service health check failed',
+        503,
+        'SERVICE_UNAVAILABLE',
+        { error: (error as Error).message }
+      );
     }
   }
-
-
-
-
-
-
 }
 
 // Export handler function for Lambda

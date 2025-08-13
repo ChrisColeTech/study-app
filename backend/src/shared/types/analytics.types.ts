@@ -1,5 +1,9 @@
 // Analytics specific types for progress tracking
 
+// ===============================================
+// 🎯 CONSOLIDATED ANALYTICS REQUEST/RESPONSE TYPES
+// ===============================================
+
 export interface ProgressAnalyticsRequest {
   timeframe?: 'week' | 'month' | 'quarter' | 'year' | 'all';
   providerId?: string;
@@ -30,6 +34,10 @@ export interface ProgressAnalyticsResponse {
     calculatedAt: string;
   };
 }
+
+// ===============================================
+// 📊 CORE ANALYTICS DATA TYPES
+// ===============================================
 
 export interface ProgressOverview {
   overallProgress: number; // percentage (0-100)
@@ -69,6 +77,10 @@ export interface CompetencyTrendData extends TrendData {
   masteryLevel: 'novice' | 'beginner' | 'intermediate' | 'advanced' | 'expert';
   questionsAnswered: number;
 }
+
+// ===============================================
+// 🧠 COMPETENCY ANALYSIS TYPES
+// ===============================================
 
 export interface CompetencyAnalytics {
   topicCompetencies: TopicCompetency[];
@@ -174,6 +186,10 @@ export interface HistoricalPerformance {
   regressions: string[]; // areas that declined
 }
 
+// ===============================================
+// 🔍 LEARNING INSIGHTS & INTELLIGENCE TYPES
+// ===============================================
+
 export interface LearningInsights {
   patterns: LearningPattern[];
   recommendations: LearningRecommendation[];
@@ -182,7 +198,12 @@ export interface LearningInsights {
 }
 
 export interface LearningPattern {
-  type: 'time_preference' | 'difficulty_preference' | 'topic_affinity' | 'learning_velocity' | 'consistency';
+  type:
+    | 'time_preference'
+    | 'difficulty_preference'
+    | 'topic_affinity'
+    | 'learning_velocity'
+    | 'consistency';
   description: string;
   strength: number; // 0-1
   evidence: string[];
@@ -190,7 +211,12 @@ export interface LearningPattern {
 }
 
 export interface LearningRecommendation {
-  type: 'study_schedule' | 'topic_focus' | 'difficulty_adjustment' | 'review_strategy' | 'exam_readiness';
+  type:
+    | 'study_schedule'
+    | 'topic_focus'
+    | 'difficulty_adjustment'
+    | 'review_strategy'
+    | 'exam_readiness';
   title: string;
   description: string;
   priority: 'high' | 'medium' | 'low';
@@ -200,7 +226,12 @@ export interface LearningRecommendation {
 }
 
 export interface LearningMilestone {
-  type: 'mastery_achieved' | 'streak_milestone' | 'accuracy_milestone' | 'study_time_milestone' | 'topic_completion';
+  type:
+    | 'mastery_achieved'
+    | 'streak_milestone'
+    | 'accuracy_milestone'
+    | 'study_time_milestone'
+    | 'topic_completion';
   title: string;
   description: string;
   achievedAt: string; // ISO string
@@ -221,6 +252,10 @@ export interface LearningWarning {
   recommendations: string[];
   detectedAt: string; // ISO string
 }
+
+// ===============================================
+// 📈 VISUALIZATION & CHARTS TYPES
+// ===============================================
 
 export interface VisualizationData {
   charts: {
@@ -293,16 +328,122 @@ export interface GaugeData {
   };
 }
 
+// ===============================================
+// 🎯 SESSION-SPECIFIC ANALYTICS TYPES (Consolidated from session.types.ts)
+// ===============================================
+
+export interface SessionPerformanceAnalytics {
+  difficulty: DifficultyPerformance[];
+  topics: TopicPerformanceBreakdown[];
+  timeDistribution: TimeDistribution;
+  progressUpdates: UserProgressUpdate[];
+}
+
+export interface DifficultyPerformance {
+  difficulty: 'easy' | 'medium' | 'hard';
+  totalQuestions: number;
+  correctQuestions: number;
+  accuracy: number;
+  averageTime: number;
+  totalScore: number;
+  maxPossibleScore: number;
+}
+
+export interface TopicPerformanceBreakdown {
+  topicId: string;
+  topicName: string;
+  questionsTotal: number;
+  questionsCorrect: number;
+  accuracy: number;
+  averageTime: number;
+  strongestArea: boolean; // true if this is the best performing topic
+  weakestArea: boolean; // true if this is the worst performing topic
+  needsImprovement: boolean; // true if accuracy < 70%
+  totalScore: number;
+  maxPossibleScore: number;
+}
+
+export interface TimeDistribution {
+  fastQuestions: number; // < 50% of expected time
+  normalQuestions: number; // 50-100% of expected time
+  slowQuestions: number; // > 100% of expected time
+  averageTimeEasy: number;
+  averageTimeMedium: number;
+  averageTimeHard: number;
+}
+
+export interface UserProgressUpdate {
+  topicId: string;
+  topicName: string;
+  previousAccuracy: number;
+  newAccuracy: number;
+  previousMasteryLevel: string;
+  newMasteryLevel: string;
+  improvementDirection: 'improved' | 'declined' | 'maintained';
+}
+
+// ===============================================
+// 🏢 LEGACY ANALYTICS TYPES (Consolidated from domain.types.ts)
+// ===============================================
+
+/**
+ * @deprecated Use ProgressOverview instead
+ * Legacy Analytics interface from domain.types.ts - kept for backward compatibility
+ */
+export interface LegacyAnalytics {
+  userId: string;
+  examId: string;
+  providerId: string;
+  totalSessions: number;
+  totalQuestionsAnswered: number;
+  totalCorrectAnswers: number;
+  overallAccuracy: number;
+  averageSessionDuration: number; // minutes
+  studyStreak: number; // days
+  topicBreakdown: LegacyTopicAnalytics[];
+  weeklyProgress: WeeklyProgress[];
+  lastCalculatedAt: string;
+}
+
+/**
+ * @deprecated Use TopicCompetency instead
+ * Legacy TopicAnalytics interface from domain.types.ts - kept for backward compatibility
+ */
+export interface LegacyTopicAnalytics {
+  topicId: string;
+  topicName: string;
+  questionsAnswered: number;
+  correctAnswers: number;
+  accuracy: number;
+  averageTime: number;
+  masteryLevel: string;
+}
+
+export interface WeeklyProgress {
+  week: string; // ISO week (YYYY-WW)
+  questionsAnswered: number;
+  accuracy: number;
+  studyTime: number; // minutes
+}
+
+// ===============================================
+// 🔌 SERVICE INTERFACES
+// ===============================================
+
 // Service interface for analytics operations
 export interface IAnalyticsService {
   getProgressAnalytics(request: ProgressAnalyticsRequest): Promise<ProgressAnalyticsResponse>;
   calculateProgressOverview(userId?: string): Promise<ProgressOverview>;
   generateProgressTrends(timeframe: string, userId?: string): Promise<ProgressTrends>;
   analyzeCompetencies(userId?: string): Promise<CompetencyAnalytics>;
-  getHistoricalPerformance(startDate: string, endDate: string, userId?: string): Promise<HistoricalPerformance[]>;
+  getHistoricalPerformance(
+    startDate: string,
+    endDate: string,
+    userId?: string
+  ): Promise<HistoricalPerformance[]>;
   generateLearningInsights(userId?: string): Promise<LearningInsights>;
   prepareVisualizationData(analyticsData: any): Promise<VisualizationData>;
-  getSessionAnalytics(sessionId: string): Promise<any>;
+  getSessionAnalytics(sessionId: string): Promise<SessionPerformanceAnalytics>;
   getPerformanceAnalytics(params: any): Promise<any>;
 }
 
@@ -315,7 +456,11 @@ export interface IAnalyticsService {
 export interface IProgressAnalyzer {
   calculateProgressOverview(userId?: string): Promise<ProgressOverview>;
   generateProgressTrends(timeframe: string, userId?: string): Promise<ProgressTrends>;
-  getHistoricalPerformance(startDate: string, endDate: string, userId?: string): Promise<HistoricalPerformance[]>;
+  getHistoricalPerformance(
+    startDate: string,
+    endDate: string,
+    userId?: string
+  ): Promise<HistoricalPerformance[]>;
 }
 
 /**
@@ -324,10 +469,13 @@ export interface IProgressAnalyzer {
  */
 export interface ICompetencyAnalyzer {
   analyzeCompetencies(userId?: string): Promise<CompetencyAnalytics>;
-  calculateTopicCompetencies(sessions: any[], progressData: any[]): Promise<TopicCompetency[]>;
-  calculateProviderCompetencies(sessions: any[]): Promise<ProviderCompetency[]>;
+  calculateTopicCompetencies(sessions: SessionAnalyticsData[], progressData: UserProgressData[]): Promise<TopicCompetency[]>;
+  calculateProviderCompetencies(sessions: SessionAnalyticsData[]): Promise<ProviderCompetency[]>;
   analyzeStrengthsAndWeaknesses(topicCompetencies: TopicCompetency[]): StrengthsWeaknesses;
-  calculateMasteryProgression(topicCompetencies: TopicCompetency[], userId?: string): Promise<MasteryProgression>;
+  calculateMasteryProgression(
+    topicCompetencies: TopicCompetency[],
+    userId?: string
+  ): Promise<MasteryProgression>;
 }
 
 /**
@@ -339,10 +487,16 @@ export interface IPerformanceAnalyzer {
   calculateCompetencyScores(data: any): Promise<any>;
   calculatePerformanceTrends(data: any): Promise<any>;
   generatePerformanceInsights(data: any): any;
-  calculateDifficultyProgressTrend(timeframe: string, userId?: string): Promise<DifficultyTrendData[]>;
-  calculateCompetencyGrowthTrend(timeframe: string, userId?: string): Promise<CompetencyTrendData[]>;
-  calculateDifficultyBreakdown(session: any): any;
-  calculateTopicBreakdown(session: any): any;
+  calculateDifficultyProgressTrend(
+    timeframe: string,
+    userId?: string
+  ): Promise<DifficultyTrendData[]>;
+  calculateCompetencyGrowthTrend(
+    timeframe: string,
+    userId?: string
+  ): Promise<CompetencyTrendData[]>;
+  calculateDifficultyBreakdown(session: SessionAnalyticsData): DifficultyPerformance[];
+  calculateTopicBreakdown(session: SessionAnalyticsData): TopicPerformanceBreakdown[];
 }
 
 /**
@@ -352,22 +506,29 @@ export interface IPerformanceAnalyzer {
 export interface IInsightGenerator {
   generateLearningInsights(userId?: string): Promise<LearningInsights>;
   prepareVisualizationData(analyticsData: any): Promise<VisualizationData>;
-  identifyLearningPatterns(sessions: any[]): LearningPattern[];
-  generateLearningRecommendations(sessions: any[], progressData: any[]): LearningRecommendation[];
-  identifyLearningMilestones(sessions: any[], progressData: any[]): LearningMilestone[];
-  detectLearningWarnings(sessions: any[], progressData: any[]): LearningWarning[];
-  generateSessionInsights(session: any): any;
+  identifyLearningPatterns(sessions: SessionAnalyticsData[]): LearningPattern[];
+  generateLearningRecommendations(sessions: SessionAnalyticsData[], progressData: UserProgressData[]): LearningRecommendation[];
+  identifyLearningMilestones(sessions: SessionAnalyticsData[], progressData: UserProgressData[]): LearningMilestone[];
+  detectLearningWarnings(sessions: SessionAnalyticsData[], progressData: UserProgressData[]): LearningWarning[];
+  generateSessionInsights(session: SessionAnalyticsData): any;
 }
+
+// ===============================================
+// 🗄️ REPOSITORY & DATA TYPES
+// ===============================================
 
 // Repository interface for analytics data persistence
 export interface IAnalyticsRepository {
   getCompletedSessions(filters: SessionAnalyticsFilters): Promise<SessionAnalyticsData[]>;
   getUserProgressData(userId?: string): Promise<UserProgressData[]>;
-  getTopicPerformanceHistory(topicIds: string[], userId?: string): Promise<TopicPerformanceHistory[]>;
+  getTopicPerformanceHistory(
+    topicIds: string[],
+    userId?: string
+  ): Promise<TopicPerformanceHistory[]>;
   calculateTrendData(metric: string, timeframe: string, userId?: string): Promise<TrendData[]>;
   saveAnalyticsSnapshot(snapshot: AnalyticsSnapshot): Promise<void>;
   getAnalyticsSnapshot(userId?: string): Promise<AnalyticsSnapshot | null>;
-  getSessionDetails(sessionId: string): Promise<any>;
+  getSessionDetails(sessionId: string): Promise<SessionAnalyticsData>;
   getPerformanceData(params: any): Promise<any>;
 }
 

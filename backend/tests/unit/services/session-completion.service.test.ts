@@ -28,7 +28,7 @@ describe('SessionService - Session Completion', () => {
   beforeEach(() => {
     // Reset mocks
     jest.clearAllMocks();
-    
+
     // Create mocked dependencies
     mockSessionRepository = new SessionRepository() as jest.Mocked<SessionRepository>;
     mockProviderService = new ProviderService() as jest.Mocked<ProviderService>;
@@ -61,7 +61,7 @@ describe('SessionService - Session Completion', () => {
         markedForReview: false,
         userAnswer: ['option-0'],
         isCorrect: true,
-        answeredAt: '2023-01-01T10:00:45Z'
+        answeredAt: '2023-01-01T10:00:45Z',
       },
       {
         questionId: 'q2',
@@ -71,15 +71,15 @@ describe('SessionService - Session Completion', () => {
         markedForReview: false,
         userAnswer: ['option-2'],
         isCorrect: false,
-        answeredAt: '2023-01-01T10:01:45Z'
-      }
+        answeredAt: '2023-01-01T10:01:45Z',
+      },
     ],
     currentQuestionIndex: 1,
     totalQuestions: 2,
     correctAnswers: 1,
     createdAt: '2023-01-01T09:59:00Z',
     updatedAt: '2023-01-01T10:01:45Z',
-    ...overrides
+    ...overrides,
   });
 
   const createMockQuestion = (questionId: string, overrides: any = {}) => ({
@@ -95,7 +95,7 @@ describe('SessionService - Session Completion', () => {
     tags: ['tag1'],
     createdAt: '2023-01-01T00:00:00Z',
     updatedAt: '2023-01-01T00:00:00Z',
-    ...overrides
+    ...overrides,
   });
 
   describe('completeSession', () => {
@@ -110,14 +110,15 @@ describe('SessionService - Session Completion', () => {
         .mockResolvedValueOnce({ question: mockQuestion1 })
         .mockResolvedValueOnce({ question: mockQuestion2 });
       mockTopicService.getTopic.mockResolvedValue({
-        topic: { id: 'topic-1', name: 'Test Topic' }
+        topic: { id: 'topic-1', name: 'Test Topic' },
       } as any);
-      
+
       const completedSession = { ...mockSession, status: 'completed' as const };
       mockSessionRepository.update.mockResolvedValue(completedSession);
 
       // Act
-      const result: CompleteSessionResponse = await sessionService.completeSession('test-session-123');
+      const result: CompleteSessionResponse =
+        await sessionService.completeSession('test-session-123');
 
       // Assert
       expect(result.success).toBe(true);
@@ -147,7 +148,7 @@ describe('SessionService - Session Completion', () => {
           status: 'completed',
           endTime: expect.any(String),
           score: expect.any(Number),
-          updatedAt: expect.any(String)
+          updatedAt: expect.any(String),
         })
       );
     });
@@ -157,8 +158,9 @@ describe('SessionService - Session Completion', () => {
       mockSessionRepository.findById.mockResolvedValue(null);
 
       // Act & Assert
-      await expect(sessionService.completeSession('non-existent-id'))
-        .rejects.toThrow('Session not found');
+      await expect(sessionService.completeSession('non-existent-id')).rejects.toThrow(
+        'Session not found'
+      );
     });
 
     it('should throw error when session is already completed', async () => {
@@ -167,8 +169,9 @@ describe('SessionService - Session Completion', () => {
       mockSessionRepository.findById.mockResolvedValue(completedSession);
 
       // Act & Assert
-      await expect(sessionService.completeSession('test-session-123'))
-        .rejects.toThrow('Session is already completed');
+      await expect(sessionService.completeSession('test-session-123')).rejects.toThrow(
+        'Session is already completed'
+      );
     });
 
     it('should throw error when session is abandoned', async () => {
@@ -177,8 +180,9 @@ describe('SessionService - Session Completion', () => {
       mockSessionRepository.findById.mockResolvedValue(abandonedSession);
 
       // Act & Assert
-      await expect(sessionService.completeSession('test-session-123'))
-        .rejects.toThrow('Cannot complete abandoned session');
+      await expect(sessionService.completeSession('test-session-123')).rejects.toThrow(
+        'Cannot complete abandoned session'
+      );
     });
 
     it('should throw error when there are unanswered questions', async () => {
@@ -193,7 +197,7 @@ describe('SessionService - Session Completion', () => {
             markedForReview: false,
             userAnswer: ['option-0'],
             isCorrect: true,
-            answeredAt: '2023-01-01T10:00:45Z'
+            answeredAt: '2023-01-01T10:00:45Z',
           },
           {
             questionId: 'q2',
@@ -202,14 +206,15 @@ describe('SessionService - Session Completion', () => {
             skipped: false,
             markedForReview: false,
             // No userAnswer - unanswered question
-          }
-        ]
+          },
+        ],
       });
       mockSessionRepository.findById.mockResolvedValue(sessionWithUnanswered);
 
       // Act & Assert
-      await expect(sessionService.completeSession('test-session-123'))
-        .rejects.toThrow('Cannot complete session: 1 questions remain unanswered');
+      await expect(sessionService.completeSession('test-session-123')).rejects.toThrow(
+        'Cannot complete session: 1 questions remain unanswered'
+      );
     });
 
     it('should generate appropriate recommendations based on performance', async () => {
@@ -224,7 +229,7 @@ describe('SessionService - Session Completion', () => {
             markedForReview: false,
             userAnswer: ['option-0'],
             isCorrect: true,
-            answeredAt: '2023-01-01T10:00:30Z'
+            answeredAt: '2023-01-01T10:00:30Z',
           },
           {
             questionId: 'q2',
@@ -234,21 +239,20 @@ describe('SessionService - Session Completion', () => {
             markedForReview: false,
             userAnswer: ['option-1'],
             isCorrect: true,
-            answeredAt: '2023-01-01T10:01:05Z'
-          }
+            answeredAt: '2023-01-01T10:01:05Z',
+          },
         ],
-        correctAnswers: 2
+        correctAnswers: 2,
       });
 
       mockSessionRepository.findById.mockResolvedValue(highPerformanceSession);
-      mockQuestionService.getQuestion
-        .mockResolvedValue({ question: createMockQuestion('q1') });
+      mockQuestionService.getQuestion.mockResolvedValue({ question: createMockQuestion('q1') });
       mockTopicService.getTopic.mockResolvedValue({
-        topic: { id: 'topic-1', name: 'Test Topic' }
+        topic: { id: 'topic-1', name: 'Test Topic' },
       } as any);
       mockSessionRepository.update.mockResolvedValue({
         ...highPerformanceSession,
-        status: 'completed'
+        status: 'completed',
       } as any);
 
       // Act
@@ -265,18 +269,18 @@ describe('SessionService - Session Completion', () => {
       // Arrange
       const mockSession = createMockSession();
       mockSessionRepository.findById.mockResolvedValue(mockSession);
-      
+
       // Mock question service to fail for one question
       mockQuestionService.getQuestion
         .mockResolvedValueOnce({ question: createMockQuestion('q1') })
         .mockRejectedValueOnce(new Error('Question not found'));
-      
+
       mockTopicService.getTopic.mockResolvedValue({
-        topic: { id: 'topic-1', name: 'Test Topic' }
+        topic: { id: 'topic-1', name: 'Test Topic' },
       } as any);
       mockSessionRepository.update.mockResolvedValue({
         ...mockSession,
-        status: 'completed'
+        status: 'completed',
       } as any);
 
       // Act
@@ -285,22 +289,27 @@ describe('SessionService - Session Completion', () => {
       // Assert - Should complete successfully with placeholder for missing question
       expect(result.success).toBe(true);
       expect(result.detailedResults.questionsBreakdown).toHaveLength(2);
-      expect(result.detailedResults.questionsBreakdown[1].questionText).toBe('Question not available');
-      expect(result.detailedResults.questionsBreakdown[1].explanation).toBe('No explanation available');
+      expect(result.detailedResults.questionsBreakdown[1].questionText).toBe(
+        'Question not available'
+      );
+      expect(result.detailedResults.questionsBreakdown[1].explanation).toBe(
+        'No explanation available'
+      );
     });
 
     it('should calculate performance metrics correctly', async () => {
       // Arrange
       const mockSession = createMockSession();
       mockSessionRepository.findById.mockResolvedValue(mockSession);
-      mockQuestionService.getQuestion
-        .mockResolvedValue({ question: createMockQuestion('q1', { difficulty: 'hard' }) });
+      mockQuestionService.getQuestion.mockResolvedValue({
+        question: createMockQuestion('q1', { difficulty: 'hard' }),
+      });
       mockTopicService.getTopic.mockResolvedValue({
-        topic: { id: 'topic-1', name: 'Test Topic' }
+        topic: { id: 'topic-1', name: 'Test Topic' },
       } as any);
       mockSessionRepository.update.mockResolvedValue({
         ...mockSession,
-        status: 'completed'
+        status: 'completed',
       } as any);
 
       // Act

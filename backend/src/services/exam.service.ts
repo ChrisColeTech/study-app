@@ -1,13 +1,13 @@
 // Exam service for Study App V3 Backend
 // Phase 8: Exam Listing Feature
 
-import { 
-  Exam, 
-  GetExamsRequest, 
-  GetExamsResponse, 
+import {
+  Exam,
+  GetExamsRequest,
+  GetExamsResponse,
   GetExamRequest,
   GetExamResponse,
-  IExamService
+  IExamService,
 } from '../shared/types/exam.types';
 import { IExamRepository } from '../repositories/exam.repository';
 import { createLogger } from '../shared/logger';
@@ -22,12 +22,12 @@ export class ExamService extends BaseService implements IExamService {
    * Get all exams with optional filtering
    */
   async getExams(request: GetExamsRequest): Promise<GetExamsResponse> {
-    this.logger.info('Getting exams', { 
+    this.logger.info('Getting exams', {
       provider: request.provider,
       category: request.category,
       level: request.level,
       search: request.search,
-      includeInactive: request.includeInactive 
+      includeInactive: request.includeInactive,
     });
 
     try {
@@ -40,8 +40,8 @@ export class ExamService extends BaseService implements IExamService {
 
       // Filter by provider
       if (request.provider) {
-        filteredExams = filteredExams.filter((e: any) => 
-          e.providerId.toLowerCase() === request.provider!.toLowerCase()
+        filteredExams = filteredExams.filter(
+          (e: any) => e.providerId.toLowerCase() === request.provider!.toLowerCase()
         );
       }
 
@@ -54,8 +54,8 @@ export class ExamService extends BaseService implements IExamService {
       if (request.level) {
         if (request.category) {
           // If already filtered by category, apply level filter to those results
-          filteredExams = filteredExams.filter((e: any) => 
-            e.level.toLowerCase() === request.level!.toLowerCase()
+          filteredExams = filteredExams.filter(
+            (e: any) => e.level.toLowerCase() === request.level!.toLowerCase()
           );
         } else {
           filteredExams = await this.examRepository.findByLevel(request.level);
@@ -70,12 +70,13 @@ export class ExamService extends BaseService implements IExamService {
       // Apply search filter
       if (request.search) {
         const searchLower = request.search.toLowerCase();
-        filteredExams = filteredExams.filter((e: any) => 
-          e.examName.toLowerCase().includes(searchLower) ||
-          e.examCode.toLowerCase().includes(searchLower) ||
-          e.description.toLowerCase().includes(searchLower) ||
-          e.providerName.toLowerCase().includes(searchLower) ||
-          (e.topics && e.topics.some((topic: any) => topic.toLowerCase().includes(searchLower)))
+        filteredExams = filteredExams.filter(
+          (e: any) =>
+            e.examName.toLowerCase().includes(searchLower) ||
+            e.examCode.toLowerCase().includes(searchLower) ||
+            e.description.toLowerCase().includes(searchLower) ||
+            e.providerName.toLowerCase().includes(searchLower) ||
+            (e.topics && e.topics.some((topic: any) => topic.toLowerCase().includes(searchLower)))
         );
       }
 
@@ -83,11 +84,11 @@ export class ExamService extends BaseService implements IExamService {
       filteredExams.sort((a: any, b: any) => {
         const providerCompare = a.providerName.localeCompare(b.providerName);
         if (providerCompare !== 0) return providerCompare;
-        
+
         const levelOrder = ['foundational', 'associate', 'professional', 'specialty', 'expert'];
         const levelCompare = levelOrder.indexOf(a.level) - levelOrder.indexOf(b.level);
         if (levelCompare !== 0) return levelCompare;
-        
+
         return a.examName.localeCompare(b.examName);
       });
 
@@ -99,7 +100,9 @@ export class ExamService extends BaseService implements IExamService {
 
       // Get available filter options from all exams
       const availableProviders = [...new Set(allExams.map((e: any) => e.providerId))];
-      const availableCategories = [...new Set(allExams.map((e: any) => this.getCategoryFromProvider(e.providerId)))].filter(Boolean);
+      const availableCategories = [
+        ...new Set(allExams.map((e: any) => this.getCategoryFromProvider(e.providerId))),
+      ].filter(Boolean);
       const availableLevels = [...new Set(allExams.map((e: any) => e.level))];
 
       const response: GetExamsResponse = {
@@ -108,23 +111,22 @@ export class ExamService extends BaseService implements IExamService {
         filters: {
           providers: availableProviders.sort(),
           categories: availableCategories.sort(),
-          levels: availableLevels.sort()
+          levels: availableLevels.sort(),
         },
         pagination: {
           limit,
           offset,
-          hasMore
-        }
+          hasMore,
+        },
       };
 
-      this.logger.info('Exams retrieved successfully', { 
+      this.logger.info('Exams retrieved successfully', {
         total: response.total,
         returned: paginatedExams.length,
-        hasMore
+        hasMore,
       });
 
       return response;
-
     } catch (error) {
       this.logger.error('Failed to get exams', error as Error);
       throw new Error('Failed to retrieve exams');
@@ -135,9 +137,9 @@ export class ExamService extends BaseService implements IExamService {
    * Get a specific exam by ID
    */
   async getExam(examId: string, request: GetExamRequest): Promise<GetExamResponse> {
-    this.logger.info('Getting exam by ID', { 
+    this.logger.info('Getting exam by ID', {
       examId,
-      includeProvider: request.includeProvider
+      includeProvider: request.includeProvider,
     });
 
     try {
@@ -150,7 +152,7 @@ export class ExamService extends BaseService implements IExamService {
       }
 
       const response: GetExamResponse = {
-        exam
+        exam,
       };
 
       // Include provider details if requested
@@ -162,26 +164,25 @@ export class ExamService extends BaseService implements IExamService {
           fullName: exam.providerName,
           description: '',
           website: '',
-          category: exam.category || 'other'
+          category: exam.category || 'other',
         };
       }
 
-      this.logger.info('Exam retrieved successfully', { 
+      this.logger.info('Exam retrieved successfully', {
         examId,
         examName: exam.examName,
         providerId: exam.providerId,
-        includeProvider: request.includeProvider
+        includeProvider: request.includeProvider,
       });
 
       return response;
-
     } catch (error) {
       this.logger.error('Failed to get exam', error as Error, { examId });
-      
+
       if ((error as Error).message === 'Exam not found') {
         throw error; // Re-throw for 404 handling
       }
-      
+
       throw new Error('Failed to retrieve exam');
     }
   }
@@ -192,13 +193,13 @@ export class ExamService extends BaseService implements IExamService {
   private getCategoryFromProvider(providerId: string): string {
     // Map common provider IDs to categories
     const categoryMap: Record<string, string> = {
-      'aws': 'cloud',
-      'azure': 'cloud',
-      'gcp': 'cloud',
-      'cisco': 'networking',
-      'comptia': 'general'
+      aws: 'cloud',
+      azure: 'cloud',
+      gcp: 'cloud',
+      cisco: 'networking',
+      comptia: 'general',
     };
-    
+
     return categoryMap[providerId.toLowerCase()] || 'other';
   }
 
@@ -210,10 +211,10 @@ export class ExamService extends BaseService implements IExamService {
 
     try {
       this.examRepository.clearCache();
-      
+
       // Warm up the cache by loading all exams
       await this.examRepository.findAll();
-      
+
       this.logger.info('Exam cache refreshed successfully');
     } catch (error) {
       this.logger.error('Failed to refresh exam cache', error as Error);

@@ -11,15 +11,13 @@ import {
   MasteryProgression,
   MasteryDistribution,
   MasteryProgressionPoint,
-  MasteryProjection
+  MasteryProjection,
 } from '../shared/types/analytics.types';
 
 export class CompetencyAnalyzer implements ICompetencyAnalyzer {
   private logger = createLogger({ service: 'CompetencyAnalyzer' });
 
-  constructor(
-    private analyticsRepository: IAnalyticsRepository
-  ) {}
+  constructor(private analyticsRepository: IAnalyticsRepository) {}
 
   /**
    * Analyze competencies across topics and providers
@@ -32,7 +30,7 @@ export class CompetencyAnalyzer implements ICompetencyAnalyzer {
       if (userId) sessionFilters.userId = userId;
       const [sessions, progressData] = await Promise.all([
         this.analyticsRepository.getCompletedSessions(sessionFilters),
-        this.analyticsRepository.getUserProgressData(userId)
+        this.analyticsRepository.getUserProgressData(userId),
       ]);
 
       // Calculate topic competencies
@@ -51,11 +49,12 @@ export class CompetencyAnalyzer implements ICompetencyAnalyzer {
         topicCompetencies,
         providerCompetencies,
         strengthsAndWeaknesses,
-        masteryProgression
+        masteryProgression,
       };
-
     } catch (error) {
-      this.logger.error('Failed to analyze competencies', error as Error, { ...(userId && { userId }) });
+      this.logger.error('Failed to analyze competencies', error as Error, {
+        ...(userId && { userId }),
+      });
       throw error;
     }
   }
@@ -63,14 +62,17 @@ export class CompetencyAnalyzer implements ICompetencyAnalyzer {
   /**
    * Calculate topic-specific competencies
    */
-  async calculateTopicCompetencies(sessions: any[], progressData: any[]): Promise<TopicCompetency[]> {
+  async calculateTopicCompetencies(
+    sessions: any[],
+    progressData: any[]
+  ): Promise<TopicCompetency[]> {
     const topicMap = new Map<string, any>();
-    
+
     // Aggregate data from sessions
     for (const session of sessions) {
       for (const topicData of session.topicBreakdown) {
         const topicId = topicData.topicId;
-        
+
         if (!topicMap.has(topicId)) {
           topicMap.set(topicId, {
             topicId: topicId,
@@ -81,7 +83,7 @@ export class CompetencyAnalyzer implements ICompetencyAnalyzer {
             correctAnswers: 0,
             totalTime: 0,
             studySessions: 0,
-            lastStudied: session.startTime
+            lastStudied: session.startTime,
           });
         }
 
@@ -90,7 +92,7 @@ export class CompetencyAnalyzer implements ICompetencyAnalyzer {
         topic.correctAnswers += topicData.questionsCorrect;
         topic.totalTime += topicData.averageTime * topicData.questionsAnswered;
         topic.studySessions++;
-        
+
         if (new Date(session.startTime) > new Date(topic.lastStudied)) {
           topic.lastStudied = session.startTime;
         }
@@ -99,11 +101,13 @@ export class CompetencyAnalyzer implements ICompetencyAnalyzer {
 
     // Convert to TopicCompetency format
     const competencies: TopicCompetency[] = [];
-    
+
     for (const [topicId, data] of topicMap) {
-      const currentAccuracy = data.questionsAnswered > 0 ? (data.correctAnswers / data.questionsAnswered) * 100 : 0;
-      const averageTimePerQuestion = data.questionsAnswered > 0 ? data.totalTime / data.questionsAnswered : 0;
-      
+      const currentAccuracy =
+        data.questionsAnswered > 0 ? (data.correctAnswers / data.questionsAnswered) * 100 : 0;
+      const averageTimePerQuestion =
+        data.questionsAnswered > 0 ? data.totalTime / data.questionsAnswered : 0;
+
       competencies.push({
         topicId: data.topicId,
         topicName: data.topicName,
@@ -119,10 +123,22 @@ export class CompetencyAnalyzer implements ICompetencyAnalyzer {
         studySessions: data.studySessions,
         timeSpent: Math.round(data.totalTime / 60), // Convert to minutes
         difficultyBreakdown: {
-          easy: { answered: Math.floor(data.questionsAnswered * 0.4), correct: Math.floor(data.correctAnswers * 0.5), accuracy: currentAccuracy + 10 },
-          medium: { answered: Math.floor(data.questionsAnswered * 0.4), correct: Math.floor(data.correctAnswers * 0.35), accuracy: currentAccuracy },
-          hard: { answered: Math.floor(data.questionsAnswered * 0.2), correct: Math.floor(data.correctAnswers * 0.15), accuracy: Math.max(0, currentAccuracy - 15) }
-        }
+          easy: {
+            answered: Math.floor(data.questionsAnswered * 0.4),
+            correct: Math.floor(data.correctAnswers * 0.5),
+            accuracy: currentAccuracy + 10,
+          },
+          medium: {
+            answered: Math.floor(data.questionsAnswered * 0.4),
+            correct: Math.floor(data.correctAnswers * 0.35),
+            accuracy: currentAccuracy,
+          },
+          hard: {
+            answered: Math.floor(data.questionsAnswered * 0.2),
+            correct: Math.floor(data.correctAnswers * 0.15),
+            accuracy: Math.max(0, currentAccuracy - 15),
+          },
+        },
       });
     }
 
@@ -134,48 +150,56 @@ export class CompetencyAnalyzer implements ICompetencyAnalyzer {
    */
   async calculateProviderCompetencies(sessions: any[]): Promise<ProviderCompetency[]> {
     const providerMap = new Map<string, any>();
-    
+
     for (const session of sessions) {
       const providerId = session.providerId;
-      
+
       if (!providerMap.has(providerId)) {
         providerMap.set(providerId, {
           providerId: providerId,
           providerName: providerId, // Would need to enrich with actual provider name
           sessions: [],
-          examMap: new Map()
+          examMap: new Map(),
         });
       }
 
       providerMap.get(providerId).sessions.push(session);
-      
+
       const examId = session.examId;
       const examMap = providerMap.get(providerId).examMap;
-      
+
       if (!examMap.has(examId)) {
         examMap.set(examId, {
           examId: examId,
           examName: examId, // Would need to enrich with actual exam name
-          sessions: []
+          sessions: [],
         });
       }
-      
+
       examMap.get(examId).sessions.push(session);
     }
 
     const providerCompetencies: ProviderCompetency[] = [];
-    
+
     for (const [providerId, providerData] of providerMap) {
       const sessions = providerData.sessions;
-      const overallAccuracy = sessions.reduce((sum: number, s: any) => sum + s.accuracy, 0) / sessions.length;
-      const questionsAnswered = sessions.reduce((sum: number, s: any) => sum + s.questionsAnswered, 0);
+      const overallAccuracy =
+        sessions.reduce((sum: number, s: any) => sum + s.accuracy, 0) / sessions.length;
+      const questionsAnswered = sessions.reduce(
+        (sum: number, s: any) => sum + s.questionsAnswered,
+        0
+      );
       const studyTime = sessions.reduce((sum: number, s: any) => sum + s.duration, 0);
 
       const examCompetencies: ExamCompetency[] = [];
       for (const [examId, examData] of providerData.examMap) {
         const examSessions = examData.sessions;
-        const examAccuracy = examSessions.reduce((sum: number, s: any) => sum + s.accuracy, 0) / examSessions.length;
-        const examQuestions = examSessions.reduce((sum: number, s: any) => sum + s.questionsAnswered, 0);
+        const examAccuracy =
+          examSessions.reduce((sum: number, s: any) => sum + s.accuracy, 0) / examSessions.length;
+        const examQuestions = examSessions.reduce(
+          (sum: number, s: any) => sum + s.questionsAnswered,
+          0
+        );
         const examStudyTime = examSessions.reduce((sum: number, s: any) => sum + s.duration, 0);
 
         examCompetencies.push({
@@ -185,7 +209,7 @@ export class CompetencyAnalyzer implements ICompetencyAnalyzer {
           questionsAnswered: examQuestions,
           studyTime: examStudyTime,
           estimatedReadiness: Math.min(examAccuracy * 1.2, 100), // Simple readiness calculation
-          recommendedStudyTime: Math.max(0, (80 - examAccuracy) * 10) // Hours needed to reach 80%
+          recommendedStudyTime: Math.max(0, (80 - examAccuracy) * 10), // Hours needed to reach 80%
         });
       }
 
@@ -203,7 +227,7 @@ export class CompetencyAnalyzer implements ICompetencyAnalyzer {
       const strengths = Array.from(topicAccuracies.entries())
         .filter(([, accuracy]) => accuracy > 80)
         .map(([topicName]) => topicName);
-      
+
       const weaknesses = Array.from(topicAccuracies.entries())
         .filter(([, accuracy]) => accuracy < 60)
         .map(([topicName]) => topicName);
@@ -216,7 +240,7 @@ export class CompetencyAnalyzer implements ICompetencyAnalyzer {
         studyTime: studyTime,
         examCompetencies: examCompetencies,
         strengths: strengths,
-        weaknesses: weaknesses
+        weaknesses: weaknesses,
       });
     }
 
@@ -239,7 +263,7 @@ export class CompetencyAnalyzer implements ICompetencyAnalyzer {
         questionsAnswered: topic.questionsAnswered,
         improvementPotential: 0,
         priority: 'medium',
-        recommendedActions: []
+        recommendedActions: [],
       };
 
       if (topic.currentAccuracy >= 80) {
@@ -249,7 +273,11 @@ export class CompetencyAnalyzer implements ICompetencyAnalyzer {
       } else if (topic.currentAccuracy < 60) {
         area.priority = 'high';
         area.improvementPotential = 100 - topic.currentAccuracy;
-        area.recommendedActions = ['Focus study time here', 'Review fundamentals', 'Practice more questions'];
+        area.recommendedActions = [
+          'Focus study time here',
+          'Review fundamentals',
+          'Practice more questions',
+        ];
         weaknesses.push(area);
       } else {
         area.priority = 'medium';
@@ -265,13 +293,16 @@ export class CompetencyAnalyzer implements ICompetencyAnalyzer {
   /**
    * Calculate mastery progression over time
    */
-  async calculateMasteryProgression(topicCompetencies: TopicCompetency[], userId?: string): Promise<MasteryProgression> {
+  async calculateMasteryProgression(
+    topicCompetencies: TopicCompetency[],
+    userId?: string
+  ): Promise<MasteryProgression> {
     const currentDistribution: MasteryDistribution = {
       novice: 0,
       beginner: 0,
       intermediate: 0,
       advanced: 0,
-      expert: 0
+      expert: 0,
     };
 
     // Count current mastery levels
@@ -282,16 +313,16 @@ export class CompetencyAnalyzer implements ICompetencyAnalyzer {
     // Mock historical data - in real implementation would fetch from database
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-    
+
     const progressionHistory: MasteryProgressionPoint[] = [
       {
         date: thirtyDaysAgo.toISOString(),
-        distribution: { novice: 5, beginner: 3, intermediate: 2, advanced: 0, expert: 0 }
+        distribution: { novice: 5, beginner: 3, intermediate: 2, advanced: 0, expert: 0 },
       },
       {
         date: new Date().toISOString(),
-        distribution: currentDistribution
-      }
+        distribution: currentDistribution,
+      },
     ];
 
     // Simple projection - in real implementation would use ML/statistical models
@@ -303,9 +334,9 @@ export class CompetencyAnalyzer implements ICompetencyAnalyzer {
           beginner: currentDistribution.beginner,
           intermediate: currentDistribution.intermediate + 1,
           advanced: currentDistribution.advanced,
-          expert: currentDistribution.expert
+          expert: currentDistribution.expert,
         },
-        confidence: 0.7
+        confidence: 0.7,
       },
       {
         timeframe: '3_months',
@@ -314,22 +345,25 @@ export class CompetencyAnalyzer implements ICompetencyAnalyzer {
           beginner: Math.max(0, currentDistribution.beginner - 1),
           intermediate: currentDistribution.intermediate + 1,
           advanced: currentDistribution.advanced + 2,
-          expert: currentDistribution.expert
+          expert: currentDistribution.expert,
         },
-        confidence: 0.5
-      }
+        confidence: 0.5,
+      },
     ];
 
     return {
       currentDistribution,
       progressionHistory,
-      projectedGrowth
+      projectedGrowth,
     };
   }
 
   // Private helper methods
 
-  private calculateMasteryLevel(accuracy: number, questionsAnswered: number): 'novice' | 'beginner' | 'intermediate' | 'advanced' | 'expert' {
+  private calculateMasteryLevel(
+    accuracy: number,
+    questionsAnswered: number
+  ): 'novice' | 'beginner' | 'intermediate' | 'advanced' | 'expert' {
     if (questionsAnswered < 5) return 'novice';
     if (accuracy >= 90 && questionsAnswered >= 50) return 'expert';
     if (accuracy >= 80 && questionsAnswered >= 30) return 'advanced';

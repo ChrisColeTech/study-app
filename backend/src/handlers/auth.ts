@@ -17,7 +17,7 @@ import {
   ErrorHandlingMiddleware,
   AuthMiddleware,
   ErrorContexts,
-  CommonParsing
+  CommonParsing,
 } from '../shared/middleware';
 
 export class AuthHandler extends BaseHandler {
@@ -63,12 +63,17 @@ export class AuthHandler extends BaseHandler {
    */
   private async register(context: HandlerContext): Promise<ApiResponse> {
     // Parse request body using helper method
-    const { data: userData, error: parseError } = await this.parseRequestBodyOrError<CreateUserRequest>(context, true);
+    const { data: userData, error: parseError } =
+      await this.parseRequestBodyOrError<CreateUserRequest>(context, true);
     if (parseError) return parseError;
 
     // Validate using middleware - just check required fields here, detailed validation in service
     if (!userData!.email || !userData!.password || !userData!.firstName || !userData!.lastName) {
-      return this.buildErrorResponse('Missing required fields: email, password, firstName, lastName', 400, ERROR_CODES.VALIDATION_ERROR);
+      return this.buildErrorResponse(
+        'Missing required fields: email, password, firstName, lastName',
+        400,
+        ERROR_CODES.VALIDATION_ERROR
+      );
     }
 
     // Execute service logic using helper method
@@ -80,7 +85,7 @@ export class AuthHandler extends BaseHandler {
       {
         requestId: context.requestId,
         operation: ErrorContexts.Auth.REGISTER,
-        additionalInfo: { email: userData!.email }
+        additionalInfo: { email: userData!.email },
       }
     );
 
@@ -100,12 +105,19 @@ export class AuthHandler extends BaseHandler {
    */
   private async login(context: HandlerContext): Promise<ApiResponse> {
     // Parse request body using helper method
-    const { data: loginData, error: parseError } = await this.parseRequestBodyOrError<LoginRequest>(context, true);
+    const { data: loginData, error: parseError } = await this.parseRequestBodyOrError<LoginRequest>(
+      context,
+      true
+    );
     if (parseError) return parseError;
 
     // Validate using middleware - just check required fields here
     if (!loginData!.email || !loginData!.password) {
-      return this.buildErrorResponse('Email and password are required', 400, ERROR_CODES.VALIDATION_ERROR);
+      return this.buildErrorResponse(
+        'Email and password are required',
+        400,
+        ERROR_CODES.VALIDATION_ERROR
+      );
     }
 
     // Execute service logic using helper method
@@ -117,7 +129,7 @@ export class AuthHandler extends BaseHandler {
       {
         requestId: context.requestId,
         operation: ErrorContexts.Auth.LOGIN,
-        additionalInfo: { email: loginData!.email }
+        additionalInfo: { email: loginData!.email },
       }
     );
 
@@ -137,12 +149,18 @@ export class AuthHandler extends BaseHandler {
    */
   private async refresh(context: HandlerContext): Promise<ApiResponse> {
     // Parse request body using helper method
-    const { data: refreshData, error: parseError } = await this.parseRequestBodyOrError<{ refreshToken: string }>(context, true);
+    const { data: refreshData, error: parseError } = await this.parseRequestBodyOrError<{
+      refreshToken: string;
+    }>(context, true);
     if (parseError) return parseError;
 
     // Validate using middleware - just check required fields here
     if (!refreshData!.refreshToken) {
-      return this.buildErrorResponse('Refresh token is required', 400, ERROR_CODES.VALIDATION_ERROR);
+      return this.buildErrorResponse(
+        'Refresh token is required',
+        400,
+        ERROR_CODES.VALIDATION_ERROR
+      );
     }
 
     // Execute service logic using helper method
@@ -153,7 +171,7 @@ export class AuthHandler extends BaseHandler {
       },
       {
         requestId: context.requestId,
-        operation: ErrorContexts.Auth.REFRESH
+        operation: ErrorContexts.Auth.REFRESH,
       }
     );
 
@@ -183,7 +201,7 @@ export class AuthHandler extends BaseHandler {
       },
       {
         requestId: context.requestId,
-        operation: ErrorContexts.Auth.LOGOUT
+        operation: ErrorContexts.Auth.LOGOUT,
       }
     );
 

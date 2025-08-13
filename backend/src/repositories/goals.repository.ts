@@ -1,12 +1,24 @@
 // Goals repository for DynamoDB operations
 // Phase 18: Goals Management System
 
-import { DynamoDBDocumentClient, PutCommand, GetCommand, QueryCommand, UpdateCommand, DeleteCommand, ScanCommand } from '@aws-sdk/lib-dynamodb';
+import {
+  DynamoDBDocumentClient,
+  PutCommand,
+  GetCommand,
+  QueryCommand,
+  UpdateCommand,
+  DeleteCommand,
+  ScanCommand,
+} from '@aws-sdk/lib-dynamodb';
 import { Goal } from '../shared/types/goals.types';
 import { GetGoalsRequest } from '../shared/types/goals.types';
 import { ServiceConfig } from '../shared/service-factory';
 import { DynamoDBBaseRepository } from './base.repository';
-import { IStandardCrudRepository, IUserScopedRepository, StandardQueryResult } from '../shared/types/repository.types';
+import {
+  IStandardCrudRepository,
+  IUserScopedRepository,
+  StandardQueryResult,
+} from '../shared/types/repository.types';
 
 /**
  * Helper class for building DynamoDB query expressions and filtering logic
@@ -27,33 +39,39 @@ class GoalsQueryBuilder {
 
     // Status filter
     if (filters.status && filters.status.length > 0) {
-      const statusConditions = filters.status.map((status, index) => {
-        const placeholder = `:status${index}`;
-        expressionAttributeValues[placeholder] = status;
-        return `#status = ${placeholder}`;
-      }).join(' OR ');
+      const statusConditions = filters.status
+        .map((status, index) => {
+          const placeholder = `:status${index}`;
+          expressionAttributeValues[placeholder] = status;
+          return `#status = ${placeholder}`;
+        })
+        .join(' OR ');
       filterConditions.push(`(${statusConditions})`);
       expressionAttributeNames['#status'] = 'status';
     }
 
     // Type filter
     if (filters.type && filters.type.length > 0) {
-      const typeConditions = filters.type.map((type, index) => {
-        const placeholder = `:type${index}`;
-        expressionAttributeValues[placeholder] = type;
-        return `#type = ${placeholder}`;
-      }).join(' OR ');
+      const typeConditions = filters.type
+        .map((type, index) => {
+          const placeholder = `:type${index}`;
+          expressionAttributeValues[placeholder] = type;
+          return `#type = ${placeholder}`;
+        })
+        .join(' OR ');
       filterConditions.push(`(${typeConditions})`);
       expressionAttributeNames['#type'] = 'type';
     }
 
     // Priority filter
     if (filters.priority && filters.priority.length > 0) {
-      const priorityConditions = filters.priority.map((priority, index) => {
-        const placeholder = `:priority${index}`;
-        expressionAttributeValues[placeholder] = priority;
-        return `priority = ${placeholder}`;
-      }).join(' OR ');
+      const priorityConditions = filters.priority
+        .map((priority, index) => {
+          const placeholder = `:priority${index}`;
+          expressionAttributeValues[placeholder] = priority;
+          return `priority = ${placeholder}`;
+        })
+        .join(' OR ');
       filterConditions.push(`(${priorityConditions})`);
     }
 
@@ -82,7 +100,9 @@ class GoalsQueryBuilder {
     // Search filter (search in title and description)
     if (filters.search) {
       const searchTerm = filters.search.toLowerCase();
-      filterConditions.push('(contains(#title, :searchTerm) OR contains(description, :searchTerm))');
+      filterConditions.push(
+        '(contains(#title, :searchTerm) OR contains(description, :searchTerm))'
+      );
       expressionAttributeNames['#title'] = 'title';
       expressionAttributeValues[':searchTerm'] = searchTerm;
     }
@@ -90,7 +110,7 @@ class GoalsQueryBuilder {
     return {
       filterExpression: filterConditions.length > 0 ? filterConditions.join(' AND ') : '',
       expressionAttributeNames,
-      expressionAttributeValues
+      expressionAttributeValues,
     };
   }
 
@@ -109,7 +129,7 @@ class GoalsQueryBuilder {
     }
   ): any {
     const { filterExpression, expressionAttributeNames, expressionAttributeValues } = filterData;
-    
+
     // Add userId to expression values
     expressionAttributeValues[':userId'] = userId;
 
@@ -118,7 +138,7 @@ class GoalsQueryBuilder {
       IndexName: indexName,
       KeyConditionExpression: 'userId = :userId',
       ExpressionAttributeValues: expressionAttributeValues,
-      Limit: filters.limit || 50
+      Limit: filters.limit || 50,
     };
 
     if (Object.keys(expressionAttributeNames).length > 0) {
@@ -148,7 +168,7 @@ class GoalsDataProcessor {
 
     return goals.sort((a, b) => {
       let aValue: any, bValue: any;
-      
+
       switch (filters.sortBy) {
         case 'created':
           aValue = new Date(a.createdAt).getTime();
@@ -163,7 +183,7 @@ class GoalsDataProcessor {
           bValue = b.deadline ? new Date(b.deadline).getTime() : 0;
           break;
         case 'priority':
-          const priorityOrder = { 'high': 3, 'medium': 2, 'low': 1 };
+          const priorityOrder = { high: 3, medium: 2, low: 1 };
           aValue = priorityOrder[a.priority];
           bValue = priorityOrder[b.priority];
           break;
@@ -215,7 +235,7 @@ class GoalsUpdateBuilder {
       if (value !== undefined) {
         const attributeName = `#${key}`;
         const valueName = `:${key}`;
-        
+
         updateExpressions.push(`${attributeName} = ${valueName}`);
         expressionAttributeNames[attributeName] = key;
         expressionAttributeValues[valueName] = value;
@@ -225,12 +245,14 @@ class GoalsUpdateBuilder {
     return {
       updateExpression: `SET ${updateExpressions.join(', ')}`,
       expressionAttributeNames,
-      expressionAttributeValues
+      expressionAttributeValues,
     };
   }
 }
 
-export interface IGoalsRepository extends IStandardCrudRepository<Goal, Goal, Partial<Goal>>, IUserScopedRepository<Goal, GetGoalsRequest> {
+export interface IGoalsRepository
+  extends IStandardCrudRepository<Goal, Goal, Partial<Goal>>,
+    IUserScopedRepository<Goal, GetGoalsRequest> {
   /**
    * Find goals by user ID with standardized filtering and pagination
    * @param userId - User identifier
@@ -244,7 +266,7 @@ export interface IGoalsRepository extends IStandardCrudRepository<Goal, Goal, Pa
 export class GoalsRepository extends DynamoDBBaseRepository implements IGoalsRepository {
   private docClient: DynamoDBDocumentClient;
   private userIdIndexName: string;
-  
+
   // Helper classes for SRP compliance
   private queryBuilder: GoalsQueryBuilder;
   private dataProcessor: GoalsDataProcessor;
@@ -254,7 +276,7 @@ export class GoalsRepository extends DynamoDBBaseRepository implements IGoalsRep
     super('GoalsRepository', config, config.tables.goals);
     this.docClient = dynamoClient;
     this.userIdIndexName = 'UserGoalsIndex'; // GSI for querying by userId
-    
+
     // Initialize helper classes
     this.queryBuilder = new GoalsQueryBuilder();
     this.dataProcessor = new GoalsDataProcessor();
@@ -265,136 +287,163 @@ export class GoalsRepository extends DynamoDBBaseRepository implements IGoalsRep
    * Perform health check operation for DynamoDB connectivity
    */
   protected async performHealthCheck(): Promise<void> {
-    await this.docClient.send(new QueryCommand({
-      TableName: this.tableName,
-      IndexName: this.userIdIndexName,
-      KeyConditionExpression: 'userId = :userId',
-      ExpressionAttributeValues: { ':userId': 'health-check-user' },
-      Limit: 1
-    }));
+    await this.docClient.send(
+      new QueryCommand({
+        TableName: this.tableName,
+        IndexName: this.userIdIndexName,
+        KeyConditionExpression: 'userId = :userId',
+        ExpressionAttributeValues: { ':userId': 'health-check-user' },
+        Limit: 1,
+      })
+    );
   }
 
   /**
    * Create a new goal in the database
    */
   async create(goal: Goal): Promise<Goal> {
-    return this.executeWithErrorHandling('create', async () => {
-      this.validateRequired({ 
-        goalId: goal.goalId, 
-        userId: goal.userId,
-        type: goal.type,
-        targetValue: goal.targetValue
-      }, 'create');
+    return this.executeWithErrorHandling(
+      'create',
+      async () => {
+        this.validateRequired(
+          {
+            goalId: goal.goalId,
+            userId: goal.userId,
+            type: goal.type,
+            targetValue: goal.targetValue,
+          },
+          'create'
+        );
 
-      try {
-        await this.docClient.send(new PutCommand({
-          TableName: this.tableName,
-          Item: goal,
-          ConditionExpression: 'attribute_not_exists(goalId)'
-        }));
+        try {
+          await this.docClient.send(
+            new PutCommand({
+              TableName: this.tableName,
+              Item: goal,
+              ConditionExpression: 'attribute_not_exists(goalId)',
+            })
+          );
 
-        this.logger.info('Goal created successfully', { 
-          goalId: goal.goalId, 
-          userId: goal.userId,
-          type: goal.type,
-          targetValue: goal.targetValue
-        });
-        
-        return goal;
-      } catch (error: any) {
-        if (error.name === 'ConditionalCheckFailedException') {
-          throw this.createRepositoryError('create', new Error('Goal with this ID already exists'), { goalId: goal.goalId });
+          this.logger.info('Goal created successfully', {
+            goalId: goal.goalId,
+            userId: goal.userId,
+            type: goal.type,
+            targetValue: goal.targetValue,
+          });
+
+          return goal;
+        } catch (error: any) {
+          if (error.name === 'ConditionalCheckFailedException') {
+            throw this.createRepositoryError(
+              'create',
+              new Error('Goal with this ID already exists'),
+              { goalId: goal.goalId }
+            );
+          }
+          throw error;
         }
-        throw error;
-      }
-    }, { goalId: goal.goalId, userId: goal.userId });
+      },
+      { goalId: goal.goalId, userId: goal.userId }
+    );
   }
 
   /**
    * Find a goal by its ID
    */
   async findById(goalId: string): Promise<Goal | null> {
-    return this.executeWithErrorHandling('findById', async () => {
-      this.validateRequired({ goalId }, 'findById');
+    return this.executeWithErrorHandling(
+      'findById',
+      async () => {
+        this.validateRequired({ goalId }, 'findById');
 
-      const result = await this.docClient.send(new GetCommand({
-        TableName: this.tableName,
-        Key: { goalId }
-      }));
+        const result = await this.docClient.send(
+          new GetCommand({
+            TableName: this.tableName,
+            Key: { goalId },
+          })
+        );
 
-      if (!result.Item) {
-        this.logger.debug('Goal not found', { goalId });
-        return null;
-      }
+        if (!result.Item) {
+          this.logger.debug('Goal not found', { goalId });
+          return null;
+        }
 
-      this.logger.debug('Goal retrieved successfully', { goalId });
-      return result.Item as Goal;
-    }, { goalId });
+        this.logger.debug('Goal retrieved successfully', { goalId });
+        return result.Item as Goal;
+      },
+      { goalId }
+    );
   }
 
   /**
    * Find goals by user ID with optional filtering and pagination
    * Refactored to use helper classes for SRP compliance
    */
-  async findByUserId(userId: string, filters: GetGoalsRequest = {}): Promise<StandardQueryResult<Goal>> {
-    return this.executeWithErrorHandling('findByUserId', async () => {
-      this.validateRequired({ userId }, 'findByUserId');
-      
-      this.logger.debug('Querying goals by userId', { userId, filters });
+  async findByUserId(
+    userId: string,
+    filters: GetGoalsRequest = {}
+  ): Promise<StandardQueryResult<Goal>> {
+    return this.executeWithErrorHandling(
+      'findByUserId',
+      async () => {
+        this.validateRequired({ userId }, 'findByUserId');
 
-      // Use GoalsQueryBuilder to build filter expressions
-      const filterData = this.queryBuilder.buildFilterExpression(filters);
-      const queryParams = this.queryBuilder.buildQueryParams(
-        this.tableName,
-        this.userIdIndexName,
-        userId,
-        filters,
-        filterData
-      );
+        this.logger.debug('Querying goals by userId', { userId, filters });
 
-      // Execute query with pagination handling
-      let allGoals: Goal[] = [];
-      let lastEvaluatedKey: any = undefined;
-      let totalScanned = 0;
+        // Use GoalsQueryBuilder to build filter expressions
+        const filterData = this.queryBuilder.buildFilterExpression(filters);
+        const queryParams = this.queryBuilder.buildQueryParams(
+          this.tableName,
+          this.userIdIndexName,
+          userId,
+          filters,
+          filterData
+        );
 
-      do {
-        if (lastEvaluatedKey) {
-          queryParams.ExclusiveStartKey = lastEvaluatedKey;
-        }
+        // Execute query with pagination handling
+        let allGoals: Goal[] = [];
+        let lastEvaluatedKey: any = undefined;
+        let totalScanned = 0;
 
-        const result = await this.docClient.send(new QueryCommand(queryParams));
-        
-        if (result.Items) {
-          allGoals.push(...(result.Items as Goal[]));
-        }
+        do {
+          if (lastEvaluatedKey) {
+            queryParams.ExclusiveStartKey = lastEvaluatedKey;
+          }
 
-        totalScanned += result.ScannedCount || 0;
-        lastEvaluatedKey = result.LastEvaluatedKey;
+          const result = await this.docClient.send(new QueryCommand(queryParams));
 
-      } while (lastEvaluatedKey && allGoals.length < (filters.limit || 50));
+          if (result.Items) {
+            allGoals.push(...(result.Items as Goal[]));
+          }
 
-      // Use GoalsDataProcessor for sorting and pagination
-      const sortedGoals = this.dataProcessor.sortGoals(allGoals, filters);
-      const paginatedGoals = this.dataProcessor.applyPagination(sortedGoals, filters);
+          totalScanned += result.ScannedCount || 0;
+          lastEvaluatedKey = result.LastEvaluatedKey;
+        } while (lastEvaluatedKey && allGoals.length < (filters.limit || 50));
 
-      this.logger.info('Goals retrieved successfully', { 
-        userId,
-        total: allGoals.length,
-        returned: paginatedGoals.length,
-        totalScanned,
-        filters
-      });
+        // Use GoalsDataProcessor for sorting and pagination
+        const sortedGoals = this.dataProcessor.sortGoals(allGoals, filters);
+        const paginatedGoals = this.dataProcessor.applyPagination(sortedGoals, filters);
 
-      // Return standardized format
-      return {
-        items: paginatedGoals,
-        total: allGoals.length,
-        limit: filters.limit || 50,
-        offset: filters.offset || 0,
-        lastEvaluatedKey,
-        hasMore: (filters.offset || 0) + paginatedGoals.length < allGoals.length
-      };
-    }, { userId, filters });
+        this.logger.info('Goals retrieved successfully', {
+          userId,
+          total: allGoals.length,
+          returned: paginatedGoals.length,
+          totalScanned,
+          filters,
+        });
+
+        // Return standardized format
+        return {
+          items: paginatedGoals,
+          total: allGoals.length,
+          limit: filters.limit || 50,
+          offset: filters.offset || 0,
+          lastEvaluatedKey,
+          hasMore: (filters.offset || 0) + paginatedGoals.length < allGoals.length,
+        };
+      },
+      { userId, filters }
+    );
   }
 
   /**
@@ -402,83 +451,101 @@ export class GoalsRepository extends DynamoDBBaseRepository implements IGoalsRep
    * Refactored to use GoalsUpdateBuilder for SRP compliance
    */
   async update(goalId: string, updateData: Partial<Goal>): Promise<Goal> {
-    return this.executeWithErrorHandling('update', async () => {
-      this.validateRequired({ goalId }, 'update');
+    return this.executeWithErrorHandling(
+      'update',
+      async () => {
+        this.validateRequired({ goalId }, 'update');
 
-      // Use GoalsUpdateBuilder to build update expression
-      const { updateExpression, expressionAttributeNames, expressionAttributeValues } = 
-        this.updateBuilder.buildUpdateExpression(updateData);
+        // Use GoalsUpdateBuilder to build update expression
+        const { updateExpression, expressionAttributeNames, expressionAttributeValues } =
+          this.updateBuilder.buildUpdateExpression(updateData);
 
-      try {
-        const result = await this.docClient.send(new UpdateCommand({
-          TableName: this.tableName,
-          Key: { goalId },
-          UpdateExpression: updateExpression,
-          ExpressionAttributeNames: expressionAttributeNames,
-          ExpressionAttributeValues: expressionAttributeValues,
-          ReturnValues: 'ALL_NEW',
-          ConditionExpression: 'attribute_exists(goalId)'
-        }));
+        try {
+          const result = await this.docClient.send(
+            new UpdateCommand({
+              TableName: this.tableName,
+              Key: { goalId },
+              UpdateExpression: updateExpression,
+              ExpressionAttributeNames: expressionAttributeNames,
+              ExpressionAttributeValues: expressionAttributeValues,
+              ReturnValues: 'ALL_NEW',
+              ConditionExpression: 'attribute_exists(goalId)',
+            })
+          );
 
-        if (!result.Attributes) {
-          throw new Error('Goal not found');
+          if (!result.Attributes) {
+            throw new Error('Goal not found');
+          }
+
+          this.logger.info('Goal updated successfully', {
+            goalId,
+            updatedFields: Object.keys(updateData),
+          });
+
+          return result.Attributes as Goal;
+        } catch (error: any) {
+          if (error.name === 'ConditionalCheckFailedException') {
+            throw this.createRepositoryError('update', new Error('Goal not found'), { goalId });
+          }
+          throw error;
         }
-
-        this.logger.info('Goal updated successfully', { 
-          goalId,
-          updatedFields: Object.keys(updateData)
-        });
-
-        return result.Attributes as Goal;
-      } catch (error: any) {
-        if (error.name === 'ConditionalCheckFailedException') {
-          throw this.createRepositoryError('update', new Error('Goal not found'), { goalId });
-        }
-        throw error;
-      }
-    }, { goalId, updateFields: Object.keys(updateData) });
+      },
+      { goalId, updateFields: Object.keys(updateData) }
+    );
   }
 
   /**
    * Delete a goal
    */
   async delete(goalId: string): Promise<boolean> {
-    return this.executeWithErrorHandling('delete', async () => {
-      this.validateRequired({ goalId }, 'delete');
+    return this.executeWithErrorHandling(
+      'delete',
+      async () => {
+        this.validateRequired({ goalId }, 'delete');
 
-      try {
-        await this.docClient.send(new DeleteCommand({
-          TableName: this.tableName,
-          Key: { goalId },
-          ConditionExpression: 'attribute_exists(goalId)'
-        }));
+        try {
+          await this.docClient.send(
+            new DeleteCommand({
+              TableName: this.tableName,
+              Key: { goalId },
+              ConditionExpression: 'attribute_exists(goalId)',
+            })
+          );
 
-        this.logger.info('Goal deleted successfully', { goalId });
-        return true;
-      } catch (error: any) {
-        if (error.name === 'ConditionalCheckFailedException') {
-          this.logger.warn('Goal not found for deletion', { goalId });
-          return false;
+          this.logger.info('Goal deleted successfully', { goalId });
+          return true;
+        } catch (error: any) {
+          if (error.name === 'ConditionalCheckFailedException') {
+            this.logger.warn('Goal not found for deletion', { goalId });
+            return false;
+          }
+          throw error;
         }
-        throw error;
-      }
-    }, { goalId });
+      },
+      { goalId }
+    );
   }
 
   /**
    * Check if a goal exists
    */
   async exists(goalId: string): Promise<boolean> {
-    return this.executeWithErrorHandling('exists', async () => {
-      this.validateRequired({ goalId }, 'exists');
+    return this.executeWithErrorHandling(
+      'exists',
+      async () => {
+        this.validateRequired({ goalId }, 'exists');
 
-      const result = await this.docClient.send(new GetCommand({
-        TableName: this.tableName,
-        Key: { goalId },
-        ProjectionExpression: 'goalId'
-      }));
+        const result = await this.docClient.send(
+          new GetCommand({
+            TableName: this.tableName,
+            Key: { goalId },
+            ProjectionExpression: 'goalId',
+          })
+        );
 
-      return !!result.Item;
-    }, { goalId });
+        return !!result.Item;
+      },
+      { goalId }
+    );
   }
 }

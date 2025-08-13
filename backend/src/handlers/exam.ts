@@ -13,7 +13,7 @@ import {
   ParsingMiddleware,
   ErrorHandlingMiddleware,
   ErrorContexts,
-  CommonParsing
+  CommonParsing,
 } from '../shared/middleware';
 
 export class ExamHandler extends BaseHandler {
@@ -38,7 +38,7 @@ export class ExamHandler extends BaseHandler {
         path: '/v1/exams/{id}',
         handler: this.getExam.bind(this),
         requireAuth: false,
-      }
+      },
     ];
   }
 
@@ -53,7 +53,7 @@ export class ExamHandler extends BaseHandler {
       level: { type: 'string', decode: true },
       search: CommonParsing.search,
       includeInactive: CommonParsing.booleanFlag,
-      ...CommonParsing.pagination
+      ...CommonParsing.pagination,
     });
     if (parseError) return parseError;
 
@@ -61,7 +61,11 @@ export class ExamHandler extends BaseHandler {
     if (queryParams.level) {
       const validLevels = ['foundational', 'associate', 'professional', 'specialty', 'expert'];
       if (!validLevels.includes(queryParams.level.toLowerCase())) {
-        return this.buildErrorResponse(`Invalid level. Valid options: ${validLevels.join(', ')}`, 400, ERROR_CODES.VALIDATION_ERROR);
+        return this.buildErrorResponse(
+          `Invalid level. Valid options: ${validLevels.join(', ')}`,
+          400,
+          ERROR_CODES.VALIDATION_ERROR
+        );
       }
     }
 
@@ -73,7 +77,7 @@ export class ExamHandler extends BaseHandler {
       ...(queryParams.search && { search: queryParams.search }),
       ...(queryParams.includeInactive && { includeInactive: queryParams.includeInactive }),
       ...(queryParams.limit && { limit: queryParams.limit }),
-      ...(queryParams.offset && { offset: queryParams.offset })
+      ...(queryParams.offset && { offset: queryParams.offset }),
     };
 
     // Business logic only - delegate error handling to middleware
@@ -85,18 +89,18 @@ export class ExamHandler extends BaseHandler {
       {
         requestId: context.requestId,
         operation: ErrorContexts.Exam.LIST,
-        additionalInfo: { filters: request }
+        additionalInfo: { filters: request },
       }
     );
 
     if (error) return error;
 
-    this.logger.info('Exams retrieved successfully', { 
+    this.logger.info('Exams retrieved successfully', {
       requestId: context.requestId,
       total: result!.total,
       returned: result!.exams.length,
       filters: request,
-      pagination: result!.pagination
+      pagination: result!.pagination,
     });
 
     return this.buildSuccessResponse('Exams retrieved successfully', result);
@@ -117,12 +121,12 @@ export class ExamHandler extends BaseHandler {
 
     // Parse query parameters
     const { data: queryParams } = ParsingMiddleware.parseQueryParams(context, {
-      includeProvider: CommonParsing.booleanFlag
+      includeProvider: CommonParsing.booleanFlag,
     });
 
     // Build request object
     const request: GetExamRequest = {
-      ...(queryParams?.includeProvider && { includeProvider: queryParams.includeProvider })
+      ...(queryParams?.includeProvider && { includeProvider: queryParams.includeProvider }),
     };
 
     // Business logic only - delegate error handling to middleware
@@ -134,18 +138,18 @@ export class ExamHandler extends BaseHandler {
       {
         requestId: context.requestId,
         operation: ErrorContexts.Exam.GET,
-        additionalInfo: { examId: pathParams.id }
+        additionalInfo: { examId: pathParams.id },
       }
     );
 
     if (error) return error;
 
-    this.logger.info('Exam retrieved successfully', { 
+    this.logger.info('Exam retrieved successfully', {
       requestId: context.requestId,
       examId: pathParams.id,
       examName: result!.exam.examName,
       providerId: result!.exam.providerId,
-      includeProvider: request.includeProvider
+      includeProvider: request.includeProvider,
     });
 
     return this.buildSuccessResponse('Exam retrieved successfully', result);
