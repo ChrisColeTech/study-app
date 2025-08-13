@@ -18,12 +18,12 @@ import {
 import {
   ParsingMiddleware,
   ValidationMiddleware,
-  ValidationRules,
   ErrorHandlingMiddleware,
   AuthMiddleware,
   ErrorContexts,
   CommonParsing,
 } from '../shared/middleware';
+import { ValidationRules } from '../shared/validation/validation-rules';
 
 export class ProviderHandler extends BaseHandler {
   private serviceFactory: ServiceFactory;

@@ -1,7 +1,8 @@
 // Validation schemas for extracting handler validation methods
 // Phase 2: Handler Validation Extraction
 
-import { ValidationSchema, ValidationRules } from './validation.middleware';
+import { ValidationSchema } from './validation.middleware';
+import { ValidationRules } from '../validation/validation-rules';
 import { HandlerContext, ApiResponse } from '../types/api.types';
 import { ERROR_CODES } from '../constants/error.constants';
 

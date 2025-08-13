@@ -19,11 +19,11 @@ import {
   ErrorHandlingMiddleware,
   ErrorContexts,
   ValidationMiddleware,
-  ValidationRules,
   AuthMiddleware,
   AuthConfigs,
   AuthenticatedContext,
 } from '../shared/middleware';
+import { ValidationRules } from '../shared/validation/validation-rules';
 import { SessionValidationSchemas, AdditionalValidationHelpers } from '../shared/middleware/validation-schemas';
 
 export class SessionHandler extends BaseHandler {

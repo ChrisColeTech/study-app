@@ -13,12 +13,12 @@ import { LoginRequest } from '../shared/types/auth.types';
 import {
   ParsingMiddleware,
   ValidationMiddleware,
-  ValidationRules,
   ErrorHandlingMiddleware,
   AuthMiddleware,
   ErrorContexts,
   CommonParsing,
 } from '../shared/middleware';
+import { ValidationRules } from '../shared/validation/validation-rules';
 
 export class AuthHandler extends BaseHandler {
   private serviceFactory: ServiceFactory;

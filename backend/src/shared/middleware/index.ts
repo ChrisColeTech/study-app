@@ -1,12 +1,7 @@
 // Middleware exports for clean imports across the application
 // Centralizes all middleware components
 
-export { 
-  ValidationMiddleware, 
-  ValidationRules,
-  TypeSafeValidationGenerator,
-  TypeSafeValidators
-} from './validation.middleware';
+export { ValidationMiddleware } from './validation.middleware';
 
 export {
   SessionValidationSchemas,
@@ -26,10 +21,6 @@ export type {
   ValidationSchema,
   ValidationResult,
   ValidationContext,
-  TypeValidationDefinition,
-  FieldValidationDefinition,
-  InterfaceValidationDefinition,
-  TypeAwareValidationSchema,
 } from './validation.middleware';
 
 export { ParsingMiddleware, CommonParsing } from './parsing.middleware';
