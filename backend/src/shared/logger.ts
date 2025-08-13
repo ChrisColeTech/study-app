@@ -1,5 +1,6 @@
 // Structured logging utility for Lambda functions
 
+import { ConfigurationManager } from '@/shared/service-factory';
 export enum LogLevel {
   DEBUG = 0,
   INFO = 1,
@@ -121,25 +122,33 @@ class Logger {
   }
 }
 
-// Create default logger instance
-export const logger = new Logger(
-  process.env.LOG_LEVEL ? LogLevel[process.env.LOG_LEVEL as keyof typeof LogLevel] : LogLevel.INFO,
-  {
-    functionName: process.env.AWS_LAMBDA_FUNCTION_NAME || 'unknown',
-    version: process.env.AWS_LAMBDA_FUNCTION_VERSION || '1.0.0',
-    region: process.env.AWS_REGION || 'us-east-1',
-  }
-);
-
-// Factory function for creating context-specific loggers
-export function createLogger(context: LogContext = {}): Logger {
-  const logLevel = process.env.LOG_LEVEL
-    ? LogLevel[process.env.LOG_LEVEL as keyof typeof LogLevel]
-    : LogLevel.INFO;
+// Create default logger instance with centralized configuration
+export const logger = (() => {
+  const configManager = ConfigurationManager.getInstance();
+  const appConfig = configManager.getAppConfig();
+  const awsConfig = configManager.getAWSConfig();
+  
+  const logLevel = LogLevel[appConfig.logLevel as keyof typeof LogLevel] || LogLevel.INFO;
+  
   return new Logger(logLevel, {
-    functionName: process.env.AWS_LAMBDA_FUNCTION_NAME || 'unknown',
-    version: process.env.AWS_LAMBDA_FUNCTION_VERSION || '1.0.0',
-    region: process.env.AWS_REGION || 'us-east-1',
+    functionName: awsConfig.lambda.functionName || 'unknown',
+    version: awsConfig.lambda.functionVersion || appConfig.version,
+    region: awsConfig.region,
+  });
+})();
+
+// Factory function for creating context-specific loggers with centralized configuration
+export function createLogger(context: LogContext = {}): Logger {
+  const configManager = ConfigurationManager.getInstance();
+  const appConfig = configManager.getAppConfig();
+  const awsConfig = configManager.getAWSConfig();
+  
+  const logLevel = LogLevel[appConfig.logLevel as keyof typeof LogLevel] || LogLevel.INFO;
+  
+  return new Logger(logLevel, {
+    functionName: awsConfig.lambda.functionName || 'unknown',
+    version: awsConfig.lambda.functionVersion || appConfig.version,
+    region: awsConfig.region,
     ...context,
   });
 }

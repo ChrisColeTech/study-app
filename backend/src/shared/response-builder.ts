@@ -5,6 +5,8 @@ import { ApiResponse, ApiSuccessResponse, ApiErrorResponse, ErrorDetails, Pagina
 import { HTTP_STATUS_CODES, COMMON_HEADERS } from './constants/api.constants';
 import { ERROR_CODES, ERROR_MESSAGES, ErrorCode } from './constants/error.constants';
 
+import { ConfigurationManager } from '@/shared/service-factory';
+
 export class ResponseBuilder {
   /**
    * Create a successful API response
@@ -339,7 +341,7 @@ export class ResponseBuilder {
           name: error.name,
           message: error.message,
           // Only include stack trace in non-production environments
-          ...(process.env.NODE_ENV !== 'production' && { stack: error.stack }),
+          ...(ConfigurationManager.getInstance().shouldIncludeDebugInfo() && { stack: error.stack }),
         }
       : undefined;
 
@@ -669,7 +671,7 @@ export class ResponseBuilder {
       finalStatusCode,
       {
         name: error.name,
-        ...(process.env.NODE_ENV !== 'production' && { stack: error.stack }),
+        ...(ConfigurationManager.getInstance().shouldIncludeDebugInfo() && { stack: error.stack }),
       },
       requestId
     );

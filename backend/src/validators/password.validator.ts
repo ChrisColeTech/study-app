@@ -74,10 +74,11 @@ export class PasswordValidator {
     return (password: string): { isValid: boolean; error?: string } => {
       const result = this.validate(password);
       
-      return {
-        isValid: result.isValid,
-        error: result.isValid ? undefined : result.errors[0],
-      };
+      if (result.isValid) {
+        return { isValid: true };
+      } else {
+        return { isValid: false, error: result.errors[0] };
+      }
     };
   }
 

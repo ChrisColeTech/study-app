@@ -14,7 +14,7 @@ import {
   ErrorContexts,
   ValidationMiddleware,
 } from '../shared/middleware';
-import { AnalyticsValidationSchemas, TypeAwareValidationSchemas } from '../shared/middleware/validation-schemas';
+import { AnalyticsValidationSchemas, AdditionalValidationHelpers } from '../shared/middleware/validation-schemas';
 
 export class AnalyticsHandler extends BaseHandler {
   private serviceFactory: ServiceFactory;
@@ -69,7 +69,7 @@ export class AnalyticsHandler extends BaseHandler {
     // Validate using type-aware schema that corresponds to ProgressAnalyticsRequest interface
     const validationResult = ValidationMiddleware.validateFields(
       queryParams,
-      TypeAwareValidationSchemas.progressAnalyticsRequestFromType(),
+      AdditionalValidationHelpers.createEnhancedAnalyticsValidation(),
       'query'
     );
     if (validationResult) return validationResult;

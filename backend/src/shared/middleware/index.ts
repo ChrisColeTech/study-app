@@ -18,8 +18,7 @@ export {
   ExamValidationSchemas,
   TopicValidationSchemas,
   HealthValidationSchemas,
-  TypeAwareValidationSchemas,
-  EnhancedValidationMiddleware,
+  AdditionalValidationHelpers,
 } from './validation-schemas';
 
 export type {

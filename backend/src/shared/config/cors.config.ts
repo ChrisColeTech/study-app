@@ -8,6 +8,8 @@
  * - Performance optimizations
  */
 
+import { ConfigurationManager } from '@/shared/service-factory';
+
 export interface CorsOriginConfig {
   readonly patterns: string[];
   readonly allowCredentials: boolean;
@@ -235,36 +237,36 @@ export class CorsConfig {
    * Apply environment variable overrides to configuration
    */
   private static applyEnvironmentOverrides(): void {
-    // Override origins from environment variable
-    if (process.env.CORS_ALLOWED_ORIGINS) {
-      const origins = process.env.CORS_ALLOWED_ORIGINS.split(',').map(o => o.trim());
-      (CorsConfig.config.origins as any).patterns = origins;
+    const configManager = ConfigurationManager.getInstance();
+    const corsConfig = configManager.getCORSConfig();
+    
+    // Override origins from centralized configuration
+    if (corsConfig.allowedOrigins && corsConfig.allowedOrigins.length > 0) {
+      (CorsConfig.config.origins as any).patterns = corsConfig.allowedOrigins;
     }
 
     // Override credentials setting
-    if (process.env.CORS_ALLOW_CREDENTIALS !== undefined) {
-      (CorsConfig.config.origins as any).allowCredentials = process.env.CORS_ALLOW_CREDENTIALS === 'true';
+    if (corsConfig.allowCredentials !== undefined) {
+      (CorsConfig.config.origins as any).allowCredentials = corsConfig.allowCredentials;
     }
 
     // Override methods
-    if (process.env.CORS_ALLOWED_METHODS) {
-      const methods = process.env.CORS_ALLOWED_METHODS.split(',').map(m => m.trim().toUpperCase());
-      (CorsConfig.config.methods as any).allowed = methods;
+    if (corsConfig.allowedMethods && corsConfig.allowedMethods.length > 0) {
+      (CorsConfig.config.methods as any).allowed = corsConfig.allowedMethods;
     }
 
     // Override headers
-    if (process.env.CORS_ALLOWED_HEADERS) {
-      const headers = process.env.CORS_ALLOWED_HEADERS.split(',').map(h => h.trim());
-      (CorsConfig.config.headers as any).allowed = headers;
+    if (corsConfig.allowedHeaders && corsConfig.allowedHeaders.length > 0) {
+      (CorsConfig.config.headers as any).allowed = corsConfig.allowedHeaders;
     }
 
     // Override security settings
-    if (process.env.CORS_STRICT_ORIGIN_CHECK !== undefined) {
-      (CorsConfig.config.security as any).strictOriginCheck = process.env.CORS_STRICT_ORIGIN_CHECK === 'true';
+    if (corsConfig.strictOriginCheck !== undefined) {
+      (CorsConfig.config.security as any).strictOriginCheck = corsConfig.strictOriginCheck;
     }
 
-    if (process.env.CORS_REQUIRE_HTTPS !== undefined) {
-      (CorsConfig.config.security as any).requireHttps = process.env.CORS_REQUIRE_HTTPS === 'true';
+    if (corsConfig.requireHttps !== undefined) {
+      (CorsConfig.config.security as any).requireHttps = corsConfig.requireHttps;
     }
   }
 
@@ -273,7 +275,8 @@ export class CorsConfig {
    */
   public static getConfig(): CorsEnvironmentConfig {
     if (!CorsConfig.config) {
-      CorsConfig.initialize(process.env.NODE_ENV || 'development');
+      const configManager = ConfigurationManager.getInstance();
+      CorsConfig.initialize(configManager.getEnvironment());
     }
     return CorsConfig.config;
   }

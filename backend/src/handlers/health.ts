@@ -5,6 +5,7 @@ import { HandlerContext, ApiResponse } from '../shared/types/api.types';
 import { ServiceFactory } from '../shared/service-factory';
 import { createLogger } from '../shared/logger';
 import { ERROR_CODES } from '../shared/constants/error.constants';
+import { ConfigurationManager } from '../shared/config/configuration-manager';
 
 export class HealthHandler extends BaseHandler {
   private serviceFactory: ServiceFactory;
@@ -78,6 +79,9 @@ export class HealthHandler extends BaseHandler {
       // Get basic health info
       const healthData = await healthService.checkHealth();
 
+      // Get configuration manager for Lambda metadata
+      const configManager = ConfigurationManager.getInstance();
+
       // Add additional system information
       const systemInfo = {
         ...healthData,
@@ -107,13 +111,13 @@ export class HealthHandler extends BaseHandler {
           },
         },
         lambda: {
-          functionName: process.env.AWS_LAMBDA_FUNCTION_NAME,
-          functionVersion: process.env.AWS_LAMBDA_FUNCTION_VERSION,
-          runtime: process.env.AWS_EXECUTION_ENV,
-          memorySize: process.env.AWS_LAMBDA_FUNCTION_MEMORY_SIZE,
-          timeout: process.env.AWS_LAMBDA_FUNCTION_TIMEOUT,
-          logGroup: process.env.AWS_LAMBDA_LOG_GROUP_NAME,
-          logStream: process.env.AWS_LAMBDA_LOG_STREAM_NAME,
+          functionName: configManager.getLambdaMetadata().functionName,
+          functionVersion: configManager.getLambdaMetadata().functionVersion,
+          runtime: configManager.getLambdaMetadata().runtime,
+          memorySize: configManager.getLambdaMetadata().memorySize,
+          timeout: configManager.getLambdaMetadata().timeout,
+          logGroup: configManager.getLambdaMetadata().logGroup,
+          logStream: configManager.getLambdaMetadata().logStream,
         },
       };
 

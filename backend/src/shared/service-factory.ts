@@ -4,6 +4,17 @@ import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb';
 import { S3Client } from '@aws-sdk/client-s3';
 
+// Import configuration management
+import { 
+  ConfigurationManager,
+  Environment,
+  type AppConfiguration,
+  type AWSConfig,
+  type AuthConfig,
+  type ApplicationConfig,
+  type CORSConfig
+} from './config/configuration-manager';
+
 // Import service interfaces
 import type { IAuthService } from '../services/auth.service';
 import type { IUserService } from '../services/user.service';
@@ -100,6 +111,32 @@ export interface IHealthService {
 }
 
 // Configuration interface
+/**
+ * Central Configuration Management System
+ * Provides type-safe, validated access to environment configuration
+ */
+
+// Environment enum moved to shared/config/configuration-manager.ts
+
+// Configuration interfaces moved to shared/config/configuration-manager.ts
+
+// AuthConfig interface moved to shared/config/configuration-manager.ts
+
+// ApplicationConfig interface moved to shared/config/configuration-manager.ts
+
+// CORSConfig interface moved to shared/config/configuration-manager.ts
+
+// AppConfiguration interface moved to shared/config/configuration-manager.ts
+
+// ConfigValidationError interface moved to shared/config/configuration-manager.ts
+
+// ConfigurationManager class moved to shared/config/configuration-manager.ts
+// Import the new enhanced ConfigurationManager
+export { ConfigurationManager } from './config/configuration-manager';
+
+// Export singleton instance
+export const config = ConfigurationManager.getInstance();
+
 export interface ServiceConfig {
   region: string;
   environment: string;
@@ -148,22 +185,24 @@ export class InfrastructureFactory {
    * Load configuration from environment variables
    */
   private loadConfig(): ServiceConfig {
-    const questionDataBucket = process.env.QUESTION_DATA_BUCKET_NAME || '';
+    const configManager = ConfigurationManager.getInstance();
+    const awsConfig = configManager.getAWSConfig();
+    
     return {
-      region: process.env.AWS_REGION || 'us-east-1',
-      environment: process.env.NODE_ENV || 'dev',
+      region: awsConfig.region,
+      environment: configManager.getEnvironment(),
       tables: {
-        users: process.env.USERS_TABLE_NAME || '',
-        studySessions: process.env.STUDY_SESSIONS_TABLE_NAME || '',
-        userProgress: process.env.USER_PROGRESS_TABLE_NAME || '',
-        goals: process.env.GOALS_TABLE_NAME || '',
+        users: awsConfig.tables.users,
+        studySessions: awsConfig.tables.studySessions,
+        userProgress: awsConfig.tables.userProgress,
+        goals: awsConfig.tables.goals,
       },
       s3: {
-        bucketName: questionDataBucket,
+        bucketName: awsConfig.buckets.questionData,
       },
       buckets: {
-        questionData: questionDataBucket,
-        assets: process.env.ASSETS_BUCKET_NAME || '',
+        questionData: awsConfig.buckets.questionData,
+        assets: awsConfig.buckets.assets,
       },
     };
   }

@@ -25,7 +25,7 @@ import {
   AuthMiddleware,
   AuthConfigs,
 } from '../shared/middleware';
-import { QuestionValidationSchemas, TypeAwareValidationSchemas } from '../shared/middleware/validation-schemas';
+import { QuestionValidationSchemas, AdditionalValidationHelpers } from '../shared/middleware/validation-schemas';
 
 export class QuestionHandler extends BaseHandler {
   private serviceFactory: ServiceFactory;
@@ -137,7 +137,7 @@ export class QuestionHandler extends BaseHandler {
     // Validate question ID using type-aware schema that corresponds to QuestionIdParam interface
     const questionIdValidation = ValidationMiddleware.validateFields(
       { questionId: pathParams.id },
-      TypeAwareValidationSchemas.questionIdFromType(),
+      AdditionalValidationHelpers.createEnhancedQuestionIdValidation(),
       'params'
     );
     if (questionIdValidation) return questionIdValidation;

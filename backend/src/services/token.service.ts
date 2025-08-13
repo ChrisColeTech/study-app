@@ -13,6 +13,8 @@ export interface TokenGenerationResult {
   expiresIn: number;
 }
 
+import { ConfigurationManager } from '@/shared/service-factory';
+
 export interface ITokenService {
   generateTokens(user: UserResponse): Promise<TokenGenerationResult>;
   validateToken(token: string): Promise<JwtPayload>;
@@ -29,19 +31,16 @@ export class TokenService implements ITokenService {
   private jwtRefreshExpiresIn: string;
 
   constructor() {
-    this.jwtSecret = process.env.JWT_SECRET || 'default-secret-key';
-    this.jwtRefreshSecret = process.env.JWT_REFRESH_SECRET || 'default-refresh-secret-key';
-    this.jwtExpiresIn = process.env.JWT_EXPIRES_IN || '24h';
-    this.jwtRefreshExpiresIn = process.env.JWT_REFRESH_EXPIRES_IN || '7d';
+    const configManager = ConfigurationManager.getInstance();
+    const authConfig = configManager.getAuthConfig();
+    
+    this.jwtSecret = authConfig.jwtSecret;
+    this.jwtRefreshSecret = authConfig.jwtRefreshSecret;
+    this.jwtExpiresIn = authConfig.jwtExpiresIn;
+    this.jwtRefreshExpiresIn = authConfig.jwtRefreshExpiresIn;
 
-    if (
-      this.jwtSecret === 'default-secret-key' ||
-      this.jwtRefreshSecret === 'default-refresh-secret-key'
-    ) {
-      this.logger.warn(
-        'Using default JWT secrets - should be set via environment variables in production'
-      );
-    }
+    // Configuration validation is handled centrally in ConfigurationManager
+    // This ensures proper secrets are configured at application startup
   }
 
   /**

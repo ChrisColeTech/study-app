@@ -15,8 +15,8 @@ export class UserValidator {
    */
   static validateEmail(email: string): UserValidationResult {
     // Use centralized email validation to eliminate duplication
-    const { validateEmail } = require('../shared/middleware/validation.rules-library');
-    const emailValidator = validateEmail();
+    const { ValidationRules } = require('../shared/middleware/validation.middleware');
+    const emailValidator = ValidationRules.email();
     const result = emailValidator(email);
 
     return {
@@ -38,8 +38,8 @@ export class UserValidator {
     }
 
     // Use centralized string length validation
-    const { validateStringLength } = require('../shared/middleware/validation.rules-library');
-    const lengthValidator = validateStringLength(1, 50);
+    const { ValidationRules } = require('../shared/middleware/validation.middleware');
+    const lengthValidator = ValidationRules.stringLength(1, 50);
     const lengthResult = lengthValidator(name.trim());
 
     if (!lengthResult.isValid) {
@@ -145,10 +145,11 @@ export class UserValidator {
     return (email: string): { isValid: boolean; error?: string } => {
       const result = this.validateEmail(email);
       
-      return {
-        isValid: result.isValid,
-        error: result.isValid ? undefined : result.errors[0],
-      };
+      if (result.isValid) {
+        return { isValid: true };
+      } else {
+        return { isValid: false, error: result.errors[0] };
+      }
     };
   }
 
@@ -159,10 +160,11 @@ export class UserValidator {
     return (name: string): { isValid: boolean; error?: string } => {
       const result = this.validateName(name, fieldName);
       
-      return {
-        isValid: result.isValid,
-        error: result.isValid ? undefined : result.errors[0],
-      };
+      if (result.isValid) {
+        return { isValid: true };
+      } else {
+        return { isValid: false, error: result.errors[0] };
+      }
     };
   }
 

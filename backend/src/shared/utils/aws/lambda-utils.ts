@@ -4,6 +4,8 @@
  * Single Responsibility: Lambda execution context and environment utilities
  */
 
+import { ConfigurationManager } from '@/shared/service-factory';
+
 /**
  * Extract request ID from Lambda context
  */
@@ -60,7 +62,7 @@ export function getInvokedFunctionArn(context?: any): string | undefined {
  * Extract region from ARN or environment
  */
 export function getCurrentRegion(): string {
-  return process.env.AWS_REGION || process.env.AWS_DEFAULT_REGION || 'us-east-1';
+  return ConfigurationManager.getInstance().getAWSConfig().region;
 }
 
 /**

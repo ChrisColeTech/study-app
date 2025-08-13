@@ -19,12 +19,12 @@ import {
   ErrorHandlingMiddleware,
   ErrorContexts,
   ValidationMiddleware,
-  ValidationRulesLibrary,
+  ValidationRules,
   AuthMiddleware,
   AuthConfigs,
   AuthenticatedContext,
 } from '../shared/middleware';
-import { SessionValidationSchemas, TypeAwareValidationSchemas } from '../shared/middleware/validation-schemas';
+import { SessionValidationSchemas, AdditionalValidationHelpers } from '../shared/middleware/validation-schemas';
 
 export class SessionHandler extends BaseHandler {
   private serviceFactory: ServiceFactory;
@@ -164,7 +164,7 @@ export class SessionHandler extends BaseHandler {
       context,
       'write', // Pattern: parsing + validation + error handling
       {
-        body: TypeAwareValidationSchemas.createSessionRequestFromType(),
+        body: AdditionalValidationHelpers.createEnhancedSessionValidation(),
       },
       async () => {
         const requestBody = context.parsedData?.body as CreateSessionRequest;
@@ -229,8 +229,8 @@ export class SessionHandler extends BaseHandler {
       context,
       'write', // Pattern: parsing + validation + error handling
       {
-        path: TypeAwareValidationSchemas.sessionIdFromType(),
-        body: TypeAwareValidationSchemas.updateSessionRequestFromType(),
+        path: AdditionalValidationHelpers.createEnhancedSessionIdValidation(),
+        body: AdditionalValidationHelpers.createEnhancedUpdateValidation(),
       },
       async () => {
         const pathParams = context.parsedData?.path!;
@@ -302,8 +302,8 @@ export class SessionHandler extends BaseHandler {
       context,
       'write', // Pattern: parsing + validation + error handling
       {
-        path: TypeAwareValidationSchemas.sessionIdFromType(),
-        body: TypeAwareValidationSchemas.submitAnswerRequestFromType(),
+        path: AdditionalValidationHelpers.createEnhancedSessionIdValidation(),
+        body: AdditionalValidationHelpers.createEnhancedAnswerValidation(),
       },
       async () => {
         const pathParams = context.parsedData?.path!;

@@ -19,7 +19,7 @@ import {
   AuthConfigs,
   AuthenticatedContext,
 } from '../shared/middleware';
-import { GoalsValidationSchemas, TypeAwareValidationSchemas } from '../shared/middleware/validation-schemas';
+import { GoalsValidationSchemas, AdditionalValidationHelpers } from '../shared/middleware/validation-schemas';
 
 export class GoalsHandler extends BaseHandler {
   private serviceFactory: ServiceFactory;
@@ -135,7 +135,7 @@ export class GoalsHandler extends BaseHandler {
     // Validate using type-aware schema that corresponds to CreateGoalRequest interface
     const validationResult = ValidationMiddleware.validateRequestBody(
       context,
-      TypeAwareValidationSchemas.createGoalRequestFromType()
+      AdditionalValidationHelpers.createEnhancedGoalValidation()
     );
     if (validationResult.error) return validationResult.error;
 
