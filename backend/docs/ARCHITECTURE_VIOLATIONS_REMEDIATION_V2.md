@@ -846,7 +846,7 @@
 - Implement environment-specific configuration handling
 - Standardize configuration access patterns across all services
 
-**📚 Documentation**: [Phase 32 Configuration Management Enhancement](./phases/phase-32-configuration-management-enhancement.md)
+**📚 Documentation**: [Phase 32 Configuration Management Enhancement](./phases/PHASE_32_CONFIGURATION_MANAGEMENT_ENHANCEMENT.md)
 
 ---
 
@@ -889,7 +889,7 @@
 
 **Final Results**: 1,328 lines → 292 lines (78% reduction), zero TypeScript errors, SRP compliance achieved through focused delegation pattern
 
-**📚 Documentation**: [Phase 30 ValidationMiddleware Decomposition](./phases/phase-30-lessons-learned.md)
+**📚 Documentation**: [Phase 30 ValidationMiddleware Decomposition](./phases/PHASE_30_VALIDATIONMIDDLEWARE_DECOMPOSITION.md)
 
 ### **Objective 35: ValidationSchemas Decomposition (1,138 lines → Domain Schemas)** ⚠️ **REQUIRES SCHEMA DOMAIN SEPARATION**
 
