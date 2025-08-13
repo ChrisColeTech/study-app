@@ -13,9 +13,23 @@ import {
 import { StatusType } from '../shared/types/domain.types';
 import { ProviderFilter } from '../filters/provider.filter';
 
+/**
+ * ProviderMapper - Dedicated mapper for provider response objects
+ * 
+ * Extracted from ProviderService to separate mapping concerns and provide
+ * standardized transformation patterns for provider-related data objects.
+ * 
+ * @responsibilities  
+ * - Transform Provider to EnhancedProvider with metadata
+ * - Create provider response objects with filtering and pagination
+ * - Handle array transformations and filter option extraction
+ */
 export class ProviderMapper {
   /**
    * Convert Provider to EnhancedProvider with additional metadata
+   * 
+   * @param provider - Basic provider object
+   * @returns Enhanced provider with metadata and default values
    */
   static toEnhancedProvider(provider: Provider): EnhancedProvider {
     return {
@@ -36,6 +50,9 @@ export class ProviderMapper {
 
   /**
    * Convert array of Providers to EnhancedProviders
+   * 
+   * @param providers - Array of basic provider objects
+   * @returns Array of enhanced providers with metadata
    */
   static toEnhancedProviders(providers: Provider[]): EnhancedProvider[] {
     return providers.map(provider => this.toEnhancedProvider(provider));
@@ -43,6 +60,12 @@ export class ProviderMapper {
 
   /**
    * Create GetProvidersResponse from filtered providers and request
+   * 
+   * @param filteredProviders - Filtered provider array
+   * @param totalFiltered - Total count after filtering  
+   * @param allProviders - All available providers for filter options
+   * @param request - Original request with pagination/filter parameters
+   * @returns Complete GetProvidersResponse with pagination and filter metadata
    */
   static toGetProvidersResponse(
     filteredProviders: Provider[],
@@ -85,6 +108,9 @@ export class ProviderMapper {
 
   /**
    * Create GetProviderResponse from provider
+   * 
+   * @param provider - Basic provider object
+   * @returns Single provider response with enhanced data
    */
   static toGetProviderResponse(provider: Provider): GetProviderResponse {
     return {
