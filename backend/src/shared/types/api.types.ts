@@ -22,7 +22,7 @@ export interface ApiErrorResponse {
   error: {
     code: string;
     message: string;
-    details?: ErrorDetails;
+    details?: ErrorDetails | undefined;
   };
   timestamp: string;
   requestId?: string | undefined;
@@ -170,7 +170,59 @@ export interface StandardizedErrorDetails {
   [key: string]: any;
 }
 
-export type ErrorDetails = unknown;
+export type ErrorDetails = 
+  // Validation error details
+  | {
+      statusCode?: number;
+      validationErrors?: StandardizedValidationError[];
+      field?: string;
+      value?: any;
+    }
+  // Resource error details
+  | {
+      statusCode?: number;
+      resource?: string;
+      resourceId?: string;
+      path?: string;
+      method?: string;
+    }
+  // Authentication error details
+  | {
+      statusCode?: number;
+      requiredPermissions?: string[];
+      userRole?: string;
+      operation?: string;
+    }
+  // System error details
+  | {
+      statusCode?: number;
+      error?: string;
+      errorMessage?: string;
+      region?: string;
+      service?: string;
+    }
+  // Method not allowed details
+  | {
+      statusCode?: number;
+      allowedMethods?: string[];
+    }
+  // HTTP-specific error details
+  | {
+      statusCode?: number;
+      acceptableTypes?: string[];
+      maxSize?: number;
+      supportedTypes?: string[];
+      retryAfter?: number;
+    }
+  // Exception details
+  | {
+      statusCode?: number;
+      stack?: string | any;
+      name?: string | any;
+      message?: string | any;
+    }
+  // Generic record for compatibility
+  | Record<string, any>;
 
 export type ApiResponse<T = any> = ApiSuccessResponse<T> | ApiErrorResponse;
 

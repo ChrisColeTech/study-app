@@ -54,7 +54,10 @@ export class HealthHandler extends BaseHandler {
         requestId: context.requestId,
       });
 
-      return this.error(ERROR_CODES.INTERNAL_ERROR, 'Health check failed', error);
+      return this.error(ERROR_CODES.INTERNAL_ERROR, 'Health check failed', {
+        error: error instanceof Error ? error.message : String(error),
+        ...(error instanceof Error && { name: error.name }),
+      });
     }
   }
 
@@ -120,7 +123,10 @@ export class HealthHandler extends BaseHandler {
         requestId: context.requestId,
       });
 
-      return this.error(ERROR_CODES.INTERNAL_ERROR, 'System status check failed', error);
+      return this.error(ERROR_CODES.INTERNAL_ERROR, 'System status check failed', {
+        error: error instanceof Error ? error.message : String(error),
+        ...(error instanceof Error && { name: error.name }),
+      });
     }
   }
 }

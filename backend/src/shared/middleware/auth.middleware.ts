@@ -24,6 +24,28 @@ export interface AuthOptions {
 
 export class AuthMiddleware {
   /**
+   * Create standardized error response following BaseHandler pattern
+   * @private
+   */
+  private static createStandardizedErrorResponse(
+    message: string,
+    statusCode: number,
+    errorCode: string,
+    details?: any
+  ): ApiResponse {
+    return {
+      success: false,
+      message,
+      error: {
+        code: errorCode,
+        message,
+        details: details ? { statusCode, ...details } : { statusCode },
+      },
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  /**
    * Validate JWT token and extract user context
    */
   static async authenticateRequest(
@@ -41,9 +63,10 @@ export class AuthMiddleware {
       if (!authHeader) {
         if (options.required) {
           return {
-            error: ErrorHandlingMiddleware.createErrorResponse(
-              ERROR_CODES.UNAUTHORIZED,
-              'Authorization header is required'
+            error: this.createStandardizedErrorResponse(
+              'Authorization header is required',
+              401,
+              ERROR_CODES.UNAUTHORIZED
             ),
           };
         }
@@ -53,9 +76,10 @@ export class AuthMiddleware {
 
       if (!authHeader.startsWith('Bearer ')) {
         return {
-          error: ErrorHandlingMiddleware.createErrorResponse(
-            ERROR_CODES.UNAUTHORIZED,
-            'Authorization header must use Bearer token format'
+          error: this.createStandardizedErrorResponse(
+            'Authorization header must use Bearer token format',
+            401,
+            ERROR_CODES.UNAUTHORIZED
           ),
         };
       }
@@ -64,9 +88,10 @@ export class AuthMiddleware {
 
       if (!token || token.trim() === '') {
         return {
-          error: ErrorHandlingMiddleware.createErrorResponse(
-            ERROR_CODES.UNAUTHORIZED,
-            'Bearer token is required'
+          error: this.createStandardizedErrorResponse(
+            'Bearer token is required',
+            401,
+            ERROR_CODES.UNAUTHORIZED
           ),
         };
       }
@@ -91,7 +116,11 @@ export class AuthMiddleware {
         });
 
         return {
-          error: ErrorHandlingMiddleware.createErrorResponse(errorInfo.code, errorInfo.message),
+          error: this.createStandardizedErrorResponse(
+            errorInfo.message,
+            401,
+            errorInfo.code
+          ),
         };
       }
 
@@ -104,9 +133,10 @@ export class AuthMiddleware {
         });
 
         return {
-          error: ErrorHandlingMiddleware.createErrorResponse(
-            ERROR_CODES.UNAUTHORIZED,
-            'Invalid token payload'
+          error: this.createStandardizedErrorResponse(
+            'Invalid token payload',
+            401,
+            ERROR_CODES.UNAUTHORIZED
           ),
         };
       }
@@ -147,9 +177,10 @@ export class AuthMiddleware {
       });
 
       return {
-        error: ErrorHandlingMiddleware.createErrorResponse(
-          ERROR_CODES.INTERNAL_ERROR,
-          'Authentication processing failed'
+        error: this.createStandardizedErrorResponse(
+          'Authentication processing failed',
+          500,
+          ERROR_CODES.INTERNAL_ERROR
         ),
       };
     }
@@ -198,18 +229,20 @@ export class AuthMiddleware {
 
     if (!authHeader) {
       return {
-        error: ErrorHandlingMiddleware.createErrorResponse(
-          ERROR_CODES.VALIDATION_ERROR,
-          'Authorization header is required'
+        error: this.createStandardizedErrorResponse(
+          'Authorization header is required',
+          400,
+          ERROR_CODES.VALIDATION_ERROR
         ),
       };
     }
 
     if (!authHeader.startsWith('Bearer ')) {
       return {
-        error: ErrorHandlingMiddleware.createErrorResponse(
-          ERROR_CODES.VALIDATION_ERROR,
-          'Authorization header must use Bearer token format'
+        error: this.createStandardizedErrorResponse(
+          'Authorization header must use Bearer token format',
+          400,
+          ERROR_CODES.VALIDATION_ERROR
         ),
       };
     }
@@ -218,9 +251,10 @@ export class AuthMiddleware {
 
     if (!token || token.trim() === '') {
       return {
-        error: ErrorHandlingMiddleware.createErrorResponse(
-          ERROR_CODES.VALIDATION_ERROR,
-          'Bearer token is required'
+        error: this.createStandardizedErrorResponse(
+          'Bearer token is required',
+          400,
+          ERROR_CODES.VALIDATION_ERROR
         ),
       };
     }
@@ -244,9 +278,10 @@ export class AuthMiddleware {
         resourceType,
       });
 
-      return ErrorHandlingMiddleware.createErrorResponse(
-        ERROR_CODES.FORBIDDEN,
-        `Access denied to ${resourceType}`
+      return this.createStandardizedErrorResponse(
+        `Access denied to ${resourceType}`,
+        403,
+        ERROR_CODES.FORBIDDEN
       );
     }
 
