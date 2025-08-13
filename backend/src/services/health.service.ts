@@ -14,6 +14,7 @@ import {
   HealthTrend,
 } from '../shared/types/health.types';
 import { createLogger } from '../shared/logger';
+import { EnvironmentDetector, LambdaMetadataAccessor } from '../shared/config';
 
 export class HealthService implements IHealthService {
   private logger = createLogger({ service: 'HealthService' });
@@ -46,8 +47,8 @@ export class HealthService implements IHealthService {
       const response = {
         status: 'healthy' as string,
         timestamp: new Date().toISOString(),
-        environment: process.env.NODE_ENV || 'development',
-        version: process.env.AWS_LAMBDA_FUNCTION_VERSION || '1.0.0',
+        environment: EnvironmentDetector.getEnvironmentString(),
+        version: LambdaMetadataAccessor.getFunctionVersion() || '1.0.0',
         dependencies,
       };
 
@@ -76,8 +77,8 @@ export class HealthService implements IHealthService {
       return {
         status: 'unhealthy',
         timestamp: new Date().toISOString(),
-        environment: process.env.NODE_ENV || 'development',
-        version: process.env.AWS_LAMBDA_FUNCTION_VERSION || '1.0.0',
+        environment: EnvironmentDetector.getEnvironmentString(),
+        version: LambdaMetadataAccessor.getFunctionVersion() || '1.0.0',
         error: (error as Error).message,
         totalTime,
       };

@@ -10,6 +10,7 @@ import { ValidationMiddleware, ValidationSchema } from './validation.middleware'
 import { ErrorHandlingMiddleware } from './error-handling.middleware';
 import { AuthMiddleware } from './auth.middleware';
 import { RequestLifecycleTracker } from './request-lifecycle-tracker';
+import { EnvironmentDetector } from '../config';
 
 export interface PipelineExecutionContext {
   event: APIGatewayProxyEvent;
@@ -555,7 +556,7 @@ export class RequestProcessingPipeline {
         code: 'INTERNAL_ERROR',
         message: 'Internal server error',
         details: {
-          ...(process.env.NODE_ENV === 'development' && { errorMessage: error.message }),
+          ...(EnvironmentDetector.isDevelopment() && { errorMessage: error.message }),
           path: this.event.path,
           method: this.event.httpMethod,
         },

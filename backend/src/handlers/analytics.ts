@@ -6,6 +6,7 @@ import { ServiceFactory } from '../shared/service-factory';
 import { createLogger } from '../shared/logger';
 import { ERROR_CODES } from '../shared/constants/error.constants';
 import { ProgressAnalyticsRequest, IAnalyticsService } from '../shared/types/analytics.types';
+import { EnvironmentDetector } from '../shared/config';
 
 // Import middleware
 import {
@@ -186,7 +187,7 @@ export class AnalyticsHandler extends BaseHandler {
         status: 'healthy',
         service: 'analytics',
         timestamp: new Date().toISOString(),
-        environment: process.env.NODE_ENV || 'development',
+        environment: EnvironmentDetector.getEnvironmentString(),
         features: {
           progressAnalytics: 'available',
           competencyTracking: 'available',

@@ -5,6 +5,7 @@
  */
 
 import { formatJSON } from '../common/format-utils';
+import { ApplicationMetadataAccessor } from '../../config';
 
 /**
  * Common HTTP status codes
@@ -399,7 +400,7 @@ export function createHealthResponse(
     status,
     timestamp: new Date().toISOString(),
     checks,
-    version: process.env.APP_VERSION || '1.0.0',
+    version: ApplicationMetadataAccessor.getAppVersion(),
   };
   
   return {

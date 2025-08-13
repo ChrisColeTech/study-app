@@ -22,6 +22,7 @@ import {
 } from '../shared/types/health.types';
 import * as os from 'os';
 import * as dns from 'dns';
+import { LambdaMetadataAccessor } from '../shared/config';
 import { promisify } from 'util';
 
 // Re-export interfaces for external use
@@ -445,7 +446,7 @@ export class HealthMonitoringService {
     const startTime = Date.now();
 
     try {
-      const functionName = process.env.AWS_LAMBDA_FUNCTION_NAME;
+      const functionName = LambdaMetadataAccessor.getFunctionName();
       if (!functionName) {
         return {
           service: 'lambda',
@@ -559,11 +560,7 @@ export class HealthMonitoringService {
       heap: {
         used: Math.round(memoryUsage.heapUsed / 1024 / 1024),
         total: Math.round(memoryUsage.heapTotal / 1024 / 1024),
-        limit: Math.round(
-          process.env.AWS_LAMBDA_FUNCTION_MEMORY_SIZE
-            ? parseInt(process.env.AWS_LAMBDA_FUNCTION_MEMORY_SIZE)
-            : 512
-        ),
+        limit: Math.round(LambdaMetadataAccessor.getMemorySize() || 512),
         percentage: Math.round((memoryUsage.heapUsed / memoryUsage.heapTotal) * 100),
       },
     };
@@ -699,7 +696,7 @@ export class HealthConfigurationValidator {
     });
 
     // Check Lambda function environment
-    if (!process.env.AWS_LAMBDA_FUNCTION_NAME) {
+    if (!LambdaMetadataAccessor.getFunctionName()) {
       warnings.push('Lambda function name not available in environment');
     }
 

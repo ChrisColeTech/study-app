@@ -3,6 +3,8 @@
 
 // Using generic types since specific health types may not be exported
 
+import { EnvironmentDetector, ApplicationMetadataAccessor } from '../shared/config';
+
 /**
  * HealthMapper - Dedicated mapper for health check data transformations
  * 
@@ -65,8 +67,8 @@ export class HealthMapper {
     return {
       uptime: process.uptime(),
       timestamp: new Date().toISOString(),
-      version: process.env.npm_package_version || '1.0.0',
-      environment: process.env.NODE_ENV || 'development',
+      version: ApplicationMetadataAccessor.getAppVersion(),
+      environment: EnvironmentDetector.getEnvironmentString(),
       database: checks.database || { status: 'unknown' },
       storage: checks.storage || { status: 'unknown' },
       memory: checks.memory || this.getMemoryInfo(),
