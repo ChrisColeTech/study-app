@@ -15,7 +15,7 @@ import {
   ErrorContexts,
   ValidationMiddleware,
 } from '../shared/middleware';
-import { AnalyticsValidationSchemas, AdditionalValidationHelpers } from '../shared/middleware/validation-schemas';
+import { AnalyticsValidationSchemas, AdditionalValidationHelpers } from '../shared/middleware';
 
 export class AnalyticsHandler extends BaseHandler {
   private serviceFactory: ServiceFactory;

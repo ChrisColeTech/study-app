@@ -25,7 +25,7 @@ import {
   AuthMiddleware,
   AuthConfigs,
 } from '../shared/middleware';
-import { QuestionValidationSchemas, AdditionalValidationHelpers } from '../shared/middleware/validation-schemas';
+import { QuestionValidationSchemas, AdditionalValidationHelpers } from '../shared/middleware';
 
 export class QuestionHandler extends BaseHandler {
   private serviceFactory: ServiceFactory;

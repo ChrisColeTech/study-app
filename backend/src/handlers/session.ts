@@ -24,7 +24,7 @@ import {
   AuthenticatedContext,
 } from '../shared/middleware';
 import { ValidationRules } from '../shared/validation/validation-rules';
-import { SessionValidationSchemas, AdditionalValidationHelpers } from '../shared/middleware/validation-schemas';
+import { SessionValidationSchemas, AdditionalValidationHelpers } from '../shared/middleware';
 
 export class SessionHandler extends BaseHandler {
   private serviceFactory: ServiceFactory;

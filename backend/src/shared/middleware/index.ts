@@ -3,18 +3,16 @@
 
 export { ValidationMiddleware } from './validation.middleware';
 
-export {
-  SessionValidationSchemas,
-  GoalsValidationSchemas,
-  AnalyticsValidationSchemas,
-  QuestionValidationSchemas,
-  AuthValidationSchemas,
-  ProviderValidationSchemas,
-  ExamValidationSchemas,
-  TopicValidationSchemas,
-  HealthValidationSchemas,
-  AdditionalValidationHelpers,
-} from './validation-schemas';
+export { SessionValidationSchemas } from './session-validation-schemas';
+export { GoalsValidationSchemas } from './goals-validation-schemas';
+export { AnalyticsValidationSchemas } from './analytics-validation-schemas';
+export { QuestionValidationSchemas } from './question-validation-schemas';
+export { AuthValidationSchemas } from './auth-validation-schemas';
+export { ProviderValidationSchemas } from './provider-validation-schemas';
+export { ExamValidationSchemas } from './exam-validation-schemas';
+export { TopicValidationSchemas } from './topic-validation-schemas';
+export { HealthValidationSchemas } from './health-validation-schemas';
+export { AdditionalValidationHelpers } from './validation-schemas';
 
 export type {
   ValidationRule,

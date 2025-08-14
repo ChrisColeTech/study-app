@@ -19,7 +19,7 @@ import {
   AuthConfigs,
   AuthenticatedContext,
 } from '../shared/middleware';
-import { GoalsValidationSchemas, AdditionalValidationHelpers } from '../shared/middleware/validation-schemas';
+import { GoalsValidationSchemas, AdditionalValidationHelpers } from '../shared/middleware';
 
 export class GoalsHandler extends BaseHandler {
   private serviceFactory: ServiceFactory;
