@@ -484,23 +484,31 @@ export class StudyFactory {
    */
   public getQuestionService(): IQuestionService {
     if (!this._questionService) {
-      const {
-        QuestionService,
-        QuestionSelector,
-        QuestionAnalyzer,
-      } = require('../services/question.service');
+      const { QuestionService } = require('../services/question.service');
+      const { QuestionCrudService } = require('../services/question-crud.service');
+      const { QuestionSelectionService } = require('../services/question-selection.service');
+      const { QuestionValidationService } = require('../services/question-validation.service');
+      const { QuestionAnalyticsService } = require('../services/question-analytics.service');
 
-      // Create question selector service
-      const questionSelector = new QuestionSelector();
-
-      // Create question analyzer service (depends on selector)
-      const questionAnalyzer = new QuestionAnalyzer(questionSelector);
-
-      // Create main question service with dependencies
-      this._questionService = new QuestionService(
+      // Create focused services
+      const questionSelectionService = new QuestionSelectionService();
+      const questionValidationService = new QuestionValidationService();
+      const questionAnalyticsService = new QuestionAnalyticsService(
         this.getQuestionRepository(),
-        questionSelector,
-        questionAnalyzer
+        questionSelectionService
+      );
+
+      // Create CRUD service with its dependencies
+      const questionCrudService = new QuestionCrudService(
+        this.getQuestionRepository(),
+        questionSelectionService,
+        questionValidationService
+      );
+
+      // Create main question service with focused services
+      this._questionService = new QuestionService(
+        questionCrudService,
+        questionAnalyticsService
       );
     }
     return this._questionService!;
