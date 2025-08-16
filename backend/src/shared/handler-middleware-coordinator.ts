@@ -63,13 +63,26 @@ export class MiddlewareCoordinator {
     context: HandlerContext,
     required: boolean = true
   ): Promise<{ data?: T; error?: ApiResponse }> {
-    // Check if body has already been parsed by the pipeline
-    if (context.parsedData?.body !== undefined) {
+    // Debug logging
+    console.log('DEBUG: parseRequestBodyOrError called', {
+      hasEvent: !!context.event,
+      hasBody: !!context.event?.body,
+      bodyPreview: context.event?.body?.substring(0, 100),
+      hasParsedData: !!context.parsedData,
+      parsedDataKeys: context.parsedData ? Object.keys(context.parsedData) : [],
+      parsedBodyValue: context.parsedData?.body
+    });
+
+    // Check if body has already been parsed by the pipeline and is valid
+    if (context.parsedData && 'body' in context.parsedData && context.parsedData.body !== null) {
+      console.log('DEBUG: Using pre-parsed body from context.parsedData');
       return { data: context.parsedData.body as T };
     }
 
-    // Fall back to direct parsing if not already parsed
+    console.log('DEBUG: Falling back to direct parsing');
+    // Fall back to direct parsing if not already parsed or parsing failed
     const { data, error: parseError } = ParsingMiddleware.parseRequestBody<T>(context, required);
+    console.log('DEBUG: Direct parsing result', { hasData: !!data, hasError: !!parseError, data });
     if (parseError) return { error: parseError };
     return { data };
   }
