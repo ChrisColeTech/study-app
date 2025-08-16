@@ -63,14 +63,16 @@ export class MiddlewareCoordinator {
     context: HandlerContext,
     required: boolean = true
   ): Promise<{ data?: T; error?: ApiResponse }> {
-    // Debug logging
-    console.log('DEBUG: parseRequestBodyOrError called', {
+    // Add logging to debug the issue
+    console.log('DEBUG parseRequestBodyOrError:', {
       hasEvent: !!context.event,
-      hasBody: !!context.event?.body,
-      bodyPreview: context.event?.body?.substring(0, 100),
+      eventBody: context.event?.body,
+      bodyLength: context.event?.body?.length,
+      httpMethod: context.event?.httpMethod,
       hasParsedData: !!context.parsedData,
       parsedDataKeys: context.parsedData ? Object.keys(context.parsedData) : [],
-      parsedBodyValue: context.parsedData?.body
+      parsedDataBody: context.parsedData?.body,
+      required
     });
 
     // Check if body has already been parsed by the pipeline and is valid
