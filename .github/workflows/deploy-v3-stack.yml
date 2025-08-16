@@ -229,6 +229,7 @@ jobs:
           fi
           
           # Step 3: Smart upload with change detection
+          chmod +x .github/scripts/smart-s3-upload.sh
           .github/scripts/smart-s3-upload.sh
           
           # Step 4: Create provider metadata (always update to reflect current state)
