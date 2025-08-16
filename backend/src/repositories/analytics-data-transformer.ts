@@ -19,31 +19,47 @@ export class AnalyticsDataTransformer {
    * Transform session data to analytics format
    */
   transformSessionToAnalyticsData(session: StudySession): SessionAnalyticsData {
-    const duration = session.endTime
+    // Add null safety checks for session object and required properties
+    if (!session) {
+      throw new Error('Session data is required for analytics transformation');
+    }
+
+    if (!session.sessionId) {
+      throw new Error('Session ID is required for analytics transformation');
+    }
+
+    // Safe access to time properties with fallbacks
+    const startTime = session.startTime || new Date().toISOString();
+    const endTime = session.endTime || null;
+    
+    const duration = endTime
       ? Math.round(
-          (new Date(session.endTime).getTime() - new Date(session.startTime).getTime()) /
+          (new Date(endTime).getTime() - new Date(startTime).getTime()) /
             (1000 * 60)
         )
       : 0;
 
-    const questions: QuestionAnalyticsData[] = session.questions.map((q: any) => ({
-      questionId: q.questionId,
-      topicId: 'unknown', // Will need to enrich with topic data
-      difficulty: 'medium' as const, // Will need to enrich with question data
-      isCorrect: q.isCorrect || false,
-      timeSpent: q.timeSpent,
-      userAnswer: q.userAnswer || [],
-      correctAnswer: q.correctAnswer,
-      skipped: q.skipped,
-      markedForReview: q.markedForReview,
+    // Safe access to questions array with null check
+    const questionsArray = Array.isArray(session.questions) ? session.questions : [];
+    
+    const questions: QuestionAnalyticsData[] = questionsArray.map((q: any) => ({
+      questionId: q?.questionId || 'unknown',
+      topicId: q?.topicId || 'unknown', 
+      difficulty: (q?.difficulty as 'easy' | 'medium' | 'hard') || 'medium',
+      isCorrect: Boolean(q?.isCorrect),
+      timeSpent: typeof q?.timeSpent === 'number' ? q.timeSpent : 0,
+      userAnswer: Array.isArray(q?.userAnswer) ? q.userAnswer : [],
+      correctAnswer: Array.isArray(q?.correctAnswer) ? q.correctAnswer : [],
+      skipped: Boolean(q?.skipped),
+      markedForReview: Boolean(q?.markedForReview),
     }));
 
-    // Calculate topic breakdown from questions
+    // Calculate topic breakdown from questions with null safety
     const topicBreakdown: SessionTopicAnalyticsData[] = [];
     const topicMap = new Map<string, SessionTopicAnalyticsData>();
 
     for (const question of questions) {
-      const topicId = question.topicId;
+      const topicId = question.topicId || 'unknown';
       if (!topicMap.has(topicId)) {
         topicMap.set(topicId, {
           topicId: topicId,
@@ -59,7 +75,7 @@ export class AnalyticsDataTransformer {
 
       const topicData = topicMap.get(topicId)!;
       topicData.questionsTotal++;
-      if (question.userAnswer.length > 0) {
+      if (question.userAnswer && question.userAnswer.length > 0) {
         topicData.questionsAnswered++;
         if (question.isCorrect) {
           topicData.questionsCorrect++;
@@ -68,32 +84,35 @@ export class AnalyticsDataTransformer {
       }
     }
 
-    // Calculate averages for each topic
+    // Calculate averages for each topic with null safety
     for (const [, topicData] of topicMap) {
       if (topicData.questionsAnswered > 0) {
         topicData.accuracy = (topicData.questionsCorrect / topicData.questionsAnswered) * 100;
         const topicQuestions = questions.filter(q => q.topicId === topicData.topicId);
-        topicData.averageTime =
-          topicQuestions.reduce((sum: number, q: any) => sum + q.timeSpent, 0) /
-          topicQuestions.length;
+        const totalTime = topicQuestions.reduce((sum: number, q: any) => sum + (q.timeSpent || 0), 0);
+        topicData.averageTime = topicQuestions.length > 0 ? totalTime / topicQuestions.length : 0;
       }
     }
+
+    // Safe access to all session properties with defaults
+    const totalQuestions = typeof session.totalQuestions === 'number' ? session.totalQuestions : questionsArray.length;
+    const correctAnswers = typeof session.correctAnswers === 'number' ? session.correctAnswers 
+      : questionsArray.filter(q => q?.isCorrect).length;
+    const questionsAnswered = questionsArray.filter(q => q?.userAnswer && Array.isArray(q.userAnswer) && q.userAnswer.length > 0).length;
 
     return {
       sessionId: session.sessionId,
       ...(session.userId && { userId: session.userId }),
-      providerId: session.providerId,
-      examId: session.examId,
-      startTime: session.startTime,
-      endTime: session.endTime || '',
+      providerId: session.providerId || 'unknown',
+      examId: session.examId || 'unknown',
+      startTime: startTime,
+      endTime: endTime || '',
       duration: duration,
-      totalQuestions: session.totalQuestions,
-      questionsAnswered: session.questions.filter(q => q.userAnswer && q.userAnswer.length > 0)
-        .length,
-      correctAnswers: session.correctAnswers,
-      accuracy:
-        session.correctAnswers > 0 ? (session.correctAnswers / session.totalQuestions) * 100 : 0,
-      score: session.score || 0,
+      totalQuestions: totalQuestions,
+      questionsAnswered: questionsAnswered,
+      correctAnswers: correctAnswers,
+      accuracy: totalQuestions > 0 ? (correctAnswers / totalQuestions) * 100 : 0,
+      score: typeof session.score === 'number' ? session.score : 0,
       questions: questions,
       topicBreakdown: Array.from(topicMap.values()),
     };

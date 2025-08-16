@@ -28,38 +28,75 @@ export class CompetencyAnalyzer implements ICompetencyAnalyzer {
   try {
     const sessionFilters: any = {};
     if (userId) sessionFilters.userId = userId;
+    
     const [sessionResults, progressResults] = await Promise.all([
       this.analyticsRepository.getCompletedSessions(sessionFilters),
       this.analyticsRepository.getUserProgressData(userId),
     ]);
 
-    // Fix: Extract items arrays from StandardQueryResult objects
-    const sessions = sessionResults.items;
-    const progressData = progressResults.items;
+    // Add null safety checks for results
+    const sessions = sessionResults?.items && Array.isArray(sessionResults.items) ? sessionResults.items : [];
+    const progressData = progressResults?.items && Array.isArray(progressResults.items) ? progressResults.items : [];
 
-    // Calculate topic competencies
+    // Calculate topic competencies with null safety
     const topicCompetencies = await this.calculateTopicCompetencies(sessions, progressData);
 
-    // Calculate provider competencies
+    // Calculate provider competencies with null safety
     const providerCompetencies = await this.calculateProviderCompetencies(sessions);
 
-    // Analyze strengths and weaknesses
+    // Analyze strengths and weaknesses with null safety
     const strengthsAndWeaknesses = this.analyzeStrengthsAndWeaknesses(topicCompetencies);
 
-    // Calculate mastery progression
+    // Calculate mastery progression with null safety
     const masteryProgression = await this.calculateMasteryProgression(topicCompetencies, userId);
 
     return {
-      topicCompetencies,
-      providerCompetencies,
-      strengthsAndWeaknesses,
-      masteryProgression,
+      topicCompetencies: Array.isArray(topicCompetencies) ? topicCompetencies : [],
+      providerCompetencies: Array.isArray(providerCompetencies) ? providerCompetencies : [],
+      strengthsAndWeaknesses: strengthsAndWeaknesses || {
+        strengths: [],
+        weaknesses: [],
+        opportunities: []
+      },
+      masteryProgression: masteryProgression || {
+        currentDistribution: {
+          novice: 0,
+          beginner: 0,
+          intermediate: 0,
+          advanced: 0,
+          expert: 0
+        },
+        progressionHistory: [],
+        projectedGrowth: []
+      },
     };
   } catch (error) {
     this.logger.error('Failed to analyze competencies', error as Error, {
       ...(userId && { userId }),
     });
-    throw error;
+    
+    // Return empty competency data instead of throwing to prevent 500 errors
+    this.logger.warn('Returning empty competency analytics due to error');
+    return {
+      topicCompetencies: [],
+      providerCompetencies: [],
+      strengthsAndWeaknesses: {
+        strengths: [],
+        weaknesses: [],
+        opportunities: []
+      },
+      masteryProgression: {
+        currentDistribution: {
+          novice: 0,
+          beginner: 0,
+          intermediate: 0,
+          advanced: 0,
+          expert: 0
+        },
+        progressionHistory: [],
+        projectedGrowth: []
+      },
+    };
   }
 }
 

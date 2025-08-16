@@ -24,31 +24,57 @@ export class ProgressAnalyzer implements IProgressAnalyzer {
     try {
       const sessionFilters: any = {};
       if (userId) sessionFilters.userId = userId;
+      
       const sessionResults = await this.analyticsRepository.getCompletedSessions(sessionFilters);
-      const sessions = sessionResults.items; // Fix: extract items array from result object
+      
+      // Add null safety checks for session results
+      if (!sessionResults || !sessionResults.items) {
+        this.logger.warn('No session results found, returning empty progress overview');
+        return this.getEmptyProgressOverview();
+      }
+      
+      const sessions = Array.isArray(sessionResults.items) ? sessionResults.items : [];
+      
       const progressResults = await this.analyticsRepository.getUserProgressData(userId);
-      const progressData = progressResults.items; // Fix: extract items array from result object
+      const progressData = progressResults?.items && Array.isArray(progressResults.items) ? progressResults.items : [];
 
       if (sessions.length === 0) {
+        this.logger.info('No completed sessions found, returning empty progress overview');
         return this.getEmptyProgressOverview();
       }
 
-      // Calculate basic metrics
+      // Calculate basic metrics with null safety
       const totalSessionsCompleted = sessions.length;
-      const totalQuestionsAnswered = sessions.reduce((sum, s) => sum + s.questionsAnswered, 0);
-      const totalCorrectAnswers = sessions.reduce((sum, s) => sum + s.correctAnswers, 0);
-      const overallAccuracy =
-        totalQuestionsAnswered > 0 ? (totalCorrectAnswers / totalQuestionsAnswered) * 100 : 0;
-      const totalStudyTime = sessions.reduce((sum, s) => sum + s.duration, 0);
-      const averageSessionDuration = totalStudyTime / totalSessionsCompleted;
+      
+      // Safe calculation of questions answered with null checks
+      const totalQuestionsAnswered = sessions.reduce((sum, s) => {
+        const questionsAnswered = typeof s?.questionsAnswered === 'number' ? s.questionsAnswered : 0;
+        return sum + questionsAnswered;
+      }, 0);
+      
+      // Safe calculation of correct answers
+      const totalCorrectAnswers = sessions.reduce((sum, s) => {
+        const correctAnswers = typeof s?.correctAnswers === 'number' ? s.correctAnswers : 0;
+        return sum + correctAnswers;
+      }, 0);
+      
+      const overallAccuracy = totalQuestionsAnswered > 0 ? (totalCorrectAnswers / totalQuestionsAnswered) * 100 : 0;
+      
+      // Safe calculation of study time
+      const totalStudyTime = sessions.reduce((sum, s) => {
+        const duration = typeof s?.duration === 'number' ? s.duration : 0;
+        return sum + duration;
+      }, 0);
+      
+      const averageSessionDuration = totalSessionsCompleted > 0 ? totalStudyTime / totalSessionsCompleted : 0;
 
-      // Calculate streaks
+      // Calculate streaks with null safety
       const { currentStreak, longestStreak } = this.calculateStudyStreaks(sessions);
 
-      // Calculate improvement velocity
+      // Calculate improvement velocity with null safety
       const improvementVelocity = this.calculateImprovementVelocity(sessions);
 
-      // Calculate overall progress percentage
+      // Calculate overall progress percentage with null safety
       const overallProgress = this.calculateOverallProgress(progressData, overallAccuracy);
 
       return {
@@ -66,7 +92,10 @@ export class ProgressAnalyzer implements IProgressAnalyzer {
       this.logger.error('Failed to calculate progress overview', error as Error, {
         ...(userId && { userId }),
       });
-      throw error;
+      
+      // Return empty overview instead of throwing to prevent 500 errors
+      this.logger.warn('Returning empty progress overview due to error');
+      return this.getEmptyProgressOverview();
     }
   }
 
@@ -77,40 +106,46 @@ export class ProgressAnalyzer implements IProgressAnalyzer {
   this.logger.info('Generating progress trends', { timeframe, ...(userId && { userId }) });
 
   try {
-    // Get trend data for different metrics
+    // Get trend data for different metrics with null safety
     const [accuracyTrendResults, studyTimeTrendResults, sessionFrequencyTrendResults] = await Promise.all([
       this.analyticsRepository.calculateTrendData('accuracy', timeframe, userId),
       this.analyticsRepository.calculateTrendData('studyTime', timeframe, userId),
       this.analyticsRepository.calculateTrendData('sessionCount', timeframe, userId),
     ]);
 
-    // Fix: Extract items arrays from StandardQueryResult objects
-    const accuracyTrend = accuracyTrendResults.items;
-    const studyTimeTrend = studyTimeTrendResults.items;
-    const sessionFrequencyTrend = sessionFrequencyTrendResults.items;
+    // Add null safety checks for trend results
+    const accuracyTrend = accuracyTrendResults?.items && Array.isArray(accuracyTrendResults.items) ? accuracyTrendResults.items : [];
+    const studyTimeTrend = studyTimeTrendResults?.items && Array.isArray(studyTimeTrendResults.items) ? studyTimeTrendResults.items : [];
+    const sessionFrequencyTrend = sessionFrequencyTrendResults?.items && Array.isArray(sessionFrequencyTrendResults.items) ? sessionFrequencyTrendResults.items : [];
 
-    // Get difficulty progression trends
-    const difficultyProgressTrend = await this.calculateDifficultyProgressTrend(
-      timeframe,
-      userId
-    );
+    // Get difficulty progression trends with null safety
+    const difficultyProgressTrend = await this.calculateDifficultyProgressTrend(timeframe, userId);
 
-    // Get competency growth trends
+    // Get competency growth trends with null safety
     const competencyGrowthTrend = await this.calculateCompetencyGrowthTrend(timeframe, userId);
 
     return {
       accuracyTrend,
       studyTimeTrend,
       sessionFrequencyTrend,
-      difficultyProgressTrend,
-      competencyGrowthTrend,
+      difficultyProgressTrend: Array.isArray(difficultyProgressTrend) ? difficultyProgressTrend : [],
+      competencyGrowthTrend: Array.isArray(competencyGrowthTrend) ? competencyGrowthTrend : [],
     };
   } catch (error) {
     this.logger.error('Failed to generate progress trends', error as Error, {
       timeframe,
       ...(userId && { userId }),
     });
-    throw error;
+    
+    // Return empty trends instead of throwing to prevent 500 errors
+    this.logger.warn('Returning empty progress trends due to error');
+    return {
+      accuracyTrend: [],
+      studyTimeTrend: [],
+      sessionFrequencyTrend: [],
+      difficultyProgressTrend: [],
+      competencyGrowthTrend: [],
+    };
   }
 }
 
@@ -229,90 +264,145 @@ export class ProgressAnalyzer implements IProgressAnalyzer {
   }
 
   private calculateStudyStreaks(sessions: any[]): { currentStreak: number; longestStreak: number } {
-    if (sessions.length === 0) return { currentStreak: 0, longestStreak: 0 };
+    // Add null safety checks
+    if (!Array.isArray(sessions) || sessions.length === 0) {
+      return { currentStreak: 0, longestStreak: 0 };
+    }
 
-    // Sort sessions by date
-    const sortedSessions = sessions.sort(
-      (a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime()
-    );
+    try {
+      // Filter sessions with valid startTime and sort by date
+      const validSessions = sessions.filter(s => s?.startTime && typeof s.startTime === 'string');
+      
+      if (validSessions.length === 0) {
+        return { currentStreak: 0, longestStreak: 0 };
+      }
+      
+      const sortedSessions = validSessions.sort(
+        (a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime()
+      );
 
-    // Get unique study days
-    const studyDates = [
-      ...new Set(sortedSessions.map(s => new Date(s.startTime).toDateString())),
-    ].sort();
+      // Get unique study days with null safety
+      const studyDates = [
+        ...new Set(sortedSessions.map(s => {
+          try {
+            return new Date(s.startTime).toDateString();
+          } catch {
+            return null;
+          }
+        }).filter(date => date !== null)),
+      ].sort();
 
-    let currentStreak = 0;
-    let longestStreak = 0;
-    let tempStreak = 1;
+      let currentStreak = 0;
+      let longestStreak = 0;
+      let tempStreak = 1;
 
-    const today = new Date().toDateString();
-    const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toDateString();
+      const today = new Date().toDateString();
+      const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toDateString();
 
-    // Calculate current streak
-    if (studyDates.includes(today) || studyDates.includes(yesterday)) {
-      currentStreak = 1;
-      const latestDate = studyDates.includes(today) ? today : yesterday;
-      let checkDate = new Date(latestDate);
+      // Calculate current streak
+      if (studyDates.includes(today) || studyDates.includes(yesterday)) {
+        currentStreak = 1;
+        const latestDate = studyDates.includes(today) ? today : yesterday;
+        let checkDate = new Date(latestDate);
 
-      for (let i = studyDates.length - (studyDates.includes(today) ? 1 : 2); i >= 0; i--) {
-        checkDate.setDate(checkDate.getDate() - 1);
-        if (studyDates[i] === checkDate.toDateString()) {
-          currentStreak++;
-        } else {
-          break;
+        for (let i = studyDates.length - (studyDates.includes(today) ? 1 : 2); i >= 0; i--) {
+          checkDate.setDate(checkDate.getDate() - 1);
+          if (studyDates[i] === checkDate.toDateString()) {
+            currentStreak++;
+          } else {
+            break;
+          }
         }
       }
-    }
 
-    // Calculate longest streak
-    for (let i = 1; i < studyDates.length; i++) {
-      const prevDate = new Date(studyDates[i - 1]);
-      const currDate = new Date(studyDates[i]);
-      const dayDiff = (currDate.getTime() - prevDate.getTime()) / (1000 * 60 * 60 * 24);
+      // Calculate longest streak
+      for (let i = 1; i < studyDates.length; i++) {
+        try {
+          const prevDate = new Date(studyDates[i - 1]);
+          const currDate = new Date(studyDates[i]);
+          const dayDiff = (currDate.getTime() - prevDate.getTime()) / (1000 * 60 * 60 * 24);
 
-      if (dayDiff === 1) {
-        tempStreak++;
-      } else {
-        longestStreak = Math.max(longestStreak, tempStreak);
-        tempStreak = 1;
+          if (dayDiff === 1) {
+            tempStreak++;
+          } else {
+            longestStreak = Math.max(longestStreak, tempStreak);
+            tempStreak = 1;
+          }
+        } catch (error) {
+          // Skip invalid dates
+          continue;
+        }
       }
-    }
-    longestStreak = Math.max(longestStreak, tempStreak);
+      longestStreak = Math.max(longestStreak, tempStreak);
 
-    return { currentStreak, longestStreak };
+      return { currentStreak, longestStreak };
+    } catch (error) {
+      // Return safe defaults if calculation fails
+      return { currentStreak: 0, longestStreak: 0 };
+    }
   }
 
   private calculateImprovementVelocity(sessions: any[]): number {
-    if (sessions.length < 2) return 0;
+    // Add null safety checks
+    if (!Array.isArray(sessions) || sessions.length < 2) return 0;
 
-    // Calculate weekly improvement in accuracy
-    const sortedSessions = sessions.sort(
-      (a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime()
-    );
+    try {
+      // Filter sessions with valid data and sort by date
+      const validSessions = sessions.filter(s => 
+        s?.startTime && 
+        typeof s.startTime === 'string' && 
+        typeof s.accuracy === 'number'
+      );
 
-    const firstWeekSessions = sortedSessions.slice(0, Math.min(5, sessions.length / 2));
-    const lastWeekSessions = sortedSessions.slice(-Math.min(5, sessions.length / 2));
+      if (validSessions.length < 2) return 0;
 
-    const firstWeekAccuracy =
-      firstWeekSessions.reduce((sum, s) => sum + s.accuracy, 0) / firstWeekSessions.length;
-    const lastWeekAccuracy =
-      lastWeekSessions.reduce((sum, s) => sum + s.accuracy, 0) / lastWeekSessions.length;
+      const sortedSessions = validSessions.sort(
+        (a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime()
+      );
 
-    const timeDiff =
-      (new Date(lastWeekSessions[0].startTime).getTime() -
-        new Date(firstWeekSessions[0].startTime).getTime()) /
-      (1000 * 60 * 60 * 24 * 7);
+      const firstWeekSessions = sortedSessions.slice(0, Math.min(5, sortedSessions.length / 2));
+      const lastWeekSessions = sortedSessions.slice(-Math.min(5, sortedSessions.length / 2));
 
-    return timeDiff > 0 ? (lastWeekAccuracy - firstWeekAccuracy) / timeDiff : 0;
+      if (firstWeekSessions.length === 0 || lastWeekSessions.length === 0) return 0;
+
+      // Safe calculation of accuracy with null checks
+      const firstWeekAccuracy = firstWeekSessions.reduce((sum, s) => {
+        const accuracy = typeof s?.accuracy === 'number' ? s.accuracy : 0;
+        return sum + accuracy;
+      }, 0) / firstWeekSessions.length;
+      
+      const lastWeekAccuracy = lastWeekSessions.reduce((sum, s) => {
+        const accuracy = typeof s?.accuracy === 'number' ? s.accuracy : 0;
+        return sum + accuracy;
+      }, 0) / lastWeekSessions.length;
+
+      // Safe time calculation
+      const firstSessionTime = firstWeekSessions[0]?.startTime;
+      const lastSessionTime = lastWeekSessions[0]?.startTime;
+      
+      if (!firstSessionTime || !lastSessionTime) return 0;
+
+      const timeDiff = (new Date(lastSessionTime).getTime() - new Date(firstSessionTime).getTime()) / (1000 * 60 * 60 * 24 * 7);
+
+      return timeDiff > 0 ? (lastWeekAccuracy - firstWeekAccuracy) / timeDiff : 0;
+    } catch (error) {
+      // Return safe default if calculation fails
+      return 0;
+    }
   }
 
   private calculateOverallProgress(progressData: any[], accuracy: number): number {
+    // Add null safety checks
+    const safeAccuracy = typeof accuracy === 'number' && !isNaN(accuracy) ? accuracy : 0;
+    const safeProgressData = Array.isArray(progressData) ? progressData : [];
+    
     // Combine accuracy, consistency, and topic coverage for overall progress
-    const accuracyScore = Math.min(accuracy, 100);
-    const topicCoverage = progressData.length > 0 ? Math.min(progressData.length * 10, 100) : 0;
+    const accuracyScore = Math.min(Math.max(safeAccuracy, 0), 100);
+    const topicCoverage = safeProgressData.length > 0 ? Math.min(safeProgressData.length * 10, 100) : 0;
 
     // Weight accuracy more heavily
-    return Math.round((accuracyScore * 0.7 + topicCoverage * 0.3) * 100) / 100;
+    const overallProgress = (accuracyScore * 0.7 + topicCoverage * 0.3);
+    return Math.round(overallProgress * 100) / 100;
   }
 
   private async calculateDifficultyProgressTrend(

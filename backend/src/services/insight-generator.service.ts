@@ -34,14 +34,15 @@ export class InsightGenerator implements IInsightGenerator {
   try {
     const sessionFilters: any = {};
     if (userId) sessionFilters.userId = userId;
+    
     const [sessionResults, progressResults] = await Promise.all([
       this.analyticsRepository.getCompletedSessions(sessionFilters),
       this.analyticsRepository.getUserProgressData(userId),
     ]);
 
-    // Fix: Extract items arrays from StandardQueryResult objects
-    const sessions = sessionResults.items;
-    const progressData = progressResults.items;
+    // Add null safety checks for results
+    const sessions = sessionResults?.items && Array.isArray(sessionResults.items) ? sessionResults.items : [];
+    const progressData = progressResults?.items && Array.isArray(progressResults.items) ? progressResults.items : [];
 
     const patterns = this.identifyLearningPatterns(sessions);
     const recommendations = this.generateLearningRecommendations(sessions, progressData);
@@ -49,16 +50,24 @@ export class InsightGenerator implements IInsightGenerator {
     const warnings = this.detectLearningWarnings(sessions, progressData);
 
     return {
-      patterns,
-      recommendations,
-      milestones,
-      warnings,
+      patterns: Array.isArray(patterns) ? patterns : [],
+      recommendations: Array.isArray(recommendations) ? recommendations : [],
+      milestones: Array.isArray(milestones) ? milestones : [],
+      warnings: Array.isArray(warnings) ? warnings : [],
     };
   } catch (error) {
     this.logger.error('Failed to generate learning insights', error as Error, {
       ...(userId && { userId }),
     });
-    throw error;
+    
+    // Return empty insights instead of throwing to prevent 500 errors
+    this.logger.warn('Returning empty learning insights due to error');
+    return {
+      patterns: [],
+      recommendations: [],
+      milestones: [],
+      warnings: [],
+    };
   }
 }
 
