@@ -25,80 +25,12 @@ import {
 } from '../shared/middleware';
 import { ValidationRules } from '../shared/validation/validation-rules';
 import { SessionValidationSchemas, AdditionalValidationHelpers } from '../shared/middleware';
+import { SessionOrchestrator } from '../shared/session-orchestrator';
 
 export class SessionHandler extends BaseHandler {
   private serviceFactory: ServiceFactory;
   private logger = createLogger({ handler: 'SessionHandler' });
-  // Common session error mappings for standardization
-  private static readonly SESSION_ERROR_MAPPINGS = {
-    COMMON: [
-      {
-        keywords: ['Session not found'],
-        errorCode: 'NOT_FOUND',
-        statusCode: 404,
-      },
-    ],
-    DELETE: [
-      {
-        keywords: ['Cannot delete completed'],
-        errorCode: 'CONFLICT',
-        statusCode: 409,
-      },
-      {
-        keywords: ['Session not found'],
-        errorCode: 'NOT_FOUND',
-        statusCode: 404,
-      },
-    ],
-    COMPLETE: [
-      {
-        keywords: ['Session not found'],
-        errorCode: 'NOT_FOUND',
-        statusCode: 404,
-      },
-      {
-        keywords: ['Session is already completed'],
-        errorCode: 'CONFLICT',
-        statusCode: 409,
-      },
-      {
-        keywords: ['Cannot complete abandoned session'],
-        errorCode: 'CONFLICT',
-        statusCode: 409,
-      },
-      {
-        keywords: ['Cannot complete session:', 'questions remain unanswered'],
-        errorCode: 'VALIDATION_ERROR',
-        statusCode: 400,
-      },
-    ],
-    SUBMIT_ANSWER: [
-      {
-        keywords: ['Session not found'],
-        errorCode: 'NOT_FOUND',
-        statusCode: 404,
-      },
-      {
-        keywords: ['Cannot submit answers to inactive'],
-        errorCode: 'CONFLICT',
-        statusCode: 409,
-      },
-      {
-        keywords: ['Question not found in session'],
-        errorCode: 'VALIDATION_ERROR',
-        statusCode: 400,
-      },
-    ],
-  };
-
-  // Common session ID validation helper
-  private validateSessionId(pathParams: any): ApiResponse | null {
-    return ValidationMiddleware.validateFields(
-      { sessionId: pathParams.id },
-      SessionValidationSchemas.sessionId(),
-      'params'
-    );
-  }
+  private sessionOrchestrator = SessionOrchestrator.getInstance();
 
   constructor() {
     super();
@@ -153,13 +85,10 @@ export class SessionHandler extends BaseHandler {
   }
 
   /**
-   * Create a new study session - now clean and focused
-   */
-  /**
-   * Create a new study session - Enhanced with optimized middleware integration
+   * Create a new study session - Pure routing with orchestrator delegation
    */
   private async createSession(context: HandlerContext): Promise<ApiResponse> {
-    // Use type-aware validation that corresponds to CreateSessionRequest interface
+    // Use optimized middleware pattern for write operations
     return this.executeWithMiddleware(
       context,
       'write', // Pattern: parsing + validation + error handling
@@ -167,19 +96,13 @@ export class SessionHandler extends BaseHandler {
         body: AdditionalValidationHelpers.createEnhancedSessionValidation(),
       },
       async () => {
-        const requestBody = context.parsedData?.body as CreateSessionRequest;
-        
-        const sessionService = this.serviceFactory.getSessionService();
-        const result = await sessionService.createSession(requestBody);
+        // Delegate business logic to orchestrator
+        const { result, error } = await this.sessionOrchestrator.orchestrateCreateSession(
+          context,
+          this.executeServiceOrError.bind(this)
+        );
 
-        this.logger.info('Session created successfully with type-safe validation', {
-          requestId: context.requestId,
-          sessionId: result.session.sessionId,
-          totalQuestions: result.session.totalQuestions,
-          providerId: result.session.providerId,
-          examId: result.session.examId,
-          validationType: 'CreateSessionRequest',
-        });
+        if (error) return error;
 
         return result;
       }
@@ -187,44 +110,42 @@ export class SessionHandler extends BaseHandler {
   }
 
   /**
-   * Get an existing study session - now clean and focused
-   */
-  /**
-   * Get an existing study session - Enhanced with optimized middleware integration
+   * Get an existing study session - Pure routing with orchestrator delegation
    */
   private async getSession(context: HandlerContext): Promise<ApiResponse> {
-    // Use optimized middleware pattern for read operations
-    return this.executeWithMiddleware(
+    // Parse path parameters using middleware
+    const { data: pathParams, error: parseError } = await this.parsePathParamsOrError(context);
+    if (parseError) return parseError;
+
+    // Validate session ID using orchestrator
+    const sessionIdError = this.sessionOrchestrator.validateSessionIdOrError(pathParams);
+    if (sessionIdError) return sessionIdError;
+
+    // Delegate business logic to orchestrator
+    const { result, error } = await this.sessionOrchestrator.orchestrateGetSession(
       context,
-      'read', // Pattern: parsing + validation + caching
-      {
-        path: SessionValidationSchemas.sessionId(),
-      },
-      async () => {
-        const pathParams = context.parsedData?.path!;
-        
-        const sessionService = this.serviceFactory.getSessionService();
-        const result = await sessionService.getSession(pathParams.id);
-
-        this.logger.info('Session retrieved successfully', {
-          requestId: context.requestId,
-          sessionId: result.session.sessionId,
-          status: result.session.status,
-          currentQuestion: result.progress.currentQuestion,
-          totalQuestions: result.progress.totalQuestions,
-          accuracy: result.progress.accuracy,
-        });
-
-        return result;
-      }
+      pathParams.id,
+      this.executeServiceOrError.bind(this)
     );
+
+    if (error) return error;
+
+    return this.buildSuccessResponse('Session retrieved successfully', result);
   }
 
   /**
-   * Update an existing study session - now clean and focused
+   * Update an existing study session - Pure routing with orchestrator delegation
    */
   private async updateSession(context: HandlerContext): Promise<ApiResponse> {
-    // Use type-aware validation that corresponds to UpdateSessionRequest interface
+    // Parse path parameters using middleware
+    const { data: pathParams, error: parseError } = await this.parsePathParamsOrError(context);
+    if (parseError) return parseError;
+
+    // Validate session ID using orchestrator
+    const sessionIdError = this.sessionOrchestrator.validateSessionIdOrError(pathParams);
+    if (sessionIdError) return sessionIdError;
+
+    // Use optimized middleware pattern for write operations
     return this.executeWithMiddleware(
       context,
       'write', // Pattern: parsing + validation + error handling
@@ -233,20 +154,14 @@ export class SessionHandler extends BaseHandler {
         body: AdditionalValidationHelpers.createEnhancedUpdateValidation(),
       },
       async () => {
-        const pathParams = context.parsedData?.path!;
-        const requestBody = context.parsedData?.body as UpdateSessionRequest;
-        
-        const sessionService = this.serviceFactory.getSessionService();
-        const result = await sessionService.updateSession(pathParams.id, requestBody);
+        // Delegate business logic to orchestrator
+        const { result, error } = await this.sessionOrchestrator.orchestrateUpdateSession(
+          context,
+          pathParams.id,
+          this.executeServiceOrError.bind(this)
+        );
 
-        this.logger.info('Session updated successfully with type-safe validation', {
-          requestId: context.requestId,
-          sessionId: result.session.sessionId,
-          status: result.session.status,
-          currentQuestion: result.progress.currentQuestion,
-          action: requestBody.action,
-          validationType: 'UpdateSessionRequest',
-        });
+        if (error) return error;
 
         return result;
       }
@@ -254,50 +169,42 @@ export class SessionHandler extends BaseHandler {
   }
 
   /**
-   * Delete a study session - Phase 19 implementation
+   * Delete a study session - Pure routing with orchestrator delegation
    */
   private async deleteSession(context: HandlerContext): Promise<ApiResponse> {
-    // No authentication required - sessions work independently (auth association in Phase 30)
-
     // Parse path parameters using middleware
     const { data: pathParams, error: parseError } = await this.parsePathParamsOrError(context);
     if (parseError) return parseError;
 
-    // Validate session ID using standardized helper
-    const sessionIdValidation = this.validateSessionId(pathParams);
-    if (sessionIdValidation) return sessionIdValidation;
+    // Validate session ID using orchestrator
+    const sessionIdError = this.sessionOrchestrator.validateSessionIdOrError(pathParams);
+    if (sessionIdError) return sessionIdError;
 
-    // Business logic only - delegate error handling to middleware
-    const { result, error } = await this.executeServiceOrError(
-      async () => {
-        const sessionService = this.serviceFactory.getSessionService();
-        return await sessionService.deleteSession(pathParams.id);
-      },
-      {
-        requestId: context.requestId,
-        operation: ErrorContexts.Session.DELETE,
-        additionalInfo: { sessionId: pathParams.id },
-      }
+    // Delegate business logic to orchestrator
+    const { result, error } = await this.sessionOrchestrator.orchestrateDeleteSession(
+      context,
+      pathParams.id,
+      this.executeServiceOrError.bind(this)
     );
 
     if (error) return error;
-
-    this.logger.info('Session deleted successfully', {
-      requestId: context.requestId,
-      sessionId: pathParams.id,
-    });
 
     return this.buildSuccessResponse('Session deleted successfully', result);
   }
 
   /**
-   * Submit answer for a question in a session - Phase 20 implementation
-   */
-  /**
-   * Submit answer for a question in a session - Enhanced with optimized middleware integration
+   * Submit answer for a question in a session - Pure routing with orchestrator delegation
    */
   private async submitAnswer(context: HandlerContext): Promise<ApiResponse> {
-    // Use type-aware validation that corresponds to SubmitAnswerRequest interface
+    // Parse path parameters using middleware
+    const { data: pathParams, error: parseError } = await this.parsePathParamsOrError(context);
+    if (parseError) return parseError;
+
+    // Validate session ID using orchestrator
+    const sessionIdError = this.sessionOrchestrator.validateSessionIdOrError(pathParams);
+    if (sessionIdError) return sessionIdError;
+
+    // Use optimized middleware pattern for write operations
     return this.executeWithMiddleware(
       context,
       'write', // Pattern: parsing + validation + error handling
@@ -306,21 +213,14 @@ export class SessionHandler extends BaseHandler {
         body: AdditionalValidationHelpers.createEnhancedAnswerValidation(),
       },
       async () => {
-        const pathParams = context.parsedData?.path!;
-        const requestBody = context.parsedData?.body as SubmitAnswerRequest;
-        
-        const sessionService = this.serviceFactory.getSessionService();
-        const result = await sessionService.submitAnswer(pathParams.id, requestBody);
+        // Delegate business logic to orchestrator
+        const { result, error } = await this.sessionOrchestrator.orchestrateSubmitAnswer(
+          context,
+          pathParams.id,
+          this.executeServiceOrError.bind(this)
+        );
 
-        this.logger.info('Answer submitted successfully with type-safe validation', {
-          requestId: context.requestId,
-          sessionId: pathParams.id,
-          questionId: requestBody.questionId,
-          isCorrect: result.feedback.isCorrect,
-          score: result.feedback.score,
-          sessionStatus: result.session.status,
-          validationType: 'SubmitAnswerRequest',
-        });
+        if (error) return error;
 
         return result;
       }
@@ -328,49 +228,31 @@ export class SessionHandler extends BaseHandler {
   }
 
   /**
-   * Complete a study session - Phase 21 implementation
+   * Complete a study session - Pure routing with orchestrator delegation
    */
   private async completeSession(context: HandlerContext): Promise<ApiResponse> {
-    // No authentication required - sessions work independently (auth association in Phase 30)
-
     // Parse path parameters using middleware
     const { data: pathParams, error: parseError } = await this.parsePathParamsOrError(context);
     if (parseError) return parseError;
 
-    // Validate session ID using standardized helper
-    const sessionIdValidation = this.validateSessionId(pathParams);
-    if (sessionIdValidation) return sessionIdValidation;
+    // Validate session ID using orchestrator
+    const sessionIdError = this.sessionOrchestrator.validateSessionIdOrError(pathParams);
+    if (sessionIdError) return sessionIdError;
 
-    // Business logic only - delegate error handling to middleware
-    const { result, error } = await this.executeServiceOrError(
-      async () => {
-        const sessionService = this.serviceFactory.getSessionService();
-        return await sessionService.completeSession(pathParams.id);
-      },
-      {
-        requestId: context.requestId,
-        operation: 'SESSION_COMPLETE',
-        additionalInfo: { sessionId: pathParams.id },
-      }
+    // Delegate business logic to orchestrator
+    const { result, error } = await this.sessionOrchestrator.orchestrateCompleteSession(
+      context,
+      pathParams.id,
+      this.executeServiceOrError.bind(this)
     );
 
     if (error) return error;
-
-    this.logger.info('Session completed successfully', {
-      requestId: context.requestId,
-      sessionId: pathParams.id,
-      finalScore: result!.detailedResults.finalScore,
-      accuracy: result!.detailedResults.accuracyPercentage,
-      overallRecommendation: result!.recommendations.overallRecommendation,
-      readinessForExam: result!.recommendations.readinessForExam,
-    });
 
     return this.buildSuccessResponse('Session completed successfully', result);
   }
 
   /**
-   * Create an adaptive study session - Phase 22 implementation
-   * Reuses existing createSession logic with isAdaptive flag
+   * Create an adaptive study session - Pure routing with orchestrator delegation
    */
   private async createAdaptiveSession(context: HandlerContext): Promise<ApiResponse> {
     // Parse and validate request body using middleware
@@ -378,19 +260,15 @@ export class SessionHandler extends BaseHandler {
       await this.parseRequestBodyOrError<CreateSessionRequest>(context, true);
     if (parseError) return parseError;
 
-    // Use same validation as createSession (now using schema)
-    const validationResult = ValidationMiddleware.validateRequestBody(
+    // Delegate business logic to orchestrator
+    const { result, error } = await this.sessionOrchestrator.orchestrateCreateAdaptiveSession(
       context,
-      SessionValidationSchemas.createSessionRequest()
+      this.executeServiceOrError.bind(this)
     );
-    if (validationResult.error) return validationResult.error;
 
-    // Mark as adaptive and delegate to existing createSession logic
-    const adaptiveRequest = { ...requestBody, isAdaptive: true };
-    return await this.createSession({
-      ...context,
-      event: { ...context.event, body: JSON.stringify(adaptiveRequest) },
-    });
+    if (error) return error;
+
+    return this.buildSuccessResponse('Adaptive session created successfully', result);
   }
 }
 
