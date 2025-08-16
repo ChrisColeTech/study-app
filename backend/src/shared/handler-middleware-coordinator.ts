@@ -63,6 +63,12 @@ export class MiddlewareCoordinator {
     context: HandlerContext,
     required: boolean = true
   ): Promise<{ data?: T; error?: ApiResponse }> {
+    // Check if body has already been parsed by the pipeline
+    if (context.parsedData?.body !== undefined) {
+      return { data: context.parsedData.body as T };
+    }
+
+    // Fall back to direct parsing if not already parsed
     const { data, error: parseError } = ParsingMiddleware.parseRequestBody<T>(context, required);
     if (parseError) return { error: parseError };
     return { data };
