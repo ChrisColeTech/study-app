@@ -150,8 +150,8 @@ export class QuestionRepository extends S3BaseRepository implements IQuestionRep
           return cachedResult;
         }
 
-        // For now, return empty result - implement S3 loading later
-        const allQuestions: Question[] = [];
+        // Load all questions from S3 (currently only AWS provider)
+        const allQuestions = await this.loadQuestionsFromS3('aws');
 
         // Apply filters and pagination
         const filteredQuestions = this.applyFilters(allQuestions, filters);
@@ -187,11 +187,164 @@ export class QuestionRepository extends S3BaseRepository implements IQuestionRep
   }
 
   /**
+   * Transform S3 question data to Question interface
+   */
+  private transformS3QuestionToQuestion(s3Item: any, provider: string, examType: string): Question {
+    try {
+      const questionNumber = s3Item.question_number || 1;
+      const questionData = s3Item.question || {};
+      const answerData = s3Item.answer || {};
+      const studyMetadata = s3Item.study_metadata || {};
+
+      // Generate unique question ID
+      const questionId = `${provider}-${examType}-${String(questionNumber).padStart(3, '0')}`;
+      
+      // Extract question text
+      const questionText = questionData.text || 'Question text not available';
+      
+      // Transform options from S3 format [[letter, text], ...] to string array
+      const options: string[] = [];
+      if (questionData.options && Array.isArray(questionData.options)) {
+        questionData.options.forEach((option: any) => {
+          if (Array.isArray(option) && option.length >= 2) {
+            // Format: "A: Option text"
+            options.push(`${option[0]}: ${option[1]}`);
+          }
+        });
+      }
+
+      // Extract correct answer
+      const correctAnswer = answerData.correct_answer || 'Answer not available';
+
+      // Extract explanation
+      const explanation = answerData.explanation || 'Explanation not available';
+
+      // Map difficulty (S3 uses 'easy', 'medium', 'hard' which matches our enum)
+      const difficulty = studyMetadata.difficulty || 'medium';
+
+      // Extract topic
+      const topicId = questionData.topic || questionData.service_category || 'general';
+
+      // Extract tags
+      const tags: string[] = [];
+      if (questionData.aws_services && Array.isArray(questionData.aws_services)) {
+        tags.push(...questionData.aws_services);
+      }
+      if (answerData.keywords && Array.isArray(answerData.keywords)) {
+        tags.push(...answerData.keywords);
+      }
+
+      // Create Question object matching the interface
+      const question: Question = {
+        questionId,
+        providerId: provider,
+        examId: examType,
+        topicId,
+        questionText,
+        options,
+        correctAnswer: [correctAnswer], // Array for multi-select support
+        explanation,
+        difficulty: difficulty as any, // Cast to DifficultyLevel
+        tags,
+        // EntityMetadata fields
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+
+      return question;
+    } catch (error) {
+      this.logger.error('Failed to transform S3 question', { 
+        error: error instanceof Error ? error.message : 'Unknown error',
+        questionNumber: s3Item.question_number 
+      });
+      
+      // Return minimal question object on error
+      return {
+        questionId: `${provider}-${examType}-error`,
+        providerId: provider,
+        examId: examType,
+        topicId: 'general',
+        questionText: 'Error loading question',
+        options: [],
+        correctAnswer: [],
+        explanation: 'Error loading explanation',
+        difficulty: 'medium' as any,
+        tags: [],
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+    }
+  }
+
+  /**
    * Load questions from S3 for a provider
    */
   private async loadQuestionsFromS3(provider: string): Promise<any[]> {
-    // Simple implementation for compilation
-    return [];
+    try {
+      const startTime = Date.now();
+      this.logger.debug('Loading questions from S3', { provider });
+
+      // For AWS provider, load all exam files
+      if (provider.toLowerCase() === 'aws') {
+        const examTypes = ['aif-c01', 'clf-c02', 'saa-c03', 'sap-c02'];
+        const allQuestions: any[] = [];
+
+        for (const examType of examTypes) {
+          const key = `${this.QUESTIONS_PREFIX}${provider}/${examType}/questions.json`;
+          this.logger.debug('Fetching S3 object', { bucket: this.bucketName, key });
+
+          try {
+            const response = await this.s3Client.send(
+              new GetObjectCommand({
+                Bucket: this.bucketName,
+                Key: key,
+              })
+            );
+
+            if (response.Body) {
+              const bodyContents = await response.Body.transformToString();
+              const questionData = JSON.parse(bodyContents);
+              
+              // Extract questions from study_data array
+              if (questionData.study_data && Array.isArray(questionData.study_data)) {
+                const transformedQuestions = questionData.study_data.map((item: any) => 
+                  this.transformS3QuestionToQuestion(item, provider, examType)
+                );
+                allQuestions.push(...transformedQuestions);
+                
+                this.logger.debug('Loaded questions from exam', { 
+                  examType, 
+                  count: transformedQuestions.length 
+                });
+              }
+            }
+          } catch (error) {
+            this.logger.warn('Failed to load questions for exam', { 
+              examType, 
+              error: error instanceof Error ? error.message : 'Unknown error' 
+            });
+            // Continue with other exams even if one fails
+          }
+        }
+
+        this.logger.info('Questions loaded from S3', { 
+          provider, 
+          totalQuestions: allQuestions.length,
+          loadTimeMs: Date.now() - startTime 
+        });
+        return allQuestions;
+      }
+
+      // For other providers, return empty for now
+      this.logger.warn('Provider not supported yet', { provider });
+      return [];
+    } catch (error) {
+      this.logger.error('Failed to load questions from S3', { 
+        provider, 
+        error: error instanceof Error ? error.message : 'Unknown error' 
+      });
+      return [];
+    }
   }
 
   /**
