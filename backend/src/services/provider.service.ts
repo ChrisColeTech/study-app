@@ -49,12 +49,34 @@ export class ProviderService extends BaseService implements IProviderService {
       const allProviders = allProvidersResult.items;
       this.logger.info('Extracted providers from result', { count: allProviders.length });
 
+      // DEBUG: Log actual provider objects to see status values
+      this.logger.info('DEBUG: Provider details before filtering', {
+        providers: allProviders.map(p => ({
+          id: p.id,
+          name: p.name,
+          status: p.status,
+          statusType: typeof p.status,
+          isActive: p.isActive
+        })),
+        expectedActiveStatus: ProviderStatusEnum.ACTIVE,
+        requestIncludeInactive: request.includeInactive
+      });
+
       // Apply filters using dedicated filter class
       const { filtered, total } = ProviderFilter.applyFilters(allProviders, request);
       this.logger.info('Applied filters', { 
         originalCount: allProviders.length,
         filteredCount: filtered.length,
         total 
+      });
+
+      // DEBUG: Log filtered results
+      this.logger.info('DEBUG: Provider details after filtering', {
+        filteredProviders: filtered.map(p => ({
+          id: p.id,
+          name: p.name,
+          status: p.status
+        }))
       });
 
       // Sort providers using dedicated filter class
