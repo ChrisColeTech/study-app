@@ -2,10 +2,12 @@
 """
 Consolidate overlapping exam datasets into unified sets
 Removes duplicate questions and creates clean, merged datasets
+Only regenerates when source data actually changes
 """
 
 import json
 import hashlib
+import os
 from pathlib import Path
 from collections import defaultdict
 from datetime import datetime
@@ -21,6 +23,42 @@ def hash_question_content(question_text, options):
     
     # Return hash
     return hashlib.md5(content.encode('utf-8')).hexdigest()[:12]
+
+def hash_source_files(files):
+    """Create hash of all source files to detect changes"""
+    hasher = hashlib.sha256()
+    
+    for file_path in sorted(files):
+        if file_path.exists():
+            with open(file_path, 'rb') as f:
+                hasher.update(f.read())
+    
+    return hasher.hexdigest()
+
+def should_regenerate(exam_type, source_files, output_dir):
+    """Check if consolidation needs to be regenerated"""
+    output_file = output_dir / f"{exam_type}-consolidated_study_data.json"
+    
+    # If output doesn't exist, regenerate
+    if not output_file.exists():
+        return True, "Output file doesn't exist"
+    
+    # Calculate current source hash
+    current_source_hash = hash_source_files(source_files)
+    
+    # Try to get stored source hash from existing output
+    try:
+        with open(output_file) as f:
+            existing_data = json.load(f)
+            stored_hash = existing_data.get('metadata', {}).get('source_files_hash', '')
+            
+        if current_source_hash != stored_hash:
+            return True, f"Source files changed (hash: {current_source_hash[:12]}...)"
+        else:
+            return False, "Source files unchanged"
+            
+    except (json.JSONDecodeError, FileNotFoundError, KeyError):
+        return True, "Cannot verify existing output"
 
 def consolidate_exam_datasets():
     """Merge overlapping exam datasets into consolidated versions"""
@@ -62,12 +100,25 @@ def consolidate_exam_datasets():
         print(f"\n📚 Processing {exam_type.upper()}")
         print("-" * 40)
         
+        # Check if regeneration is needed
+        should_regen, reason = should_regenerate(exam_type, files, output_dir)
+        if not should_regen:
+            print(f"  ⏭️  Skipping {exam_type.upper()}: {reason}")
+            existing_file = output_dir / f"{exam_type}-consolidated_study_data.json"
+            with open(existing_file) as f:
+                existing_data = json.load(f)
+                total_consolidated += existing_data['metadata']['total_questions']
+            continue
+        
+        print(f"  🔄 Regenerating {exam_type.upper()}: {reason}")
+        
         # Track unique questions by content hash
         unique_questions = {}  # hash -> question_data
         question_metadata = defaultdict(list)  # hash -> [source_files]
         
         exam_name = ""
         exam_description = ""
+        current_time = datetime.now().isoformat()  # Single timestamp for this regeneration
         
         # Process all files for this exam type
         for file_path in files:
@@ -123,7 +174,7 @@ def consolidate_exam_datasets():
                             'content_hash': content_hash,
                             'sources': [],  # Will be filled below
                             'extraction_method': 'consolidated_v2',
-                            'consolidation_date': datetime.now().isoformat()
+                            'consolidation_date': current_time
                         }
                     }
                     
@@ -144,17 +195,19 @@ def consolidate_exam_datasets():
         total_consolidated += consolidated_count
         
         duplicates_removed = total_original - total_consolidated
+        source_hash = hash_source_files(files)
         
         consolidated_dataset = {
             'metadata': {
                 'exam_code': exam_type,
                 'name': exam_name,
                 'description': exam_description,
-                'creation_date': datetime.now().isoformat(),
+                'creation_date': current_time,
                 'version': '2.1-consolidated',
                 'total_questions': consolidated_count,
                 'answered_questions': consolidated_count,
                 'coverage_percentage': 100.0,
+                'source_files_hash': source_hash,
                 'consolidation_stats': {
                     'source_files': [f.name for f in files],
                     'original_questions': sum(len(json.load(open(f))['study_data']) for f in files),
@@ -205,7 +258,16 @@ def consolidate_exam_datasets():
     print(f"{'SAVED':<10} {sum(d['duplicates_removed'] for d in consolidated_datasets):>3} redundant questions eliminated")
     
     print(f"\n✅ Consolidated datasets saved to: {output_dir}")
-    print(f"📈 Storage efficiency: {sum(d['duplicates_removed'] for d in consolidated_datasets) / (sum(d['unique_questions'] for d in consolidated_datasets) + sum(d['duplicates_removed'] for d in consolidated_datasets)) * 100:.1f}% reduction")
+    
+    total_questions = sum(d['unique_questions'] for d in consolidated_datasets)
+    total_duplicates = sum(d['duplicates_removed'] for d in consolidated_datasets)
+    total_original = total_questions + total_duplicates
+    
+    if total_original > 0:
+        efficiency = (total_duplicates / total_original) * 100
+        print(f"📈 Storage efficiency: {efficiency:.1f}% reduction")
+    else:
+        print(f"📈 No files processed - all datasets unchanged")
     
     return consolidated_datasets
 
