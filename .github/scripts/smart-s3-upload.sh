@@ -185,11 +185,13 @@ main() {
     log_section "Processing exam datasets..."
     
     # AIF-C01 (AI Fundamentals)
-    if smart_upload \
+    set +e  # Temporarily disable exit on error
+    smart_upload \
         "data/v2/consolidated/aif-c01-consolidated_study_data.json" \
         "questions/aws/aif-c01/questions.json" \
         "AIF-C01" \
-        "data/v2/consolidated/aif-c01"; then
+        "data/v2/consolidated/aif-c01"
+    if [ $? -eq 0 ]; then
         ((uploads++))
         count=$(get_question_count "data/v2/consolidated/aif-c01-consolidated_study_data.json")
         total_questions=$((total_questions + count))
@@ -197,15 +199,18 @@ main() {
     else
         ((skipped++))
     fi
+    set -e  # Re-enable exit on error
     
     echo ""
     
     # CLF-C02 (Cloud Practitioner)
-    if smart_upload \
+    set +e  # Temporarily disable exit on error
+    smart_upload \
         "data/v2/consolidated/clf-c02-consolidated_study_data.json" \
         "questions/aws/clf-c02/questions.json" \
         "CLF-C02" \
-        "data/v2/consolidated/clf-c02"; then
+        "data/v2/consolidated/clf-c02"
+    if [ $? -eq 0 ]; then
         ((uploads++))
         count=$(get_question_count "data/v2/consolidated/clf-c02-consolidated_study_data.json")
         total_questions=$((total_questions + count))
@@ -213,15 +218,18 @@ main() {
     else
         ((skipped++))
     fi
+    set -e  # Re-enable exit on error
     
     echo ""
     
     # SAP-C02 (Solutions Architect Professional)
-    if smart_upload \
+    set +e  # Temporarily disable exit on error
+    smart_upload \
         "data/v2/consolidated/sap-c02-consolidated_study_data.json" \
         "questions/aws/sap-c02/questions.json" \
         "SAP-C02" \
-        "data/v2/consolidated/sap-c02"; then
+        "data/v2/consolidated/sap-c02"
+    if [ $? -eq 0 ]; then
         ((uploads++))
         count=$(get_question_count "data/v2/consolidated/sap-c02-consolidated_study_data.json")
         total_questions=$((total_questions + count))
@@ -229,15 +237,18 @@ main() {
     else
         ((skipped++))
     fi
+    set -e  # Re-enable exit on error
     
     echo ""
     
     # SAA-C03 (Solutions Architect Associate)
-    if smart_upload \
+    set +e  # Temporarily disable exit on error
+    smart_upload \
         "data/study_data_final.json" \
         "questions/aws/saa-c03/questions.json" \
         "SAA-C03" \
-        "data/study_data_final.json"; then
+        "data/study_data_final.json"
+    if [ $? -eq 0 ]; then
         ((uploads++))
         count=$(get_question_count "data/study_data_final.json")
         total_questions=$((total_questions + count))
@@ -245,6 +256,7 @@ main() {
     else
         ((skipped++))
     fi
+    set -e  # Re-enable exit on error
     
     echo ""
     
