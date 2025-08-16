@@ -88,8 +88,17 @@ export abstract class BaseHandler {
         headers: event.headers ? Object.keys(event.headers) : [],
       });
 
-      // Initialize request processing pipeline
-      const pipeline = new RequestProcessingPipeline(event, context, logger);
+      // Initialize request processing pipeline with optional logging service
+      let apiLoggingService;
+      try {
+        const { ServiceFactory } = require('./service-factory');
+        apiLoggingService = ServiceFactory.getInstance().getApiLoggingService();
+      } catch (error) {
+        // Graceful degradation if logging service unavailable
+        logger.debug('ApiLoggingService not available, proceeding without comprehensive logging');
+      }
+      
+      const pipeline = new RequestProcessingPipeline(event, context, logger, apiLoggingService);
       requestLifecycle.start('pipeline_execution');
 
       // Execute the complete pipeline

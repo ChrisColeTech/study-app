@@ -1,5 +1,6 @@
 import { APIGatewayProxyEvent, Context } from 'aws-lambda';
 import { logger } from '../logger';
+import type { IApiLoggingService } from '../../services/api-logging.service';
 
 type Logger = typeof logger;
 import { RouteConfig } from '../base-handler';
@@ -30,12 +31,31 @@ export class RequestProcessingPipeline {
   private logger: Logger;
   private lifecycle: RequestLifecycleTracker;
   private middlewareCache: Map<string, any> = new Map();
+  private apiLoggingService: IApiLoggingService | undefined;
+  private startTime: number;
 
-  constructor(event: APIGatewayProxyEvent, context: Context, logger: Logger) {
+  constructor(
+    event: APIGatewayProxyEvent, 
+    context: Context, 
+    logger: Logger,
+    apiLoggingService?: IApiLoggingService | undefined
+  ) {
     this.event = event;
     this.context = context;
     this.logger = logger;
     this.lifecycle = new RequestLifecycleTracker(context.awsRequestId, logger);
+    this.apiLoggingService = apiLoggingService;
+    this.startTime = Date.now();
+    
+    // Log incoming request if logging service is available
+    if (this.apiLoggingService) {
+      try {
+        this.apiLoggingService.logApiRequest(event, context);
+      } catch (error) {
+        // Graceful degradation - don't let logging errors break the request
+        this.logger.warn('Failed to log API request', { error: error instanceof Error ? error.message : 'Unknown error' });
+      }
+    }
   }
 
   /**
@@ -115,6 +135,23 @@ export class RequestProcessingPipeline {
       });
 
       this.lifecycle.complete('pipeline_init');
+      
+      // Log response if logging service is available
+      if (this.apiLoggingService) {
+        try {
+          this.apiLoggingService.logApiResponse(
+            result, 
+            this.context, 
+            this.startTime, 
+            handlerContext,
+            this.lifecycle.getMetrics()
+          );
+        } catch (error) {
+          // Graceful degradation - don't let logging errors break the response
+          this.logger.warn('Failed to log API response', { error: error instanceof Error ? error.message : 'Unknown error' });
+        }
+      }
+      
       return result;
 
     } catch (error) {
@@ -126,7 +163,25 @@ export class RequestProcessingPipeline {
         requestId: this.context.awsRequestId,
       });
 
-      return this.createInternalErrorResponse(error as Error);
+      const errorResponse = this.createInternalErrorResponse(error as Error);
+      
+      // Log error response if logging service is available
+      if (this.apiLoggingService) {
+        try {
+          this.apiLoggingService.logApiResponse(
+            errorResponse, 
+            this.context, 
+            this.startTime, 
+            undefined,
+            this.lifecycle.getMetrics()
+          );
+        } catch (loggingError) {
+          // Graceful degradation - don't let logging errors break the error response
+          this.logger.warn('Failed to log error response', { error: loggingError instanceof Error ? loggingError.message : 'Unknown error' });
+        }
+      }
+
+      return errorResponse;
     }
   }
 

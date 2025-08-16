@@ -86,6 +86,10 @@ export type {
   IInsightGenerator,
 };
 
+// Import ApiLoggingService interface
+import type { IApiLoggingService } from '../services/api-logging.service';
+export type { IApiLoggingService };
+
 export interface IHealthService {
   checkHealth(): Promise<{
     status: string;
@@ -166,6 +170,9 @@ export class InfrastructureFactory {
   // AWS Clients (lazy initialized)
   private _dynamoClient: DynamoDBDocumentClient | null = null;
   private _s3Client: S3Client | null = null;
+  
+  // Infrastructure Services (lazy initialized)
+  private _apiLoggingService: IApiLoggingService | null = null;
 
   private constructor() {
     this.config = this.loadConfig();
@@ -243,6 +250,17 @@ export class InfrastructureFactory {
   }
 
   /**
+   * Get ApiLoggingService
+   */
+  public getApiLoggingService(): IApiLoggingService {
+    if (!this._apiLoggingService) {
+      const { ApiLoggingService } = require('../services/api-logging.service');
+      this._apiLoggingService = new ApiLoggingService();
+    }
+    return this._apiLoggingService!;
+  }
+
+  /**
    * Get configuration
    */
   public getConfig(): ServiceConfig {
@@ -255,6 +273,7 @@ export class InfrastructureFactory {
   public reset(): void {
     this._dynamoClient = null;
     this._s3Client = null;
+    this._apiLoggingService = null;
   }
 }
 
@@ -998,6 +1017,13 @@ export class ServiceFactory {
    */
   public getS3Client(): S3Client {
     return this.infrastructureFactory.getS3Client();
+  }
+
+  /**
+   * Get ApiLoggingService
+   */
+  public getApiLoggingService(): IApiLoggingService {
+    return this.infrastructureFactory.getApiLoggingService();
   }
 
   /**
