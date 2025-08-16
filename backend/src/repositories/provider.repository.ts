@@ -108,23 +108,14 @@ export class ProviderRepository extends S3BaseRepository implements IProviderRep
    */
   async findAll(filters?: any): Promise<StandardQueryResult<Provider>> {
     return this.executeWithErrorHandling('findAll', async () => {
-      const cacheKey = 'all-providers';
+      this.logger.info('ProviderRepository.findAll called', { 
+        bucket: this.bucketName,
+        filters 
+      });
 
-      // Check cache first
-      const cachedProviders = this.getFromCache<Provider[]>(cacheKey);
-      let providers: Provider[];
-
-      if (cachedProviders) {
-        this.logger.debug('Providers retrieved from cache', { count: cachedProviders.length });
-        providers = cachedProviders;
-      } else {
-        // Load from S3
-        providers = await this.loadProvidersFromS3();
-
-        // Cache results
-        this.setCache(cacheKey, providers);
-        this.logger.info('Providers loaded from S3', { count: providers.length });
-      }
+      // For now, ALWAYS return fallback providers to debug the issue
+      const providers = this.getFallbackProviders();
+      this.logger.info('Returning fallback providers for debugging', { count: providers.length });
 
       // Return standardized result format
       return {
@@ -132,7 +123,7 @@ export class ProviderRepository extends S3BaseRepository implements IProviderRep
         total: providers.length,
         limit: filters?.limit || this.config.query?.defaultLimit || 20,
         offset: filters?.offset || 0,
-        hasMore: false, // All providers loaded in one call
+        hasMore: false,
         executionTimeMs: 0, // Will be set by executeWithErrorHandling
       };
     });
