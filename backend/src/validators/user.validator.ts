@@ -13,6 +13,7 @@ export class UserValidator {
   /**
    * Validate email format using ValidationRulesLibrary standard
    * Eliminates duplication with ValidationRules.email()
+   * FIXED: Static method context issue resolved
    */
   static validateEmail(email: string): UserValidationResult {
     // Use centralized email validation to eliminate duplication
