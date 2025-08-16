@@ -1,5 +1,6 @@
 // Dedicated user validation logic
 // Extracted from UserService to eliminate mixed validation/business logic
+// Fixed static method context issue
 
 import { CreateUserRequest, UpdateUserRequest } from '../shared/types/user.types';
 

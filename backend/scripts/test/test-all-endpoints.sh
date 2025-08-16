@@ -45,7 +45,7 @@ main() {
 
     # Test order matters - auth first to establish authentication patterns
     # Other domains can be tested independently since most are public endpoints for now
-    DOMAINS=("auth" "providers" "exams" "topics" "questions" "sessions" "analytics" "goals" "users")  # All available test scripts
+    DOMAINS=("auth" "provider" "exam" "topic" "question" "session" "analytics" "goals" "user")  # All available test scripts
     RESULTS=()
     PASSED=0
     FAILED=0
@@ -148,7 +148,7 @@ show_help() {
     echo "  $0 http://localhost:3000 local"
     echo
     echo "Available domain tests:"
-    for domain in auth providers sessions questions users; do
+    for domain in auth provider session question user; do
         script_path="$SCRIPT_DIR/test-${domain}-endpoints.sh"
         if [[ -f "$script_path" ]]; then
             echo "  ✅ $domain"
@@ -159,10 +159,10 @@ show_help() {
     echo
     echo "Individual domain tests can be run with:"
     echo "  npm run test:endpoints:auth"
-    echo "  npm run test:endpoints:providers"
-    echo "  npm run test:endpoints:sessions"
-    echo "  npm run test:endpoints:questions"
-    echo "  npm run test:endpoints:users"
+    echo "  npm run test:endpoints:provider"
+    echo "  npm run test:endpoints:session"
+    echo "  npm run test:endpoints:question"
+    echo "  npm run test:endpoints:user"
 }
 
 # Handle help flag
