@@ -274,269 +274,57 @@ export class ProviderRepository extends S3BaseRepository implements IProviderRep
    * Load providers from S3 - simple implementation for compilation
    */
   private async loadProvidersFromS3(): Promise<Provider[]> {
-  try {
-    this.logger.info('Loading providers from S3', { 
-      bucket: this.bucketName, 
-      prefix: this.PROVIDERS_PREFIX 
-    });
-
-    // First, try to load from a providers metadata file
     try {
+      this.logger.info('Loading providers from S3', { 
+        bucket: this.bucketName, 
+        key: 'providers/metadata.json'
+      });
+
       const getCommand = new GetObjectCommand({
         Bucket: this.bucketName,
         Key: 'providers/metadata.json',
       });
 
       const result = await this.s3Client.send(getCommand);
-      if (result.Body) {
-        const content = await result.Body.transformToString();
-        const providersData = JSON.parse(content);
-        
-        if (providersData.providers && Array.isArray(providersData.providers)) {
-          this.logger.info('Providers loaded from metadata.json', { 
-            count: providersData.providers.length 
-          });
-          return providersData.providers;
-        }
+      if (!result.Body) {
+        throw new Error('No data returned from S3');
       }
-    } catch (error: any) {
-      this.logger.debug('No providers/metadata.json file found, attempting to discover from structure', {
-        error: error.message,
-        code: error.Code
-      });
-    }
 
-    // If no metadata file, discover providers from S3 structure
-    this.logger.info('Attempting to discover providers from S3 structure', {
-      bucket: this.bucketName,
-      prefix: 'questions/'
-    });
-
-    const listCommand = new ListObjectsV2Command({
-      Bucket: this.bucketName,
-      Prefix: 'questions/',
-      Delimiter: '/',
-    });
-
-    const result = await this.s3Client.send(listCommand);
-    const providers: Provider[] = [];
-
-    this.logger.info('S3 list result', {
-      keyCount: result.KeyCount,
-      isTruncated: result.IsTruncated,
-      commonPrefixesCount: result.CommonPrefixes?.length || 0,
-      contentsCount: result.Contents?.length || 0
-    });
-
-    if (result.CommonPrefixes) {
-      this.logger.info('Discovering providers from S3 structure', { 
-        prefixes: result.CommonPrefixes.length 
-      });
-
-      // Log all discovered prefixes for debugging
-      result.CommonPrefixes.forEach((prefix, index) => {
-        this.logger.debug(`S3 CommonPrefix[${index}]`, { prefix: prefix.Prefix });
-      });
-
-      // Extract provider IDs from the S3 structure (questions/aws/, questions/azure/, etc.)
-      for (const prefix of result.CommonPrefixes) {
-        if (prefix.Prefix) {
-          const providerIdMatch = prefix.Prefix.match(/questions\/([^\/]+)\//);
-          if (providerIdMatch) {
-            const providerId = providerIdMatch[1];
-            
-            this.logger.debug('Matched provider from S3 prefix', { 
-              prefix: prefix.Prefix, 
-              providerId 
-            });
-            
-            // Create provider from discovered structure
-            const provider: Provider = {
-              id: providerId,
-              providerId: providerId,
-              name: this.getProviderDisplayName(providerId),
-              description: `${this.getProviderDisplayName(providerId)} certification study material`,
-              logoUrl: `https://cdn.example.com/logos/${providerId}.png`,
-              category: 'cloud',
-              status: StatusType.ACTIVE,
-              isActive: true,
-              exams: [], // Will be populated separately when exams are loaded
-              createdAt: new Date().toISOString(),
-              updatedAt: new Date().toISOString(),
-            };
-
-            providers.push(provider);
-            this.logger.debug('Created provider from S3 structure', { providerId });
-          } else {
-            this.logger.debug('S3 prefix did not match provider pattern', { 
-              prefix: prefix.Prefix 
-            });
-          }
-        }
+      const content = await result.Body.transformToString();
+      const providersData = JSON.parse(content);
+      
+      if (!providersData.providers || !Array.isArray(providersData.providers)) {
+        throw new Error('Invalid providers data structure');
       }
-    } else {
-      this.logger.warn('No CommonPrefixes found in S3 list result', {
+
+      // Convert S3 data to Provider format
+      const providers: Provider[] = providersData.providers.map((providerData: any) => ({
+        id: providerData.id,
+        providerId: providerData.id,
+        name: providerData.name,
+        description: providerData.description,
+        logoUrl: providerData.logoUrl,
+        category: 'cloud', // Set based on provider type
+        status: StatusType.ACTIVE,
+        isActive: true,
+        exams: [], // Exams will be loaded separately
+        createdAt: new Date().toISOString(),
+        updatedAt: providerData.lastUpdated || new Date().toISOString(),
+      }));
+
+      this.logger.info('Providers loaded from S3 metadata', { 
+        count: providers.length 
+      });
+      
+      return providers;
+
+    } catch (error) {
+      this.logger.error('Failed to load providers from S3', error as Error, {
         bucket: this.bucketName,
-        prefix: 'questions/'
+        key: 'providers/metadata.json'
       });
+      throw error;
     }
-
-    if (providers.length === 0) {
-      this.logger.warn('No providers discovered from S3 structure, returning fallback providers');
-      return this.getFallbackProviders();
-    }
-
-    this.logger.info('Providers discovered from S3 structure', { count: providers.length });
-    return providers;
-
-  } catch (error) {
-    this.logger.error('Failed to load providers from S3', error as Error, {
-      bucket: this.bucketName,
-      prefix: this.PROVIDERS_PREFIX,
-    });
-    
-    // Return fallback hardcoded providers if S3 fails
-    this.logger.info('Returning fallback providers due to S3 error');
-    return this.getFallbackProviders();
   }
-}
-
-private getProviderDisplayName(providerId: string): string {
-  const names: Record<string, string> = {
-    aws: 'Amazon Web Services',
-    azure: 'Microsoft Azure',
-    gcp: 'Google Cloud Platform',
-    cisco: 'Cisco',
-    comptia: 'CompTIA',
-  };
-  return names[providerId] || providerId.toUpperCase();
-}
-
-private getProviderWebsite(providerId: string): string {
-  const websites: Record<string, string> = {
-    aws: 'https://aws.amazon.com',
-    azure: 'https://azure.microsoft.com',
-    gcp: 'https://cloud.google.com',
-    cisco: 'https://cisco.com',
-    comptia: 'https://comptia.org',
-  };
-  return websites[providerId] || `https://${providerId}.com`;
-}
-
-private getProviderFoundationYear(providerId: string): number {
-  const years: Record<string, number> = {
-    aws: 2006,
-    azure: 2010,
-    gcp: 2008,
-    cisco: 1984,
-    comptia: 1982,
-  };
-  return years[providerId] || 2000;
-}
-
-private getProviderHeadquarters(providerId: string): string {
-  const headquarters: Record<string, string> = {
-    aws: 'Seattle, WA',
-    azure: 'Redmond, WA',
-    gcp: 'Mountain View, CA',
-    cisco: 'San Jose, CA',
-    comptia: 'Downers Grove, IL',
-  };
-  return headquarters[providerId] || 'Unknown';
-}
-
-private getProviderMarketShare(providerId: string): number {
-  const marketShares: Record<string, number> = {
-    aws: 32,
-    azure: 23,
-    gcp: 10,
-    cisco: 8,
-    comptia: 15,
-  };
-  return marketShares[providerId] || 5;
-}
-
-private getProviderSpecializations(providerId: string): string[] {
-  const specializations: Record<string, string[]> = {
-    aws: ['Cloud Computing', 'Machine Learning', 'Data Analytics', 'IoT'],
-    azure: ['Cloud Computing', 'AI/ML', 'DevOps', 'Enterprise Solutions'],
-    gcp: ['Cloud Computing', 'Data Analytics', 'Machine Learning', 'Kubernetes'],
-    cisco: ['Networking', 'Security', 'Collaboration', 'Data Center'],
-    comptia: ['IT Fundamentals', 'Security', 'Cloud', 'Project Management'],
-  };
-  return specializations[providerId] || ['Technology'];
-}
-
-private getFallbackProviders(): Provider[] {
-  const fallbackProviders: Provider[] = [
-    {
-      id: 'aws',
-      providerId: 'aws',
-      name: 'Amazon Web Services',
-      description: 'Amazon Web Services (AWS) certification study material',
-      logoUrl: 'https://cdn.example.com/logos/aws.png',
-      category: 'cloud',
-      status: StatusType.ACTIVE,
-      isActive: true,
-      exams: [],
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    },
-    {
-      id: 'azure',
-      providerId: 'azure', 
-      name: 'Microsoft Azure',
-      description: 'Microsoft Azure certification study material',
-      logoUrl: 'https://cdn.example.com/logos/azure.png',
-      category: 'cloud',
-      status: StatusType.ACTIVE,
-      isActive: true,
-      exams: [],
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    },
-    {
-      id: 'gcp',
-      providerId: 'gcp',
-      name: 'Google Cloud Platform',
-      description: 'Google Cloud Platform certification study material',
-      logoUrl: 'https://cdn.example.com/logos/gcp.png',
-      category: 'cloud',
-      status: StatusType.ACTIVE,
-      isActive: true,
-      exams: [],
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    },
-    {
-      id: 'cisco',
-      providerId: 'cisco',
-      name: 'Cisco',
-      description: 'Cisco certification study material',
-      logoUrl: 'https://cdn.example.com/logos/cisco.png',
-      category: 'networking',
-      status: StatusType.ACTIVE,
-      isActive: true,
-      exams: [],
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    },
-    {
-      id: 'comptia',
-      providerId: 'comptia',
-      name: 'CompTIA',
-      description: 'CompTIA certification study material',
-      logoUrl: 'https://cdn.example.com/logos/comptia.png',
-      category: 'general',
-      status: StatusType.ACTIVE,
-      isActive: true,
-      exams: [],
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    }
-  ];
-
-  this.logger.info('Using fallback providers', { count: fallbackProviders.length });
-  return fallbackProviders;
 }
 }
