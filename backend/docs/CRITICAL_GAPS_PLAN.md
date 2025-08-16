@@ -30,7 +30,7 @@ _Context: Comprehensive audit post-provider/exam fixes_
   - **Step 4: Testing & Validation** - Verify functionality works correctly after changes
   - **Step 5: Documentation & Tracking** - Create lessons learned doc and update remediation plan
   - **Step 6: Git & Deployment Workflow** - Commit, push, and deploy via CI/CD pipeline
-  - **Step 7: Quality Assurance Final Check** - Verify all completion requirements are met
+  - **Step 7: Quality Assurance Final Check** - Write documentation while deployment runs, then verify all completion requirements are met
 - **✅ Subtasks**: Specific actionable items within each step
   - Each step contains multiple subtasks that must be completed
   - Subtasks are the actual work items that can be checked off
@@ -159,10 +159,12 @@ _Context: Comprehensive audit post-provider/exam fixes_
    - Run `git push origin v3-implementation`
    - Verify commit with `git log --oneline | head -1`
 
-6. **✅ CI/CD Verification**:
-   - Run `gh run list --limit 1` to get latest run ID
-   - Monitor with `gh run watch [run-id]` until completion
-   - Verify successful deployment
+6. **✅ CI/CD Verification** (IMPROVED WORKFLOW):
+   - **Step A**: Push triggers deployment automatically
+   - **Step B**: WHILE DEPLOYMENT RUNS, create phase documentation (Step 5)
+   - **Step C**: Update tracking table in CRITICAL_GAPS_PLAN.md
+   - **Step D**: AFTER documentation complete, run `gh run watch [run-id]` to monitor deployment
+   - **Step E**: Once deployment completes, test endpoints to verify fix works
 
 **🚫 DO NOT CLAIM COMPLETION UNLESS ALL 6 STEPS VERIFIED SUCCESSFUL**
 
@@ -610,7 +612,7 @@ Based on successful provider/exam fix:
 
 | #   | Issue                            | Category      | Priority    | Status      | Evidence                  | Fix Required             |
 | --- | -------------------------------- | ------------- | ----------- | ----------- | ------------------------- | ------------------------ |
-| 1   | Question Data Loading            | Critical      | ❌ Blocking | Not Started | 0/1,082 questions loaded  | S3 loading debug         |
+| 1   | Question Data Loading            | Critical      | ✅ **COMPLETED** | ✅ **COMPLETED** | Real S3 loading implemented  | S3 loading debug         |
 | 2   | Session Management               | Critical      | ❌ Blocking | Not Started | Hangs indefinitely        | Routing fix              |
 | 3   | User Context Extraction          | Critical      | ❌ Blocking | Not Started | Hardcoded placeholder     | JWT extraction           |
 | 4   | Analytics 500 Errors             | Critical      | ❌ Blocking | Not Started | Undefined property access | Debug implementation     |
