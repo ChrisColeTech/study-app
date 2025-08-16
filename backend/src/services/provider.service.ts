@@ -30,7 +30,7 @@ export class ProviderService extends BaseService implements IProviderService {
    * Get all providers with optional filtering
    */
   async getProviders(request: GetProvidersRequest): Promise<GetProvidersResponse> {
-    this.logger.info('Getting providers', {
+    this.logger.info('ProviderService.getProviders called', {
       category: request.category,
       status: request.status,
       search: request.search,
@@ -39,11 +39,23 @@ export class ProviderService extends BaseService implements IProviderService {
 
     try {
       // Get all providers from repository
+      this.logger.info('Calling providerRepository.findAll()');
       const allProvidersResult = await this.providerRepository.findAll();
+      this.logger.info('Repository returned result', {
+        itemsCount: allProvidersResult.items.length,
+        total: allProvidersResult.total
+      });
+      
       const allProviders = allProvidersResult.items;
+      this.logger.info('Extracted providers from result', { count: allProviders.length });
 
       // Apply filters using dedicated filter class
       const { filtered, total } = ProviderFilter.applyFilters(allProviders, request);
+      this.logger.info('Applied filters', { 
+        originalCount: allProviders.length,
+        filteredCount: filtered.length,
+        total 
+      });
 
       // Sort providers using dedicated filter class
       const sortedProviders = ProviderFilter.sortProviders(filtered);
