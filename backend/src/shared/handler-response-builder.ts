@@ -27,48 +27,33 @@ import { ERROR_CODES } from './constants/error.constants';
 export class ResponseBuilder {
   /**
    * Helper method to create success responses
+   * Delegates to ApiResponseFormatter
    */
   static success<T>(data: T, message?: string): ApiResponse<T> {
-    return {
-      success: true,
-      data,
-      message,
-      timestamp: new Date().toISOString(),
-    };
+    return ApiResponseFormatter.createSuccessApiResponse(data, message);
   }
 
   /**
    * Helper method to create error responses
+   * Delegates to ApiResponseFormatter
    */
   static error(code: string, message: string, details?: ErrorDetails): ApiResponse {
-    return {
-      success: false,
-      error: {
-        code,
-        message,
-        details,
-      },
-      timestamp: new Date().toISOString(),
-    };
+    return ApiResponseFormatter.createErrorApiResponse(code, message, details);
   }
 
   /**
    * Build standardized success response with comprehensive metadata support
+   * Delegates to ApiResponseFormatter and MetadataStandardizer
    */
   static buildSuccessResponse<T>(
     message: string,
     data: T,
     metadata?: ResponseMetadata
   ): ApiResponse<T> {
-    const response: ApiResponse<T> = {
-      success: true,
-      message,
-      data,
-      timestamp: new Date().toISOString(),
-    };
+    const response = ApiResponseFormatter.createSuccessApiResponse(data, message);
 
     if (metadata) {
-      response.metadata = ResponseBuilder.standardizeMetadata(metadata);
+      return ApiResponseFormatter.addMetadataToResponse(response, MetadataStandardizer.standardizeMetadata(metadata));
     }
 
     return response;
@@ -76,6 +61,7 @@ export class ResponseBuilder {
 
   /**
    * Build standardized error response with enhanced error details
+   * Delegates to ApiResponseFormatter and MetadataStandardizer
    */
   static buildErrorResponse(
     message: string,
@@ -83,20 +69,13 @@ export class ResponseBuilder {
     errorCode: string,
     details?: any
   ): ApiResponse {
-    return {
-      success: false,
-      message,
-      error: {
-        code: errorCode,
-        message,
-        details: ResponseBuilder.standardizeErrorDetails(details, statusCode),
-      },
-      timestamp: new Date().toISOString(),
-    };
+    const standardizedDetails = MetadataStandardizer.standardizeErrorDetails(details, statusCode);
+    return ApiResponseFormatter.createErrorApiResponse(errorCode, message, standardizedDetails);
   }
 
   /**
    * Build paginated response with standardized pagination metadata
+   * Delegates to ApiResponseFormatter and MetadataStandardizer
    */
   static buildPaginatedResponse<T>(
     message: string,
@@ -104,7 +83,7 @@ export class ResponseBuilder {
     pagination: PaginationInfo,
     additionalMetadata?: Record<string, any>
   ): ApiResponse<T[]> {
-    const paginationMetadata = ResponseBuilder.standardizePaginationMetadata(pagination);
+    const paginationMetadata = MetadataStandardizer.standardizePaginationMetadata(pagination);
     
     const metadata: ResponseMetadata = {
       pagination: paginationMetadata,
@@ -117,6 +96,7 @@ export class ResponseBuilder {
 
   /**
    * Build response with performance metrics
+   * Delegates to ApiResponseFormatter and MetadataStandardizer
    */
   static buildPerformanceResponse<T>(
     message: string,
@@ -125,7 +105,7 @@ export class ResponseBuilder {
     additionalMetadata?: Record<string, any>
   ): ApiResponse<T> {
     const metadata: ResponseMetadata = {
-      performance: ResponseBuilder.standardizePerformanceMetadata(performanceData),
+      performance: MetadataStandardizer.standardizePerformanceMetadata(performanceData),
       ...additionalMetadata,
     };
 
@@ -134,26 +114,18 @@ export class ResponseBuilder {
 
   /**
    * Build response with validation errors
+   * Delegates to ValidationErrorFormatter
    */
   static buildValidationErrorResponse(
     validationErrors: ValidationError[],
     statusCode: number = 400
   ): ApiResponse {
-    const formattedErrors = ResponseBuilder.standardizeValidationErrors(validationErrors);
-    
-    return ResponseBuilder.buildErrorResponse(
-      'Validation failed',
-      statusCode,
-      ERROR_CODES.VALIDATION_ERROR,
-      {
-        validationErrors: formattedErrors,
-        errorCount: formattedErrors.length,
-      }
-    );
+    return ValidationErrorFormatter.formatValidationErrors(validationErrors, statusCode);
   }
 
   /**
    * Build response with resource information
+   * Delegates to ApiResponseFormatter and MetadataStandardizer
    */
   static buildResourceResponse<T>(
     message: string,
@@ -162,7 +134,7 @@ export class ResponseBuilder {
     additionalMetadata?: Record<string, any>
   ): ApiResponse<T> {
     const metadata: ResponseMetadata = {
-      resource: ResponseBuilder.standardizeResourceInfo(resourceInfo),
+      resource: MetadataStandardizer.standardizeResourceInfo(resourceInfo),
       ...additionalMetadata,
     };
 
@@ -171,6 +143,7 @@ export class ResponseBuilder {
 
   /**
    * Build partial content response (206)
+   * Delegates to ApiResponseFormatter and MetadataStandardizer
    */
   static buildPartialContentResponse<T>(
     message: string,
@@ -179,7 +152,7 @@ export class ResponseBuilder {
     additionalMetadata?: Record<string, any>
   ): ApiResponse<T> {
     const metadata: ResponseMetadata = {
-      contentRange: ResponseBuilder.standardizeContentRange(contentRange),
+      contentRange: MetadataStandardizer.standardizeContentRange(contentRange),
       ...additionalMetadata,
     };
 
@@ -188,6 +161,7 @@ export class ResponseBuilder {
 
   /**
    * Build response with caching information
+   * Delegates to ApiResponseFormatter and MetadataStandardizer
    */
   static buildCachedResponse<T>(
     message: string,
@@ -196,7 +170,7 @@ export class ResponseBuilder {
     additionalMetadata?: Record<string, any>
   ): ApiResponse<T> {
     const metadata: ResponseMetadata = {
-      cache: ResponseBuilder.standardizeCacheInfo(cacheInfo),
+      cache: MetadataStandardizer.standardizeCacheInfo(cacheInfo),
       ...additionalMetadata,
     };
 
@@ -204,9 +178,182 @@ export class ResponseBuilder {
   }
 
   // ===================================
-  // METADATA STANDARDIZATION METHODS
+  // METADATA STANDARDIZATION METHODS (DELEGATES)
   // ===================================
 
+  /**
+   * Standardize general response metadata
+   * Delegates to MetadataStandardizer
+   */
+  static standardizeMetadata(metadata: ResponseMetadata): ResponseMetadata {
+    return MetadataStandardizer.standardizeMetadata(metadata);
+  }
+
+  /**
+   * Standardize pagination metadata
+   * Delegates to MetadataStandardizer
+   */
+  static standardizePaginationMetadata(pagination: PaginationInfo): StandardizedPagination {
+    return MetadataStandardizer.standardizePaginationMetadata(pagination);
+  }
+
+  /**
+   * Standardize performance metadata
+   * Delegates to MetadataStandardizer
+   */
+  static standardizePerformanceMetadata(performance: ResponsePerformanceMetrics): StandardizedResponsePerformance {
+    return MetadataStandardizer.standardizePerformanceMetadata(performance);
+  }
+
+  /**
+   * Standardize resource information
+   * Delegates to MetadataStandardizer
+   */
+  static standardizeResourceInfo(resource: ResourceInfo): StandardizedResource {
+    return MetadataStandardizer.standardizeResourceInfo(resource);
+  }
+
+  /**
+   * Standardize resource links
+   * Delegates to MetadataStandardizer
+   */
+  static standardizeResourceLinks(links: Record<string, string>): StandardizedResourceLinks {
+    return MetadataStandardizer.standardizeResourceLinks(links);
+  }
+
+  /**
+   * Get default HTTP method for relation type
+   * Delegates to MetadataStandardizer
+   */
+  static getDefaultMethodForRel(rel: string): string {
+    return MetadataStandardizer.getDefaultMethodForRel(rel);
+  }
+
+  /**
+   * Standardize cache information
+   * Delegates to MetadataStandardizer
+   */
+  static standardizeCacheInfo(cache: CacheInfo): StandardizedCache {
+    return MetadataStandardizer.standardizeCacheInfo(cache);
+  }
+
+  /**
+   * Standardize content range information
+   * Delegates to MetadataStandardizer
+   */
+  static standardizeContentRange(contentRange: ContentRange): StandardizedContentRange {
+    return MetadataStandardizer.standardizeContentRange(contentRange);
+  }
+
+  /**
+   * Standardize error details
+   * Delegates to MetadataStandardizer
+   */
+  static standardizeErrorDetails(details: any, statusCode: number): StandardizedErrorDetails {
+    return MetadataStandardizer.standardizeErrorDetails(details, statusCode);
+  }
+
+  /**
+   * Standardize validation errors
+   * Delegates to ValidationErrorFormatter
+   */
+  static standardizeValidationErrors(errors: ValidationError[]): StandardizedValidationError[] {
+    return ValidationErrorFormatter.standardizeValidationErrors(errors);
+  }
+}
+
+// ===================================
+// HELPER CLASSES FOR HANDLER RESPONSE BUILDER OPTIMIZATION  
+// ===================================
+
+/**
+ * ApiResponseFormatter - API response structure formatting
+ * Handles core API response construction and basic formatting
+ */
+export class ApiResponseFormatter {
+  /**
+   * Create basic success API response
+   */
+  static createSuccessApiResponse<T>(
+    data: T,
+    message?: string,
+    timestamp?: string
+  ): ApiResponse<T> {
+    return {
+      success: true,
+      data,
+      message,
+      timestamp: timestamp || new Date().toISOString(),
+    };
+  }
+
+  /**
+   * Create basic error API response
+   */
+  static createErrorApiResponse(
+    code: string,
+    message: string,
+    details?: ErrorDetails,
+    timestamp?: string
+  ): ApiResponse {
+    return {
+      success: false,
+      error: {
+        code,
+        message,
+        details,
+      },
+      timestamp: timestamp || new Date().toISOString(),
+    };
+  }
+
+  /**
+   * Add metadata to existing response
+   */
+  /**
+   * Add metadata to existing response (only for success responses)
+   */
+  static addMetadataToResponse<T>(
+    response: ApiResponse<T>,
+    metadata: ResponseMetadata
+  ): ApiResponse<T> {
+    if (response.success) {
+      return {
+        ...response,
+        metadata,
+      };
+    }
+    // Return error responses unchanged as they don't support metadata
+    return response;
+  }
+
+  /**
+   * Create success response with automatic timestamp
+   */
+  static buildSuccessResponse<T>(
+    message: string,
+    data: T
+  ): ApiResponse<T> {
+    return ApiResponseFormatter.createSuccessApiResponse(data, message);
+  }
+
+  /**
+   * Create error response with automatic timestamp  
+   */
+  static buildErrorResponse(
+    message: string,
+    statusCode: number,
+    errorCode: string
+  ): ApiResponse {
+    return ApiResponseFormatter.createErrorApiResponse(errorCode, message);
+  }
+}
+
+/**
+ * MetadataStandardizer - All metadata standardization functionality
+ * Handles pagination, performance, resource, cache, and content range metadata
+ */
+export class MetadataStandardizer {
   /**
    * Standardize general response metadata
    */
@@ -214,23 +361,23 @@ export class ResponseBuilder {
     const standardized: ResponseMetadata = {};
 
     if (metadata.pagination) {
-      standardized.pagination = ResponseBuilder.standardizePaginationMetadata(metadata.pagination);
+      standardized.pagination = MetadataStandardizer.standardizePaginationMetadata(metadata.pagination);
     }
 
     if (metadata.performance && 'executionTime' in metadata.performance) {
-      standardized.performance = ResponseBuilder.standardizePerformanceMetadata(metadata.performance as ResponsePerformanceMetrics);
+      standardized.performance = MetadataStandardizer.standardizePerformanceMetadata(metadata.performance as ResponsePerformanceMetrics);
     }
 
     if (metadata.resource && 'id' in metadata.resource) {
-      standardized.resource = ResponseBuilder.standardizeResourceInfo(metadata.resource as ResourceInfo);
+      standardized.resource = MetadataStandardizer.standardizeResourceInfo(metadata.resource as ResourceInfo);
     }
 
     if (metadata.cache && 'cached' in metadata.cache) {
-      standardized.cache = ResponseBuilder.standardizeCacheInfo(metadata.cache as CacheInfo);
+      standardized.cache = MetadataStandardizer.standardizeCacheInfo(metadata.cache as CacheInfo);
     }
 
     if (metadata.contentRange && 'unit' in metadata.contentRange) {
-      standardized.contentRange = ResponseBuilder.standardizeContentRange(metadata.contentRange as ContentRange);
+      standardized.contentRange = MetadataStandardizer.standardizeContentRange(metadata.contentRange as ContentRange);
     }
 
     // Include any additional metadata
@@ -283,7 +430,7 @@ export class ResponseBuilder {
       version: resource.version || '1.0',
       lastModified: resource.lastModified || new Date().toISOString(),
       etag: resource.etag || undefined,
-      links: ResponseBuilder.standardizeResourceLinks(resource.links || {}),
+      links: MetadataStandardizer.standardizeResourceLinks(resource.links || {}),
     };
   }
 
@@ -297,7 +444,7 @@ export class ResponseBuilder {
       standardized[rel] = {
         href: links[rel],
         rel,
-        method: ResponseBuilder.getDefaultMethodForRel(rel),
+        method: MetadataStandardizer.getDefaultMethodForRel(rel),
       };
     });
 
@@ -369,7 +516,7 @@ export class ResponseBuilder {
     };
 
     if (details.validationErrors) {
-      standardized.validationErrors = ResponseBuilder.standardizeValidationErrors(details.validationErrors);
+      standardized.validationErrors = MetadataStandardizer.standardizeValidationErrors(details.validationErrors);
     }
 
     if (details.field) {
@@ -410,5 +557,99 @@ export class ResponseBuilder {
       location: error.location || 'body',
       constraint: error.constraint || undefined,
     }));
+  }
+}
+
+/**
+ * ValidationErrorFormatter - Validation error formatting and standardization  
+ * Handles validation error processing and formatting
+ */
+export class ValidationErrorFormatter {
+  /**
+   * Format validation errors into standardized response
+   */
+  static formatValidationErrors(
+    validationErrors: ValidationError[],
+    statusCode: number = 400
+  ): ApiResponse {
+    const formattedErrors = ValidationErrorFormatter.standardizeValidationErrors(validationErrors);
+    
+    return ApiResponseFormatter.createErrorApiResponse(
+      ERROR_CODES.VALIDATION_ERROR,
+      'Validation failed',
+      {
+        validationErrors: formattedErrors,
+        errorCount: formattedErrors.length,
+        statusCode,
+      }
+    );
+  }
+
+  /**
+   * Standardize validation errors
+   */
+  static standardizeValidationErrors(errors: ValidationError[]): StandardizedValidationError[] {
+    return errors.map(error => ({
+      field: error.field,
+      message: error.message,
+      code: error.code || 'VALIDATION_ERROR',
+      value: error.value,
+      location: error.location || 'body',
+      constraint: error.constraint || undefined,
+    }));
+  }
+
+  /**
+   * Create validation error response with detailed context
+   */
+  static createDetailedValidationErrorResponse(
+    errors: ValidationError[],
+    statusCode: number = 400,
+    customMessage?: string
+  ): ApiResponse {
+    const formattedErrors = ValidationErrorFormatter.standardizeValidationErrors(errors);
+    const errorCount = formattedErrors.length;
+    
+    const message = customMessage || 
+      (errorCount === 1 ? 'A validation error occurred' : `${errorCount} validation errors occurred`);
+
+    return ApiResponseFormatter.createErrorApiResponse(
+      ERROR_CODES.VALIDATION_ERROR,
+      message,
+      {
+        validationErrors: formattedErrors,
+        errorCount,
+        statusCode,
+        severity: errorCount > 5 ? 'high' : errorCount > 2 ? 'medium' : 'low',
+      }
+    );
+  }
+
+  /**
+   * Extract validation error summary
+   */
+  static extractValidationSummary(errors: ValidationError[]): {
+    fieldCount: number;
+    errorCount: number;
+    fields: string[];
+    mostCommonError: string;
+  } {
+    const fields = Array.from(new Set(errors.map(e => e.field)));
+    const errorMessages = errors.map(e => e.message);
+    const messageCount = errorMessages.reduce((acc, msg) => {
+      acc[msg] = (acc[msg] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+    
+    const mostCommonError = Object.keys(messageCount).reduce((a, b) => 
+      messageCount[a] > messageCount[b] ? a : b
+    );
+
+    return {
+      fieldCount: fields.length,
+      errorCount: errors.length,
+      fields,
+      mostCommonError,
+    };
   }
 }
