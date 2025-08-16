@@ -65,15 +65,15 @@ export class UserValidator {
     const allErrors: string[] = [];
 
     // Validate email
-    const emailResult = this.validateEmail(userData.email);
+    const emailResult = UserValidator.validateEmail(userData.email);
     allErrors.push(...emailResult.errors);
 
     // Validate firstName
-    const firstNameResult = this.validateName(userData.firstName, 'First name');
+    const firstNameResult = UserValidator.validateName(userData.firstName, 'First name');
     allErrors.push(...firstNameResult.errors);
 
     // Validate lastName
-    const lastNameResult = this.validateName(userData.lastName, 'Last name');
+    const lastNameResult = UserValidator.validateName(userData.lastName, 'Last name');
     allErrors.push(...lastNameResult.errors);
 
     return {
@@ -90,12 +90,12 @@ export class UserValidator {
 
     // Only validate fields that are being updated
     if (updateData.firstName !== undefined) {
-      const firstNameResult = this.validateName(updateData.firstName, 'First name');
+      const firstNameResult = UserValidator.validateName(updateData.firstName, 'First name');
       allErrors.push(...firstNameResult.errors);
     }
 
     if (updateData.lastName !== undefined) {
-      const lastNameResult = this.validateName(updateData.lastName, 'Last name');
+      const lastNameResult = UserValidator.validateName(updateData.lastName, 'Last name');
       allErrors.push(...lastNameResult.errors);
     }
 
@@ -109,7 +109,7 @@ export class UserValidator {
    * Validate and throw error if invalid (for backward compatibility)
    */
   static validateCreateUserOrThrow(userData: CreateUserRequest): void {
-    const result = this.validateCreateUser(userData);
+    const result = UserValidator.validateCreateUser(userData);
 
     if (!result.isValid) {
       throw new Error(result.errors[0]); // Throw first error for backward compatibility
@@ -120,7 +120,7 @@ export class UserValidator {
    * Validate and throw error if invalid (for backward compatibility)
    */
   static validateUpdateUserOrThrow(updateData: UpdateUserRequest): void {
-    const result = this.validateUpdateUser(updateData);
+    const result = UserValidator.validateUpdateUser(updateData);
 
     if (!result.isValid) {
       throw new Error(result.errors[0]); // Throw first error for backward compatibility
@@ -131,7 +131,7 @@ export class UserValidator {
    * Validate email format and throw error if invalid (for backward compatibility)
    */
   static validateEmailOrThrow(email: string): void {
-    const result = this.validateEmail(email);
+    const result = UserValidator.validateEmail(email);
 
     if (!result.isValid) {
       throw new Error(result.errors[0]); // Throw first error for backward compatibility
@@ -143,7 +143,7 @@ export class UserValidator {
    */
   static getEmailValidationFunction() {
     return (email: string): { isValid: boolean; error?: string } => {
-      const result = this.validateEmail(email);
+      const result = UserValidator.validateEmail(email);
       
       if (result.isValid) {
         return { isValid: true };
@@ -158,7 +158,7 @@ export class UserValidator {
    */
   static getNameValidationFunction(fieldName: string) {
     return (name: string): { isValid: boolean; error?: string } => {
-      const result = this.validateName(name, fieldName);
+      const result = UserValidator.validateName(name, fieldName);
       
       if (result.isValid) {
         return { isValid: true };
@@ -174,7 +174,7 @@ export class UserValidator {
   static createEmailValidationRule(field: string = 'email') {
     return {
       field,
-      validate: this.getEmailValidationFunction(),
+      validate: UserValidator.getEmailValidationFunction(),
     };
   }
 
@@ -184,7 +184,7 @@ export class UserValidator {
   static createNameValidationRule(field: string, displayName: string) {
     return {
       field,
-      validate: this.getNameValidationFunction(displayName),
+      validate: UserValidator.getNameValidationFunction(displayName),
     };
   }
 
@@ -193,9 +193,9 @@ export class UserValidator {
    */
   static createUserCreationRules() {
     return [
-      this.createEmailValidationRule('email'),
-      this.createNameValidationRule('firstName', 'First name'),
-      this.createNameValidationRule('lastName', 'Last name'),
+      UserValidator.createEmailValidationRule('email'),
+      UserValidator.createNameValidationRule('firstName', 'First name'),
+      UserValidator.createNameValidationRule('lastName', 'Last name'),
     ];
   }
 }
