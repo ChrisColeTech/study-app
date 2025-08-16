@@ -13,7 +13,7 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Configuration
-BASE_URL="${1:-http://localhost:3000}"
+BASE_URL="${1:-https://l1dj6h3lie.execute-api.us-east-2.amazonaws.com/dev}"
 FIXTURES_DIR="$(dirname "$0")/../../tests/fixtures/sessions"
 TEMP_DIR="/tmp/session-tests"
 

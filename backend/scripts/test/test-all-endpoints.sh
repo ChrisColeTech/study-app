@@ -7,7 +7,7 @@ set -e
 
 # Configuration
 ENVIRONMENT=${2:-"dev"}
-BASE_URL=${1:-"https://t6pkkabhvi.execute-api.us-east-2.amazonaws.com/dev"}
+BASE_URL=${1:-"https://l1dj6h3lie.execute-api.us-east-2.amazonaws.com/dev"}
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Colors for output

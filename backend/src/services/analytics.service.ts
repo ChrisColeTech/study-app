@@ -133,7 +133,8 @@ export class AnalyticsService extends BaseService implements IAnalyticsService {
         // Get session count for metadata
         const sessionFilters: any = { startDate, endDate };
         if (userId) sessionFilters.userId = userId;
-        const sessions = await this.analyticsRepository.getCompletedSessions(sessionFilters);
+        const sessionResults = await this.analyticsRepository.getCompletedSessions(sessionFilters);
+        const sessions = sessionResults.items;
 
         const response: ProgressAnalyticsResponse = {
           success: true,

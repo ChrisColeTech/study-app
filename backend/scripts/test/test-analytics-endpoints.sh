@@ -8,7 +8,7 @@ echo "🧪 Testing Analytics Endpoints - Phase 22"
 echo "========================================"
 
 # Test configuration
-API_BASE="https://your-api-gateway-url.amazonaws.com/dev/v1"
+API_BASE="https://l1dj6h3lie.execute-api.us-east-2.amazonaws.com/dev/v1"
 echo "API Base: $API_BASE"
 echo ""
 

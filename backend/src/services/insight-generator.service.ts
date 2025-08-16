@@ -29,32 +29,38 @@ export class InsightGenerator implements IInsightGenerator {
    * Generate learning insights and recommendations
    */
   async generateLearningInsights(userId?: string): Promise<LearningInsights> {
-    this.logger.info('Generating learning insights', { ...(userId && { userId }) });
+  this.logger.info('Generating learning insights', { ...(userId && { userId }) });
 
-    try {
-      const sessionFilters: any = {};
-      if (userId) sessionFilters.userId = userId;
-      const sessions = await this.analyticsRepository.getCompletedSessions(sessionFilters);
-      const progressData = await this.analyticsRepository.getUserProgressData(userId);
+  try {
+    const sessionFilters: any = {};
+    if (userId) sessionFilters.userId = userId;
+    const [sessionResults, progressResults] = await Promise.all([
+      this.analyticsRepository.getCompletedSessions(sessionFilters),
+      this.analyticsRepository.getUserProgressData(userId),
+    ]);
 
-      const patterns = this.identifyLearningPatterns(sessions);
-      const recommendations = this.generateLearningRecommendations(sessions, progressData);
-      const milestones = this.identifyLearningMilestones(sessions, progressData);
-      const warnings = this.detectLearningWarnings(sessions, progressData);
+    // Fix: Extract items arrays from StandardQueryResult objects
+    const sessions = sessionResults.items;
+    const progressData = progressResults.items;
 
-      return {
-        patterns,
-        recommendations,
-        milestones,
-        warnings,
-      };
-    } catch (error) {
-      this.logger.error('Failed to generate learning insights', error as Error, {
-        ...(userId && { userId }),
-      });
-      throw error;
-    }
+    const patterns = this.identifyLearningPatterns(sessions);
+    const recommendations = this.generateLearningRecommendations(sessions, progressData);
+    const milestones = this.identifyLearningMilestones(sessions, progressData);
+    const warnings = this.detectLearningWarnings(sessions, progressData);
+
+    return {
+      patterns,
+      recommendations,
+      milestones,
+      warnings,
+    };
+  } catch (error) {
+    this.logger.error('Failed to generate learning insights', error as Error, {
+      ...(userId && { userId }),
+    });
+    throw error;
   }
+}
 
   /**
    * Prepare data for visualizations

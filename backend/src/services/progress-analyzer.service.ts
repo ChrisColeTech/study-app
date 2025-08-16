@@ -24,8 +24,10 @@ export class ProgressAnalyzer implements IProgressAnalyzer {
     try {
       const sessionFilters: any = {};
       if (userId) sessionFilters.userId = userId;
-      const sessions = await this.analyticsRepository.getCompletedSessions(sessionFilters);
-      const progressData = await this.analyticsRepository.getUserProgressData(userId);
+      const sessionResults = await this.analyticsRepository.getCompletedSessions(sessionFilters);
+      const sessions = sessionResults.items; // Fix: extract items array from result object
+      const progressResults = await this.analyticsRepository.getUserProgressData(userId);
+      const progressData = progressResults.items; // Fix: extract items array from result object
 
       if (sessions.length === 0) {
         return this.getEmptyProgressOverview();
@@ -72,40 +74,45 @@ export class ProgressAnalyzer implements IProgressAnalyzer {
    * Generate progress trends over time
    */
   async generateProgressTrends(timeframe: string, userId?: string): Promise<ProgressTrends> {
-    this.logger.info('Generating progress trends', { timeframe, ...(userId && { userId }) });
+  this.logger.info('Generating progress trends', { timeframe, ...(userId && { userId }) });
 
-    try {
-      // Get trend data for different metrics
-      const [accuracyTrend, studyTimeTrend, sessionFrequencyTrend] = await Promise.all([
-        this.analyticsRepository.calculateTrendData('accuracy', timeframe, userId),
-        this.analyticsRepository.calculateTrendData('studyTime', timeframe, userId),
-        this.analyticsRepository.calculateTrendData('sessionCount', timeframe, userId),
-      ]);
+  try {
+    // Get trend data for different metrics
+    const [accuracyTrendResults, studyTimeTrendResults, sessionFrequencyTrendResults] = await Promise.all([
+      this.analyticsRepository.calculateTrendData('accuracy', timeframe, userId),
+      this.analyticsRepository.calculateTrendData('studyTime', timeframe, userId),
+      this.analyticsRepository.calculateTrendData('sessionCount', timeframe, userId),
+    ]);
 
-      // Get difficulty progression trends
-      const difficultyProgressTrend = await this.calculateDifficultyProgressTrend(
-        timeframe,
-        userId
-      );
+    // Fix: Extract items arrays from StandardQueryResult objects
+    const accuracyTrend = accuracyTrendResults.items;
+    const studyTimeTrend = studyTimeTrendResults.items;
+    const sessionFrequencyTrend = sessionFrequencyTrendResults.items;
 
-      // Get competency growth trends
-      const competencyGrowthTrend = await this.calculateCompetencyGrowthTrend(timeframe, userId);
+    // Get difficulty progression trends
+    const difficultyProgressTrend = await this.calculateDifficultyProgressTrend(
+      timeframe,
+      userId
+    );
 
-      return {
-        accuracyTrend,
-        studyTimeTrend,
-        sessionFrequencyTrend,
-        difficultyProgressTrend,
-        competencyGrowthTrend,
-      };
-    } catch (error) {
-      this.logger.error('Failed to generate progress trends', error as Error, {
-        timeframe,
-        ...(userId && { userId }),
-      });
-      throw error;
-    }
+    // Get competency growth trends
+    const competencyGrowthTrend = await this.calculateCompetencyGrowthTrend(timeframe, userId);
+
+    return {
+      accuracyTrend,
+      studyTimeTrend,
+      sessionFrequencyTrend,
+      difficultyProgressTrend,
+      competencyGrowthTrend,
+    };
+  } catch (error) {
+    this.logger.error('Failed to generate progress trends', error as Error, {
+      timeframe,
+      ...(userId && { userId }),
+    });
+    throw error;
   }
+}
 
   /**
    * Get historical performance data
@@ -124,7 +131,8 @@ export class ProgressAnalyzer implements IProgressAnalyzer {
     try {
       const sessionFilters: any = { startDate, endDate };
       if (userId) sessionFilters.userId = userId;
-      const sessions = await this.analyticsRepository.getCompletedSessions(sessionFilters);
+      const sessionResults = await this.analyticsRepository.getCompletedSessions(sessionFilters);
+      const sessions = sessionResults.items; // Fix: extract items array from result object
 
       // Group sessions by date
       const dailyPerformance = new Map<string, HistoricalPerformance>();
@@ -312,9 +320,10 @@ export class ProgressAnalyzer implements IProgressAnalyzer {
     userId?: string
   ): Promise<DifficultyTrendData[]> {
     // Simplified implementation - would need actual question difficulty data
-    const sessions = await this.analyticsRepository.getCompletedSessions({
+    const sessionResults = await this.analyticsRepository.getCompletedSessions({
       ...(userId && { userId }),
     });
+    const sessions = sessionResults.items; // Fix: extract items array from result object
     const trends: DifficultyTrendData[] = [];
 
     // Mock difficulty progression data - in real implementation, would analyze actual question difficulties
@@ -338,7 +347,8 @@ export class ProgressAnalyzer implements IProgressAnalyzer {
     timeframe: string,
     userId?: string
   ): Promise<CompetencyTrendData[]> {
-    const progressData = await this.analyticsRepository.getUserProgressData(userId);
+    const progressResults = await this.analyticsRepository.getUserProgressData(userId);
+    const progressData = progressResults.items; // Fix: extract items array from result object
 
     return progressData.slice(0, 5).map((progress, index) => ({
       period: `2024-${(index + 1).toString().padStart(2, '0')}`,

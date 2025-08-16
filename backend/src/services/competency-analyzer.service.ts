@@ -23,41 +23,45 @@ export class CompetencyAnalyzer implements ICompetencyAnalyzer {
    * Analyze competencies across topics and providers
    */
   async analyzeCompetencies(userId?: string): Promise<CompetencyAnalytics> {
-    this.logger.info('Analyzing competencies', { ...(userId && { userId }) });
+  this.logger.info('Analyzing competencies', { ...(userId && { userId }) });
 
-    try {
-      const sessionFilters: any = {};
-      if (userId) sessionFilters.userId = userId;
-      const [sessions, progressData] = await Promise.all([
-        this.analyticsRepository.getCompletedSessions(sessionFilters),
-        this.analyticsRepository.getUserProgressData(userId),
-      ]);
+  try {
+    const sessionFilters: any = {};
+    if (userId) sessionFilters.userId = userId;
+    const [sessionResults, progressResults] = await Promise.all([
+      this.analyticsRepository.getCompletedSessions(sessionFilters),
+      this.analyticsRepository.getUserProgressData(userId),
+    ]);
 
-      // Calculate topic competencies
-      const topicCompetencies = await this.calculateTopicCompetencies(sessions, progressData);
+    // Fix: Extract items arrays from StandardQueryResult objects
+    const sessions = sessionResults.items;
+    const progressData = progressResults.items;
 
-      // Calculate provider competencies
-      const providerCompetencies = await this.calculateProviderCompetencies(sessions);
+    // Calculate topic competencies
+    const topicCompetencies = await this.calculateTopicCompetencies(sessions, progressData);
 
-      // Analyze strengths and weaknesses
-      const strengthsAndWeaknesses = this.analyzeStrengthsAndWeaknesses(topicCompetencies);
+    // Calculate provider competencies
+    const providerCompetencies = await this.calculateProviderCompetencies(sessions);
 
-      // Calculate mastery progression
-      const masteryProgression = await this.calculateMasteryProgression(topicCompetencies, userId);
+    // Analyze strengths and weaknesses
+    const strengthsAndWeaknesses = this.analyzeStrengthsAndWeaknesses(topicCompetencies);
 
-      return {
-        topicCompetencies,
-        providerCompetencies,
-        strengthsAndWeaknesses,
-        masteryProgression,
-      };
-    } catch (error) {
-      this.logger.error('Failed to analyze competencies', error as Error, {
-        ...(userId && { userId }),
-      });
-      throw error;
-    }
+    // Calculate mastery progression
+    const masteryProgression = await this.calculateMasteryProgression(topicCompetencies, userId);
+
+    return {
+      topicCompetencies,
+      providerCompetencies,
+      strengthsAndWeaknesses,
+      masteryProgression,
+    };
+  } catch (error) {
+    this.logger.error('Failed to analyze competencies', error as Error, {
+      ...(userId && { userId }),
+    });
+    throw error;
   }
+}
 
   /**
    * Calculate topic-specific competencies

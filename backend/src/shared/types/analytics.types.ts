@@ -1,5 +1,7 @@
 // Analytics specific types for progress tracking
 
+import { StandardQueryResult } from './repository.types';
+
 // ===============================================
 // 🎯 CONSOLIDATED ANALYTICS REQUEST/RESPONSE TYPES
 // ===============================================
@@ -519,13 +521,13 @@ export interface IInsightGenerator {
 
 // Repository interface for analytics data persistence
 export interface IAnalyticsRepository {
-  getCompletedSessions(filters: SessionAnalyticsFilters): Promise<SessionAnalyticsData[]>;
-  getUserProgressData(userId?: string): Promise<UserProgressData[]>;
+  getCompletedSessions(filters: SessionAnalyticsFilters): Promise<StandardQueryResult<SessionAnalyticsData>>;
+  getUserProgressData(userId?: string): Promise<StandardQueryResult<UserProgressData>>;
   getTopicPerformanceHistory(
     topicIds: string[],
     userId?: string
-  ): Promise<TopicPerformanceHistory[]>;
-  calculateTrendData(metric: string, timeframe: string, userId?: string): Promise<TrendData[]>;
+  ): Promise<StandardQueryResult<TopicPerformanceHistory>>;
+  calculateTrendData(metric: string, timeframe: string, userId?: string): Promise<StandardQueryResult<TrendData>>;
   saveAnalyticsSnapshot(snapshot: AnalyticsSnapshot): Promise<void>;
   getAnalyticsSnapshot(userId?: string): Promise<AnalyticsSnapshot | null>;
   getSessionDetails(sessionId: string): Promise<SessionAnalyticsData>;

@@ -74,52 +74,58 @@ export class PerformanceAnalyzer implements IPerformanceAnalyzer {
    * Calculate difficulty progression trends
    */
   async calculateDifficultyProgressTrend(
-    timeframe: string,
-    userId?: string
-  ): Promise<DifficultyTrendData[]> {
-    // Simplified implementation - would need actual question difficulty data
-    const sessions = await this.analyticsRepository.getCompletedSessions({
-      ...(userId && { userId }),
+  timeframe: string,
+  userId?: string
+): Promise<DifficultyTrendData[]> {
+  // Simplified implementation - would need actual question difficulty data
+  const sessionResults = await this.analyticsRepository.getCompletedSessions({
+    ...(userId && { userId }),
+  });
+  
+  // Fix: Extract items array from StandardQueryResult object
+  const sessions = sessionResults.items;
+  const trends: DifficultyTrendData[] = [];
+
+  // Mock difficulty progression data - in real implementation, would analyze actual question difficulties
+  const difficulties: ('easy' | 'medium' | 'hard')[] = ['easy', 'medium', 'hard'];
+
+  for (const difficulty of difficulties) {
+    trends.push({
+      period: '2024-01',
+      value: 70 + Math.random() * 20,
+      change: (Math.random() - 0.5) * 10,
+      dataPoints: sessions.length,
+      difficulty: difficulty,
+      questionsAnswered: Math.floor(sessions.length * Math.random() * 50),
     });
-    const trends: DifficultyTrendData[] = [];
-
-    // Mock difficulty progression data - in real implementation, would analyze actual question difficulties
-    const difficulties: ('easy' | 'medium' | 'hard')[] = ['easy', 'medium', 'hard'];
-
-    for (const difficulty of difficulties) {
-      trends.push({
-        period: '2024-01',
-        value: 70 + Math.random() * 20,
-        change: (Math.random() - 0.5) * 10,
-        dataPoints: sessions.length,
-        difficulty: difficulty,
-        questionsAnswered: Math.floor(sessions.length * Math.random() * 50),
-      });
-    }
-
-    return trends;
   }
+
+  return trends;
+}
 
   /**
    * Calculate competency growth trends
    */
   async calculateCompetencyGrowthTrend(
-    timeframe: string,
-    userId?: string
-  ): Promise<CompetencyTrendData[]> {
-    const progressData = await this.analyticsRepository.getUserProgressData(userId);
+  timeframe: string,
+  userId?: string
+): Promise<CompetencyTrendData[]> {
+  const progressResults = await this.analyticsRepository.getUserProgressData(userId);
+  
+  // Fix: Extract items array from StandardQueryResult object
+  const progressData = progressResults.items;
 
-    return progressData.slice(0, 5).map((progress, index) => ({
-      period: `2024-${(index + 1).toString().padStart(2, '0')}`,
-      value: progress.accuracy,
-      change: Math.random() * 10 - 5,
-      dataPoints: progress.questionsAttempted,
-      topicId: progress.topicId,
-      topicName: progress.topicId, // Would need to enrich with actual topic name
-      masteryLevel: progress.masteryLevel as any,
-      questionsAnswered: progress.questionsAttempted,
-    }));
-  }
+  return progressData.slice(0, 5).map((progress, index) => ({
+    period: `2024-${(index + 1).toString().padStart(2, '0')}`,
+    value: progress.accuracy,
+    change: Math.random() * 10 - 5,
+    dataPoints: progress.questionsAttempted,
+    topicId: progress.topicId,
+    topicName: progress.topicId, // Would need to enrich with actual topic name
+    masteryLevel: progress.masteryLevel as any,
+    questionsAnswered: progress.questionsAttempted,
+  }));
+}
 
   /**
    * Calculate difficulty breakdown for sessions
