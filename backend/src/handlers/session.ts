@@ -47,6 +47,12 @@ export class SessionHandler extends BaseHandler {
       },
       {
         method: 'GET',
+        path: '/v1/sessions',
+        handler: this.getSessions.bind(this),
+        requireAuth: false,
+      },
+      {
+        method: 'GET',
         path: '/v1/sessions/{id}',
         handler: this.getSession.bind(this),
         requireAuth: false,
@@ -107,6 +113,66 @@ export class SessionHandler extends BaseHandler {
         return result;
       }
     );
+  }
+
+  /**
+   * Get sessions for a user - Pure routing with service delegation
+   * Added in Phase 38: Session Management Fix
+   */
+  private async getSessions(context: HandlerContext): Promise<ApiResponse> {
+    // Parse query parameters using middleware
+    const { data: queryParams, error: parseError } = await this.parseQueryParamsOrError(context, {
+      userId: { type: 'string', required: true },
+      status: { type: 'string', decode: true },
+      examId: { type: 'string', decode: true },
+      providerId: { type: 'string', decode: true },
+      limit: { type: 'number', decode: true },
+      lastEvaluatedKey: { type: 'string', decode: true },
+    });
+    if (parseError) return parseError;
+
+    // Validate required userId parameter
+    if (!queryParams.userId) {
+      return this.buildErrorResponse('userId is required', 400, ERROR_CODES.VALIDATION_ERROR);
+    }
+
+    // Business logic - delegate to service
+    const { result, error } = await this.executeServiceOrError(
+      async () => {
+        const sessionService = this.serviceFactory.getSessionService();
+        return await sessionService.getSessions({
+          userId: queryParams.userId,
+          status: queryParams.status,
+          examId: queryParams.examId,
+          providerId: queryParams.providerId,
+          limit: queryParams.limit,
+          lastEvaluatedKey: queryParams.lastEvaluatedKey,
+        });
+      },
+      {
+        requestId: context.requestId,
+        operation: 'getSessions',
+        userId: queryParams.userId,
+        additionalInfo: { 
+          filters: {
+            status: queryParams.status,
+            examId: queryParams.examId,
+            providerId: queryParams.providerId,
+          }
+        },
+      }
+    );
+
+    if (error) return error;
+
+    this.logger.info('Sessions retrieved successfully', {
+      requestId: context.requestId,
+      userId: queryParams.userId,
+      totalSessions: result!.total,
+      returned: result!.sessions.length,
+    });
+
+    return this.buildSuccessResponse('Sessions retrieved successfully', result);
   }
 
   /**

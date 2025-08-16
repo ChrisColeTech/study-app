@@ -1,6 +1,6 @@
 // Study session specific types
 
-import { StudySession, SessionQuestion, Question } from './domain.types';
+import { StudySession, SessionQuestion, Question, StatusType } from './domain.types';
 import { 
   DifficultyPerformance, 
   TopicPerformanceBreakdown, 
@@ -141,6 +141,28 @@ export interface GetSessionResponse {
   progress: SessionProgress;
 }
 
+/**
+ * Request for getting multiple sessions
+ */
+export interface GetSessionsRequest {
+  userId: string;
+  status?: StatusType;
+  examId?: string;
+  providerId?: string;
+  limit?: number;
+  lastEvaluatedKey?: string;
+}
+
+/**
+ * Response for getting multiple sessions
+ */
+export interface GetSessionsResponse {
+  sessions: StudySession[];
+  total: number;
+  limit: number;
+  lastEvaluatedKey?: string;
+}
+
 export interface UpdateSessionResponse {
   session: StudySession;
   questions: QuestionResponse[];
@@ -215,6 +237,7 @@ export interface FocusArea {
 
 export interface ISessionService {
   createSession(request: CreateSessionRequest): Promise<CreateSessionResponse>;
+  getSessions(request: GetSessionsRequest): Promise<GetSessionsResponse>;
   getSession(sessionId: string): Promise<GetSessionResponse>;
   updateSession(sessionId: string, request: UpdateSessionRequest): Promise<UpdateSessionResponse>;
   deleteSession(sessionId: string): Promise<{ success: boolean; message: string }>;

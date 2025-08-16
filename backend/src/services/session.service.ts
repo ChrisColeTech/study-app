@@ -8,6 +8,8 @@ import {
   IAnswerProcessor,
   CreateSessionRequest,
   CreateSessionResponse,
+  GetSessionsRequest,
+  GetSessionsResponse,
   GetSessionResponse,
   UpdateSessionRequest,
   UpdateSessionResponse,
@@ -154,6 +156,61 @@ export class SessionService extends BaseService implements ISessionService {
       this.logger.error('Failed to create session', error as Error, {
         examId: request.examId,
         providerId: request.providerId,
+      });
+      throw error;
+    }
+  }
+
+  /**
+   * Get sessions for a user with optional filtering
+   * Added in Phase 38: Session Management Fix
+   */
+  async getSessions(request: GetSessionsRequest): Promise<GetSessionsResponse> {
+    this.logger.info('Getting sessions for user', {
+      userId: request.userId,
+      status: request.status,
+      examId: request.examId,
+      providerId: request.providerId,
+      limit: request.limit,
+    });
+
+    try {
+      // Get sessions from repository using userId index
+      const queryResult = await this.sessionRepository.findByUserId(request.userId, {
+        limit: request.limit || 20,
+        lastEvaluatedKey: request.lastEvaluatedKey,
+      });
+
+      let sessions = queryResult.items;
+
+      // Apply optional filters
+      if (request.status) {
+        sessions = sessions.filter(session => session.status === request.status);
+      }
+
+      if (request.examId) {
+        sessions = sessions.filter(session => session.examId === request.examId);
+      }
+
+      if (request.providerId) {
+        sessions = sessions.filter(session => session.providerId === request.providerId);
+      }
+
+      this.logger.info('Sessions retrieved successfully', {
+        userId: request.userId,
+        totalSessions: sessions.length,
+        filteredCount: sessions.length,
+      });
+
+      return {
+        sessions,
+        total: sessions.length,
+        limit: request.limit || 20,
+        lastEvaluatedKey: queryResult.lastEvaluatedKey,
+      };
+    } catch (error) {
+      this.logger.error('Failed to get sessions', error as Error, {
+        userId: request.userId,
       });
       throw error;
     }
