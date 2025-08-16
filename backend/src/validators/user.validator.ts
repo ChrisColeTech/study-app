@@ -17,7 +17,7 @@ export class UserValidator {
    */
   static validateEmail(email: string): UserValidationResult {
     // Use centralized email validation to eliminate duplication
-    const { ValidationRules } = require('../shared/middleware/validation.middleware');
+    const { ValidationRules } = require('../shared/validation/validation-rules');
     const emailValidator = ValidationRules.email();
     const result = emailValidator(email);
 
@@ -40,7 +40,7 @@ export class UserValidator {
     }
 
     // Use centralized string length validation
-    const { ValidationRules } = require('../shared/middleware/validation.middleware');
+    const { ValidationRules } = require('../shared/validation/validation-rules');
     const lengthValidator = ValidationRules.stringLength(1, 50);
     const lengthResult = lengthValidator(name.trim());
 
