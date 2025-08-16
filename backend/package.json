@@ -1,6 +1,6 @@
 {
   "name": "study-app-v3-backend",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "Study App V3 Backend Lambda Functions",
   "main": "dist/handlers/health.js",
   "scripts": {

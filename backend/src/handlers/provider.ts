@@ -61,69 +61,42 @@ export class ProviderHandler extends BaseHandler {
    * Get all providers with optional filtering - now clean and focused
    */
   private async getProviders(context: HandlerContext): Promise<ApiResponse> {
-    // Parse query parameters using middleware with specific config
-    const { data: queryParams, error: parseError } = await this.parseQueryParamsOrError(context, {
-      category: { type: 'string', decode: true },
-      status: { type: 'string', decode: true },
-      search: CommonParsing.search,
-      includeInactive: CommonParsing.booleanFlag,
-    });
-    if (parseError) return parseError;
-
-    // Validate enum values manually (simpler for now)
-    if (
-      queryParams.category &&
-      !Object.values(ProviderCategory).includes(queryParams.category as ProviderCategory)
-    ) {
-      return this.buildErrorResponse(
-        `Invalid category. Valid options: ${Object.values(ProviderCategory).join(', ')}`,
-        400,
-        ERROR_CODES.VALIDATION_ERROR
-      );
-    }
-
-    if (
-      queryParams.status &&
-      !Object.values(ProviderStatusEnum).includes(queryParams.status as ProviderStatus)
-    ) {
-      return this.buildErrorResponse(
-        `Invalid status. Valid options: ${Object.values(ProviderStatusEnum).join(', ')}`,
-        400,
-        ERROR_CODES.VALIDATION_ERROR
-      );
-    }
-
-    // Build request object
-    const request: GetProvidersRequest = {
-      ...(queryParams.category && { category: queryParams.category as ProviderCategory }),
-      ...(queryParams.status && { status: queryParams.status as ProviderStatus }),
-      ...(queryParams.search && { search: queryParams.search }),
-      ...(queryParams.includeInactive && { includeInactive: queryParams.includeInactive }),
+    this.logger.info('ProviderHandler.getProviders called - DEBUG MODE');
+    
+    // TEMPORARY: Return hardcoded providers to test if the API plumbing works
+    const hardcodedResponse = {
+      providers: [
+        {
+          id: 'aws',
+          providerId: 'aws', 
+          name: 'Amazon Web Services',
+          description: 'AWS certification study material',
+          logoUrl: 'https://cdn.example.com/logos/aws.png',
+          category: 'cloud',
+          status: 'active',
+          isActive: true,
+          totalExams: 3,
+          totalQuestions: 500,
+          averageDifficulty: 'medium',
+          metadata: {
+            specialization: 'cloud',
+            marketShare: 32,
+            region: 'global'
+          }
+        }
+      ],
+      total: 1,
+      filters: {
+        categories: ['cloud'],
+        statuses: ['active', 'inactive']
+      }
     };
 
-    // Business logic only - delegate error handling to middleware
-    const { result, error } = await this.executeServiceOrError(
-      async () => {
-        const providerService = this.serviceFactory.getProviderService();
-        return await providerService.getProviders(request);
-      },
-      {
-        requestId: context.requestId,
-        operation: ErrorContexts.Provider.LIST,
-        additionalInfo: { filters: request },
-      }
-    );
-
-    if (error) return error;
-
-    this.logger.info('Providers retrieved successfully', {
-      requestId: context.requestId,
-      total: result!.total,
-      returned: result!.providers.length,
-      filters: request,
+    this.logger.info('Returning hardcoded response for debugging', { 
+      providersCount: hardcodedResponse.providers.length 
     });
 
-    return this.buildSuccessResponse('Providers retrieved successfully', result);
+    return this.buildSuccessResponse('Providers retrieved successfully (DEBUG)', hardcodedResponse);
   }
 
   /**
