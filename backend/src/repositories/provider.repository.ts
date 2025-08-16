@@ -327,4 +327,3 @@ export class ProviderRepository extends S3BaseRepository implements IProviderRep
     }
   }
 }
-}

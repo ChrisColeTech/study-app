@@ -2,6 +2,7 @@
 
 import { S3Client, GetObjectCommand, ListObjectsV2Command } from '@aws-sdk/client-s3';
 import { Exam } from '../shared/types/exam.types';
+import { StatusType } from '../shared/types/domain.types';
 import { ServiceConfig } from '../shared/service-factory';
 import { S3BaseRepository } from './base.repository';
 import { IListRepository, StandardQueryResult } from '../shared/types/repository.types';
@@ -217,18 +218,26 @@ export class ExamRepository extends S3BaseRepository implements IExamRepository 
           for (const examData of provider.exams) {
             const exam: Exam = {
               examId: examData.code,
+              examName: examData.name,
+              examCode: examData.code,
               providerId: provider.id,
-              name: examData.name,
+              providerName: provider.name,
               description: examData.description,
-              category: this.mapExamCategory(examData.categories),
               level: this.mapExamLevel(examData.difficulty),
+              category: this.mapExamCategory(examData.categories),
               duration: examData.duration,
               questionCount: examData.questionCount,
               passingScore: this.getPassingScore(examData.code),
-              status: StatusType.ACTIVE,
+              topics: [],
               isActive: true,
-              createdAt: new Date().toISOString(),
-              updatedAt: provider.lastUpdated || new Date().toISOString(),
+              metadata: {
+                lastUpdated: provider.lastUpdated || new Date().toISOString(),
+                examUrl: undefined,
+                cost: undefined,
+                validityPeriod: undefined,
+                retakePolicy: undefined,
+                languages: undefined,
+              },
             };
             exams.push(exam);
           }
@@ -258,13 +267,14 @@ export class ExamRepository extends S3BaseRepository implements IExamRepository 
     return 'general';
   }
 
-  private mapExamLevel(difficulty: string): string {
-    if (!difficulty) return 'intermediate';
+  private mapExamLevel(difficulty: string): 'foundational' | 'associate' | 'professional' | 'specialty' | 'expert' {
+    if (!difficulty) return 'associate';
     const diff = difficulty.toLowerCase();
-    if (diff.includes('foundational') || diff.includes('practitioner')) return 'beginner';
-    if (diff.includes('associate')) return 'intermediate';
-    if (diff.includes('professional') || diff.includes('expert')) return 'advanced';
-    return 'intermediate';
+    if (diff.includes('foundational') || diff.includes('practitioner')) return 'foundational';
+    if (diff.includes('associate')) return 'associate';
+    if (diff.includes('professional')) return 'professional';
+    if (diff.includes('expert') || diff.includes('specialty')) return 'expert';
+    return 'associate';
   }
 
   private getPassingScore(examCode: string): number {
@@ -276,5 +286,4 @@ export class ExamRepository extends S3BaseRepository implements IExamRepository 
     };
     return passingScores[examCode] || 700;
   }
-}
 }

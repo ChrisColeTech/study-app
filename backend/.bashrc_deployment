@@ -1,0 +1,37 @@
+# Generic CDK deployment safeguards
+# Source this file to prevent manual CDK deployments
+
+# Override cdk deploy to show proper workflow
+function cdk() {
+    if [[ "$1" == "deploy" ]]; then
+        echo "❌ BLOCKED: Manual CDK deployment not allowed!"
+        echo ""
+        echo "✅ Use the CI/CD pipeline instead:"
+        echo "1. Work on your feature/implementation branch"
+        echo "2. git add [files]"
+        echo "3. git commit -m 'your message'"
+        echo "4. git push origin [branch-name]"
+        echo ""
+        echo "The CI/CD pipeline will handle deployment automatically."
+        echo "Check your project's README or docs for specific branch workflow."
+        return 1
+    else
+        command cdk "$@"
+    fi
+}
+
+# Add reminder function
+function remind_workflow() {
+    echo "📋 Proper Deployment Workflow:"
+    echo "1. Work on designated implementation branch"
+    echo "2. Follow project methodology guidelines"
+    echo "3. Push to trigger CI/CD pipeline"
+    echo "4. Never use manual 'cdk deploy'"
+    echo ""
+    echo "Check project documentation for specific workflow details."
+}
+
+# Functions are available in current shell
+
+echo "🛡️  Deployment safeguards loaded. Manual CDK deploy is blocked."
+echo "💡 Type 'remind_workflow' for deployment instructions."

@@ -48,31 +48,13 @@ export class ProviderFilter {
     status?: ProviderStatus,
     includeInactive = false
   ): Provider[] {
-    console.log('DEBUG: filterByStatus called', {
-      providersCount: providers.length,
-      status,
-      includeInactive,
-      ProviderStatusEnum_ACTIVE: ProviderStatusEnum.ACTIVE,
-      providers: providers.map(p => ({ id: p.id, status: p.status, statusType: typeof p.status }))
-    });
-
     if (status !== undefined) {
-      const filtered = providers.filter(p => p.status === status);
-      console.log('DEBUG: Status filter applied', { originalCount: providers.length, filteredCount: filtered.length, targetStatus: status });
-      return filtered;
+      return providers.filter(p => p.status === status);
     } else if (!includeInactive) {
       // Default: only show active providers unless explicitly requested
-      const filtered = providers.filter(p => p.status === ProviderStatusEnum.ACTIVE);
-      console.log('DEBUG: Active-only filter applied', { 
-        originalCount: providers.length, 
-        filteredCount: filtered.length, 
-        targetStatus: ProviderStatusEnum.ACTIVE,
-        actualStatuses: providers.map(p => p.status)
-      });
-      return filtered;
+      return providers.filter(p => p.status === ProviderStatusEnum.ACTIVE);
     }
 
-    console.log('DEBUG: No status filter applied');
     return providers;
   }
 
