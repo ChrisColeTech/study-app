@@ -44,17 +44,17 @@ validate_environment() {
     log_info "Using S3 bucket: $BUCKET_NAME"
 }
 
-# Check if git changes exist for a file pattern
+# Check if git changes exist for a file pattern (supplementary info only)
 check_git_changes() {
     local file_pattern="$1"
     
     # Check if this is the first commit
     if ! git rev-parse HEAD~1 >/dev/null 2>&1; then
-        log_info "First commit detected - will upload all files"
+        log_info "First commit detected - git change tracking not available"
         return 0
     fi
     
-    # Check if files matching pattern changed
+    # Check if files matching pattern changed (informational only)
     if git diff --name-only HEAD~1 HEAD | grep -q "$file_pattern"; then
         return 0  # Changes found
     else
@@ -77,19 +77,12 @@ smart_upload() {
         return 1
     fi
     
-    # Step 1: Git-based quick check
-    if ! check_git_changes "$git_pattern"; then
-        log_info "⏭️  Skipping $file_name (no git changes in $git_pattern)"
-        return 1
-    fi
-    
-    log_info "📁 Git changes detected for $file_name"
-    
-    # Step 2: Calculate local file hash
+    # Step 1: Calculate local file hash (primary check)
+    log_info "🔍 Checking file content hash for $file_name"
     local_hash=$(sha256sum "$local_file" | cut -d' ' -f1)
     log_info "📋 Local hash: $local_hash"
     
-    # Step 3: Get S3 file hash from metadata
+    # Step 2: Get S3 file hash from metadata
     s3_hash=$(aws s3api head-object \
         --bucket "$BUCKET_NAME" \
         --key "$s3_key" \
@@ -103,9 +96,16 @@ smart_upload() {
         s3_hash=""
     fi
     
-    # Step 4: Compare hashes
+    # Step 3: Compare hashes (primary decision point)
     if [ "$local_hash" != "$s3_hash" ]; then
-        log_info "🔄 Uploading $file_name (hash changed or new file)"
+        # Optional: Show git change info for context
+        if check_git_changes "$git_pattern"; then
+            log_info "📁 Git changes detected for pattern: $git_pattern"
+        else
+            log_info "📁 No git changes detected, but content hash differs"
+        fi
+        
+        log_info "🔄 Uploading $file_name (content hash changed or new file)"
         
         # Get file size for logging
         file_size=$(stat -c%s "$local_file")
