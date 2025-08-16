@@ -2,6 +2,7 @@
 
 import { S3Client, GetObjectCommand, ListObjectsV2Command } from '@aws-sdk/client-s3';
 import { Exam } from '../shared/types/exam.types';
+import { StatusType } from '../shared/types/domain.types';
 import { ServiceConfig } from '../shared/service-factory';
 import { S3BaseRepository } from './base.repository';
 import { IListRepository, StandardQueryResult } from '../shared/types/repository.types';
@@ -190,299 +191,99 @@ export class ExamRepository extends S3BaseRepository implements IExamRepository 
     try {
       this.logger.info('Loading exams from S3', { 
         bucket: this.bucketName, 
-        prefix: 'questions/' 
+        key: 'providers/metadata.json'
       });
 
-      // First, try to load from an exams metadata file
-      try {
-        const getCommand = new GetObjectCommand({
-          Bucket: this.bucketName,
-          Key: 'exams/metadata.json',
-        });
-
-        const result = await this.s3Client.send(getCommand);
-        if (result.Body) {
-          const content = await result.Body.transformToString();
-          const examsData = JSON.parse(content);
-          
-          if (examsData.exams && Array.isArray(examsData.exams)) {
-            this.logger.info('Exams loaded from metadata.json', { 
-              count: examsData.exams.length 
-            });
-            return examsData.exams;
-          }
-        }
-      } catch (error: any) {
-        this.logger.debug('No exams/metadata.json file found, attempting to discover from structure', {
-          error: error.message,
-          code: error.Code
-        });
-      }
-
-      // If no metadata file, discover exams from S3 structure
-      this.logger.info('Attempting to discover exams from S3 structure', {
-        bucket: this.bucketName,
-        prefix: 'questions/'
-      });
-
-      const listCommand = new ListObjectsV2Command({
+      const getCommand = new GetObjectCommand({
         Bucket: this.bucketName,
-        Prefix: 'questions/',
-        Delimiter: '/',
+        Key: 'providers/metadata.json',
       });
 
-      const result = await this.s3Client.send(listCommand);
+      const result = await this.s3Client.send(getCommand);
+      if (!result.Body) {
+        throw new Error('No data returned from S3');
+      }
+
+      const content = await result.Body.transformToString();
+      const providersData = JSON.parse(content);
+      
+      if (!providersData.providers || !Array.isArray(providersData.providers)) {
+        throw new Error('Invalid providers data structure');
+      }
+
+      // Extract exams from all providers
       const exams: Exam[] = [];
-
-      this.logger.info('S3 list result for exams', {
-        keyCount: result.KeyCount,
-        isTruncated: result.IsTruncated,
-        commonPrefixesCount: result.CommonPrefixes?.length || 0,
-        contentsCount: result.Contents?.length || 0
-      });
-
-      if (result.CommonPrefixes) {
-        this.logger.info('Discovering exams from S3 structure', { 
-          prefixes: result.CommonPrefixes.length 
-        });
-
-        // Process each provider (aws/, azure/, etc.)
-        for (const providerPrefix of result.CommonPrefixes) {
-          if (providerPrefix.Prefix) {
-            const providerMatch = providerPrefix.Prefix.match(/questions\/([^\/]+)\//);
-            if (providerMatch) {
-              const providerId = providerMatch[1];
-              
-              // List exams for this provider
-              const examListCommand = new ListObjectsV2Command({
-                Bucket: this.bucketName,
-                Prefix: providerPrefix.Prefix,
-                Delimiter: '/',
-              });
-
-              const examResult = await this.s3Client.send(examListCommand);
-              
-              if (examResult.CommonPrefixes) {
-                // Extract exam IDs from the S3 structure (questions/aws/clf-c02/, questions/aws/saa-c03/, etc.)
-                for (const examPrefix of examResult.CommonPrefixes) {
-                  if (examPrefix.Prefix) {
-                    const examMatch = examPrefix.Prefix.match(/questions\/[^\/]+\/([^\/]+)\//);
-                    if (examMatch) {
-                      const examId = examMatch[1];
-                      
-                      this.logger.debug('Matched exam from S3 prefix', { 
-                        prefix: examPrefix.Prefix, 
-                        providerId,
-                        examId 
-                      });
-                      
-                      // Create exam from discovered structure
-                      const exam: Exam = {
-                        examId: examId,
-                        providerId: providerId,
-                        name: this.getExamDisplayName(examId, providerId),
-                        description: `${this.getExamDisplayName(examId, providerId)} certification exam`,
-                        category: this.getExamCategory(providerId),
-                        level: this.getExamLevel(examId),
-                        duration: this.getExamDuration(examId),
-                        questionCount: 0, // Will be determined when questions are loaded
-                        passingScore: this.getExamPassingScore(examId),
-                        status: StatusType.ACTIVE,
-                        isActive: true,
-                        createdAt: new Date().toISOString(),
-                        updatedAt: new Date().toISOString(),
-                      };
-
-                      exams.push(exam);
-                      this.logger.debug('Created exam from S3 structure', { examId, providerId });
-                    } else {
-                      this.logger.debug('S3 exam prefix did not match pattern', { 
-                        prefix: examPrefix.Prefix 
-                      });
-                    }
-                  }
-                }
-              }
-            } else {
-              this.logger.debug('S3 provider prefix did not match pattern', { 
-                prefix: providerPrefix.Prefix 
-              });
-            }
+      for (const provider of providersData.providers) {
+        if (provider.exams && Array.isArray(provider.exams)) {
+          for (const examData of provider.exams) {
+            const exam: Exam = {
+              examId: examData.code,
+              examName: examData.name,
+              examCode: examData.code,
+              providerId: provider.id,
+              providerName: provider.name,
+              description: examData.description,
+              level: this.mapExamLevel(examData.difficulty),
+              category: this.mapExamCategory(examData.categories),
+              duration: examData.duration,
+              questionCount: examData.questionCount,
+              passingScore: this.getPassingScore(examData.code),
+              topics: [],
+              isActive: true,
+              metadata: {
+                lastUpdated: provider.lastUpdated || new Date().toISOString(),
+                examUrl: undefined,
+                cost: undefined,
+                validityPeriod: undefined,
+                retakePolicy: undefined,
+                languages: undefined,
+              },
+            };
+            exams.push(exam);
           }
         }
-      } else {
-        this.logger.warn('No CommonPrefixes found in S3 list result', {
-          bucket: this.bucketName,
-          prefix: 'questions/'
-        });
       }
 
-      if (exams.length === 0) {
-        this.logger.warn('No exams discovered from S3 structure, returning fallback exams');
-        return this.getFallbackExams();
-      }
-
-      this.logger.info('Exams discovered from S3 structure', { count: exams.length });
+      this.logger.info('Exams loaded from S3 metadata', { 
+        count: exams.length 
+      });
+      
       return exams;
 
     } catch (error) {
       this.logger.error('Failed to load exams from S3', error as Error, {
         bucket: this.bucketName,
-        prefix: 'questions/',
+        key: 'providers/metadata.json'
       });
-      
-      // Return fallback hardcoded exams if S3 fails
-      this.logger.info('Returning fallback exams due to S3 error');
-      return this.getFallbackExams();
+      throw error;
     }
   }
 
-  private getExamDisplayName(examId: string, providerId: string): string {
-    const names: Record<string, string> = {
-      'clf-c02': 'AWS Certified Cloud Practitioner',
-      'saa-c03': 'AWS Certified Solutions Architect - Associate',
-      'sap-c02': 'AWS Certified Solutions Architect - Professional',
-      'aif-c01': 'AWS Certified AI Practitioner',
-      'az-900': 'Microsoft Azure Fundamentals',
-      'az-104': 'Microsoft Azure Administrator Associate',
-      'az-204': 'Microsoft Azure Developer Associate',
-      'gcp-ace': 'Google Cloud Associate Cloud Engineer',
-      'gcp-pca': 'Google Cloud Professional Cloud Architect',
-      'ccna': 'Cisco Certified Network Associate',
-      'ccnp': 'Cisco Certified Network Professional',
-      'security-plus': 'CompTIA Security+',
-      'network-plus': 'CompTIA Network+',
-    };
-    return names[examId] || `${providerId.toUpperCase()} ${examId.toUpperCase()}`;
+  private mapExamCategory(categories: string[]): string {
+    if (!categories || !Array.isArray(categories)) return 'general';
+    if (categories.some(cat => cat.toLowerCase().includes('cloud'))) return 'cloud';
+    if (categories.some(cat => cat.toLowerCase().includes('ai') || cat.toLowerCase().includes('ml'))) return 'ai';
+    if (categories.some(cat => cat.toLowerCase().includes('architect'))) return 'architecture';
+    return 'general';
   }
 
-  private getExamCategory(providerId: string): string {
-    const categories: Record<string, string> = {
-      aws: 'cloud',
-      azure: 'cloud',
-      gcp: 'cloud',
-      cisco: 'networking',
-      comptia: 'general',
-    };
-    return categories[providerId] || 'technology';
+  private mapExamLevel(difficulty: string): 'foundational' | 'associate' | 'professional' | 'specialty' | 'expert' {
+    if (!difficulty) return 'associate';
+    const diff = difficulty.toLowerCase();
+    if (diff.includes('foundational') || diff.includes('practitioner')) return 'foundational';
+    if (diff.includes('associate')) return 'associate';
+    if (diff.includes('professional')) return 'professional';
+    if (diff.includes('expert') || diff.includes('specialty')) return 'expert';
+    return 'associate';
   }
 
-  private getExamLevel(examId: string): string {
-    if (examId.includes('fundamentals') || examId.includes('practitioner') || examId.includes('c02') || examId.includes('900')) {
-      return 'beginner';
-    }
-    if (examId.includes('associate') || examId.includes('c03') || examId.includes('104') || examId.includes('204') || examId.includes('ace')) {
-      return 'intermediate';
-    }
-    if (examId.includes('professional') || examId.includes('expert') || examId.includes('pca') || examId.includes('ccnp')) {
-      return 'advanced';
-    }
-    return 'intermediate';
-  }
-
-  private getExamDuration(examId: string): number {
-    const durations: Record<string, number> = {
-      'clf-c02': 90,
-      'saa-c03': 130,
-      'sap-c02': 180,
-      'aif-c01': 85,
-      'az-900': 60,
-      'az-104': 120,
-      'az-204': 120,
-      'gcp-ace': 120,
-      'gcp-pca': 120,
-      'ccna': 120,
-      'ccnp': 120,
-      'security-plus': 90,
-      'network-plus': 90,
-    };
-    return durations[examId] || 120;
-  }
-
-  private getExamPassingScore(examId: string): number {
+  private getPassingScore(examCode: string): number {
     const passingScores: Record<string, number> = {
       'clf-c02': 700,
       'saa-c03': 720,
       'sap-c02': 750,
       'aif-c01': 700,
-      'az-900': 700,
-      'az-104': 700,
-      'az-204': 700,
-      'gcp-ace': 70,
-      'gcp-pca': 70,
-      'ccna': 825,
-      'ccnp': 800,
-      'security-plus': 750,
-      'network-plus': 720,
     };
-    return passingScores[examId] || 700;
-  }
-
-  private getFallbackExams(): Exam[] {
-    const fallbackExams: Exam[] = [
-      {
-        examId: 'clf-c02',
-        providerId: 'aws',
-        name: 'AWS Certified Cloud Practitioner',
-        description: 'AWS Certified Cloud Practitioner certification exam',
-        category: 'cloud',
-        level: 'beginner',
-        duration: 90,
-        questionCount: 65,
-        passingScore: 700,
-        status: StatusType.ACTIVE,
-        isActive: true,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      },
-      {
-        examId: 'saa-c03',
-        providerId: 'aws',
-        name: 'AWS Certified Solutions Architect - Associate',
-        description: 'AWS Certified Solutions Architect - Associate certification exam',
-        category: 'cloud',
-        level: 'intermediate',
-        duration: 130,
-        questionCount: 65,
-        passingScore: 720,
-        status: StatusType.ACTIVE,
-        isActive: true,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      },
-      {
-        examId: 'sap-c02',
-        providerId: 'aws',
-        name: 'AWS Certified Solutions Architect - Professional',
-        description: 'AWS Certified Solutions Architect - Professional certification exam',
-        category: 'cloud',
-        level: 'advanced',
-        duration: 180,
-        questionCount: 75,
-        passingScore: 750,
-        status: StatusType.ACTIVE,
-        isActive: true,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      },
-      {
-        examId: 'aif-c01',
-        providerId: 'aws',
-        name: 'AWS Certified AI Practitioner',
-        description: 'AWS Certified AI Practitioner certification exam',
-        category: 'cloud',
-        level: 'beginner',
-        duration: 85,
-        questionCount: 65,
-        passingScore: 700,
-        status: StatusType.ACTIVE,
-        isActive: true,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      }
-    ];
-
-    this.logger.info('Using fallback exams', { count: fallbackExams.length });
-    return fallbackExams;
+    return passingScores[examCode] || 700;
   }
 }

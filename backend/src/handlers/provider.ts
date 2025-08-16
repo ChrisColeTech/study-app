@@ -93,12 +93,12 @@ export class ProviderHandler extends BaseHandler {
       );
     }
 
-    // Build request object
+    // Build request object with proper defaults
     const request: GetProvidersRequest = {
       ...(queryParams.category && { category: queryParams.category as ProviderCategory }),
       ...(queryParams.status && { status: queryParams.status as ProviderStatus }),
       ...(queryParams.search && { search: queryParams.search }),
-      ...(queryParams.includeInactive && { includeInactive: queryParams.includeInactive }),
+      includeInactive: queryParams.includeInactive || false, // Default to false
     };
 
     // Business logic only - delegate error handling to middleware
