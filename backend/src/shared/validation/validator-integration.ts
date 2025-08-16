@@ -122,7 +122,7 @@ export class ValidatorIntegration {
   static createPasswordValidationRule(field: string = 'password'): ValidationRule {
     return {
       field,
-      validate: (value: string) => this.validatePasswordField(value),
+      validate: (value: string) => ValidatorIntegration.validatePasswordField(value),
     };
   }
 
@@ -132,7 +132,7 @@ export class ValidatorIntegration {
   static createEmailValidationRule(field: string = 'email'): ValidationRule {
     return {
       field,
-      validate: (value: string) => this.validateEmailField(value),
+      validate: (value: string) => ValidatorIntegration.validateEmailField(value),
     };
   }
 
@@ -144,7 +144,7 @@ export class ValidatorIntegration {
     return [
       {
         field: 'email',
-        validate: (value: string) => this.validateEmailField(value),
+        validate: (value: string) => ValidatorIntegration.validateEmailField(value),
       },
       {
         field: 'firstName',
@@ -182,7 +182,7 @@ export class ValidatorIntegration {
       },
       {
         field: 'password',
-        validate: (value: string) => this.validatePasswordField(value),
+        validate: (value: string) => ValidatorIntegration.validatePasswordField(value),
       },
     ];
   }
@@ -194,7 +194,7 @@ export class ValidatorIntegration {
   static createRegistrationValidationRule(): ValidationRule {
     return {
       field: 'userData',
-      validate: (userData: any) => this.validateUserCreationField(userData),
+      validate: (userData: any) => ValidatorIntegration.validateUserCreationField(userData),
     };
   }
 
